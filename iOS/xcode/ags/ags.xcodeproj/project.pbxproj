@@ -102,6 +102,11 @@
 		608A53D6155B0608002E3D41 /* AGSBlend.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 608A53D5155B0608002E3D41 /* AGSBlend.cpp */; };
 		608A53D8155B061C002E3D41 /* agsflashlight.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 608A53D7155B061C002E3D41 /* agsflashlight.cpp */; };
 		60BC89A8155E969700807358 /* iTunesArtwork in Resources */ = {isa = PBXBuildFile; fileRef = 60BC89A7155E969700807358 /* iTunesArtwork */; };
+		60CA833F15BA1FCC0010D3B4 /* ac2game.dat in Resources */ = {isa = PBXBuildFile; fileRef = 60CA833A15BA1FCC0010D3B4 /* ac2game.dat */; };
+		60CA834015BA1FCC0010D3B4 /* acsetup.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 60CA833B15BA1FCC0010D3B4 /* acsetup.cfg */; };
+		60CA834115BA1FCC0010D3B4 /* audio.vox in Resources */ = {isa = PBXBuildFile; fileRef = 60CA833C15BA1FCC0010D3B4 /* audio.vox */; };
+		60CA834215BA1FCC0010D3B4 /* PRELOAD.pcx in Resources */ = {isa = PBXBuildFile; fileRef = 60CA833D15BA1FCC0010D3B4 /* PRELOAD.pcx */; };
+		60CA834315BA1FCC0010D3B4 /* speech.vox in Resources */ = {isa = PBXBuildFile; fileRef = 60CA833E15BA1FCC0010D3B4 /* speech.vox */; };
 		60CE9D9C155272CD00A52D5A /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CE9D9B155272CD00A52D5A /* libfreetype.a */; };
 		60F49A4A155131E500A07887 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60F49A49155131E500A07887 /* AudioToolbox.framework */; };
 /* End PBXBuildFile section */
@@ -257,6 +262,11 @@
 		609D6FF8154C625A0003AE8D /* acdebug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acdebug.h; sourceTree = "<group>"; };
 		609D6FF9154C626B0003AE8D /* ali3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ali3d.h; sourceTree = "<group>"; };
 		60BC89A7155E969700807358 /* iTunesArtwork */ = {isa = PBXFileReference; lastKnownFileType = file; path = iTunesArtwork; sourceTree = "<group>"; };
+		60CA833A15BA1FCC0010D3B4 /* ac2game.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = ac2game.dat; sourceTree = "<group>"; };
+		60CA833B15BA1FCC0010D3B4 /* acsetup.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = acsetup.cfg; sourceTree = "<group>"; };
+		60CA833C15BA1FCC0010D3B4 /* audio.vox */ = {isa = PBXFileReference; lastKnownFileType = file; path = audio.vox; sourceTree = "<group>"; };
+		60CA833D15BA1FCC0010D3B4 /* PRELOAD.pcx */ = {isa = PBXFileReference; lastKnownFileType = file; path = PRELOAD.pcx; sourceTree = "<group>"; };
+		60CA833E15BA1FCC0010D3B4 /* speech.vox */ = {isa = PBXFileReference; lastKnownFileType = file; path = speech.vox; sourceTree = "<group>"; };
 		60CE9D9B155272CD00A52D5A /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = ../../nativelibs/fat/lib/libfreetype.a; sourceTree = SOURCE_ROOT; };
 		60F49A49155131E500A07887 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		8D1107310486CEB800E47090 /* ags-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "ags-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
@@ -334,6 +344,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				60CA833915BA1FCC0010D3B4 /* game */,
 				60BC89A7155E969700807358 /* iTunesArtwork */,
 				608498E7155CDF7000121EFE /* Icon@2x.png */,
 				608498E5155CDF6400121EFE /* Icon-72.png */,
@@ -628,6 +639,19 @@
 			name = Plugins;
 			sourceTree = "<group>";
 		};
+		60CA833915BA1FCC0010D3B4 /* game */ = {
+			isa = PBXGroup;
+			children = (
+				60CA833A15BA1FCC0010D3B4 /* ac2game.dat */,
+				60CA833B15BA1FCC0010D3B4 /* acsetup.cfg */,
+				60CA833C15BA1FCC0010D3B4 /* audio.vox */,
+				60CA833D15BA1FCC0010D3B4 /* PRELOAD.pcx */,
+				60CA833E15BA1FCC0010D3B4 /* speech.vox */,
+			);
+			name = game;
+			path = grue;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -692,6 +716,11 @@
 				608498E8155CDF7000121EFE /* Icon@2x.png in Resources */,
 				60BC89A8155E969700807358 /* iTunesArtwork in Resources */,
 				60844EAD1573943400003ED0 /* MainWindow-iPad.xib in Resources */,
+				60CA833F15BA1FCC0010D3B4 /* ac2game.dat in Resources */,
+				60CA834015BA1FCC0010D3B4 /* acsetup.cfg in Resources */,
+				60CA834115BA1FCC0010D3B4 /* audio.vox in Resources */,
+				60CA834215BA1FCC0010D3B4 /* PRELOAD.pcx in Resources */,
+				60CA834315BA1FCC0010D3B4 /* speech.vox in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -709,7 +738,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export CODESIGN_ALLOCATE=/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/codesign_allocate\nif [ \"${PLATFORM_NAME}\" == \"iphoneos\" ]; then\n/Developer/iphoneentitlements401/gen_entitlements.py \"my.company.${PROJECT_NAME}\" \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/${PROJECT_NAME}.xcent\";\ncodesign -f -s \"iPhone Developer\" --entitlements \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/${PROJECT_NAME}.xcent\" \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/\"\nfi";
+			shellScript = "#export CODESIGN_ALLOCATE=/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/codesign_allocate\n#if [ \"${PLATFORM_NAME}\" == \"iphoneos\" ]; then\n#/Developer/iphoneentitlements401/gen_entitlements.py \"my.company.${PROJECT_NAME}\" \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/${PROJECT_NAME}.xcent\";\n#codesign -f -s \"iPhone Developer\" --entitlements \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/${PROJECT_NAME}.xcent\" \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/\"\n#fi\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -798,6 +827,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -809,8 +839,12 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../../nativelibs/fat/lib\"",
 				);
+				OTHER_CODE_SIGN_FLAGS = "";
+				"OTHER_CODE_SIGN_FLAGS[sdk=*]" = "";
 				PRODUCT_NAME = ags;
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
+				STRIPFLAGS = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -820,6 +854,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = ags_Prefix.pch;
@@ -829,8 +864,11 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../../nativelibs/fat/lib\"",
 				);
+				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_NAME = ags;
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
+				STRIPFLAGS = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -840,8 +878,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "Don't Code Sign";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Don't Code Sign";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Janet Gilbert (KD5AK7XJ75)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Janet Gilbert (KD5AK7XJ75)";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					USE_TREMOR,
@@ -865,8 +903,8 @@
 				LIBRARY_SEARCH_PATHS = "${SOURCE_ROOT}/../../nativelibs/fat/lib";
 				OTHER_CODE_SIGN_FLAGS = "-gta";
 				PREBINDING = NO;
-				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PROVISIONING_PROFILE = "CBBBC26A-C286-4D2B-B7D3-D0427F5FD6B6";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "CBBBC26A-C286-4D2B-B7D3-D0427F5FD6B6";
 				SDKROOT = iphoneos;
 				USER_HEADER_SEARCH_PATHS = "${SOURCE_ROOT}/../../../Common ${SOURCE_ROOT}/../../../Common/libinclude ${SOURCE_ROOT}/../../../Engine ${SOURCE_ROOT}/../../../iOS/nativelibs/fat/include ${SOURCE_ROOT}/../../nativelibs/fat/include/freetype2";
 			};
@@ -876,8 +914,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "Don't Code Sign";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Don't Code Sign";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Janet Gilbert (KD5AK7XJ75)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Janet Gilbert (KD5AK7XJ75)";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					USE_TREMOR,
@@ -899,8 +937,8 @@
 				LIBRARY_SEARCH_PATHS = "${SOURCE_ROOT}/../../nativelibs/fat/lib";
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PREBINDING = NO;
-				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PROVISIONING_PROFILE = "CBBBC26A-C286-4D2B-B7D3-D0427F5FD6B6";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "CBBBC26A-C286-4D2B-B7D3-D0427F5FD6B6";
 				SDKROOT = iphoneos;
 				USER_HEADER_SEARCH_PATHS = "${SOURCE_ROOT}/../../../Common ${SOURCE_ROOT}/../../../Common/libinclude ${SOURCE_ROOT}/../../../Engine ${SOURCE_ROOT}/../../../iOS/nativelibs/fat/include ${SOURCE_ROOT}/../../nativelibs/fat/include/freetype2";
 			};

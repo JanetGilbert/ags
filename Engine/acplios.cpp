@@ -61,6 +61,8 @@ extern void PauseGame();
 extern void UnPauseGame();
 extern int main(int argc,char*argv[]);
 
+char game_file_path[256];
+//char saved_game_file_path[256];
 char psp_game_file_name[256];
 char* psp_game_file_name_pointer = psp_game_file_name;
 
@@ -560,6 +562,9 @@ void AGSIOS::WriteConsole(const char *text, ...) {
 void startEngine(char* filename, char* directory, int loadLastSave)
 {
   strcpy(psp_game_file_name, filename);
+    
+  //strcpy(saveGameDirectory, directory);
+  sprintf(saveGameDirectory, "%s/", directory);
 
   // Get the base directory (usually "/sdcard/ags").
   chdir(directory);
@@ -571,15 +576,15 @@ void startEngine(char* filename, char* directory, int loadLastSave)
   ReadConfiguration(IOS_CONFIG_FILENAME, true);
 
   // Get the games path.
-  char path[256];
-  strcpy(path, psp_game_file_name);
-  int lastindex = strlen(path) - 1;
-  while (path[lastindex] != '/')
+  //char path[256];
+  strcpy(game_file_path, psp_game_file_name);
+  int lastindex = strlen(game_file_path) - 1;
+  while (game_file_path[lastindex] != '/')
   {
-    path[lastindex] = 0;
+    game_file_path[lastindex] = 0;
     lastindex--;
   }
-  chdir(path);
+  int success = chdir(game_file_path);
   
   setenv("ULTRADIR", "..", 1);
 

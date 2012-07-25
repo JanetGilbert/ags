@@ -404,7 +404,7 @@ extern "C" void ios_create_screen()
 	
 	[NSThread detachNewThreadSelector:@selector(startThread) toTarget:self withObject:nil];  
 }
-
+// this should not use a plain path todo
 - (void)startThread
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
@@ -416,11 +416,29 @@ extern "C" void ios_create_screen()
 	const char* bla = [documentPath UTF8String];
 	char path[300];
 	strcpy(path, bla);
-	strcat(path, "/ags/game/");
-	
-	char filename[300];
-	strcpy(filename, path);
-	strcat(filename, "ac2game.dat");
+	//strcat(path, "/game/");// /ags/game/
+    
+    /*char path[300];
+	NSString * resourceStr = [[[NSBundle mainBundle] resourcePath] stringByDeletingLastPathComponent];
+    const char * resourceChars = [resourceStr UTF8String];
+    
+	strcpy(path, resourceChars);
+    strcat(path, "/game/");*/
+    
+    char filename[300];
+    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"ac2game" 
+                                                         ofType:@"dat"];
+                                                    //inDirectory:@"game"];
+    const char * resourceChars = [filePath UTF8String];
+	strcpy(filename, resourceChars);
+    
+	/*NSString * pathn = [filePath stringByDeletingLastPathComponent];
+    const char * pathc = [pathn UTF8String];
+	char path[300];
+	strcpy(path, pathc);
+    
+    
+	strcat(filename, "ac2game.dat");*/
 	
 	startEngine(filename, path, 0);	
 

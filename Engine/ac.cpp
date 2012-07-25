@@ -78,6 +78,8 @@ extern int psp_ignore_acsetup_cfg_file; // If set, the standard AGS config file 
 extern int psp_clear_cache_on_room_change; // Clear the sprite cache on every room change.
 extern void clear_sound_cache(); // Sound cache initialization.
 extern char psp_game_file_name[]; // Game filename from the menu.
+extern char game_file_path[]; // path to game file j
+//extern char saved_game_file_path[]; // path to documents j
 extern int psp_gfx_renderer; // Which renderer to use.
 extern int psp_gfx_smooth_sprites; // usetup.enable_antialiasing
 extern char psp_translation[]; // Translation file
@@ -613,7 +615,7 @@ SpriteCache spriteset(1);
 long t1;  // timer for FPS
 int cur_mode,cur_cursor;
 int spritewidth[MAX_SPRITES],spriteheight[MAX_SPRITES];
-char saveGameDirectory[260] = "./";
+char saveGameDirectory[260] = "/";
 //int abort_all_conditions=0;
 int fps=0,display_fps=0;
 DebugConsoleText debug_line[DEBUG_CONSOLE_NUMLINES];
@@ -26609,6 +26611,7 @@ int check_write_access() {
 
   // The Save Game Dir is the only place that we should write to
   char tempPath[MAX_PATH];
+  //sprintf(tempPath, "%s%s""tmptest.tmp", saved_game_file_path, saveGameDirectory);
   sprintf(tempPath, "%s""tmptest.tmp", saveGameDirectory);
   FILE *yy = fopen(tempPath, "wb");
   if (yy == NULL)
