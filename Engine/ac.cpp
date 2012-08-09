@@ -26486,6 +26486,8 @@ void mainloop(bool checkControls, IDriverDependantBitmap *extraBitmap, int extra
   // don't let the player do anything before the screen fades in
   if ((in_new_room == 0) && (checkControls)) {
     int inRoom = displayed_room;
+//mgetbutton();
+mgetgraphpos();//j
     check_controls();
     // If an inventory interaction changed the room
     if (inRoom != displayed_room)

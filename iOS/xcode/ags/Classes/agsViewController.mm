@@ -39,17 +39,17 @@ extern "C"
 	int ios_poll_mouse_buttons()
 	{
 		int temp_button = mouse_button;
-		mouse_button = 0;
+		//j mouse_button = 0;
 		return temp_button;
 	}
-
+    
 	void ios_poll_mouse_relative(int* x, int* y)
 	{
 		*x = mouse_relative_position_x;
 		*y = mouse_relative_position_y;
 	}
-
-
+    
+    
 	void ios_poll_mouse_absolute(int* x, int* y)
 	{
 		*x = mouse_position_x;
@@ -103,9 +103,9 @@ extern "C" int ios_get_last_keypress()
 		toolbar = self.inputAccessoryView;
 	else
 		toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 30)];
-
+    
 	toolbar.barStyle = UIBarStyleBlackTranslucent;
-
+    
 	NSMutableArray* array = [[NSMutableArray alloc] initWithCapacity:6];
 	
 	UIBarButtonItem *esc = [[UIBarButtonItem alloc] initWithTitle:@"ESC" style:UIBarButtonItemStyleDone target:self action:@selector(buttonClicked:)];
@@ -127,7 +127,7 @@ extern "C" int ios_get_last_keypress()
 		UIBarButtonItem* openf1 = [[UIBarButtonItem alloc] initWithTitle:@"F1..." style:UIBarButtonItemStyleBordered target:self action:@selector(buttonClicked:)];
 		[array addObject:openf1];
 	}
-
+    
 	if ((openedKeylist == 5) || self.isIPad)
 	{
 		UIBarButtonItem* f5 = [[UIBarButtonItem alloc] initWithTitle:@"F5" style:UIBarButtonItemStyleBordered target:self action:@selector(buttonClicked:)];
@@ -161,9 +161,9 @@ extern "C" int ios_get_last_keypress()
 		UIBarButtonItem* openf9 = [[UIBarButtonItem alloc] initWithTitle:@"F9..." style:UIBarButtonItemStyleBordered target:self action:@selector(buttonClicked:)];
 		[array addObject:openf9];
 	}
-
+    
 	[toolbar setItems:array animated:YES];
-
+    
 	if (!alreadyExists)
 	{
 		self.inputAccessoryView = toolbar;
@@ -211,18 +211,18 @@ extern "C" int ios_get_last_keypress()
 
 
 // Touching
-
-
-- (IBAction)handleSingleFingerTap:(UIGestureRecognizer *)sender
-{
-	mouse_button = 1;
-}
-
-- (IBAction)handleTwoFingerTap:(UIGestureRecognizer *)sender
-{
-	mouse_button = 2;
-}
-
+/*
+ 
+ - (IBAction)handleSingleFingerTap:(UIGestureRecognizer *)sender
+ {
+ mouse_button = 1;
+ }
+ 
+ - (IBAction)handleTwoFingerTap:(UIGestureRecognizer *)sender
+ {
+ mouse_button = 2;
+ }
+ */
 
 - (void)moveViewAnimated:(BOOL)upwards duration:(float)duration
 {
@@ -237,85 +237,96 @@ extern "C" int ios_get_last_keypress()
 		else
 			newTop = self.view.frame.size.height / -4;
 	}
-
+    
 	self.view.frame = CGRectMake(0, newTop, self.view.frame.size.width, self.view.frame.size.height);
 	[UIView commitAnimations];
 }
-
-- (IBAction)handleLongPress:(UIGestureRecognizer *)sender
-{
-	if (sender.state != UIGestureRecognizerStateBegan)
-	  return;
-
-	if (self.isKeyboardActive)
-	{
-		[self resignFirstResponder];
-		
-		if (self.isInPortraitOrientation)
-			[self moveViewAnimated:NO duration:0.25];
-	}
-	else
-	{
-		[self becomeFirstResponder];
-		if (self.isInPortraitOrientation)
-			[self moveViewAnimated:YES duration:0.25];
-	}
-
-	self.isKeyboardActive = !self.isKeyboardActive;
-}
-
-- (IBAction)handleShortLongPress:(UIGestureRecognizer *)sender
-{
-	if (sender.state != UIGestureRecognizerStateBegan)
-	  return;
-
-	mouse_button = 10;
-}
+/*
+ - (IBAction)handleLongPress:(UIGestureRecognizer *)sender
+ {
+ if (sender.state != UIGestureRecognizerStateBegan)
+ return;
+ 
+ if (self.isKeyboardActive)
+ {
+ [self resignFirstResponder];
+ 
+ if (self.isInPortraitOrientation)
+ [self moveViewAnimated:NO duration:0.25];
+ }
+ else
+ {
+ [self becomeFirstResponder];
+ if (self.isInPortraitOrientation)
+ [self moveViewAnimated:YES duration:0.25];
+ }
+ 
+ self.isKeyboardActive = !self.isKeyboardActive;
+ }
+ 
+ - (IBAction)handleShortLongPress:(UIGestureRecognizer *)sender
+ {
+ if (sender.state != UIGestureRecognizerStateBegan)
+ return;
+ 
+ mouse_button = 10;
+ }*/
 
 - (void)touchesMoved:(NSSet*)touches withEvent:(UIEvent*)event
 {
 	UITouch* touch = [touches anyObject];
-	CGPoint touchPoint = [touch locationInView:self.view];	
+	CGPoint touchPoint = [touch locationInView:self.view];
 	mouse_position_x = touchPoint.x;
 	mouse_position_y = touchPoint.y;
+    mouse_button=1;
 }
 
 -(void)touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event
 {
 	UITouch* touch = [touches anyObject];
-	CGPoint touchPoint = [touch locationInView:self.view];	
+	CGPoint touchPoint = [touch locationInView:self.view];
 	mouse_position_x = touchPoint.x;
 	mouse_position_y = touchPoint.y;
+    mouse_button=1;
+}
+
+-(void)touchesEnded:(NSSet*)touches withEvent:(UIEvent*)event
+{
+	UITouch* touch = [touches anyObject];
+	CGPoint touchPoint = [touch locationInView:self.view];
+	mouse_position_x = touchPoint.x;
+	mouse_position_y = touchPoint.y;
+    mouse_button=0;
 }
 
 - (void)createGestureRecognizers
 {
-	UITapGestureRecognizer* singleFingerTap = [[UITapGestureRecognizer alloc]
-	initWithTarget:self action:@selector(handleSingleFingerTap:)];
-	singleFingerTap.numberOfTapsRequired = 1;
-	singleFingerTap.numberOfTouchesRequired = 1;
-	[self.view addGestureRecognizer:singleFingerTap];
-	[singleFingerTap release];
-
-	UITapGestureRecognizer* twoFingerTap = [[UITapGestureRecognizer alloc]
-	initWithTarget:self action:@selector(handleTwoFingerTap:)];
-	twoFingerTap.numberOfTapsRequired = 1;
-	twoFingerTap.numberOfTouchesRequired = 2;
-	[self.view addGestureRecognizer:twoFingerTap];
-	[twoFingerTap release];	
-	
-	UILongPressGestureRecognizer* longPressGesture = [[UILongPressGestureRecognizer alloc]
-	initWithTarget:self action:@selector(handleLongPress:)];
-	longPressGesture.minimumPressDuration = 1.5;
-	[self.view addGestureRecognizer:longPressGesture];
-	[longPressGesture release];
-	
-	UILongPressGestureRecognizer* shortLongPressGesture = [[UILongPressGestureRecognizer alloc]
-	initWithTarget:self action:@selector(handleShortLongPress:)];
-	shortLongPressGesture.minimumPressDuration = 0.7;
-	[shortLongPressGesture requireGestureRecognizerToFail:longPressGesture];
-	[self.view addGestureRecognizer:shortLongPressGesture];
-	[shortLongPressGesture release];
+	/*UITapGestureRecognizer* singleFingerTap = [[UITapGestureRecognizer alloc]
+     initWithTarget:self action:@selector(handleSingleFingerTap:)];
+     singleFingerTap.numberOfTapsRequired = 1;
+     singleFingerTap.numberOfTouchesRequired = 1;
+     [self.view addGestureRecognizer:singleFingerTap];
+     [singleFingerTap release];
+     
+     UITapGestureRecognizer* twoFingerTap = [[UITapGestureRecognizer alloc]
+     initWithTarget:self action:@selector(handleTwoFingerTap:)];
+     twoFingerTap.numberOfTapsRequired = 1;
+     twoFingerTap.numberOfTouchesRequired = 2;
+     [self.view addGestureRecognizer:twoFingerTap];
+     [twoFingerTap release];
+     
+     UILongPressGestureRecognizer* longPressGesture = [[UILongPressGestureRecognizer alloc]
+     initWithTarget:self action:@selector(handleLongPress:)];
+     longPressGesture.minimumPressDuration = 1.5;
+     [self.view addGestureRecognizer:longPressGesture];
+     [longPressGesture release];
+     
+     UILongPressGestureRecognizer* shortLongPressGesture = [[UILongPressGestureRecognizer alloc]
+     initWithTarget:self action:@selector(handleShortLongPress:)];
+     shortLongPressGesture.minimumPressDuration = 0.7;
+     [shortLongPressGesture requireGestureRecognizerToFail:longPressGesture];
+     [self.view addGestureRecognizer:shortLongPressGesture];
+     [shortLongPressGesture release];*/
 }
 
 
@@ -352,7 +363,7 @@ extern "C" void ios_create_screen()
 - (void)viewDidLoad
 {
 	[self showActivityIndicator];
-
+    
 	[super viewDidLoad];
 	[self.view setMultipleTouchEnabled:YES];
 	[self createGestureRecognizers];
@@ -369,7 +380,7 @@ extern "C" void ios_create_screen()
 	else if (psp_rotation == 1)
 		return UIInterfaceOrientationIsPortrait(interfaceOrientation);
 	else if (psp_rotation == 2)
-		return UIInterfaceOrientationIsLandscape(interfaceOrientation);	
+		return UIInterfaceOrientationIsLandscape(interfaceOrientation);
 }
 
 
@@ -402,13 +413,13 @@ extern "C" void ios_create_screen()
 	
 	[self createKeyboardButtonBar:1];
 	
-	[NSThread detachNewThreadSelector:@selector(startThread) toTarget:self withObject:nil];  
+	[NSThread detachNewThreadSelector:@selector(startThread) toTarget:self withObject:nil];
 }
 // this should not use a plain path todo
 - (void)startThread
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-
+    
 	// Handle any foreground procedures not related to animation here.
 	NSArray *searchPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
 	NSString *documentPath = [searchPaths objectAtIndex:0];
@@ -419,29 +430,29 @@ extern "C" void ios_create_screen()
 	//strcat(path, "/game/");// /ags/game/
     
     /*char path[300];
-	NSString * resourceStr = [[[NSBundle mainBundle] resourcePath] stringByDeletingLastPathComponent];
-    const char * resourceChars = [resourceStr UTF8String];
-    
-	strcpy(path, resourceChars);
-    strcat(path, "/game/");*/
+     NSString * resourceStr = [[[NSBundle mainBundle] resourcePath] stringByDeletingLastPathComponent];
+     const char * resourceChars = [resourceStr UTF8String];
+     
+     strcpy(path, resourceChars);
+     strcat(path, "/game/");*/
     
     char filename[300];
-    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"ac2game" 
+    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"ac2game"
                                                          ofType:@"dat"];
-                                                    //inDirectory:@"game"];
+    //inDirectory:@"game"];
     const char * resourceChars = [filePath UTF8String];
 	strcpy(filename, resourceChars);
     
 	/*NSString * pathn = [filePath stringByDeletingLastPathComponent];
-    const char * pathc = [pathn UTF8String];
-	char path[300];
-	strcpy(path, pathc);
-    
-    
-	strcat(filename, "ac2game.dat");*/
+     const char * pathc = [pathn UTF8String];
+     char path[300];
+     strcpy(path, pathc);
+     
+     
+     strcat(filename, "ac2game.dat");*/
 	
-	startEngine(filename, path, 0);	
-
+	startEngine(filename, path, 0);
+    
 	[pool release];
 }
 
@@ -463,7 +474,7 @@ void ios_show_message_box(char* buffer)
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-   ios_wait_for_ui = 0;
+    ios_wait_for_ui = 0;
 }
 
 - (void)dealloc
@@ -489,11 +500,11 @@ void ios_show_message_box(char* buffer)
 - (void)viewDidUnload
 {
 	[super viewDidUnload];
-
+    
 	// Tear down context.
 	if ([EAGLContext currentContext] == context)
 		[EAGLContext setCurrentContext:nil];
-	self.context = nil;	
+	self.context = nil;
 }
 
 - (void)didReceiveMemoryWarning

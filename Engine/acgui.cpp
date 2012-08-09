@@ -1301,7 +1301,7 @@ void GUIMain::control_positions_changed()
 {
   // force it to re-check for which control is under the mouse
   mousewasx = -1;
-  mousewasy = -1;
+  mousewasy = -1; 
 }
 
 void GUIMain::poll()
@@ -1346,6 +1346,7 @@ void GUIMain::poll()
 
 void GUIMain::mouse_but_down()
 {
+poll(); //j
   if (mouseover < 0)
     return;
 
@@ -1353,6 +1354,9 @@ void GUIMain::mouse_but_down()
   if ((objs[mouseover]->IsDisabled()) || (!objs[mouseover]->IsVisible()) ||
       (!objs[mouseover]->IsClickable()))
     return;
+
+
+//mousedownon=mouseover; //jß
 
   mousedownon = mouseover;
   if (objs[mouseover]->MouseDown())
