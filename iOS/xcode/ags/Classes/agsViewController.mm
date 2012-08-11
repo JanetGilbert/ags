@@ -6,7 +6,7 @@
 // From the engine
 extern void startEngine(char* filename, char* directory, int loadLastSave);
 extern int psp_rotation;
-
+extern void start_skipping_cutscene();
 
 
 @interface agsViewController ()
@@ -241,6 +241,14 @@ extern "C" int ios_get_last_keypress()
 	self.view.frame = CGRectMake(0, newTop, self.view.frame.size.width, self.view.frame.size.height);
 	[UIView commitAnimations];
 }
+
+- (IBAction)handleLongPress:(UIGestureRecognizer *)sender
+{
+    if (sender.state != UIGestureRecognizerStateBegan)
+        return;
+    
+    start_skipping_cutscene();
+}
 /*
  - (IBAction)handleLongPress:(UIGestureRecognizer *)sender
  {
@@ -327,6 +335,12 @@ extern "C" int ios_get_last_keypress()
      [shortLongPressGesture requireGestureRecognizerToFail:longPressGesture];
      [self.view addGestureRecognizer:shortLongPressGesture];
      [shortLongPressGesture release];*/
+    
+    UILongPressGestureRecognizer* longPressGesture = [[UILongPressGestureRecognizer alloc]
+    initWithTarget:self action:@selector(handleLongPress:)];
+    longPressGesture.minimumPressDuration = 3;
+    [self.view addGestureRecognizer:longPressGesture];
+    [longPressGesture release];
 }
 
 
