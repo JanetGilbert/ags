@@ -324,6 +324,7 @@ extern int  roomSelectorWindow(int currentRoom, int numRooms, int*roomNumbers, c
 extern void ccFlattenGlobalData (ccInstance *);
 extern void ccUnFlattenGlobalData (ccInstance *);
 
+extern int  misbuttonreleased(int);  //j
 
 // CD Player functions
 // flags returned with cd_getstatus
@@ -5788,6 +5789,12 @@ int IsKeyPressed (int keycode) {
 }
 
 void start_skipping_cutscene () {
+    
+  //j ensure that we can't freeze up the game by skipping a cutscene when not in a cutscene
+  if (play.in_cutscene == 0){
+    return;
+  }
+        
   play.fast_forward = 1;
   // if a drop-down icon bar is up, remove it as it will pause the game
   if (ifacepopped>=0)
@@ -5837,8 +5844,8 @@ void InventoryItem_RunInteraction(ScriptInvItem *iitem, int mood) {
 void check_controls() {
   int numevents_was = numevents;
   our_eip = 1007;
-  NEXT_ITERATION();
-
+  NEXT_ITERATION();        
+    
   int aa,mongu=-1;
   // If all GUIs are off, skip the loop
   if ((game.options[OPT_DISABLEOFF]==3) && (all_buttons_disabled > 0)) ;
@@ -5885,6 +5892,14 @@ void check_controls() {
       }
     }
   else if ((wasbutdown>0) && (!misbuttondown(wasbutdown-1))) {
+      
+    //j click past dialogues on mouse up
+    if (is_text_overlay > 0) {
+        if (play.cant_skip_speech & SKIP_MOUSECLICK)
+            remove_screen_overlay(OVER_TEXTMSG);
+    }
+      
+      
     guis[wasongui].mouse_but_up();
     int whichbut=wasbutdown;
     wasbutdown=0;
@@ -5927,7 +5942,7 @@ void check_controls() {
 
     run_on_event(GE_GUI_MOUSEUP, wasongui);
   }
-
+  
   aa=mgetbutton();
   if (aa>NONE) {
     if ((play.in_cutscene == 3) || (play.in_cutscene == 4))
@@ -5938,10 +5953,13 @@ void check_controls() {
     if (play.fast_forward) { }
     else if ((play.wait_counter > 0) && (play.key_skip_wait > 1))
       play.wait_counter = -1;
-    else if (is_text_overlay > 0) {
-      if (play.cant_skip_speech & SKIP_MOUSECLICK)
-        remove_screen_overlay(OVER_TEXTMSG);
-    }
+    /*else if (is_text_overlay > 0) {
+        if (play.cant_skip_speech & SKIP_MOUSECLICK)
+          remove_screen_overlay(OVER_TEXTMSG);
+    }*/ //j
+    else if (is_text_overlay > 0) { //j ensure that clicking past dialogues fires on mouse up
+       wasbutdown=aa+1;
+    } 
     else if (!IsInterfaceEnabled()) ;  // blocking cutscene, ignore mouse
     else if (platform->RunPluginHooks(AGSE_MOUSECLICK, aa+1)) {
       // plugin took the click
@@ -23132,7 +23150,13 @@ int show_dialog_options(int dlgnum, int sayChosenOption, bool runGameLoopsInBack
           parserActivated = 1;
       }
 
-      int mouseButtonPressed = mgetbutton();
+      //j, we need the conversation to fire on mouse up not mouse down for ios
+      //int mouseButtonPressed = mgetbutton(); // j removed
+      int mouseButtonPressed=NONE;
+      if (misbuttonreleased(0)){
+        mouseButtonPressed=LEFT;
+      }
+      mgetbutton();
 
       if (mouseButtonPressed != NONE) {
         if (mouseison < 0) 
