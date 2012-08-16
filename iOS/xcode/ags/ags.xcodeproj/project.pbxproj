@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1113E9A215DD4FD600AFCFE2 /* agstouch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1113E9A115DD4FD600AFCFE2 /* agstouch.cpp */; };
 		1D3623260D0F684500981E51 /* agsAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* agsAppDelegate.mm */; };
 		1D60589B0D05DD56006BFB54 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.mm */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
@@ -112,6 +113,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1113E9A115DD4FD600AFCFE2 /* agstouch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = agstouch.cpp; path = ../../../Plugins/agstouch/agstouch.cpp; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D3623240D0F684500981E51 /* agsAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = agsAppDelegate.h; sourceTree = "<group>"; };
 		1D3623250D0F684500981E51 /* agsAppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = agsAppDelegate.mm; sourceTree = "<group>"; };
@@ -632,6 +634,7 @@
 		608A53D2155B0535002E3D41 /* Plugins */ = {
 			isa = PBXGroup;
 			children = (
+				1113E9A115DD4FD600AFCFE2 /* agstouch.cpp */,
 				608A53D7155B061C002E3D41 /* agsflashlight.cpp */,
 				608A53D5155B0608002E3D41 /* AGSBlend.cpp */,
 				608A53D3155B05F7002E3D41 /* ags_snowrain.cpp */,
@@ -816,6 +819,7 @@
 				608A53D4155B05F7002E3D41 /* ags_snowrain.cpp in Sources */,
 				608A53D6155B0608002E3D41 /* AGSBlend.cpp in Sources */,
 				608A53D8155B061C002E3D41 /* agsflashlight.cpp in Sources */,
+				1113E9A215DD4FD600AFCFE2 /* agstouch.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

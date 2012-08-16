@@ -76,6 +76,49 @@ extern "C" int ios_get_last_keypress()
 	return result;
 }
 
+extern "C" void ios_show_keyboard()
+{
+	if (agsviewcontroller)
+		[agsviewcontroller performSelectorOnMainThread:@selector(showKeyboard) withObject:nil waitUntilDone:YES];
+}
+
+extern "C" void ios_hide_keyboard()
+{
+	if (agsviewcontroller)
+		[agsviewcontroller performSelectorOnMainThread:@selector(hideKeyboard) withObject:nil waitUntilDone:YES];
+}
+
+extern "C" int ios_is_keyboard_visible()
+{
+	return (agsviewcontroller.isKeyboardActive ? 1 : 0);
+}
+
+- (void)showKeyboard
+{
+	if (!self.isKeyboardActive)
+	{
+		[self becomeFirstResponder];
+        
+		if (self.isInPortraitOrientation)
+			[self moveViewAnimated:YES duration:0.25];
+        
+		self.isKeyboardActive = TRUE;
+	}
+}
+
+- (void)hideKeyboard
+{
+	if (self.isKeyboardActive)
+	{
+		[self resignFirstResponder];
+        
+		if (self.isInPortraitOrientation)
+			[self moveViewAnimated:NO duration:0.25];
+		
+		self.isKeyboardActive = FALSE;
+	}
+}
+
 - (BOOL)hasText
 {
 	return NO;
@@ -108,9 +151,11 @@ extern "C" int ios_get_last_keypress()
     
 	NSMutableArray* array = [[NSMutableArray alloc] initWithCapacity:6];
 	
+    //J Don't need f keys
 	UIBarButtonItem *esc = [[UIBarButtonItem alloc] initWithTitle:@"ESC" style:UIBarButtonItemStyleDone target:self action:@selector(buttonClicked:)];
 	[array addObject:esc];
 	
+    /*
 	if ((openedKeylist == 1) || self.isIPad)
 	{
 		UIBarButtonItem* f1 = [[UIBarButtonItem alloc] initWithTitle:@"F1" style:UIBarButtonItemStyleBordered target:self action:@selector(buttonClicked:)];
@@ -160,7 +205,7 @@ extern "C" int ios_get_last_keypress()
 	{
 		UIBarButtonItem* openf9 = [[UIBarButtonItem alloc] initWithTitle:@"F9..." style:UIBarButtonItemStyleBordered target:self action:@selector(buttonClicked:)];
 		[array addObject:openf9];
-	}
+	}*/
     
 	[toolbar setItems:array animated:YES];
     

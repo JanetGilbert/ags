@@ -26186,7 +26186,7 @@ void setup_script_exports() {
   scAdd_External_Symbol("ShellExecute", (void*)ScriptStub_ShellExecute);
 
   // ags_snowrain.dll
-  scAdd_External_Symbol("srSetSnowDriftRange",(void *)srSetSnowDriftRange);
+  /*scAdd_External_Symbol("srSetSnowDriftRange",(void *)srSetSnowDriftRange);
   scAdd_External_Symbol("srSetSnowDriftSpeed",(void *)srSetSnowDriftSpeed);
   scAdd_External_Symbol("srSetSnowFallSpeed",(void *)srSetSnowFallSpeed);
   scAdd_External_Symbol("srChangeSnowAmount",(void *)srChangeSnowAmount);
@@ -26205,7 +26205,7 @@ void setup_script_exports() {
   scAdd_External_Symbol("srSetRainAmount",(void *)srSetRainAmount);
   scAdd_External_Symbol("srSetRainFallSpeed",(void *)srSetRainFallSpeed);
   scAdd_External_Symbol("srSetWindSpeed",(void *)srSetWindSpeed);
-  scAdd_External_Symbol("srSetBaseline",(void *)srSetBaseline);
+  scAdd_External_Symbol("srSetBaseline",(void *)srSetBaseline);*/
 
   // agsjoy.dll
   scAdd_External_Symbol("JoystickCount",(void *)JoystickCount);
