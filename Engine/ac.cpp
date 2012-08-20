@@ -1095,6 +1095,16 @@ int rec_getch () {
   return result;  
 }
 
+
+void call_simulate_keypress(int keycode)
+{
+#ifdef ALLEGRO_KEYBOARD_HANDLER
+    simulate_keypress(keycode);
+#endif
+    
+}
+
+
 int rec_kbhit () {
   if ((play.playback) && (recordbuffer != NULL)) {
     // check for real keypresses to abort the replay
@@ -5649,6 +5659,8 @@ void SetCharacterIdle(int who, int iview, int itime) {
 
   Character_SetIdleView(&game.chars[who], iview, itime);
 }
+    
+
 
 int IsKeyPressed (int keycode) {
 #ifdef ALLEGRO_KEYBOARD_HANDLER
@@ -5788,6 +5800,15 @@ int IsKeyPressed (int keycode) {
 #endif
 }
 
+   /* void fakekey(int keycode)
+    {
+#ifdef ALLEGRO_KEYBOARD_HANDLER
+        
+        simulate_keypress(keycode);
+#endif
+        
+    }*/
+    
 void start_skipping_cutscene () {
     
   //j ensure that we can't freeze up the game by skipping a cutscene when not in a cutscene

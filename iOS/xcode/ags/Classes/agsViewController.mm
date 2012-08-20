@@ -7,7 +7,8 @@
 extern void startEngine(char* filename, char* directory, int loadLastSave);
 extern int psp_rotation;
 extern void start_skipping_cutscene();
-
+extern void call_simulate_keypress(int keycode);
+//extern void FakeKeyPress(int keycode);
 
 @interface agsViewController ()
 @property (nonatomic, retain) EAGLContext *context;
@@ -65,6 +66,14 @@ extern "C"
 - (BOOL)canBecomeFirstResponder
 {
 	return YES;
+}
+
+extern "C" void fakekey(int keypress)
+{
+//#ifdef ALLEGRO_KEYBOARD_HANDLER
+    
+    call_simulate_keypress(keypress);
+//#endif
 }
 
 int lastChar;

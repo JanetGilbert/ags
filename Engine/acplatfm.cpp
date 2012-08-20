@@ -22,6 +22,7 @@
 #include "../Plugins/ags_snowrain/ags_snowrain.h"
 #if defined(IOS_VERSION)
 #include "../Plugins/agstouch/agstouch.h"
+#include "../Plugins/agskey/agskey.h"
 #endif
 #endif
 
@@ -909,6 +910,19 @@ bool pl_use_builtin_plugin(EnginePlugin* apl)
     apl->builtin = true;
     return true;
    }
+#endif
+#if defined(IOS_VERSION)
+  else if (strncmp(apl->filename, "agskey", strlen("agskey")) == 0)
+  {
+      apl->engineStartup = agskey::AGS_EngineStartup;
+      apl->engineShutdown = agskey::AGS_EngineShutdown;
+      apl->onEvent = agskey::AGS_EngineOnEvent;
+      apl->debugHook = agskey::AGS_EngineDebugHook;
+      apl->initGfxHook = agskey::AGS_EngineInitGfx;
+      apl->dllHandle = (HINSTANCE)1;
+      apl->builtin = true;
+      return true;
+  }
 #endif
 #endif
 
