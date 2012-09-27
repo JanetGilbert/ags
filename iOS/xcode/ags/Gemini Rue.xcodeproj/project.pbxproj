@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		11021F7B1611F9F0009F8B3E /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 11021F7A1611F9F0009F8B3E /* Default-568h@2x.png */; };
 		1113E9A215DD4FD600AFCFE2 /* agstouch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1113E9A115DD4FD600AFCFE2 /* agstouch.cpp */; };
 		113B77AA15E27E470002E701 /* agskey.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 113B77A915E27E470002E701 /* agskey.cpp */; };
 		1D3623260D0F684500981E51 /* agsAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* agsAppDelegate.mm */; };
@@ -114,6 +115,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		11021F7A1611F9F0009F8B3E /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		1113E9A115DD4FD600AFCFE2 /* agstouch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = agstouch.cpp; path = ../../../Plugins/agstouch/agstouch.cpp; sourceTree = "<group>"; };
 		113B77A915E27E470002E701 /* agskey.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = agskey.cpp; path = ../../../Plugins/agskey/agskey.cpp; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -325,6 +327,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				11021F7A1611F9F0009F8B3E /* Default-568h@2x.png */,
 				601AC472153892250098399D /* Engine */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
@@ -727,6 +730,7 @@
 				60CA834115BA1FCC0010D3B4 /* audio.vox in Resources */,
 				60CA834215BA1FCC0010D3B4 /* PRELOAD.pcx in Resources */,
 				60CA834315BA1FCC0010D3B4 /* speech.vox in Resources */,
+				11021F7B1611F9F0009F8B3E /* Default-568h@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -834,7 +838,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = armv7;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -861,7 +865,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = armv7;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -885,7 +889,7 @@
 		C01FCF4F08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = armv7;
 				CODE_SIGN_IDENTITY = "iPhone Developer: Janet Gilbert (KD5AK7XJ75)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Janet Gilbert (KD5AK7XJ75)";
 				GCC_C_LANGUAGE_STANDARD = c99;
@@ -921,7 +925,7 @@
 		C01FCF5008A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = armv7;
 				CODE_SIGN_IDENTITY = "iPhone Developer: Janet Gilbert (KD5AK7XJ75)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Janet Gilbert (KD5AK7XJ75)";
 				GCC_C_LANGUAGE_STANDARD = c99;
