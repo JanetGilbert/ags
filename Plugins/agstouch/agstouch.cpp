@@ -15,7 +15,11 @@ Helper functions for touch devices
 #define THIS_IS_THE_PLUGIN
 #endif
 
+<<<<<<< HEAD
 #include "../../Common/agsplugin.h"
+=======
+#include "plugin/agsplugin.h"
+>>>>>>> upstream/refactory
 
 #if defined(BUILTIN_PLUGINS)
 namespace agstouch {

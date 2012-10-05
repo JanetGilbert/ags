@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="AGS.Native"
 	ProjectGUID="{65A387AF-C78C-492B-AB93-E13C6090355D}"
 	RootNamespace="AGS.Native"
@@ -28,7 +28,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="start /WAIT $(SolutionDir)\UpdateCPPVersion\bin\$(ConfigurationName)\UpdateCPPVersion.exe $(TargetPath)"
+				CommandLine="start /WAIT $(SolutionDir)\..\Editor\UpdateCPPVersion\bin\$(ConfigurationName)\UpdateCPPVersion.exe $(TargetPath)"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -55,8 +55,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..;..\..\common;..\..\common\libinclude;..\scintilla\include;..\..\Windows\include"
-				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_USRDLL;ALLEGRO_STATICLINK;ALLEGRO_NO_ASM;VS2005;_CRT_SECURE_NO_DEPRECATE;_MERGE_PROXYSTUB;STATIC_BUILD;SCI_LEXER;USE_ALFONT;_BIND_TO_CURRENT_VCLIBS_VERSION=1"
+				AdditionalIncludeDirectories="..\..;..\..\common;..\..\common\libinclude;..\..\compiler;..\..\editor\native;..\scintilla\include;..\..\Windows\include"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_USRDLL;WINDOWS_VERSION;ALLEGRO_STATICLINK;ALLEGRO_NO_ASM;VS2005;_CRT_SECURE_NO_DEPRECATE;_MERGE_PROXYSTUB;STATIC_BUILD;SCI_LEXER;USE_ALFONT;_BIND_TO_CURRENT_VCLIBS_VERSION=1"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="3"
@@ -81,8 +81,10 @@
 				Name="VCLinkerTool"
 				RegisterOutput="false"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="winmm.lib imm32.lib ddraw.lib dsound.lib dinput.lib dxguid.lib"
+				AdditionalDependencies="Common_d.lib Compiler_d.lib winmm.lib imm32.lib ddraw.lib dsound.lib dinput.lib dxguid.lib"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)\..\Solutions\.lib\$(ConfigurationName)&quot;;&quot;$(SolutionDir)\..\Windows\lib&quot;"
+				IgnoreDefaultLibraryNames="LIBCMTD.lib"
 				ModuleDefinitionFile=""
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
@@ -126,7 +128,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="$(SolutionDir)\UpdateCPPVersion\bin\$(ConfigurationName)\UpdateCPPVersion.exe $(TargetPath)"
+				CommandLine="$(SolutionDir)\..\Editor\UpdateCPPVersion\bin\$(ConfigurationName)\UpdateCPPVersion.exe $(TargetPath)"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -153,8 +155,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories="..\..;..\..\common;..\..\common\libinclude;..\scintilla\include;..\..\Windows\include"
-				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_USRDLL;ALLEGRO_STATICLINK;_MERGE_PROXYSTUB;STATIC_BUILD;SCI_LEXER;VS2005;USE_ALFONT;_BIND_TO_CURRENT_VCLIBS_VERSION=1;ALLEGRO_NO_ASM"
+				AdditionalIncludeDirectories="..\..;..\..\common;..\..\common\libinclude;..\..\compiler;..\..\editor\native;..\scintilla\include;..\..\Windows\include"
+				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_USRDLL;WINDOWS_VERSION;ALLEGRO_STATICLINK;_MERGE_PROXYSTUB;STATIC_BUILD;SCI_LEXER;VS2005;USE_ALFONT;_BIND_TO_CURRENT_VCLIBS_VERSION=1;ALLEGRO_NO_ASM"
 				RuntimeLibrary="2"
 				StructMemberAlignment="3"
 				UsePrecompiledHeader="0"
@@ -178,8 +180,10 @@
 				Name="VCLinkerTool"
 				RegisterOutput="false"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="winmm.lib imm32.lib ddraw.lib dsound.lib dinput.lib dxguid.lib"
+				AdditionalDependencies="Common.lib Compiler.lib winmm.lib imm32.lib ddraw.lib dsound.lib dinput.lib dxguid.lib"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)\..\Solutions\.lib\$(ConfigurationName)&quot;;&quot;$(SolutionDir)\..\Windows\lib&quot;"
+				IgnoreDefaultLibraryNames="LIBCMT.lib"
 				ModuleDefinitionFile=""
 				GenerateDebugInformation="false"
 				SubSystem="2"
@@ -216,7 +220,7 @@
 	<References>
 		<ProjectReference
 			ReferencedProjectIdentifier="{3EBBEDAB-214C-4201-BB5A-5152D56908DD}"
-			RelativePathToProject=".\AGS.Types\AGS.Types.csproj"
+			RelativePathToProject="..\Editor\AGS.Types\AGS.Types.csproj"
 		/>
 		<AssemblyReference
 			RelativePath="System.Drawing.dll"
@@ -231,11 +235,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\Engine\acfonts.cpp"
+				RelativePath="..\Native\acfonts_agsnative.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Engine\acgui.cpp"
+				RelativePath="..\Native\acgui_agsnative.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Native\acroom_agsnative.cpp"
 				>
 			</File>
 			<File
@@ -247,35 +255,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\Clib32.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\compress.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\cscommon.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\CSPARSER.CPP"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\CSRUN.CPP"
+				RelativePath="..\Native\color_native.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\cstretch.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\FMEM.CPP"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\lzw.cpp"
 				>
 			</File>
 			<File
@@ -291,19 +275,27 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\Common\sprcache.cpp"
+				RelativePath="..\Native\sprcache_agsnative.cpp"
 				>
 			</File>
+			<Filter
+				Name="ac"
+				>
+				<File
+					RelativePath="..\Native\ac\actiontype.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Native\ac\scriptmodule.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath="..\..\acroom.h"
-				>
-			</File>
 			<File
 				RelativePath=".\NativeMethods.h"
 				>
@@ -312,6 +304,18 @@
 				RelativePath=".\Scripting.h"
 				>
 			</File>
+			<Filter
+				Name="ac"
+				>
+				<File
+					RelativePath="..\Native\ac\actiontype.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Native\ac\scriptmodule.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"
