@@ -15,7 +15,7 @@ Fake a keypress
 #define THIS_IS_THE_PLUGIN
 #endif
 
-#include "../../Common/agsplugin.h"
+#include "plugin/agsplugin.h"
 
 #if defined(BUILTIN_PLUGINS)
 namespace agskey {

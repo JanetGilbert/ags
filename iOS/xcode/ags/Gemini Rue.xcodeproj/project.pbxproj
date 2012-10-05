@@ -7,6 +7,40 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		11F4FCBC161F7F970060820B /* ac2game.dat in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCB7161F7F960060820B /* ac2game.dat */; };
+		11F4FCBD161F7F970060820B /* acsetup.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCB8161F7F960060820B /* acsetup.cfg */; };
+		11F4FCBE161F7F970060820B /* audio.vox in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCB9161F7F960060820B /* audio.vox */; };
+		11F4FCBF161F7F970060820B /* PRELOAD.pcx in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCBA161F7F970060820B /* PRELOAD.pcx */; };
+		11F4FCC0161F7F970060820B /* speech.vox in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCBB161F7F970060820B /* speech.vox */; };
+		11F4FCE5161F81830060820B /* agskey.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11F4FCC4161F81820060820B /* agskey.cpp */; };
+		11F4FCE6161F81830060820B /* agskey.ncb in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCC7161F81820060820B /* agskey.ncb */; };
+		11F4FCE7161F81830060820B /* agskey.sln in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCC8161F81830060820B /* agskey.sln */; };
+		11F4FCE8161F81830060820B /* agskey.suo in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCC9161F81830060820B /* agskey.suo */; };
+		11F4FCE9161F81830060820B /* agskey.vcproj in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCCA161F81830060820B /* agskey.vcproj */; };
+		11F4FCEA161F81830060820B /* agskey.vcproj.Turkey.Janet.user in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCCB161F81830060820B /* agskey.vcproj.Turkey.Janet.user */; };
+		11F4FCEB161F81830060820B /* agskey.dll in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCCD161F81830060820B /* agskey.dll */; };
+		11F4FCEC161F81830060820B /* agskey.dll.embed.manifest in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCCE161F81830060820B /* agskey.dll.embed.manifest */; };
+		11F4FCED161F81830060820B /* agskey.dll.embed.manifest.res in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCCF161F81830060820B /* agskey.dll.embed.manifest.res */; };
+		11F4FCEE161F81830060820B /* agskey.dll.intermediate.manifest in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCD0161F81830060820B /* agskey.dll.intermediate.manifest */; };
+		11F4FCEF161F81830060820B /* agskey.exp in Sources */ = {isa = PBXBuildFile; fileRef = 11F4FCD1161F81830060820B /* agskey.exp */; };
+		11F4FCF0161F81830060820B /* agskey.ilk in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCD2161F81830060820B /* agskey.ilk */; };
+		11F4FCF1161F81830060820B /* agskey.lib in Frameworks */ = {isa = PBXBuildFile; fileRef = 11F4FCD3161F81830060820B /* agskey.lib */; };
+		11F4FCF2161F81830060820B /* agskey.obj in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCD4161F81830060820B /* agskey.obj */; };
+		11F4FCF3161F81830060820B /* agskey.pdb in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCD5161F81830060820B /* agskey.pdb */; };
+		11F4FCF4161F81830060820B /* BuildLog.htm in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCD6161F81830060820B /* BuildLog.htm */; };
+		11F4FCF5161F81830060820B /* mt.dep in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCD7161F81830060820B /* mt.dep */; };
+		11F4FCF6161F81830060820B /* vc90.idb in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCD8161F81830060820B /* vc90.idb */; };
+		11F4FCF7161F81830060820B /* vc90.pdb in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCD9161F81830060820B /* vc90.pdb */; };
+		11F4FCF8161F81830060820B /* agskey.dll in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCDB161F81830060820B /* agskey.dll */; };
+		11F4FCF9161F81830060820B /* agskey.dll.intermediate.manifest in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCDC161F81830060820B /* agskey.dll.intermediate.manifest */; };
+		11F4FCFA161F81830060820B /* agskey.exp in Sources */ = {isa = PBXBuildFile; fileRef = 11F4FCDD161F81830060820B /* agskey.exp */; };
+		11F4FCFB161F81830060820B /* agskey.lib in Frameworks */ = {isa = PBXBuildFile; fileRef = 11F4FCDE161F81830060820B /* agskey.lib */; };
+		11F4FCFC161F81830060820B /* agskey.obj in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCDF161F81830060820B /* agskey.obj */; };
+		11F4FCFD161F81830060820B /* agskey.pdb in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCE0161F81830060820B /* agskey.pdb */; };
+		11F4FCFE161F81830060820B /* BuildLog.htm in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCE1161F81830060820B /* BuildLog.htm */; };
+		11F4FCFF161F81830060820B /* mt.dep in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCE2161F81830060820B /* mt.dep */; };
+		11F4FD00161F81830060820B /* vc90.idb in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCE3161F81830060820B /* vc90.idb */; };
+		11F4FD01161F81830060820B /* vc90.pdb in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCE4161F81830060820B /* vc90.pdb */; };
 		1D3623260D0F684500981E51 /* agsAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* agsAppDelegate.mm */; };
 		1D60589B0D05DD56006BFB54 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.mm */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
@@ -346,16 +380,51 @@
 		60CA3EA4160713FF00CFB3BD /* test_all.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3D27160713FF00CFB3BD /* test_all.cpp */; };
 		60CA3EA5160713FF00CFB3BD /* test_file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3D29160713FF00CFB3BD /* test_file.cpp */; };
 		60CA3EA6160713FF00CFB3BD /* test_string.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3D2B160713FF00CFB3BD /* test_string.cpp */; };
-		60CA833F15BA1FCC0010D3B4 /* ac2game.dat in Resources */ = {isa = PBXBuildFile; fileRef = 60CA833A15BA1FCC0010D3B4 /* ac2game.dat */; };
-		60CA834015BA1FCC0010D3B4 /* acsetup.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 60CA833B15BA1FCC0010D3B4 /* acsetup.cfg */; };
-		60CA834115BA1FCC0010D3B4 /* audio.vox in Resources */ = {isa = PBXBuildFile; fileRef = 60CA833C15BA1FCC0010D3B4 /* audio.vox */; };
-		60CA834215BA1FCC0010D3B4 /* PRELOAD.pcx in Resources */ = {isa = PBXBuildFile; fileRef = 60CA833D15BA1FCC0010D3B4 /* PRELOAD.pcx */; };
-		60CA834315BA1FCC0010D3B4 /* speech.vox in Resources */ = {isa = PBXBuildFile; fileRef = 60CA833E15BA1FCC0010D3B4 /* speech.vox */; };
+		60CA833F15BA1FCC0010D3B4 /* (null) in Resources */ = {isa = PBXBuildFile; };
+		60CA834015BA1FCC0010D3B4 /* (null) in Resources */ = {isa = PBXBuildFile; };
+		60CA834115BA1FCC0010D3B4 /* (null) in Resources */ = {isa = PBXBuildFile; };
+		60CA834215BA1FCC0010D3B4 /* (null) in Resources */ = {isa = PBXBuildFile; };
+		60CA834315BA1FCC0010D3B4 /* (null) in Resources */ = {isa = PBXBuildFile; };
 		60CE9D9C155272CD00A52D5A /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CE9D9B155272CD00A52D5A /* libfreetype.a */; };
 		60F49A4A155131E500A07887 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60F49A49155131E500A07887 /* AudioToolbox.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		11F4FCB7161F7F960060820B /* ac2game.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = ac2game.dat; sourceTree = "<group>"; };
+		11F4FCB8161F7F960060820B /* acsetup.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = acsetup.cfg; sourceTree = "<group>"; };
+		11F4FCB9161F7F960060820B /* audio.vox */ = {isa = PBXFileReference; lastKnownFileType = file; path = audio.vox; sourceTree = "<group>"; };
+		11F4FCBA161F7F970060820B /* PRELOAD.pcx */ = {isa = PBXFileReference; lastKnownFileType = file; path = PRELOAD.pcx; sourceTree = "<group>"; };
+		11F4FCBB161F7F970060820B /* speech.vox */ = {isa = PBXFileReference; lastKnownFileType = file; path = speech.vox; sourceTree = "<group>"; };
+		11F4FCC4161F81820060820B /* agskey.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = agskey.cpp; sourceTree = "<group>"; };
+		11F4FCC5161F81820060820B /* agskey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = agskey.h; sourceTree = "<group>"; };
+		11F4FCC7161F81820060820B /* agskey.ncb */ = {isa = PBXFileReference; lastKnownFileType = file; path = agskey.ncb; sourceTree = "<group>"; };
+		11F4FCC8161F81830060820B /* agskey.sln */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = agskey.sln; sourceTree = "<group>"; };
+		11F4FCC9161F81830060820B /* agskey.suo */ = {isa = PBXFileReference; lastKnownFileType = file; path = agskey.suo; sourceTree = "<group>"; };
+		11F4FCCA161F81830060820B /* agskey.vcproj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = agskey.vcproj; sourceTree = "<group>"; };
+		11F4FCCB161F81830060820B /* agskey.vcproj.Turkey.Janet.user */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = agskey.vcproj.Turkey.Janet.user; sourceTree = "<group>"; };
+		11F4FCCD161F81830060820B /* agskey.dll */ = {isa = PBXFileReference; lastKnownFileType = file; path = agskey.dll; sourceTree = "<group>"; };
+		11F4FCCE161F81830060820B /* agskey.dll.embed.manifest */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = agskey.dll.embed.manifest; sourceTree = "<group>"; };
+		11F4FCCF161F81830060820B /* agskey.dll.embed.manifest.res */ = {isa = PBXFileReference; lastKnownFileType = file; path = agskey.dll.embed.manifest.res; sourceTree = "<group>"; };
+		11F4FCD0161F81830060820B /* agskey.dll.intermediate.manifest */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = agskey.dll.intermediate.manifest; sourceTree = "<group>"; };
+		11F4FCD1161F81830060820B /* agskey.exp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.exports; path = agskey.exp; sourceTree = "<group>"; };
+		11F4FCD2161F81830060820B /* agskey.ilk */ = {isa = PBXFileReference; lastKnownFileType = file; path = agskey.ilk; sourceTree = "<group>"; };
+		11F4FCD3161F81830060820B /* agskey.lib */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = agskey.lib; sourceTree = "<group>"; };
+		11F4FCD4161F81830060820B /* agskey.obj */ = {isa = PBXFileReference; lastKnownFileType = file; path = agskey.obj; sourceTree = "<group>"; };
+		11F4FCD5161F81830060820B /* agskey.pdb */ = {isa = PBXFileReference; lastKnownFileType = file; path = agskey.pdb; sourceTree = "<group>"; };
+		11F4FCD6161F81830060820B /* BuildLog.htm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = BuildLog.htm; sourceTree = "<group>"; };
+		11F4FCD7161F81830060820B /* mt.dep */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = mt.dep; sourceTree = "<group>"; };
+		11F4FCD8161F81830060820B /* vc90.idb */ = {isa = PBXFileReference; lastKnownFileType = file; path = vc90.idb; sourceTree = "<group>"; };
+		11F4FCD9161F81830060820B /* vc90.pdb */ = {isa = PBXFileReference; lastKnownFileType = file; path = vc90.pdb; sourceTree = "<group>"; };
+		11F4FCDB161F81830060820B /* agskey.dll */ = {isa = PBXFileReference; lastKnownFileType = file; path = agskey.dll; sourceTree = "<group>"; };
+		11F4FCDC161F81830060820B /* agskey.dll.intermediate.manifest */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = agskey.dll.intermediate.manifest; sourceTree = "<group>"; };
+		11F4FCDD161F81830060820B /* agskey.exp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.exports; path = agskey.exp; sourceTree = "<group>"; };
+		11F4FCDE161F81830060820B /* agskey.lib */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = agskey.lib; sourceTree = "<group>"; };
+		11F4FCDF161F81830060820B /* agskey.obj */ = {isa = PBXFileReference; lastKnownFileType = file; path = agskey.obj; sourceTree = "<group>"; };
+		11F4FCE0161F81830060820B /* agskey.pdb */ = {isa = PBXFileReference; lastKnownFileType = file; path = agskey.pdb; sourceTree = "<group>"; };
+		11F4FCE1161F81830060820B /* BuildLog.htm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = BuildLog.htm; sourceTree = "<group>"; };
+		11F4FCE2161F81830060820B /* mt.dep */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = mt.dep; sourceTree = "<group>"; };
+		11F4FCE3161F81830060820B /* vc90.idb */ = {isa = PBXFileReference; lastKnownFileType = file; path = vc90.idb; sourceTree = "<group>"; };
+		11F4FCE4161F81830060820B /* vc90.pdb */ = {isa = PBXFileReference; lastKnownFileType = file; path = vc90.pdb; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D3623240D0F684500981E51 /* agsAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = agsAppDelegate.h; sourceTree = "<group>"; };
 		1D3623250D0F684500981E51 /* agsAppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = agsAppDelegate.mm; sourceTree = "<group>"; };
@@ -370,123 +439,7 @@
 		28FD14FF0DC6FC520079059D /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		28FD15070DC6FC5B0079059D /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		29B97316FDCFA39411CA2CEA /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
-		32CA4F630368D1EE00C91783 /* ags_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ags_Prefix.pch; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* Gemini Rue_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Gemini Rue_Prefix.pch"; sourceTree = "<group>"; };
-		601AC476153892A30098399D /* ac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ac.cpp; path = ../../../Engine/ac.cpp; sourceTree = SOURCE_ROOT; };
-		601AC478153892A30098399D /* acaudio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = acaudio.cpp; path = ../../../Engine/acaudio.cpp; sourceTree = SOURCE_ROOT; };
-		601AC47A153892A30098399D /* acchars.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = acchars.cpp; path = ../../../Engine/acchars.cpp; sourceTree = SOURCE_ROOT; };
-		601AC47D153892A30098399D /* acdebug.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = acdebug.cpp; path = ../../../Engine/acdebug.cpp; sourceTree = SOURCE_ROOT; };
-		601AC480153892A30098399D /* acdialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = acdialog.cpp; path = ../../../Engine/acdialog.cpp; sourceTree = SOURCE_ROOT; };
-		601AC482153892A30098399D /* acfonts.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = acfonts.cpp; path = ../../../Engine/acfonts.cpp; sourceTree = SOURCE_ROOT; };
-		601AC484153892A30098399D /* acgfx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = acgfx.cpp; path = ../../../Engine/acgfx.cpp; sourceTree = SOURCE_ROOT; };
-		601AC486153892A30098399D /* acgui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = acgui.cpp; path = ../../../Engine/acgui.cpp; sourceTree = SOURCE_ROOT; };
-		601AC48A153892A30098399D /* acplatfm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = acplatfm.cpp; path = ../../../Engine/acplatfm.cpp; sourceTree = SOURCE_ROOT; };
-		601AC495153892A40098399D /* acsound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = acsound.cpp; path = ../../../Engine/acsound.cpp; sourceTree = SOURCE_ROOT; };
-		601AC645153892C50098399D /* ali3dogl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ali3dogl.cpp; path = ../../../Engine/ali3dogl.cpp; sourceTree = SOURCE_ROOT; };
-		601AC647153892C50098399D /* ali3dsw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ali3dsw.cpp; path = ../../../Engine/ali3dsw.cpp; sourceTree = SOURCE_ROOT; };
-		601AC649153892C50098399D /* almp3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = almp3.c; path = ../../../Engine/almp3.c; sourceTree = SOURCE_ROOT; };
-		601AC64B153892C50098399D /* alogg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = alogg.c; path = ../../../Engine/alogg.c; sourceTree = SOURCE_ROOT; };
-		601AC64D153892C50098399D /* bigend.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bigend.cpp; path = ../../../Engine/bigend.cpp; sourceTree = SOURCE_ROOT; };
-		601AC6BA153892CB0098399D /* AAROT.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = AAROT.c; path = "../../../Engine/libsrc/aastr-0.1.1/AAROT.c"; sourceTree = SOURCE_ROOT; };
-		601AC6BC153892CB0098399D /* aastr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = aastr.c; path = "../../../Engine/libsrc/aastr-0.1.1/aastr.c"; sourceTree = SOURCE_ROOT; };
-		601AC6BF153892CC0098399D /* aautil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = aautil.c; path = "../../../Engine/libsrc/aastr-0.1.1/aautil.c"; sourceTree = SOURCE_ROOT; };
-		601AC6C4153892CC0098399D /* alfont.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = alfont.c; path = "../../../Engine/libsrc/alfont-2.0.9/alfont.c"; sourceTree = SOURCE_ROOT; };
-		601AC6D7153892CC0098399D /* common.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = common.c; path = "../../../Engine/libsrc/almp3-2.0.5/decoder/common.c"; sourceTree = SOURCE_ROOT; };
-		601AC6D9153892CC0098399D /* dct64_i386.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dct64_i386.c; path = "../../../Engine/libsrc/almp3-2.0.5/decoder/dct64_i386.c"; sourceTree = SOURCE_ROOT; };
-		601AC6DB153892CC0098399D /* decode_i386.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = decode_i386.c; path = "../../../Engine/libsrc/almp3-2.0.5/decoder/decode_i386.c"; sourceTree = SOURCE_ROOT; };
-		601AC6DE153892CC0098399D /* interface.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = interface.c; path = "../../../Engine/libsrc/almp3-2.0.5/decoder/interface.c"; sourceTree = SOURCE_ROOT; };
-		601AC6E1153892CC0098399D /* layer2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = layer2.c; path = "../../../Engine/libsrc/almp3-2.0.5/decoder/layer2.c"; sourceTree = SOURCE_ROOT; };
-		601AC6E3153892CD0098399D /* layer3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = layer3.c; path = "../../../Engine/libsrc/almp3-2.0.5/decoder/layer3.c"; sourceTree = SOURCE_ROOT; };
-		601AC6E8153892CD0098399D /* tabinit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tabinit.c; path = "../../../Engine/libsrc/almp3-2.0.5/decoder/tabinit.c"; sourceTree = SOURCE_ROOT; };
-		601AC6EE153892CD0098399D /* apegcommon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = apegcommon.c; path = "../../../Engine/libsrc/apeg-1.2.1/audio/apegcommon.c"; sourceTree = SOURCE_ROOT; };
-		601AC6F0153892CD0098399D /* audio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = audio.c; path = "../../../Engine/libsrc/apeg-1.2.1/audio/audio.c"; sourceTree = SOURCE_ROOT; };
-		601AC6F2153892CD0098399D /* dct64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dct64.c; path = "../../../Engine/libsrc/apeg-1.2.1/audio/dct64.c"; sourceTree = SOURCE_ROOT; };
-		601AC6F4153892CD0098399D /* decode_1to1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = decode_1to1.c; path = "../../../Engine/libsrc/apeg-1.2.1/audio/decode_1to1.c"; sourceTree = SOURCE_ROOT; };
-		601AC6F6153892CD0098399D /* decode_2to1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = decode_2to1.c; path = "../../../Engine/libsrc/apeg-1.2.1/audio/decode_2to1.c"; sourceTree = SOURCE_ROOT; };
-		601AC6F8153892CD0098399D /* decode_4to1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = decode_4to1.c; path = "../../../Engine/libsrc/apeg-1.2.1/audio/decode_4to1.c"; sourceTree = SOURCE_ROOT; };
-		601AC6FA153892CD0098399D /* layer1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = layer1.c; path = "../../../Engine/libsrc/apeg-1.2.1/audio/layer1.c"; sourceTree = SOURCE_ROOT; };
-		601AC6FC153892CD0098399D /* layer2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = layer2.c; path = "../../../Engine/libsrc/apeg-1.2.1/audio/layer2.c"; sourceTree = SOURCE_ROOT; };
-		601AC6FE153892CD0098399D /* layer3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = layer3.c; path = "../../../Engine/libsrc/apeg-1.2.1/audio/layer3.c"; sourceTree = SOURCE_ROOT; };
-		601AC700153892CD0098399D /* mpg123.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mpg123.c; path = "../../../Engine/libsrc/apeg-1.2.1/audio/mpg123.c"; sourceTree = SOURCE_ROOT; };
-		601AC702153892CE0098399D /* readers.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = readers.c; path = "../../../Engine/libsrc/apeg-1.2.1/audio/readers.c"; sourceTree = SOURCE_ROOT; };
-		601AC704153892CE0098399D /* tabinit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tabinit.c; path = "../../../Engine/libsrc/apeg-1.2.1/audio/tabinit.c"; sourceTree = SOURCE_ROOT; };
-		601AC706153892CE0098399D /* vbrhead.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vbrhead.c; path = "../../../Engine/libsrc/apeg-1.2.1/audio/vbrhead.c"; sourceTree = SOURCE_ROOT; };
-		601AC709153892CE0098399D /* display.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = display.c; path = "../../../Engine/libsrc/apeg-1.2.1/display.c"; sourceTree = SOURCE_ROOT; };
-		601AC70B153892CE0098399D /* getbits.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = getbits.c; path = "../../../Engine/libsrc/apeg-1.2.1/getbits.c"; sourceTree = SOURCE_ROOT; };
-		601AC70D153892CE0098399D /* getblk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = getblk.c; path = "../../../Engine/libsrc/apeg-1.2.1/getblk.c"; sourceTree = SOURCE_ROOT; };
-		601AC70F153892CE0098399D /* gethdr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gethdr.c; path = "../../../Engine/libsrc/apeg-1.2.1/gethdr.c"; sourceTree = SOURCE_ROOT; };
-		601AC711153892CE0098399D /* getpic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = getpic.c; path = "../../../Engine/libsrc/apeg-1.2.1/getpic.c"; sourceTree = SOURCE_ROOT; };
-		601AC713153892CE0098399D /* idct.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = idct.c; path = "../../../Engine/libsrc/apeg-1.2.1/idct.c"; sourceTree = SOURCE_ROOT; };
-		601AC715153892CE0098399D /* motion.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = motion.c; path = "../../../Engine/libsrc/apeg-1.2.1/motion.c"; sourceTree = SOURCE_ROOT; };
-		601AC717153892CE0098399D /* mpeg1dec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mpeg1dec.c; path = "../../../Engine/libsrc/apeg-1.2.1/mpeg1dec.c"; sourceTree = SOURCE_ROOT; };
-		601AC719153892CE0098399D /* ogg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ogg.c; path = "../../../Engine/libsrc/apeg-1.2.1/ogg.c"; sourceTree = SOURCE_ROOT; };
-		601AC71B153892CE0098399D /* recon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = recon.c; path = "../../../Engine/libsrc/apeg-1.2.1/recon.c"; sourceTree = SOURCE_ROOT; };
-		601AC758153892D00098399D /* macport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = macport.cpp; path = ../../../Engine/macport.cpp; sourceTree = SOURCE_ROOT; };
-		601AC75C153892D00098399D /* misc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = misc.cpp; path = ../../../Engine/misc.cpp; sourceTree = SOURCE_ROOT; };
-		601AC82C153892E20098399D /* routefnd.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = routefnd.cpp; path = ../../../Engine/routefnd.cpp; sourceTree = SOURCE_ROOT; };
-		601AC82E153892E20098399D /* scrptrt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scrptrt.cpp; path = ../../../Engine/scrptrt.cpp; sourceTree = SOURCE_ROOT; };
-		601ACBD01538950E0098399D /* acgfx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = acgfx.h; path = ../../../Common/acgfx.h; sourceTree = SOURCE_ROOT; };
-		601ACBD11538950E0098399D /* acgui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = acgui.h; path = ../../../Common/acgui.h; sourceTree = SOURCE_ROOT; };
-		601ACBD21538950E0098399D /* acplatfm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = acplatfm.h; path = ../../../Common/acplatfm.h; sourceTree = SOURCE_ROOT; };
-		601ACBD31538950E0098399D /* acroom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = acroom.h; path = ../../../Common/acroom.h; sourceTree = SOURCE_ROOT; };
-		601ACBD51538950E0098399D /* acruntim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = acruntim.h; path = ../../../Common/acruntim.h; sourceTree = SOURCE_ROOT; };
-		601ACBD61538950E0098399D /* acsound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = acsound.h; path = ../../../Common/acsound.h; sourceTree = SOURCE_ROOT; };
-		601ACBD71538950E0098399D /* agsplugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = agsplugin.h; path = ../../../Common/agsplugin.h; sourceTree = SOURCE_ROOT; };
-		601ACBD81538950E0098399D /* bigend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bigend.h; path = ../../../Common/bigend.h; sourceTree = SOURCE_ROOT; };
-		601ACBDA1538950E0098399D /* Clib32.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Clib32.cpp; path = ../../../Common/Clib32.cpp; sourceTree = SOURCE_ROOT; };
-		601ACBDC1538950E0098399D /* compress.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = compress.cpp; path = ../../../Common/compress.cpp; sourceTree = SOURCE_ROOT; };
-		601ACBDD1538950E0098399D /* compress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = compress.h; path = ../../../Common/compress.h; sourceTree = SOURCE_ROOT; };
-		601ACBDF1538950E0098399D /* cscommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cscommon.cpp; path = ../../../Common/cscommon.cpp; sourceTree = SOURCE_ROOT; };
-		601ACBE11538950E0098399D /* cscomp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cscomp.h; path = ../../../Common/cscomp.h; sourceTree = SOURCE_ROOT; };
-		601ACBE41538950E0098399D /* csrun.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = csrun.cpp; path = ../../../Common/csrun.cpp; sourceTree = SOURCE_ROOT; };
-		601ACBE71538950E0098399D /* fmem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fmem.h; path = ../../../Common/fmem.h; sourceTree = SOURCE_ROOT; };
-		601ACBE91538950E0098399D /* aastr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = aastr.h; path = ../../../Common/libinclude/aastr.h; sourceTree = SOURCE_ROOT; };
-		601ACBEA1538950E0098399D /* aautil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = aautil.h; path = ../../../Common/libinclude/aautil.h; sourceTree = SOURCE_ROOT; };
-		601ACBEB1538950E0098399D /* aldumb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = aldumb.h; path = ../../../Common/libinclude/aldumb.h; sourceTree = SOURCE_ROOT; };
-		601ACBEC1538950E0098399D /* alfont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = alfont.h; path = ../../../Common/libinclude/alfont.h; sourceTree = SOURCE_ROOT; };
-		601ACBED1538950E0098399D /* alfontdll.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = alfontdll.h; path = ../../../Common/libinclude/alfontdll.h; sourceTree = SOURCE_ROOT; };
-		601ACBEE1538950E0098399D /* almp3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = almp3.h; path = ../../../Common/libinclude/almp3.h; sourceTree = SOURCE_ROOT; };
-		601ACBEF1538950E0098399D /* almp3dll.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = almp3dll.h; path = ../../../Common/libinclude/almp3dll.h; sourceTree = SOURCE_ROOT; };
-		601ACBF01538950E0098399D /* alogg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = alogg.h; path = ../../../Common/libinclude/alogg.h; sourceTree = SOURCE_ROOT; };
-		601ACBF11538950E0098399D /* aloggdll.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = aloggdll.h; path = ../../../Common/libinclude/aloggdll.h; sourceTree = SOURCE_ROOT; };
-		601ACBF21538950E0098399D /* apeg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = apeg.h; path = ../../../Common/libinclude/apeg.h; sourceTree = SOURCE_ROOT; };
-		601ACBF31538950E0098399D /* bealleg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bealleg.h; path = ../../../Common/libinclude/bealleg.h; sourceTree = SOURCE_ROOT; };
-		601ACBF41538950E0098399D /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = common.h; path = ../../../Common/libinclude/common.h; sourceTree = SOURCE_ROOT; };
-		601ACBF51538950E0098399D /* dumb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dumb.h; path = ../../../Common/libinclude/dumb.h; sourceTree = SOURCE_ROOT; };
-		601ACBF61538950E0098399D /* genre.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = genre.h; path = ../../../Common/libinclude/genre.h; sourceTree = SOURCE_ROOT; };
-		601ACBF71538950E0098399D /* getbits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = getbits.h; path = ../../../Common/libinclude/getbits.h; sourceTree = SOURCE_ROOT; };
-		601ACBF81538950E0098399D /* getblk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = getblk.h; path = ../../../Common/libinclude/getblk.h; sourceTree = SOURCE_ROOT; };
-		601ACBF91538950E0098399D /* huffman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = huffman.h; path = ../../../Common/libinclude/huffman.h; sourceTree = SOURCE_ROOT; };
-		601ACBFA1538950E0098399D /* l2tables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = l2tables.h; path = ../../../Common/libinclude/l2tables.h; sourceTree = SOURCE_ROOT; };
-		601ACBFB1538950E0098399D /* libcda.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libcda.h; path = ../../../Common/libinclude/libcda.h; sourceTree = SOURCE_ROOT; };
-		601ACBFC1538950E0098399D /* mpeg1dec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mpeg1dec.h; path = ../../../Common/libinclude/mpeg1dec.h; sourceTree = SOURCE_ROOT; };
-		601ACBFD1538950E0098399D /* mpg123.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mpg123.h; path = ../../../Common/libinclude/mpg123.h; sourceTree = SOURCE_ROOT; };
-		601ACBFE1538950E0098399D /* mpglib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mpglib.h; path = ../../../Common/libinclude/mpglib.h; sourceTree = SOURCE_ROOT; };
-		601ACC001538950E0098399D /* config_types.h.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = config_types.h.in; path = ../../../Common/libinclude/OGG/config_types.h.in; sourceTree = SOURCE_ROOT; };
-		601ACC011538950E0098399D /* CONFIG~1.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = "CONFIG~1.H"; path = "../../../Common/libinclude/OGG/CONFIG~1.H"; sourceTree = SOURCE_ROOT; };
-		601ACC021538950E0098399D /* MAKEFILE.AM */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = MAKEFILE.AM; path = ../../../Common/libinclude/OGG/MAKEFILE.AM; sourceTree = SOURCE_ROOT; };
-		601ACC031538950F0098399D /* MAKEFILE.IN */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = MAKEFILE.IN; path = ../../../Common/libinclude/OGG/MAKEFILE.IN; sourceTree = SOURCE_ROOT; };
-		601ACC041538950F0098399D /* OGG.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = OGG.H; path = ../../../Common/libinclude/OGG/OGG.H; sourceTree = SOURCE_ROOT; };
-		601ACC051538950F0098399D /* OS_TYPES.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = OS_TYPES.H; path = ../../../Common/libinclude/OGG/OS_TYPES.H; sourceTree = SOURCE_ROOT; };
-		601ACC071538950F0098399D /* codec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = codec.h; path = ../../../Common/libinclude/theora/codec.h; sourceTree = SOURCE_ROOT; };
-		601ACC081538950F0098399D /* Makefile.am */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.am; path = ../../../Common/libinclude/theora/Makefile.am; sourceTree = SOURCE_ROOT; };
-		601ACC091538950F0098399D /* Makefile.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.in; path = ../../../Common/libinclude/theora/Makefile.in; sourceTree = SOURCE_ROOT; };
-		601ACC0A1538950F0098399D /* theora.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = theora.h; path = ../../../Common/libinclude/theora/theora.h; sourceTree = SOURCE_ROOT; };
-		601ACC0B1538950F0098399D /* theoradec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = theoradec.h; path = ../../../Common/libinclude/theora/theoradec.h; sourceTree = SOURCE_ROOT; };
-		601ACC0C1538950F0098399D /* theoraenc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = theoraenc.h; path = ../../../Common/libinclude/theora/theoraenc.h; sourceTree = SOURCE_ROOT; };
-		601ACC0E1538950F0098399D /* codec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = codec.h; path = ../../../Common/libinclude/vorbis/codec.h; sourceTree = SOURCE_ROOT; };
-		601ACC0F1538950F0098399D /* Makefile.am */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.am; path = ../../../Common/libinclude/vorbis/Makefile.am; sourceTree = SOURCE_ROOT; };
-		601ACC101538950F0098399D /* Makefile.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.in; path = ../../../Common/libinclude/vorbis/Makefile.in; sourceTree = SOURCE_ROOT; };
-		601ACC111538950F0098399D /* vorbisenc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vorbisenc.h; path = ../../../Common/libinclude/vorbis/vorbisenc.h; sourceTree = SOURCE_ROOT; };
-		601ACC121538950F0098399D /* vorbisfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vorbisfile.h; path = ../../../Common/libinclude/vorbis/vorbisfile.h; sourceTree = SOURCE_ROOT; };
-		601ACC131538950F0098399D /* lzw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lzw.cpp; path = ../../../Common/lzw.cpp; sourceTree = SOURCE_ROOT; };
-		601ACC151538950F0098399D /* macport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = macport.h; path = ../../../Common/macport.h; sourceTree = SOURCE_ROOT; };
-		601ACC161538950F0098399D /* misc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = misc.h; path = ../../../Common/misc.h; sourceTree = SOURCE_ROOT; };
-		601ACC181538950F0098399D /* mousew32.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mousew32.cpp; path = ../../../Common/mousew32.cpp; sourceTree = SOURCE_ROOT; };
-		601ACC1A1538950F0098399D /* settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = settings.h; path = ../../../Common/settings.h; sourceTree = SOURCE_ROOT; };
-		601ACC1B1538950F0098399D /* sprcache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sprcache.cpp; path = ../../../Common/sprcache.cpp; sourceTree = SOURCE_ROOT; };
-		601ACC1C1538950F0098399D /* sprcache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sprcache.h; path = ../../../Common/sprcache.h; sourceTree = SOURCE_ROOT; };
-		601ACC1E1538950F0098399D /* wgt2allg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wgt2allg.h; path = ../../../Common/wgt2allg.h; sourceTree = SOURCE_ROOT; };
 		6041A85D1552E60600596310 /* libaldmb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libaldmb.a; path = ../../nativelibs/fat/lib/libaldmb.a; sourceTree = SOURCE_ROOT; };
 		6041A85E1552E60600596310 /* liballeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liballeg.a; path = ../../nativelibs/fat/lib/liballeg.a; sourceTree = SOURCE_ROOT; };
 		6041A85F1552E60600596310 /* libdumb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdumb.a; path = ../../nativelibs/fat/lib/libdumb.a; sourceTree = SOURCE_ROOT; };
@@ -1194,6 +1147,8 @@
 				6041A8681552E60600596310 /* libvorbisidec.a in Frameworks */,
 				6041A8881552E89E00596310 /* libz.dylib in Frameworks */,
 				6041A8981552E8C400596310 /* libbz2.dylib in Frameworks */,
+				11F4FCF1161F81830060820B /* agskey.lib in Frameworks */,
+				11F4FCFB161F81830060820B /* agskey.lib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1211,6 +1166,67 @@
 				28EC4C5711D54ECE0027AA9F /* agsViewController.mm */,
 			);
 			path = Classes;
+			sourceTree = "<group>";
+		};
+		11F4FCC3161F81820060820B /* agskey */ = {
+			isa = PBXGroup;
+			children = (
+				11F4FCC4161F81820060820B /* agskey.cpp */,
+				11F4FCC5161F81820060820B /* agskey.h */,
+				11F4FCC6161F81820060820B /* vc2008 */,
+			);
+			path = agskey;
+			sourceTree = "<group>";
+		};
+		11F4FCC6161F81820060820B /* vc2008 */ = {
+			isa = PBXGroup;
+			children = (
+				11F4FCC7161F81820060820B /* agskey.ncb */,
+				11F4FCC8161F81830060820B /* agskey.sln */,
+				11F4FCC9161F81830060820B /* agskey.suo */,
+				11F4FCCA161F81830060820B /* agskey.vcproj */,
+				11F4FCCB161F81830060820B /* agskey.vcproj.Turkey.Janet.user */,
+				11F4FCCC161F81830060820B /* Debug */,
+				11F4FCDA161F81830060820B /* Release */,
+			);
+			path = vc2008;
+			sourceTree = "<group>";
+		};
+		11F4FCCC161F81830060820B /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				11F4FCCD161F81830060820B /* agskey.dll */,
+				11F4FCCE161F81830060820B /* agskey.dll.embed.manifest */,
+				11F4FCCF161F81830060820B /* agskey.dll.embed.manifest.res */,
+				11F4FCD0161F81830060820B /* agskey.dll.intermediate.manifest */,
+				11F4FCD1161F81830060820B /* agskey.exp */,
+				11F4FCD2161F81830060820B /* agskey.ilk */,
+				11F4FCD3161F81830060820B /* agskey.lib */,
+				11F4FCD4161F81830060820B /* agskey.obj */,
+				11F4FCD5161F81830060820B /* agskey.pdb */,
+				11F4FCD6161F81830060820B /* BuildLog.htm */,
+				11F4FCD7161F81830060820B /* mt.dep */,
+				11F4FCD8161F81830060820B /* vc90.idb */,
+				11F4FCD9161F81830060820B /* vc90.pdb */,
+			);
+			path = Debug;
+			sourceTree = "<group>";
+		};
+		11F4FCDA161F81830060820B /* Release */ = {
+			isa = PBXGroup;
+			children = (
+				11F4FCDB161F81830060820B /* agskey.dll */,
+				11F4FCDC161F81830060820B /* agskey.dll.intermediate.manifest */,
+				11F4FCDD161F81830060820B /* agskey.exp */,
+				11F4FCDE161F81830060820B /* agskey.lib */,
+				11F4FCDF161F81830060820B /* agskey.obj */,
+				11F4FCE0161F81830060820B /* agskey.pdb */,
+				11F4FCE1161F81830060820B /* BuildLog.htm */,
+				11F4FCE2161F81830060820B /* mt.dep */,
+				11F4FCE3161F81830060820B /* vc90.idb */,
+				11F4FCE4161F81830060820B /* vc90.pdb */,
+			);
+			path = Release;
 			sourceTree = "<group>";
 		};
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
@@ -1294,6 +1310,7 @@
 		60898C2B160779D9009E152F /* Plugins */ = {
 			isa = PBXGroup;
 			children = (
+				11F4FCC3161F81820060820B /* agskey */,
 				60898C2C160779D9009E152F /* agsblend */,
 				60898C39160779D9009E152F /* AGSflashlight */,
 				60898CCB160779DA009E152F /* AGSSpriteFont */,
@@ -1982,19 +1999,6 @@
 			path = dynobj;
 			sourceTree = "<group>";
 		};
-		60CA833915BA1FCC0010D3B4 /* game */ = {
-			isa = PBXGroup;
-			children = (
-				60CA833A15BA1FCC0010D3B4 /* ac2game.dat */,
-				60CA833B15BA1FCC0010D3B4 /* acsetup.cfg */,
-				60CA833C15BA1FCC0010D3B4 /* audio.vox */,
-				60CA833D15BA1FCC0010D3B4 /* PRELOAD.pcx */,
-				60CA833E15BA1FCC0010D3B4 /* speech.vox */,
-			);
-			name = game;
-			path = grue;
-			sourceTree = "<group>";
-		};
 		60CA3BAB160713FE00CFB3BD /* debug */ = {
 			isa = PBXGroup;
 			children = (
@@ -2413,6 +2417,19 @@
 			path = test;
 			sourceTree = "<group>";
 		};
+		60CA833915BA1FCC0010D3B4 /* game */ = {
+			isa = PBXGroup;
+			children = (
+				11F4FCB7161F7F960060820B /* ac2game.dat */,
+				11F4FCB8161F7F960060820B /* acsetup.cfg */,
+				11F4FCB9161F7F960060820B /* audio.vox */,
+				11F4FCBA161F7F970060820B /* PRELOAD.pcx */,
+				11F4FCBB161F7F970060820B /* speech.vox */,
+			);
+			name = game;
+			path = grue;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -2470,12 +2487,40 @@
 				608498E8155CDF7000121EFE /* Icon@2x.png in Resources */,
 				60BC89A8155E969700807358 /* iTunesArtwork in Resources */,
 				60844EAD1573943400003ED0 /* MainWindow-iPad.xib in Resources */,
-				60CA833F15BA1FCC0010D3B4 /* ac2game.dat in Resources */,
-				60CA834015BA1FCC0010D3B4 /* acsetup.cfg in Resources */,
-				60CA834115BA1FCC0010D3B4 /* audio.vox in Resources */,
-				60CA834215BA1FCC0010D3B4 /* PRELOAD.pcx in Resources */,
-				60CA834315BA1FCC0010D3B4 /* speech.vox in Resources */,
-				11021F7B1611F9F0009F8B3E /* Default-568h@2x.png in Resources */,
+				60CA833F15BA1FCC0010D3B4 /* (null) in Resources */,
+				60CA834015BA1FCC0010D3B4 /* (null) in Resources */,
+				60CA834115BA1FCC0010D3B4 /* (null) in Resources */,
+				60CA834215BA1FCC0010D3B4 /* (null) in Resources */,
+				60CA834315BA1FCC0010D3B4 /* (null) in Resources */,
+				11F4FCBC161F7F970060820B /* ac2game.dat in Resources */,
+				11F4FCBD161F7F970060820B /* acsetup.cfg in Resources */,
+				11F4FCBE161F7F970060820B /* audio.vox in Resources */,
+				11F4FCBF161F7F970060820B /* PRELOAD.pcx in Resources */,
+				11F4FCC0161F7F970060820B /* speech.vox in Resources */,
+				11F4FCE6161F81830060820B /* agskey.ncb in Resources */,
+				11F4FCE7161F81830060820B /* agskey.sln in Resources */,
+				11F4FCE8161F81830060820B /* agskey.suo in Resources */,
+				11F4FCE9161F81830060820B /* agskey.vcproj in Resources */,
+				11F4FCEA161F81830060820B /* agskey.vcproj.Turkey.Janet.user in Resources */,
+				11F4FCEB161F81830060820B /* agskey.dll in Resources */,
+				11F4FCEC161F81830060820B /* agskey.dll.embed.manifest in Resources */,
+				11F4FCED161F81830060820B /* agskey.dll.embed.manifest.res in Resources */,
+				11F4FCEE161F81830060820B /* agskey.dll.intermediate.manifest in Resources */,
+				11F4FCF0161F81830060820B /* agskey.ilk in Resources */,
+				11F4FCF2161F81830060820B /* agskey.obj in Resources */,
+				11F4FCF3161F81830060820B /* agskey.pdb in Resources */,
+				11F4FCF4161F81830060820B /* BuildLog.htm in Resources */,
+				11F4FCF5161F81830060820B /* mt.dep in Resources */,
+				11F4FCF6161F81830060820B /* vc90.idb in Resources */,
+				11F4FCF7161F81830060820B /* vc90.pdb in Resources */,
+				11F4FCF8161F81830060820B /* agskey.dll in Resources */,
+				11F4FCF9161F81830060820B /* agskey.dll.intermediate.manifest in Resources */,
+				11F4FCFC161F81830060820B /* agskey.obj in Resources */,
+				11F4FCFD161F81830060820B /* agskey.pdb in Resources */,
+				11F4FCFE161F81830060820B /* BuildLog.htm in Resources */,
+				11F4FCFF161F81830060820B /* mt.dep in Resources */,
+				11F4FD00161F81830060820B /* vc90.idb in Resources */,
+				11F4FD01161F81830060820B /* vc90.pdb in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2822,6 +2867,9 @@
 				60898DCC160785DD009E152F /* gfxfilter_hq3x.cpp in Sources */,
 				60898DD6160787FF009E152F /* hq2x3x.cpp in Sources */,
 				6080428E1614DE8F00D33732 /* assetmanager.cpp in Sources */,
+				11F4FCE5161F81830060820B /* agskey.cpp in Sources */,
+				11F4FCEF161F81830060820B /* agskey.exp in Sources */,
+				11F4FCFA161F81830060820B /* agskey.exp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2846,6 +2894,8 @@
 					"\"$(SRCROOT)/../../nativelibs/fat/lib\"",
 					"\"$(SRCROOT)/../../../Engine\"",
 					"\"$(SRCROOT)/../../../Plugins/agslua/agslua/zlib\"",
+					"\"$(SRCROOT)/../../../Plugins/agskey/vc2008/Debug\"",
+					"\"$(SRCROOT)/../../../Plugins/agskey/vc2008/Release\"",
 				);
 				OTHER_CODE_SIGN_FLAGS = "";
 				"OTHER_CODE_SIGN_FLAGS[sdk=*]" = "";
@@ -2873,6 +2923,8 @@
 					"\"$(SRCROOT)/../../nativelibs/fat/lib\"",
 					"\"$(SRCROOT)/../../../Engine\"",
 					"\"$(SRCROOT)/../../../Plugins/agslua/agslua/zlib\"",
+					"\"$(SRCROOT)/../../../Plugins/agskey/vc2008/Debug\"",
+					"\"$(SRCROOT)/../../../Plugins/agskey/vc2008/Release\"",
 				);
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_NAME = "Gemini Rue";

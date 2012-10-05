@@ -1,7 +1,7 @@
 #ifndef AGS_KEY_H
 #define AGS_KEY_H
 
-#include "../../Common/agsplugin.h"
+#include "plugin/agsplugin.h"
 
 namespace agskey
 {

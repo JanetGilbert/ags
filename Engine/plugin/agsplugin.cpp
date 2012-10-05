@@ -49,6 +49,7 @@ namespace BitmapHelper = AGS::Common::BitmapHelper;
 #include "ags_snowrain/ags_snowrain.h"
 #if defined(IOS_VERSION)
 #include "../Plugins/agstouch/agstouch.h"
+#include "../Plugins/agskey/agskey.h"
 #endif // IOS_VERSION
 #endif // BUILTIN_PLUGINS
 
@@ -882,6 +883,19 @@ bool pl_use_builtin_plugin(EnginePlugin* apl)
         return true;
     }
 #endif // IOS_VERSION
+#if defined(IOS_VERSION)
+    else if (strncmp(apl->filename, "agskey", strlen("agskey")) == 0)
+    {
+        apl->engineStartup = agskey::AGS_EngineStartup;
+        apl->engineShutdown = agskey::AGS_EngineShutdown;
+        apl->onEvent = agskey::AGS_EngineOnEvent;
+        apl->debugHook = agskey::AGS_EngineDebugHook;
+        apl->initGfxHook = agskey::AGS_EngineInitGfx;
+        apl->dllHandle = (HINSTANCE)1;
+        apl->builtin = true;
+        return true;
+    }
+#endif
 #endif // BUILTIN_PLUGINS
 
     return false;
