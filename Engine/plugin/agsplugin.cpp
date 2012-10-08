@@ -57,9 +57,9 @@ namespace BitmapHelper = AGS::Common::BitmapHelper;
 
 
 #if defined(BUILTIN_PLUGINS)
-#include "AGSflashlight/agsflashlight.h"
-#include "agsblend/agsblend.h"
-#include "ags_snowrain/ags_snowrain.h"
+#include "../Plugins/AGSflashlight/agsflashlight.h"
+#include "../Plugins/agsblend/agsblend.h"
+#include "../Plugins/ags_snowrain/ags_snowrain.h"
 #if defined(IOS_VERSION)
 #include "../Plugins/agstouch/agstouch.h"
 #include "../Plugins/agskey/agskey.h"
