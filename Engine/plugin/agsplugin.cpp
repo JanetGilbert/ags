@@ -889,14 +889,14 @@ bool pl_use_builtin_plugin(EnginePlugin* apl)
         apl->onEvent = agskey::AGS_EngineOnEvent;
         apl->debugHook = agskey::AGS_EngineDebugHook;
         apl->initGfxHook = agskey::AGS_EngineInitGfx;
-        apl->dllHandle = (HINSTANCE)1;
+     //   apl->dllHandle = (HINSTANCE)1;
         apl->builtin = true;
         return true;
     }
 #endif
 #endif // BUILTIN_PLUGINS
 
-    AGS::Common::Out::FPrint("No built-in plugin found. Plugin loading failed!");
+   // AGS::Common::Out::FPrint("No built-in plugin found. Plugin loading failed!");
     return false;
 }
 
@@ -942,7 +942,7 @@ void pl_read_plugins_from_disk (DataStream *in) {
 
         if (apl->library.Load(apl->filename))
         {
-          AGS::Common::Out::FPrint("Plugin loading succeeded, resolving imports...");
+          sprintf(buffer, "Plugin loading succeeded, resolving imports...");
 
           if (apl->library.GetFunctionAddress("AGS_PluginV2") == NULL) {
               sprintf(buffer, "Plugin '%s' is an old incompatible version.", apl->filename);
@@ -961,7 +961,7 @@ void pl_read_plugins_from_disk (DataStream *in) {
         }
         else
         {
-          AGS::Common::Out::FPrint("Plugin loading failed, trying built-in plugins...");
+          sprintf(buffer, "Plugin loading failed, trying built-in plugins...");
           if (!pl_use_builtin_plugin(apl))
               continue;
         }

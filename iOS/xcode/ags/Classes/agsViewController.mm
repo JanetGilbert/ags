@@ -223,6 +223,8 @@ extern "C" int ios_is_keyboard_visible()
 		self.inputAccessoryView = toolbar;
 		[toolbar release];
 	}
+    
+    [array release];
 }
 
 
