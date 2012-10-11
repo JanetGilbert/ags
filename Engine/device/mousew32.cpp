@@ -259,6 +259,22 @@ int misbuttondown(int buno)
   return FALSE;
 }
 
+//j
+int misbuttonreleased(int buno)
+{
+    int toret = FALSE;
+    // int butis = mouse_b;
+    poll_mouse();
+    
+    if (mouse_b & MB_ARRAY[buno])
+        toret = FALSE;
+    else if (butwas & MB_ARRAY[buno])
+        toret = TRUE;
+    
+    // butwas = butis;
+    return toret;
+}
+
 void msetgraphpos(int xa, int ya)
 { 
   position_mouse(xa, ya); // xa -= hotx; ya -= hoty;

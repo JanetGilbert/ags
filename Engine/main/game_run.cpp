@@ -247,6 +247,13 @@ void check_controls() {
         }
     }
     else if ((wasbutdown>0) && (!misbuttondown(wasbutdown-1))) {
+        
+        //j click past dialogues on mouse up
+        if (is_text_overlay > 0) {
+            if (play.cant_skip_speech & SKIP_MOUSECLICK)
+                remove_screen_overlay(OVER_TEXTMSG);
+        }
+        
         guis[wasongui].mouse_but_up();
         int whichbut=wasbutdown;
         wasbutdown=0;
@@ -300,9 +307,12 @@ void check_controls() {
         if (play.fast_forward) { }
         else if ((play.wait_counter > 0) && (play.key_skip_wait > 1))
             play.wait_counter = -1;
-        else if (is_text_overlay > 0) {
+        /*else if (is_text_overlay > 0) {
             if (play.cant_skip_speech & SKIP_MOUSECLICK)
                 remove_screen_overlay(OVER_TEXTMSG);
+        }*/ //J
+        else if (is_text_overlay > 0) { //j ensure that clicking past dialogues fires on mouse up
+            wasbutdown=aa+1;
         }
         else if (!IsInterfaceEnabled()) ;  // blocking cutscene, ignore mouse
         else if (platform->RunPluginHooks(AGSE_MOUSECLICK, aa+1)) {
@@ -530,6 +540,7 @@ void game_loop_check_controls(bool checkControls)
     // don't let the player do anything before the screen fades in
     if ((in_new_room == 0) && (checkControls)) {
         int inRoom = displayed_room;
+        mgetgraphpos();//j
         check_controls();
         // If an inventory interaction changed the room
         if (inRoom != displayed_room)

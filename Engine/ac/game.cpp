@@ -2438,6 +2438,11 @@ int load_game(int slotn, char*descrp, int *wantShot) {
 }
 
 void start_skipping_cutscene () {
+    //j ensure that we can't freeze up the game by skipping a cutscene when not in a cutscene
+    if (play.in_cutscene == 0){
+        return;
+    }
+    
     play.fast_forward = 1;
     // if a drop-down icon bar is up, remove it as it will pause the game
     if (ifacepopped>=0)

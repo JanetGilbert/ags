@@ -80,7 +80,7 @@ char** old_speech_lines;
 int said_text = 0;
 int longestline = 0;
 
-
+extern int misbuttonreleased(int buno);
 
 
 void Dialog_Start(ScriptDialog *sd) {
@@ -835,7 +835,13 @@ int show_dialog_options(int dlgnum, int sayChosenOption, bool runGameLoopsInBack
           parserActivated = 1;
       }
 
-      int mouseButtonPressed = mgetbutton();
+      //j, we need the conversation to fire on mouse up not mouse down for ios
+      //int mouseButtonPressed = mgetbutton(); // j removed
+      int mouseButtonPressed=NONE;
+      if (misbuttonreleased(0)){
+        mouseButtonPressed=LEFT;
+      }
+      mgetbutton();
 
       if (mouseButtonPressed != NONE) {
         if (mouseison < 0) 

@@ -454,6 +454,8 @@ void GUIMain::poll()
 
 void GUIMain::mouse_but_down()
 {
+  poll(); //j
+    
   if (mouseover < 0)
     return;
 
@@ -462,7 +464,7 @@ void GUIMain::mouse_but_down()
       (!objs[mouseover]->IsClickable()))
     return;
 
-  mousedownon = mouseover;
+  mousedownon = mouseover; 
   if (objs[mouseover]->MouseDown())
     mouseover = MOVER_MOUSEDOWNLOCKED;
   objs[mousedownon]->MouseMove(mousex - x, mousey - y);

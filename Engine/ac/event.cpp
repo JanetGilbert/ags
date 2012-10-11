@@ -425,9 +425,9 @@ void ClaimEvent() {
 
 void call_simulate_keypress(int keycode)
 {
-#ifdef ALLEGRO_KEYBOARD_HANDLER
+//#ifdef ALLEGRO_KEYBOARD_HANDLER
     simulate_keypress(keycode);
-#endif
+//#endif
     
 }
 
