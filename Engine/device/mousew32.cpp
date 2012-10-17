@@ -40,29 +40,6 @@
 #include "gfx/bitmap.h"
 
 using AGS::Common::Bitmap;
-
-
-/*
-int  minstalled();    // this returns number of buttons (or 0)
-void minst();   // this exits if not installed
-void mshow();
-void mhide();
-int  mgetbutton();
-void mchangestyle(int,int);
-void mgetpos();
-void mgetgraphpos();
-void msetpos(int,int);
-void mconfine(int,int,int,int); // left top right bottom
-void mgraphconfine(int,int,int,int);
-int  mbutrelease(int);
-void domouse(int=0);   // graphics mode cursor
-void mfreemem();
-void mloadcursor(char*);  // load from file
-void mloadwcursor(char*);
-void mnewcursor(char);
-int  ismouseinbox(int,int,int,int);
-void msethotspot(int,int);   // Graphics mode only. Useful for crosshair.
-*/
 void msetgraphpos(int,int);
 
 extern char lib_file_name[13];
@@ -230,7 +207,13 @@ void mloadwcursor(char *namm)
 }
 
 int butwas = 0;
-int mgetbutton()
+
+void mupdatebuttonrelease()
+{
+  butwas = mouse_b;
+}
+
+int mgetbutton(bool checkrelease=true)
 {
   int toret = NONE;
   poll_mouse();
@@ -245,8 +228,12 @@ int mgetbutton()
     toret = RIGHT;
   else if (butis & 4)
     toret = MIDDLE;
-
-  butwas = butis;
+    
+    
+    if (checkrelease){
+       butwas = mouse_b;
+    }
+  //butwas = butis;
   return toret;
 }
 

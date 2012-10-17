@@ -35,7 +35,7 @@ int ismouseinbox(int lf, int tp, int rt, int bt);
 void mfreemem();
 void mnewcursor(char cursno);
 void mloadwcursor(char *namm);
-int mgetbutton();
+int mgetbutton(bool checkrelease);
 int misbuttondown(int buno);
 void msetgraphpos(int xa, int ya);
 void msethotspot(int xx, int yy);

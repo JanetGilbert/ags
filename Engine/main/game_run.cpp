@@ -88,6 +88,7 @@ extern unsigned int loopcounter,lastcounter;
 extern volatile int timerloop;
 extern int cur_mode,cur_cursor;
 
+extern void mupdatebuttonrelease();
 
 int numEventsAtStartOfFunction;
 long t1;  // timer for FPS // ... 't1'... how very appropriate.. :)
@@ -247,11 +248,10 @@ void check_controls() {
         }
     }
     else if ((wasbutdown>0) && (!misbuttondown(wasbutdown-1))) {
-        
         //j click past dialogues on mouse up
         if (is_text_overlay > 0) {
             if (play.cant_skip_speech & SKIP_MOUSECLICK)
-                remove_screen_overlay(OVER_TEXTMSG);
+            remove_screen_overlay(OVER_TEXTMSG);
         }
         
         guis[wasongui].mouse_but_up();
@@ -545,6 +545,8 @@ void game_loop_check_controls(bool checkControls)
         // If an inventory interaction changed the room
         if (inRoom != displayed_room)
             check_new_room();
+        
+       // mupdatebuttonrelease();//j
     }
 }
 

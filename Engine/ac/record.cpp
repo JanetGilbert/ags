@@ -202,7 +202,7 @@ int rec_misbuttondown (int but) {
     return result;
 }
 
-int rec_mgetbutton() {
+int rec_mgetbutton(bool checkrelease) {
 
     if ((play.playback) && (recordbuffer != NULL)) {
         if ((recordbuffer[recsize] < play.gamestep) && (play.gamestep < 32766))
@@ -230,7 +230,7 @@ int rec_mgetbutton() {
         pluginSimulatedClick = NONE;
     }
     else {
-        result = mgetbutton();
+        result = mgetbutton(checkrelease); //j
     }
 
     if ((result >= 0) && (globalTimerCounter < play.ignore_user_input_until_time))
