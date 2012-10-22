@@ -2439,7 +2439,7 @@ int load_game(int slotn, char*descrp, int *wantShot) {
 
 void start_skipping_cutscene () {
     //j ensure that we can't freeze up the game by skipping a cutscene when not in a cutscene
-    if (play.in_cutscene == 0){
+    if (play.in_cutscene == 0 || play.fast_forward){
         return;
     }
     
@@ -2452,6 +2452,21 @@ void start_skipping_cutscene () {
     if (is_text_overlay > 0)
         remove_screen_overlay(OVER_TEXTMSG);
 
+}
+
+// J fake a drag for cutscene skipping
+void check_skip_cutscene_drag(int startx, int starty, int endx, int endy)
+{
+    if (play.in_cutscene==1  && play.fast_forward==0){
+        int scrw = System_GetScreenWidth();
+        int scrh = System_GetScreenHeight();
+        int scr_limit_x = scrw/4;
+        int scr_limit_y = scrh/4;
+        
+        if (startx<scr_limit_x && starty<scr_limit_y && endx>scrw-scr_limit_x && endy<scr_limit_y){
+            start_skipping_cutscene();
+        }
+    }
 }
 
 void check_skip_cutscene_keypress (int kgn) {

@@ -8,6 +8,8 @@ extern void startEngine(char* filename, char* directory, int loadLastSave);
 extern int psp_rotation;
 extern void start_skipping_cutscene();
 extern void call_simulate_keypress(int keycode);
+extern void check_skip_cutscene_drag(int startx, int starty, int endx, int endy);
+
 //extern void FakeKeyPress(int keycode);
 
 @interface agsViewController ()
@@ -34,6 +36,8 @@ int mouse_position_x = 0;
 int mouse_position_y = 0;
 int mouse_relative_position_x = 0;
 int mouse_relative_position_y = 0;
+int mouse_start_position_x = 0;
+int mouse_start_position_y = 0;
 
 extern "C"
 {
@@ -297,14 +301,28 @@ extern "C" int ios_is_keyboard_visible()
 	self.view.frame = CGRectMake(0, newTop, self.view.frame.size.width, self.view.frame.size.height);
 	[UIView commitAnimations];
 }
-
+/*
 - (IBAction)handleLongPress:(UIGestureRecognizer *)sender
 {
     if (sender.state != UIGestureRecognizerStateBegan)
         return;
     
     start_skipping_cutscene();
-}
+}*/
+
+/*- (IBAction)handleSwipe:(UISwipeGestureRecognizer *)sender
+{
+    if (sender.state != UIGestureRecognizerStateEnded)
+        return;
+    
+    CGPoint point = [sender locationInView:[self view]];
+    //NSLog(@"Swipe down - start location: %f,%f", point.x, point.y);
+    //int dist_x = mouse_position_x-point.x;
+    //int dist_y = mouse_position_y-point.y;
+    
+    start_skipping_cutscene();
+}*/
+
 /*
  - (IBAction)handleLongPress:(UIGestureRecognizer *)sender
  {
@@ -351,6 +369,9 @@ extern "C" int ios_is_keyboard_visible()
 	CGPoint touchPoint = [touch locationInView:self.view];
 	mouse_position_x = touchPoint.x;
 	mouse_position_y = touchPoint.y;
+	mouse_start_position_x = touchPoint.x;
+	mouse_start_position_y = touchPoint.y;
+    
     mouse_button=1;
 }
 
@@ -361,6 +382,12 @@ extern "C" int ios_is_keyboard_visible()
 	mouse_position_x = touchPoint.x;
 	mouse_position_y = touchPoint.y;
     mouse_button=0;
+    
+    // Check skip cutscene
+   
+    check_skip_cutscene_drag(mouse_start_position_x, mouse_start_position_y, mouse_position_x, mouse_position_y);
+ 
+    
 }
 
 - (void)createGestureRecognizers
@@ -392,11 +419,17 @@ extern "C" int ios_is_keyboard_visible()
      [self.view addGestureRecognizer:shortLongPressGesture];
      [shortLongPressGesture release];*/
     
-    UILongPressGestureRecognizer* longPressGesture = [[UILongPressGestureRecognizer alloc]
+    /*UILongPressGestureRecognizer* longPressGesture = [[UILongPressGestureRecognizer alloc]
     initWithTarget:self action:@selector(handleLongPress:)];
     longPressGesture.minimumPressDuration = 3;
     [self.view addGestureRecognizer:longPressGesture];
-    [longPressGesture release];
+    [longPressGesture release];*/
+    
+    /*UISwipeGestureRecognizer* swipeGesture = [[UISwipeGestureRecognizer alloc]
+    initWithTarget:self action:@selector(handleSwipe:)];
+    [swipeGesture setDirection:UISwipeGestureRecognizerDirectionRight];
+    [self.view addGestureRecognizer:swipeGesture];
+    [swipeGesture release];*/
 }
 
 
