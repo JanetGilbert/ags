@@ -125,7 +125,7 @@ int AGSPlatformDriver::RunPluginDebugHooks(const char *scriptfile, int linenum) 
 void AGSPlatformDriver::InitialiseAbufAtStartup()
 {
     // because loading the game file accesses abuf, it must exist
-   // abuf = BitmapHelper::CreateBitmap(10,10,8); // janet this causes a minor memory leak 
+    abuf = BitmapHelper::CreateBitmap(10,10,8); // janet this causes a minor memory leak 
 }
 
 void AGSPlatformDriver::FinishedUsingGraphicsMode()
