@@ -490,7 +490,7 @@ extern "C" void ios_create_screen()
 //- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
-	self.isInPortraitOrientation = UIInterfaceOrientationIsLandscape(fromInterfaceOrientation);
+	self.isInPortraitOrientation = !UIInterfaceOrientationIsLandscape(agsviewcontroller.interfaceOrientation);
 	if (self.isKeyboardActive && self.isInPortraitOrientation)
 		[self moveViewAnimated:YES duration:0.1];
 }
@@ -512,8 +512,8 @@ extern "C" void ios_create_screen()
 	[(EAGLView *)self.view setFramebuffer];
 	
 	self.isKeyboardActive = FALSE;
-	self.isInPortraitOrientation = (agsviewcontroller.interfaceOrientation==UIDeviceOrientationPortrait) || (agsviewcontroller.interfaceOrientation==UIDeviceOrientationPortraitUpsideDown);
-	
+	self.isInPortraitOrientation = !UIInterfaceOrientationIsLandscape(agsviewcontroller.interfaceOrientation);
+ 
 	[self createKeyboardButtonBar:1];
 	
 	[NSThread detachNewThreadSelector:@selector(startThread) toTarget:self withObject:nil];
