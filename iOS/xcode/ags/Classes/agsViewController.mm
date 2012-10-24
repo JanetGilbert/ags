@@ -512,7 +512,7 @@ extern "C" void ios_create_screen()
 	[(EAGLView *)self.view setFramebuffer];
 	
 	self.isKeyboardActive = FALSE;
-	self.isInPortraitOrientation = TRUE;
+	self.isInPortraitOrientation = (agsviewcontroller.interfaceOrientation==UIDeviceOrientationPortrait) || (agsviewcontroller.interfaceOrientation==UIDeviceOrientationPortraitUpsideDown);
 	
 	[self createKeyboardButtonBar:1];
 	
