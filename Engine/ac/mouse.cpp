@@ -47,6 +47,8 @@ extern CharacterInfo*playerchar;
 extern GUIMain*guis;
 extern IGraphicsDriver *gfxDriver;
 
+extern "C" void ios_set_mouse(int x, int y);
+
 ScriptMouse scmouse;
 int cur_mode,cur_cursor;
 int mouse_frame=0,mouse_delay=0;
@@ -278,6 +280,7 @@ void SetMousePosition (int newx, int newy) {
 
     multiply_up_coordinates(&newx, &newy);
     filter->SetMousePosition(newx, newy);
+    ios_set_mouse(newx, newy); // J Need to reset the raw coordinates for this to take effect
     RefreshMouse();
 }
 
