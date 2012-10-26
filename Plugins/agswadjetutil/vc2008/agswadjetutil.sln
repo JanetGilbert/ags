@@ -1,7 +1,7 @@
 
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "agskey", "agskey.vcproj", "{31FF3B7D-D7C6-4B10-92DF-C10BADF1899E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "agswadjetutil", "agswadjetutil.vcproj", "{31FF3B7D-D7C6-4B10-92DF-C10BADF1899E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

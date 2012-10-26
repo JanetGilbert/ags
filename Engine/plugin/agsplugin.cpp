@@ -62,7 +62,7 @@ namespace BitmapHelper = AGS::Common::BitmapHelper;
 #include "../Plugins/ags_snowrain/ags_snowrain.h"
 #if defined(IOS_VERSION)
 #include "../Plugins/agstouch/agstouch.h"
-#include "../Plugins/agskey/agskey.h"
+#include "../Plugins/agswadjetutil/agswadjetutil.h"
 #endif // IOS_VERSION
 #endif // BUILTIN_PLUGINS
 
@@ -882,13 +882,13 @@ bool pl_use_builtin_plugin(EnginePlugin* apl)
     }
 #endif // IOS_VERSION
 #if defined(IOS_VERSION)
-    else if (strncmp(apl->filename, "agskey", strlen("agskey")) == 0)
+    else if (strncmp(apl->filename, "agswadjetutil", strlen("agswadjetutil")) == 0)
     {
-        apl->engineStartup = agskey::AGS_EngineStartup;
-        apl->engineShutdown = agskey::AGS_EngineShutdown;
-        apl->onEvent = agskey::AGS_EngineOnEvent;
-        apl->debugHook = agskey::AGS_EngineDebugHook;
-        apl->initGfxHook = agskey::AGS_EngineInitGfx;
+        apl->engineStartup = agswadjetutil::AGS_EngineStartup;
+        apl->engineShutdown = agswadjetutil::AGS_EngineShutdown;
+        apl->onEvent = agswadjetutil::AGS_EngineOnEvent;
+        apl->debugHook = agswadjetutil::AGS_EngineDebugHook;
+        apl->initGfxHook = agswadjetutil::AGS_EngineInitGfx;
      //   apl->dllHandle = (HINSTANCE)1;
         apl->builtin = true;
         return true;

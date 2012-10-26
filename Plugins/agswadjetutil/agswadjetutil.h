@@ -1,9 +1,9 @@
-#ifndef AGS_KEY_H
-#define AGS_KEY_H
+#ifndef AGS_WADJETUTIL_H
+#define AGS_WADJETUTIL_H
 
 #include "plugin/agsplugin.h"
 
-namespace agskey
+namespace agswadjetutil
 {
   void AGS_EngineStartup(IAGSEngine *lpEngine);
   void AGS_EngineShutdown();

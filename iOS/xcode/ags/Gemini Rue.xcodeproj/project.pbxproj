@@ -7,40 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		11188409163AFC98009CE41A /* agswadjetutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11188407163AFC98009CE41A /* agswadjetutil.cpp */; };
+		1118840C163B2692009CE41A /* ios_ipad.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 1118840B163B2692009CE41A /* ios_ipad.cfg */; };
+		1118840E163B2699009CE41A /* ios_iphone.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 1118840D163B2699009CE41A /* ios_iphone.cfg */; };
 		11F4FCBC161F7F970060820B /* ac2game.dat in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCB7161F7F960060820B /* ac2game.dat */; };
 		11F4FCBD161F7F970060820B /* acsetup.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCB8161F7F960060820B /* acsetup.cfg */; };
 		11F4FCBE161F7F970060820B /* audio.vox in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCB9161F7F960060820B /* audio.vox */; };
 		11F4FCBF161F7F970060820B /* PRELOAD.pcx in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCBA161F7F970060820B /* PRELOAD.pcx */; };
 		11F4FCC0161F7F970060820B /* speech.vox in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCBB161F7F970060820B /* speech.vox */; };
-		11F4FCE5161F81830060820B /* agskey.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11F4FCC4161F81820060820B /* agskey.cpp */; };
-		11F4FCE6161F81830060820B /* agskey.ncb in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCC7161F81820060820B /* agskey.ncb */; };
-		11F4FCE7161F81830060820B /* agskey.sln in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCC8161F81830060820B /* agskey.sln */; };
-		11F4FCE8161F81830060820B /* agskey.suo in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCC9161F81830060820B /* agskey.suo */; };
-		11F4FCE9161F81830060820B /* agskey.vcproj in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCCA161F81830060820B /* agskey.vcproj */; };
-		11F4FCEA161F81830060820B /* agskey.vcproj.Turkey.Janet.user in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCCB161F81830060820B /* agskey.vcproj.Turkey.Janet.user */; };
-		11F4FCEB161F81830060820B /* agskey.dll in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCCD161F81830060820B /* agskey.dll */; };
-		11F4FCEC161F81830060820B /* agskey.dll.embed.manifest in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCCE161F81830060820B /* agskey.dll.embed.manifest */; };
-		11F4FCED161F81830060820B /* agskey.dll.embed.manifest.res in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCCF161F81830060820B /* agskey.dll.embed.manifest.res */; };
-		11F4FCEE161F81830060820B /* agskey.dll.intermediate.manifest in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCD0161F81830060820B /* agskey.dll.intermediate.manifest */; };
-		11F4FCEF161F81830060820B /* agskey.exp in Sources */ = {isa = PBXBuildFile; fileRef = 11F4FCD1161F81830060820B /* agskey.exp */; };
-		11F4FCF0161F81830060820B /* agskey.ilk in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCD2161F81830060820B /* agskey.ilk */; };
-		11F4FCF1161F81830060820B /* agskey.lib in Frameworks */ = {isa = PBXBuildFile; fileRef = 11F4FCD3161F81830060820B /* agskey.lib */; };
-		11F4FCF2161F81830060820B /* agskey.obj in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCD4161F81830060820B /* agskey.obj */; };
-		11F4FCF3161F81830060820B /* agskey.pdb in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCD5161F81830060820B /* agskey.pdb */; };
-		11F4FCF4161F81830060820B /* BuildLog.htm in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCD6161F81830060820B /* BuildLog.htm */; };
-		11F4FCF5161F81830060820B /* mt.dep in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCD7161F81830060820B /* mt.dep */; };
-		11F4FCF6161F81830060820B /* vc90.idb in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCD8161F81830060820B /* vc90.idb */; };
-		11F4FCF7161F81830060820B /* vc90.pdb in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCD9161F81830060820B /* vc90.pdb */; };
-		11F4FCF8161F81830060820B /* agskey.dll in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCDB161F81830060820B /* agskey.dll */; };
-		11F4FCF9161F81830060820B /* agskey.dll.intermediate.manifest in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCDC161F81830060820B /* agskey.dll.intermediate.manifest */; };
-		11F4FCFA161F81830060820B /* agskey.exp in Sources */ = {isa = PBXBuildFile; fileRef = 11F4FCDD161F81830060820B /* agskey.exp */; };
-		11F4FCFB161F81830060820B /* agskey.lib in Frameworks */ = {isa = PBXBuildFile; fileRef = 11F4FCDE161F81830060820B /* agskey.lib */; };
-		11F4FCFC161F81830060820B /* agskey.obj in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCDF161F81830060820B /* agskey.obj */; };
-		11F4FCFD161F81830060820B /* agskey.pdb in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCE0161F81830060820B /* agskey.pdb */; };
-		11F4FCFE161F81830060820B /* BuildLog.htm in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCE1161F81830060820B /* BuildLog.htm */; };
-		11F4FCFF161F81830060820B /* mt.dep in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCE2161F81830060820B /* mt.dep */; };
-		11F4FD00161F81830060820B /* vc90.idb in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCE3161F81830060820B /* vc90.idb */; };
-		11F4FD01161F81830060820B /* vc90.pdb in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCE4161F81830060820B /* vc90.pdb */; };
 		1D3623260D0F684500981E51 /* agsAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* agsAppDelegate.mm */; };
 		1D60589B0D05DD56006BFB54 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.mm */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
@@ -390,41 +364,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		11188407163AFC98009CE41A /* agswadjetutil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = agswadjetutil.cpp; sourceTree = "<group>"; };
+		11188408163AFC98009CE41A /* agswadjetutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = agswadjetutil.h; sourceTree = "<group>"; };
+		1118840B163B2692009CE41A /* ios_ipad.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios_ipad.cfg; path = ../../../misc/ios_ipad.cfg; sourceTree = "<group>"; };
+		1118840D163B2699009CE41A /* ios_iphone.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios_iphone.cfg; path = ../../../misc/ios_iphone.cfg; sourceTree = "<group>"; };
 		11F4FCB7161F7F960060820B /* ac2game.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = ac2game.dat; sourceTree = "<group>"; };
 		11F4FCB8161F7F960060820B /* acsetup.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = acsetup.cfg; sourceTree = "<group>"; };
 		11F4FCB9161F7F960060820B /* audio.vox */ = {isa = PBXFileReference; lastKnownFileType = file; path = audio.vox; sourceTree = "<group>"; };
 		11F4FCBA161F7F970060820B /* PRELOAD.pcx */ = {isa = PBXFileReference; lastKnownFileType = file; path = PRELOAD.pcx; sourceTree = "<group>"; };
 		11F4FCBB161F7F970060820B /* speech.vox */ = {isa = PBXFileReference; lastKnownFileType = file; path = speech.vox; sourceTree = "<group>"; };
-		11F4FCC4161F81820060820B /* agskey.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = agskey.cpp; sourceTree = "<group>"; };
-		11F4FCC5161F81820060820B /* agskey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = agskey.h; sourceTree = "<group>"; };
-		11F4FCC7161F81820060820B /* agskey.ncb */ = {isa = PBXFileReference; lastKnownFileType = file; path = agskey.ncb; sourceTree = "<group>"; };
-		11F4FCC8161F81830060820B /* agskey.sln */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = agskey.sln; sourceTree = "<group>"; };
-		11F4FCC9161F81830060820B /* agskey.suo */ = {isa = PBXFileReference; lastKnownFileType = file; path = agskey.suo; sourceTree = "<group>"; };
-		11F4FCCA161F81830060820B /* agskey.vcproj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = agskey.vcproj; sourceTree = "<group>"; };
-		11F4FCCB161F81830060820B /* agskey.vcproj.Turkey.Janet.user */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = agskey.vcproj.Turkey.Janet.user; sourceTree = "<group>"; };
-		11F4FCCD161F81830060820B /* agskey.dll */ = {isa = PBXFileReference; lastKnownFileType = file; path = agskey.dll; sourceTree = "<group>"; };
-		11F4FCCE161F81830060820B /* agskey.dll.embed.manifest */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = agskey.dll.embed.manifest; sourceTree = "<group>"; };
-		11F4FCCF161F81830060820B /* agskey.dll.embed.manifest.res */ = {isa = PBXFileReference; lastKnownFileType = file; path = agskey.dll.embed.manifest.res; sourceTree = "<group>"; };
-		11F4FCD0161F81830060820B /* agskey.dll.intermediate.manifest */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = agskey.dll.intermediate.manifest; sourceTree = "<group>"; };
-		11F4FCD1161F81830060820B /* agskey.exp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.exports; path = agskey.exp; sourceTree = "<group>"; };
-		11F4FCD2161F81830060820B /* agskey.ilk */ = {isa = PBXFileReference; lastKnownFileType = file; path = agskey.ilk; sourceTree = "<group>"; };
-		11F4FCD3161F81830060820B /* agskey.lib */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = agskey.lib; sourceTree = "<group>"; };
-		11F4FCD4161F81830060820B /* agskey.obj */ = {isa = PBXFileReference; lastKnownFileType = file; path = agskey.obj; sourceTree = "<group>"; };
-		11F4FCD5161F81830060820B /* agskey.pdb */ = {isa = PBXFileReference; lastKnownFileType = file; path = agskey.pdb; sourceTree = "<group>"; };
-		11F4FCD6161F81830060820B /* BuildLog.htm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = BuildLog.htm; sourceTree = "<group>"; };
-		11F4FCD7161F81830060820B /* mt.dep */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = mt.dep; sourceTree = "<group>"; };
-		11F4FCD8161F81830060820B /* vc90.idb */ = {isa = PBXFileReference; lastKnownFileType = file; path = vc90.idb; sourceTree = "<group>"; };
-		11F4FCD9161F81830060820B /* vc90.pdb */ = {isa = PBXFileReference; lastKnownFileType = file; path = vc90.pdb; sourceTree = "<group>"; };
-		11F4FCDB161F81830060820B /* agskey.dll */ = {isa = PBXFileReference; lastKnownFileType = file; path = agskey.dll; sourceTree = "<group>"; };
-		11F4FCDC161F81830060820B /* agskey.dll.intermediate.manifest */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = agskey.dll.intermediate.manifest; sourceTree = "<group>"; };
-		11F4FCDD161F81830060820B /* agskey.exp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.exports; path = agskey.exp; sourceTree = "<group>"; };
-		11F4FCDE161F81830060820B /* agskey.lib */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = agskey.lib; sourceTree = "<group>"; };
-		11F4FCDF161F81830060820B /* agskey.obj */ = {isa = PBXFileReference; lastKnownFileType = file; path = agskey.obj; sourceTree = "<group>"; };
-		11F4FCE0161F81830060820B /* agskey.pdb */ = {isa = PBXFileReference; lastKnownFileType = file; path = agskey.pdb; sourceTree = "<group>"; };
-		11F4FCE1161F81830060820B /* BuildLog.htm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = BuildLog.htm; sourceTree = "<group>"; };
-		11F4FCE2161F81830060820B /* mt.dep */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = mt.dep; sourceTree = "<group>"; };
-		11F4FCE3161F81830060820B /* vc90.idb */ = {isa = PBXFileReference; lastKnownFileType = file; path = vc90.idb; sourceTree = "<group>"; };
-		11F4FCE4161F81830060820B /* vc90.pdb */ = {isa = PBXFileReference; lastKnownFileType = file; path = vc90.pdb; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D3623240D0F684500981E51 /* agsAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = agsAppDelegate.h; sourceTree = "<group>"; };
 		1D3623250D0F684500981E51 /* agsAppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = agsAppDelegate.mm; sourceTree = "<group>"; };
@@ -1147,8 +1095,6 @@
 				6041A8681552E60600596310 /* libvorbisidec.a in Frameworks */,
 				6041A8881552E89E00596310 /* libz.dylib in Frameworks */,
 				6041A8981552E8C400596310 /* libbz2.dylib in Frameworks */,
-				11F4FCF1161F81830060820B /* agskey.lib in Frameworks */,
-				11F4FCFB161F81830060820B /* agskey.lib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1168,65 +1114,13 @@
 			path = Classes;
 			sourceTree = "<group>";
 		};
-		11F4FCC3161F81820060820B /* agskey */ = {
+		11188406163AFC98009CE41A /* agswadjetutil */ = {
 			isa = PBXGroup;
 			children = (
-				11F4FCC4161F81820060820B /* agskey.cpp */,
-				11F4FCC5161F81820060820B /* agskey.h */,
-				11F4FCC6161F81820060820B /* vc2008 */,
+				11188407163AFC98009CE41A /* agswadjetutil.cpp */,
+				11188408163AFC98009CE41A /* agswadjetutil.h */,
 			);
-			path = agskey;
-			sourceTree = "<group>";
-		};
-		11F4FCC6161F81820060820B /* vc2008 */ = {
-			isa = PBXGroup;
-			children = (
-				11F4FCC7161F81820060820B /* agskey.ncb */,
-				11F4FCC8161F81830060820B /* agskey.sln */,
-				11F4FCC9161F81830060820B /* agskey.suo */,
-				11F4FCCA161F81830060820B /* agskey.vcproj */,
-				11F4FCCB161F81830060820B /* agskey.vcproj.Turkey.Janet.user */,
-				11F4FCCC161F81830060820B /* Debug */,
-				11F4FCDA161F81830060820B /* Release */,
-			);
-			path = vc2008;
-			sourceTree = "<group>";
-		};
-		11F4FCCC161F81830060820B /* Debug */ = {
-			isa = PBXGroup;
-			children = (
-				11F4FCCD161F81830060820B /* agskey.dll */,
-				11F4FCCE161F81830060820B /* agskey.dll.embed.manifest */,
-				11F4FCCF161F81830060820B /* agskey.dll.embed.manifest.res */,
-				11F4FCD0161F81830060820B /* agskey.dll.intermediate.manifest */,
-				11F4FCD1161F81830060820B /* agskey.exp */,
-				11F4FCD2161F81830060820B /* agskey.ilk */,
-				11F4FCD3161F81830060820B /* agskey.lib */,
-				11F4FCD4161F81830060820B /* agskey.obj */,
-				11F4FCD5161F81830060820B /* agskey.pdb */,
-				11F4FCD6161F81830060820B /* BuildLog.htm */,
-				11F4FCD7161F81830060820B /* mt.dep */,
-				11F4FCD8161F81830060820B /* vc90.idb */,
-				11F4FCD9161F81830060820B /* vc90.pdb */,
-			);
-			path = Debug;
-			sourceTree = "<group>";
-		};
-		11F4FCDA161F81830060820B /* Release */ = {
-			isa = PBXGroup;
-			children = (
-				11F4FCDB161F81830060820B /* agskey.dll */,
-				11F4FCDC161F81830060820B /* agskey.dll.intermediate.manifest */,
-				11F4FCDD161F81830060820B /* agskey.exp */,
-				11F4FCDE161F81830060820B /* agskey.lib */,
-				11F4FCDF161F81830060820B /* agskey.obj */,
-				11F4FCE0161F81830060820B /* agskey.pdb */,
-				11F4FCE1161F81830060820B /* BuildLog.htm */,
-				11F4FCE2161F81830060820B /* mt.dep */,
-				11F4FCE3161F81830060820B /* vc90.idb */,
-				11F4FCE4161F81830060820B /* vc90.pdb */,
-			);
-			path = Release;
+			path = agswadjetutil;
 			sourceTree = "<group>";
 		};
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
@@ -1310,7 +1204,7 @@
 		60898C2B160779D9009E152F /* Plugins */ = {
 			isa = PBXGroup;
 			children = (
-				11F4FCC3161F81820060820B /* agskey */,
+				11188406163AFC98009CE41A /* agswadjetutil */,
 				60898C2C160779D9009E152F /* agsblend */,
 				60898C39160779D9009E152F /* AGSflashlight */,
 				60898CCB160779DA009E152F /* AGSSpriteFont */,
@@ -2420,6 +2314,8 @@
 		60CA833915BA1FCC0010D3B4 /* game */ = {
 			isa = PBXGroup;
 			children = (
+				1118840D163B2699009CE41A /* ios_iphone.cfg */,
+				1118840B163B2692009CE41A /* ios_ipad.cfg */,
 				11F4FCB7161F7F960060820B /* ac2game.dat */,
 				11F4FCB8161F7F960060820B /* acsetup.cfg */,
 				11F4FCB9161F7F960060820B /* audio.vox */,
@@ -2497,30 +2393,8 @@
 				11F4FCBE161F7F970060820B /* audio.vox in Resources */,
 				11F4FCBF161F7F970060820B /* PRELOAD.pcx in Resources */,
 				11F4FCC0161F7F970060820B /* speech.vox in Resources */,
-				11F4FCE6161F81830060820B /* agskey.ncb in Resources */,
-				11F4FCE7161F81830060820B /* agskey.sln in Resources */,
-				11F4FCE8161F81830060820B /* agskey.suo in Resources */,
-				11F4FCE9161F81830060820B /* agskey.vcproj in Resources */,
-				11F4FCEA161F81830060820B /* agskey.vcproj.Turkey.Janet.user in Resources */,
-				11F4FCEB161F81830060820B /* agskey.dll in Resources */,
-				11F4FCEC161F81830060820B /* agskey.dll.embed.manifest in Resources */,
-				11F4FCED161F81830060820B /* agskey.dll.embed.manifest.res in Resources */,
-				11F4FCEE161F81830060820B /* agskey.dll.intermediate.manifest in Resources */,
-				11F4FCF0161F81830060820B /* agskey.ilk in Resources */,
-				11F4FCF2161F81830060820B /* agskey.obj in Resources */,
-				11F4FCF3161F81830060820B /* agskey.pdb in Resources */,
-				11F4FCF4161F81830060820B /* BuildLog.htm in Resources */,
-				11F4FCF5161F81830060820B /* mt.dep in Resources */,
-				11F4FCF6161F81830060820B /* vc90.idb in Resources */,
-				11F4FCF7161F81830060820B /* vc90.pdb in Resources */,
-				11F4FCF8161F81830060820B /* agskey.dll in Resources */,
-				11F4FCF9161F81830060820B /* agskey.dll.intermediate.manifest in Resources */,
-				11F4FCFC161F81830060820B /* agskey.obj in Resources */,
-				11F4FCFD161F81830060820B /* agskey.pdb in Resources */,
-				11F4FCFE161F81830060820B /* BuildLog.htm in Resources */,
-				11F4FCFF161F81830060820B /* mt.dep in Resources */,
-				11F4FD00161F81830060820B /* vc90.idb in Resources */,
-				11F4FD01161F81830060820B /* vc90.pdb in Resources */,
+				1118840C163B2692009CE41A /* ios_ipad.cfg in Resources */,
+				1118840E163B2699009CE41A /* ios_iphone.cfg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2867,9 +2741,7 @@
 				60898DCC160785DD009E152F /* gfxfilter_hq3x.cpp in Sources */,
 				60898DD6160787FF009E152F /* hq2x3x.cpp in Sources */,
 				6080428E1614DE8F00D33732 /* assetmanager.cpp in Sources */,
-				11F4FCE5161F81830060820B /* agskey.cpp in Sources */,
-				11F4FCEF161F81830060820B /* agskey.exp in Sources */,
-				11F4FCFA161F81830060820B /* agskey.exp in Sources */,
+				11188409163AFC98009CE41A /* agswadjetutil.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2896,6 +2768,14 @@
 					"\"$(SRCROOT)/../../../Plugins/agslua/agslua/zlib\"",
 					"\"$(SRCROOT)/../../../Plugins/agskey/vc2008/Debug\"",
 					"\"$(SRCROOT)/../../../Plugins/agskey/vc2008/Release\"",
+				);
+				"LIBRARY_SEARCH_PATHS[arch=*]" = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../nativelibs/fat/lib\"",
+					"\"$(SRCROOT)/../../../Engine\"",
+					"\"$(SRCROOT)/../../../Plugins/agslua/agslua/zlib\"",
+					"\"$(SRCROOT)/../../../Plugins/agskey/vc2008/Debug\"",
+					"\"$(SRCROOT)/../../../Plugins/agswadjetutil/vc2008/Release\"",
 				);
 				OTHER_CODE_SIGN_FLAGS = "";
 				"OTHER_CODE_SIGN_FLAGS[sdk=*]" = "";
@@ -2924,7 +2804,7 @@
 					"\"$(SRCROOT)/../../../Engine\"",
 					"\"$(SRCROOT)/../../../Plugins/agslua/agslua/zlib\"",
 					"\"$(SRCROOT)/../../../Plugins/agskey/vc2008/Debug\"",
-					"\"$(SRCROOT)/../../../Plugins/agskey/vc2008/Release\"",
+					"\"$(SRCROOT)/../../../Plugins/agswadjetutil/vc2008/Release\"",
 				);
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_NAME = "Gemini Rue";

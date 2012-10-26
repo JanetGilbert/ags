@@ -27,6 +27,13 @@ extern void check_skip_cutscene_drag(int startx, int starty, int endx, int endy)
 
 agsViewController* agsviewcontroller;
 
+// J Is this an iPhone or iPad?
+extern "C" bool isPhone()
+{
+    UIUserInterfaceIdiom idiom = UI_USER_INTERFACE_IDIOM();
+    
+    return (idiom==UIUserInterfaceIdiomPhone);
+}
 
 
 // Mouse
@@ -96,7 +103,7 @@ int lastChar;
 
 extern "C" int ios_get_last_keypress()
 {
-	int result = lastChar;
+	int result = lastChar; 
 	lastChar = 0;
 	return result;
 }
