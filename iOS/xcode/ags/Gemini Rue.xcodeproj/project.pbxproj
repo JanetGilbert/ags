@@ -2749,6 +2749,7 @@
 				60898DD6160787FF009E152F /* hq2x3x.cpp in Sources */,
 				6080428E1614DE8F00D33732 /* assetmanager.cpp in Sources */,
 				11188409163AFC98009CE41A /* agswadjetutil.cpp in Sources */,
+				608B4E57163BF27B00547FAA /* libc.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
