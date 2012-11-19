@@ -478,11 +478,16 @@ int ReadString(char* variable, char* section, char* name, char* default_value)
   }
 
   char* temp = INIreaditem(section, name);
+  char* to_copy=temp; // j
+    
+  if (to_copy == NULL)
+    to_copy = default_value;
 
-  if (temp == NULL)
-    temp = default_value;
-
-  strcpy(variable, temp);
+  strcpy(variable, to_copy);
+    
+  if (temp != NULL){
+    free(temp); // j fix memory leak
+  }
 
   return 1;
 }
