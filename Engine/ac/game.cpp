@@ -2461,9 +2461,11 @@ void check_skip_cutscene_drag(int startx, int starty, int endx, int endy)
         int scrw = System_GetScreenWidth();
         int scrh = System_GetScreenHeight();
         int scr_limit_x = scrw/4;
-        int scr_limit_y = scrh/4;
+        int scr_limit_y = (scrh/8)*3;
+        int distx=abs(startx-endx);
         
-        if (startx<scr_limit_x && starty<scr_limit_y && endx>scrw-scr_limit_x && endy<scr_limit_y){
+        if (distx>scr_limit_x && starty<scr_limit_y && endy<scr_limit_y){
+        //if (startx<scr_limit_x && starty<scr_limit_y && endx>scrw-scr_limit_x && endy<scr_limit_y){
             start_skipping_cutscene();
         }
     }
