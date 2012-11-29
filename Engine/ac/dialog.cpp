@@ -837,7 +837,7 @@ int show_dialog_options(int dlgnum, int sayChosenOption, bool runGameLoopsInBack
       }
 
       //j, we need the conversation to fire on mouse up not mouse down for ios
-      //int mouseButtonPressed = mgetbutton(); // j removed
+      //int mouseButtonPressed = mgetbutton(); //j removed
       int mouseButtonPressed=NONE;
       mgetbutton(false);
       if (misbuttonreleased(0)){

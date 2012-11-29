@@ -140,7 +140,7 @@ int PlaySoundEx(int val1, int channel) {
 
     // that sound is already in memory, play it
     // Janet: JJS suggests removing this to solve crash in GRUE Juice combat scene where lots of sounds play at once.
-    /*if ((last_sound_played[channel] == val1) && (channels[channel] != NULL)) {
+    /*if ((last_sound_played[channel] == val1) &&Di (channels[channel] != NULL)) {
         DEBUG_CONSOLE("Playing sound %d on channel %d; cached", val1, channel);
         channels[channel]->restart();
         channels[channel]->set_volume (play.sound_volume);

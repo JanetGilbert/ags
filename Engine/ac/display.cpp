@@ -63,6 +63,10 @@ extern int spritewidth[MAX_SPRITES],spriteheight[MAX_SPRITES];
 extern SpriteCache spriteset;
 extern DynamicArray<GUIButton> guibuts;
 
+extern int misbuttonreleased(int buno);
+extern void mupdatebuttonrelease();
+
+
 int display_message_aschar=0;
 char *heightTestString = "ZHwypgfjqhkilIK";
 
@@ -266,7 +270,18 @@ int _display_main(int xx,int yy,int wii,char*todis,int blocking,int usingfont,in
             render_graphics();
 
             update_polled_stuff_and_crossfade();
-            if (mgetbutton()>NONE) {
+            
+            //j added the follwing so that skipping "Display" triggers on mouse up.
+            int mouseButtonPressed=NONE;
+            mgetbutton(false);
+            if (misbuttonreleased(0)){
+                mouseButtonPressed=LEFT;
+            }
+            
+            mupdatebuttonrelease();
+            
+            if (mouseButtonPressed != NONE) {
+            //if (mgetbutton()>NONE) { //j removed
                 // If we're allowed, skip with mouse
                 if (skip_setting & SKIP_MOUSECLICK)
                     break;

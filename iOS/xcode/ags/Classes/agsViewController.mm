@@ -46,8 +46,8 @@ int mouse_relative_position_y = 0;
 int mouse_start_position_x = 0;
 int mouse_start_position_y = 0;
 
-extern "C" float ios_mouse_scaling_x; // j
-extern "C" float ios_mouse_scaling_y; // j
+extern "C" float ios_mouse_scaling_x; //j
+extern "C" float ios_mouse_scaling_y; //j
 
 extern "C"
 {
@@ -71,7 +71,7 @@ extern "C"
 		*y = mouse_position_y;
 	}
     
-    // j
+    //j
     void ios_set_mouse(int x, int y)
     {
         x = (float)x / ios_mouse_scaling_x; // rescale game coordinates to screen coordinates.
