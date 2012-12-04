@@ -2351,7 +2351,7 @@
 			dependencies = (
 			);
 			name = "Gemini Rue";
-			productName = ags;
+			productName = "Gemini Rue";
 			productReference = 1D6058910D05DD3D006BFB54 /* Gemini Rue.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -2828,8 +2828,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = armv7;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Janet Gilbert (KD5AK7XJ75)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Janet Gilbert (KD5AK7XJ75)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: David Gilbert (V72VMZY53F)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: David Gilbert (V72VMZY53F)";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					USE_TREMOR,
@@ -2854,8 +2854,8 @@
 				LIBRARY_SEARCH_PATHS = "${SOURCE_ROOT}/../../nativelibs/fat/lib";
 				OTHER_CODE_SIGN_FLAGS = "-gta";
 				PREBINDING = NO;
-				PROVISIONING_PROFILE = "CBBBC26A-C286-4D2B-B7D3-D0427F5FD6B6";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "CBBBC26A-C286-4D2B-B7D3-D0427F5FD6B6";
+				PROVISIONING_PROFILE = "BAF457E1-C7AB-4809-8AD4-9DA1C0EA4195";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "BAF457E1-C7AB-4809-8AD4-9DA1C0EA4195";
 				SDKROOT = iphoneos;
 				USER_HEADER_SEARCH_PATHS = "${SOURCE_ROOT}/../../../Plugins ${SOURCE_ROOT}/../../../Common ${SOURCE_ROOT}/../../../Common/libinclude ${SOURCE_ROOT}/../../../Engine ${SOURCE_ROOT}/../../../iOS/nativelibs/fat/include ${SOURCE_ROOT}/../../nativelibs/fat/include/freetype2";
 			};
@@ -2865,8 +2865,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = armv7;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Janet Gilbert (KD5AK7XJ75)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Janet Gilbert (KD5AK7XJ75)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: David Gilbert";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: David Gilbert";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					USE_TREMOR,
@@ -2888,8 +2888,8 @@
 				LIBRARY_SEARCH_PATHS = "${SOURCE_ROOT}/../../nativelibs/fat/lib";
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PREBINDING = NO;
-				PROVISIONING_PROFILE = "CBBBC26A-C286-4D2B-B7D3-D0427F5FD6B6";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "CBBBC26A-C286-4D2B-B7D3-D0427F5FD6B6";
+				PROVISIONING_PROFILE = "09259CAA-99D1-4306-A17E-8DD55031F44E";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "09259CAA-99D1-4306-A17E-8DD55031F44E";
 				SDKROOT = iphoneos;
 				USER_HEADER_SEARCH_PATHS = "${SOURCE_ROOT}/../../../Common ${SOURCE_ROOT}/../../../Common/libinclude ${SOURCE_ROOT}/../../../Engine ${SOURCE_ROOT}/../../../iOS/nativelibs/fat/include ${SOURCE_ROOT}/../../nativelibs/fat/include/freetype2";
 			};
