@@ -676,7 +676,7 @@ int engine_load_game_data()
         platform->FinishedUsingGraphicsMode();
 
         if (ee==-1)
-            platform->DisplayAlert("Main game file not found. This may be from a different AGS version, or the file may have got corrupted.\n");
+            platform->DisplayAlert("Main game file not found. This may be from a different AGS version, or the file may have got corrupted.\n"); //j this seems to be triggered in low ram conditions also?
         else if (ee==-2)
             platform->DisplayAlert("Invalid file format. The file may be corrupt, or from a different\n"
             "version of AGS.\nThis engine can only run games made with AGS 2.5 or later.\n");

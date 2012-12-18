@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1110B0101680F35B0083218F /* libTestFlight.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1110B00F1680F35B0083218F /* libTestFlight.a */; };
 		11188409163AFC98009CE41A /* agswadjetutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11188407163AFC98009CE41A /* agswadjetutil.cpp */; };
 		1118840C163B2692009CE41A /* ios_ipad.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 1118840B163B2692009CE41A /* ios_ipad.cfg */; };
 		1118840E163B2699009CE41A /* ios_iphone.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 1118840D163B2699009CE41A /* ios_iphone.cfg */; };
@@ -364,6 +365,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1110B00F1680F35B0083218F /* libTestFlight.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libTestFlight.a; sourceTree = "<group>"; };
+		1110B0121680F5F90083218F /* TestFlight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestFlight.h; sourceTree = "<group>"; };
 		11188407163AFC98009CE41A /* agswadjetutil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = agswadjetutil.cpp; sourceTree = "<group>"; };
 		11188408163AFC98009CE41A /* agswadjetutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = agswadjetutil.h; sourceTree = "<group>"; };
 		1118840B163B2692009CE41A /* ios_ipad.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios_ipad.cfg; path = ../../../misc/ios_ipad.cfg; sourceTree = "<group>"; };
@@ -1095,6 +1098,7 @@
 				6041A8681552E60600596310 /* libvorbisidec.a in Frameworks */,
 				6041A8881552E89E00596310 /* libz.dylib in Frameworks */,
 				6041A8981552E8C400596310 /* libbz2.dylib in Frameworks */,
+				1110B0101680F35B0083218F /* libTestFlight.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1174,6 +1178,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1110B00F1680F35B0083218F /* libTestFlight.a */,
 				6041A85D1552E60600596310 /* libaldmb.a */,
 				6041A8971552E8C400596310 /* libbz2.dylib */,
 				6041A85E1552E60600596310 /* liballeg.a */,
@@ -1440,6 +1445,7 @@
 		60CA39F9160713D300CFB3BD /* libinclude */ = {
 			isa = PBXGroup;
 			children = (
+				1110B0121680F5F90083218F /* TestFlight.h */,
 				60CA39FA160713D300CFB3BD /* aastr.h */,
 				60CA39FB160713D300CFB3BD /* aautil.h */,
 				60CA39FC160713D300CFB3BD /* aldumb.h */,
@@ -2778,6 +2784,7 @@
 					"\"$(SRCROOT)/../../../Plugins/agslua/agslua/zlib\"",
 					"\"$(SRCROOT)/../../../Plugins/agskey/vc2008/Debug\"",
 					"\"$(SRCROOT)/../../../Plugins/agskey/vc2008/Release\"",
+					"\"$(SRCROOT)\"",
 				);
 				"LIBRARY_SEARCH_PATHS[arch=*]" = (
 					"$(inherited)",
@@ -2803,7 +2810,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = armv7;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				COPY_PHASE_STRIP = YES;
+				COPY_PHASE_STRIP = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Gemini Rue_Prefix.pch";
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
@@ -2816,6 +2823,7 @@
 					"\"$(SRCROOT)/../../../Plugins/agslua/agslua/zlib\"",
 					"\"$(SRCROOT)/../../../Plugins/agskey/vc2008/Debug\"",
 					"\"$(SRCROOT)/../../../Plugins/agswadjetutil/vc2008/Release\"",
+					"\"$(SRCROOT)\"",
 				);
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_NAME = "Gemini Rue";
@@ -2871,6 +2879,7 @@
 				ARCHS = armv7;
 				CODE_SIGN_IDENTITY = "iPhone Developer: David Gilbert (V72VMZY53F)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: David Gilbert (V72VMZY53F)";
+				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					USE_TREMOR,
