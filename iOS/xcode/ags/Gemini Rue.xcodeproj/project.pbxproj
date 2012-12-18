@@ -2769,6 +2769,8 @@
 				GCC_PREFIX_HEADER = "Gemini Rue_Prefix.pch";
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				INFOPLIST_FILE = "Gemini Rue-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				"IPHONEOS_DEPLOYMENT_TARGET[arch=*]" = 4.3;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../nativelibs/fat/lib\"",
@@ -2806,6 +2808,7 @@
 				GCC_PREFIX_HEADER = "Gemini Rue_Prefix.pch";
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				INFOPLIST_FILE = "Gemini Rue-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../nativelibs/fat/lib\"",
@@ -2851,6 +2854,7 @@
 					"${SOURCE_ROOT}/../../../iOS/nativelibs/fat/include",
 					"${SOURCE_ROOT}/../../nativelibs/fat/include/freetype2",
 				);
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				LIBRARY_SEARCH_PATHS = "${SOURCE_ROOT}/../../nativelibs/fat/lib";
 				OTHER_CODE_SIGN_FLAGS = "-gta";
 				PREBINDING = NO;
@@ -2885,6 +2889,7 @@
 					"${SOURCE_ROOT}/../../../iOS/nativelibs/fat/include",
 					"${SOURCE_ROOT}/../../nativelibs/fat/include/freetype2",
 				);
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				LIBRARY_SEARCH_PATHS = "${SOURCE_ROOT}/../../nativelibs/fat/lib";
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PREBINDING = NO;
