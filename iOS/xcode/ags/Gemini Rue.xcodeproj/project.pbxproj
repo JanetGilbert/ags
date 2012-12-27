@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		110A9924168CDE9600B9E968 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 110A9923168CDE9600B9E968 /* Crashlytics.framework */; };
 		11188409163AFC98009CE41A /* agswadjetutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11188407163AFC98009CE41A /* agswadjetutil.cpp */; };
 		1118840C163B2692009CE41A /* ios_ipad.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 1118840B163B2692009CE41A /* ios_ipad.cfg */; };
 		1118840E163B2699009CE41A /* ios_iphone.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 1118840D163B2699009CE41A /* ios_iphone.cfg */; };
@@ -364,6 +365,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		110A9923168CDE9600B9E968 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		1110B00F1680F35B0083218F /* libTestFlight.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libTestFlight.a; sourceTree = "<group>"; };
 		11188407163AFC98009CE41A /* agswadjetutil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = agswadjetutil.cpp; sourceTree = "<group>"; };
 		11188408163AFC98009CE41A /* agswadjetutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = agswadjetutil.h; sourceTree = "<group>"; };
@@ -1096,6 +1098,7 @@
 				6041A8681552E60600596310 /* libvorbisidec.a in Frameworks */,
 				6041A8881552E89E00596310 /* libz.dylib in Frameworks */,
 				6041A8981552E8C400596310 /* libbz2.dylib in Frameworks */,
+				110A9924168CDE9600B9E968 /* Crashlytics.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1175,6 +1178,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				110A9923168CDE9600B9E968 /* Crashlytics.framework */,
 				1110B00F1680F35B0083218F /* libTestFlight.a */,
 				6041A85D1552E60600596310 /* libaldmb.a */,
 				6041A8971552E8C400596310 /* libbz2.dylib */,
@@ -2347,6 +2351,7 @@
 				1D60588E0D05DD3D006BFB54 /* Sources */,
 				1D60588F0D05DD3D006BFB54 /* Frameworks */,
 				604B5533155C4F7400581284 /* ShellScript */,
+				110A9922168CDDEB00B9E968 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -2411,6 +2416,19 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		110A9922168CDDEB00B9E968 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "./Crashlytics.framework/run 632ccb316e88010c5d7b793d4bf069e57fbf624e";
+		};
 		604B5533155C4F7400581284 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -2765,6 +2783,10 @@
 				ARCHS = armv7;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -2807,6 +2829,10 @@
 				ARCHS = armv7;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Gemini Rue_Prefix.pch";
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
