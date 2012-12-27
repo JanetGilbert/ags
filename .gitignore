@@ -163,3 +163,5 @@ Plugins/agswadjetutil/vc2008/Release/mt.dep
 Plugins/agswadjetutil/vc2008/Release/vc90.idb
 
 Plugins/agswadjetutil/vc2008/Release/vc90.pdb
+
+Engine/media/audio/audio.cpp.old
