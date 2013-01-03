@@ -11,6 +11,7 @@
 		11188409163AFC98009CE41A /* agswadjetutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11188407163AFC98009CE41A /* agswadjetutil.cpp */; };
 		1118840C163B2692009CE41A /* ios_ipad.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 1118840B163B2692009CE41A /* ios_ipad.cfg */; };
 		1118840E163B2699009CE41A /* ios_iphone.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 1118840D163B2699009CE41A /* ios_iphone.cfg */; };
+		11B1EBAD16920D470038348A /* liballeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 11B1EBAC16920D470038348A /* liballeg.a */; };
 		11F4FCBC161F7F970060820B /* ac2game.dat in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCB7161F7F960060820B /* ac2game.dat */; };
 		11F4FCBD161F7F970060820B /* acsetup.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCB8161F7F960060820B /* acsetup.cfg */; };
 		11F4FCBE161F7F970060820B /* audio.vox in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCB9161F7F960060820B /* audio.vox */; };
@@ -27,7 +28,6 @@
 		28FD15000DC6FC520079059D /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28FD14FF0DC6FC520079059D /* OpenGLES.framework */; };
 		28FD15080DC6FC5B0079059D /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28FD15070DC6FC5B0079059D /* QuartzCore.framework */; };
 		6041A8631552E60600596310 /* libaldmb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6041A85D1552E60600596310 /* libaldmb.a */; };
-		6041A8641552E60600596310 /* liballeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6041A85E1552E60600596310 /* liballeg.a */; };
 		6041A8651552E60600596310 /* libdumb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6041A85F1552E60600596310 /* libdumb.a */; };
 		6041A8661552E60600596310 /* libogg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6041A8601552E60600596310 /* libogg.a */; };
 		6041A8671552E60600596310 /* libtheora.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6041A8611552E60600596310 /* libtheora.a */; };
@@ -371,6 +371,7 @@
 		11188408163AFC98009CE41A /* agswadjetutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = agswadjetutil.h; sourceTree = "<group>"; };
 		1118840B163B2692009CE41A /* ios_ipad.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios_ipad.cfg; path = ../../../misc/ios_ipad.cfg; sourceTree = "<group>"; };
 		1118840D163B2699009CE41A /* ios_iphone.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios_iphone.cfg; path = ../../../misc/ios_iphone.cfg; sourceTree = "<group>"; };
+		11B1EBAC16920D470038348A /* liballeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liballeg.a; path = ../../nativelibs/fat/lib/liballeg.a; sourceTree = "<group>"; };
 		11F4FCB7161F7F960060820B /* ac2game.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = ac2game.dat; sourceTree = "<group>"; };
 		11F4FCB8161F7F960060820B /* acsetup.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = acsetup.cfg; sourceTree = "<group>"; };
 		11F4FCB9161F7F960060820B /* audio.vox */ = {isa = PBXFileReference; lastKnownFileType = file; path = audio.vox; sourceTree = "<group>"; };
@@ -392,7 +393,6 @@
 		29B97316FDCFA39411CA2CEA /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* Gemini Rue_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Gemini Rue_Prefix.pch"; sourceTree = "<group>"; };
 		6041A85D1552E60600596310 /* libaldmb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libaldmb.a; path = ../../nativelibs/fat/lib/libaldmb.a; sourceTree = SOURCE_ROOT; };
-		6041A85E1552E60600596310 /* liballeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liballeg.a; path = ../../nativelibs/fat/lib/liballeg.a; sourceTree = SOURCE_ROOT; };
 		6041A85F1552E60600596310 /* libdumb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdumb.a; path = ../../nativelibs/fat/lib/libdumb.a; sourceTree = SOURCE_ROOT; };
 		6041A8601552E60600596310 /* libogg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libogg.a; path = ../../nativelibs/fat/lib/libogg.a; sourceTree = SOURCE_ROOT; };
 		6041A8611552E60600596310 /* libtheora.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtheora.a; path = ../../nativelibs/fat/lib/libtheora.a; sourceTree = SOURCE_ROOT; };
@@ -1091,7 +1091,6 @@
 				60F49A4A155131E500A07887 /* AudioToolbox.framework in Frameworks */,
 				60CE9D9C155272CD00A52D5A /* libfreetype.a in Frameworks */,
 				6041A8631552E60600596310 /* libaldmb.a in Frameworks */,
-				6041A8641552E60600596310 /* liballeg.a in Frameworks */,
 				6041A8651552E60600596310 /* libdumb.a in Frameworks */,
 				6041A8661552E60600596310 /* libogg.a in Frameworks */,
 				6041A8671552E60600596310 /* libtheora.a in Frameworks */,
@@ -1099,6 +1098,7 @@
 				6041A8881552E89E00596310 /* libz.dylib in Frameworks */,
 				6041A8981552E8C400596310 /* libbz2.dylib in Frameworks */,
 				110A9924168CDE9600B9E968 /* Crashlytics.framework in Frameworks */,
+				11B1EBAD16920D470038348A /* liballeg.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1178,11 +1178,11 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				11B1EBAC16920D470038348A /* liballeg.a */,
 				110A9923168CDE9600B9E968 /* Crashlytics.framework */,
 				1110B00F1680F35B0083218F /* libTestFlight.a */,
 				6041A85D1552E60600596310 /* libaldmb.a */,
 				6041A8971552E8C400596310 /* libbz2.dylib */,
-				6041A85E1552E60600596310 /* liballeg.a */,
 				6041A85F1552E60600596310 /* libdumb.a */,
 				6041A8601552E60600596310 /* libogg.a */,
 				6041A8611552E60600596310 /* libtheora.a */,
@@ -2781,7 +2781,8 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = armv7;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: David Gilbert (V72VMZY53F)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: David Gilbert (V72VMZY53F)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2815,10 +2816,12 @@
 				OTHER_CODE_SIGN_FLAGS = "";
 				"OTHER_CODE_SIGN_FLAGS[sdk=*]" = "";
 				PRODUCT_NAME = "Gemini Rue";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PROVISIONING_PROFILE = "288F3E21-F516-42BA-A65E-6170C4FCB50E";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "288F3E21-F516-42BA-A65E-6170C4FCB50E";
 				SDKROOT = iphoneos;
 				STRIPFLAGS = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
+				"USER_HEADER_SEARCH_PATHS[arch=*]" = "${SOURCE_ROOT}/../../../Plugins ${SOURCE_ROOT}/../../../Common ${SOURCE_ROOT}/../../../Common/libinclude ${SOURCE_ROOT}/../../../Engine ${SOURCE_ROOT}/../../../iOS/nativelibs/fat/include ${SOURCE_ROOT}/../../nativelibs/fat/include/freetype2";
 			};
 			name = Debug;
 		};
@@ -2827,7 +2830,8 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = armv7;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: David Gilbert";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: David Gilbert";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2849,7 +2853,8 @@
 				);
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_NAME = "Gemini Rue";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PROVISIONING_PROFILE = "841E0626-B771-4508-BD10-E2792D606669";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "841E0626-B771-4508-BD10-E2792D606669";
 				SDKROOT = iphoneos;
 				STRIPFLAGS = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -2889,8 +2894,8 @@
 				LIBRARY_SEARCH_PATHS = "${SOURCE_ROOT}/../../nativelibs/fat/lib";
 				OTHER_CODE_SIGN_FLAGS = "-gta";
 				PREBINDING = NO;
-				PROVISIONING_PROFILE = "B2A5BA06-69A1-4C6C-8DBD-58BEF6E3DD19";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "85C8A322-5C50-42CB-B4EB-0B842296A2A7";
+				PROVISIONING_PROFILE = "288F3E21-F516-42BA-A65E-6170C4FCB50E";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "288F3E21-F516-42BA-A65E-6170C4FCB50E";
 				SDKROOT = iphoneos;
 				USER_HEADER_SEARCH_PATHS = "${SOURCE_ROOT}/../../../Plugins ${SOURCE_ROOT}/../../../Common ${SOURCE_ROOT}/../../../Common/libinclude ${SOURCE_ROOT}/../../../Engine ${SOURCE_ROOT}/../../../iOS/nativelibs/fat/include ${SOURCE_ROOT}/../../nativelibs/fat/include/freetype2";
 			};
@@ -2900,8 +2905,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = armv7;
-				CODE_SIGN_IDENTITY = "iPhone Developer: David Gilbert (V72VMZY53F)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: David Gilbert (V72VMZY53F)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: David Gilbert";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: David Gilbert";
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -2925,8 +2930,8 @@
 				LIBRARY_SEARCH_PATHS = "${SOURCE_ROOT}/../../nativelibs/fat/lib";
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PREBINDING = NO;
-				PROVISIONING_PROFILE = "B2A5BA06-69A1-4C6C-8DBD-58BEF6E3DD19";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "B2A5BA06-69A1-4C6C-8DBD-58BEF6E3DD19";
+				PROVISIONING_PROFILE = "841E0626-B771-4508-BD10-E2792D606669";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "841E0626-B771-4508-BD10-E2792D606669";
 				SDKROOT = iphoneos;
 				USER_HEADER_SEARCH_PATHS = "${SOURCE_ROOT}/../../../Common ${SOURCE_ROOT}/../../../Common/libinclude ${SOURCE_ROOT}/../../../Engine ${SOURCE_ROOT}/../../../iOS/nativelibs/fat/include ${SOURCE_ROOT}/../../nativelibs/fat/include/freetype2";
 			};
