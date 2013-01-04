@@ -147,6 +147,7 @@ int displayed_room=-10,starting_room = -1;
 int in_new_room=0, new_room_was = 0;  // 1 in new room, 2 first time in new room, 3 loading saved game
 int new_room_pos=0;
 int new_room_x = SCR_NO_VALUE, new_room_y = SCR_NO_VALUE;
+volatile bool set_cutscene_to_skip=false; //j
 
 //Bitmap *spriteset[MAX_SPRITES+1];
 //SpriteCache spriteset (MAX_SPRITES+1);
@@ -2437,12 +2438,21 @@ int load_game(int slotn, char*descrp, int *wantShot) {
     return do_game_load(nametouse, slotn, descrp, wantShot);
 }
 
-void start_skipping_cutscene () {
-    //j ensure that we can't freeze up the game by skipping a cutscene when not in a cutscene
+void prepare_cutscene_skip(){
     if (play.in_cutscene == 0 || play.fast_forward){
         return;
     }
     
+    set_cutscene_to_skip=true;
+}
+
+void start_skipping_cutscene () {
+    //j ensure that we can't freeze up the game by skipping a cutscene when not in a cutscene
+    if (play.in_cutscene == 0 || play.fast_forward || !set_cutscene_to_skip){
+        return;
+    }
+    
+    set_cutscene_to_skip = false;
     play.fast_forward = 1;
     // if a drop-down icon bar is up, remove it as it will pause the game
     if (ifacepopped>=0)
@@ -2465,8 +2475,8 @@ void check_skip_cutscene_drag(int startx, int starty, int endx, int endy)
         int distx=abs(startx-endx);
         
         if (distx>scr_limit_x && starty<scr_limit_y && endy<scr_limit_y){
-        //if (startx<scr_limit_x && starty<scr_limit_y && endx>scrw-scr_limit_x && endy<scr_limit_y){
-            start_skipping_cutscene();
+            prepare_cutscene_skip(); //j
+            //start_skipping_cutscene();
         }
     }
 }
@@ -2477,7 +2487,8 @@ void check_skip_cutscene_keypress (int kgn) {
         if ((kgn != 27) && ((play.in_cutscene == 1) || (play.in_cutscene == 5)))
             ;
         else
-            start_skipping_cutscene();
+            prepare_cutscene_skip(); //j
+            //start_skipping_cutscene();
     }
 
 }
