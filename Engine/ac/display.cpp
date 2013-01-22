@@ -58,6 +58,7 @@ extern int time_between_timers;
 extern int offsetx, offsety;
 extern int frames_per_second;
 extern int loops_per_character;
+extern int frames_per_second;
 extern IAGSFontRenderer* fontRenderers[MAX_FONTS];
 extern int spritewidth[MAX_SPRITES],spriteheight[MAX_SPRITES];
 extern SpriteCache spriteset;
@@ -259,6 +260,7 @@ int _display_main(int xx,int yy,int wii,char*todis,int blocking,int usingfont,in
         // 3 = only on keypress, no auto timer
         // 4 = mouse only
         int countdown = GetTextDisplayTime (todis);
+        int max_countdown = countdown;
         int skip_setting = user_to_internal_skip_speech(play.skip_display);
         while (1) {
             timerloop = 0;
@@ -283,8 +285,10 @@ int _display_main(int xx,int yy,int wii,char*todis,int blocking,int usingfont,in
             if (mouseButtonPressed != NONE) {
             //if (mgetbutton()>NONE) { //j removed
                 // If we're allowed, skip with mouse
-                if (skip_setting & SKIP_MOUSECLICK)
-                    break;
+                if ((max_countdown-countdown)>(frames_per_second/3)){ // j ensure you can't skip Display right away
+                    if (skip_setting & SKIP_MOUSECLICK)
+                        break;
+                }
             }
             if (kbhit()) {
                 // discard keypress, and don't leave extended keys over

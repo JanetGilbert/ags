@@ -89,6 +89,8 @@ extern int offsetx, offsety;
 extern unsigned int loopcounter,lastcounter;
 extern volatile int timerloop;
 extern int cur_mode,cur_cursor;
+extern int frames_per_second;
+extern int max_messagetime;
 extern void mupdatebuttonrelease();
 
 int numEventsAtStartOfFunction;
@@ -250,9 +252,11 @@ void check_controls() {
     }
     else if ((wasbutdown>0) && (!misbuttondown(wasbutdown-1))) {
         //j click past dialogues on mouse up
-        if (is_text_overlay > 0) {
-            if (play.cant_skip_speech & SKIP_MOUSECLICK)
-            remove_screen_overlay(OVER_TEXTMSG);
+        if ((max_messagetime-play.messagetime)>(frames_per_second/3)){ // j ensure you can't skip dialog right away
+            if (is_text_overlay > 0) {
+                if (play.cant_skip_speech & SKIP_MOUSECLICK)
+                    remove_screen_overlay(OVER_TEXTMSG);
+            }
         }
         
         guis[wasongui].mouse_but_up();

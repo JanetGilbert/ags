@@ -102,6 +102,7 @@ CharacterExtras *charextra;
 CharacterInfo*playerchar;
 long _sc_PlayerCharPtr = 0;
 int char_lowest_yp;
+int max_messagetime = 0;
 
 // Sierra-style speech settings
 int face_talking=-1,facetalkview=0,facetalkwait=0,facetalkframe=0;
@@ -2309,6 +2310,7 @@ void _displayspeech(char*texx, int aschar, int xx, int yy, int widd, int isThoug
     }
 
     play.messagetime = GetTextDisplayTime(texx);
+    max_messagetime = play.messagetime;
 
     if (isPause) {
         if (update_music_at > 0)
