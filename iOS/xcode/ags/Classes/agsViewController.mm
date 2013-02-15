@@ -178,18 +178,26 @@ extern "C" int ios_is_keyboard_visible()
 {
 	UIToolbar *toolbar;
 	BOOL alreadyExists = (self.inputAccessoryView != NULL);
+    
+    //J Make bar height bigger on iPad 
+    int buttonBarHeight=40;
+    
+    if (isIPad){
+        buttonBarHeight=80;
+    }
 	
 	if (alreadyExists)
 		toolbar = self.inputAccessoryView;
 	else
-		toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 30)];
+		toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, buttonBarHeight)];
     
 	toolbar.barStyle = UIBarStyleBlackTranslucent;
     
 	NSMutableArray* array = [[NSMutableArray alloc] initWithCapacity:6];
 	
     //J Don't need f keys
-	UIBarButtonItem *esc = [[UIBarButtonItem alloc] initWithTitle:@"ESC" style:UIBarButtonItemStyleDone target:self action:@selector(buttonClicked:)];
+	UIBarButtonItem *esc = [[UIBarButtonItem alloc] initWithTitle:@"Cancel" style:UIBarButtonItemStylePlain target:self action:@selector(buttonClicked:)]; //J
+    
 	[array addObject:esc];
 	
     /*
@@ -258,7 +266,7 @@ extern "C" int ios_is_keyboard_visible()
 
 - (IBAction)buttonClicked:(UIBarButtonItem *)sender
 {
-	if (sender.title == @"ESC")
+	if (sender.title == @"Cancel")
 		lastChar = 27;
 	else if (sender.title == @"F1")
 		lastChar = 0x1000 + 47;
