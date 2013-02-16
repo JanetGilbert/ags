@@ -12,6 +12,7 @@
 		1118840C163B2692009CE41A /* ios_ipad.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 1118840B163B2692009CE41A /* ios_ipad.cfg */; };
 		1118840E163B2699009CE41A /* ios_iphone.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 1118840D163B2699009CE41A /* ios_iphone.cfg */; };
 		11B1EBAD16920D470038348A /* liballeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 11B1EBAC16920D470038348A /* liballeg.a */; };
+		11E10A5E16CF015200349298 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 11E10A5D16CF015200349298 /* Default-568h@2x.png */; };
 		11F4FCBC161F7F970060820B /* ac2game.dat in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCB7161F7F960060820B /* ac2game.dat */; };
 		11F4FCBD161F7F970060820B /* acsetup.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCB8161F7F960060820B /* acsetup.cfg */; };
 		11F4FCBE161F7F970060820B /* audio.vox in Resources */ = {isa = PBXBuildFile; fileRef = 11F4FCB9161F7F960060820B /* audio.vox */; };
@@ -372,6 +373,7 @@
 		1118840B163B2692009CE41A /* ios_ipad.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios_ipad.cfg; path = ../../../misc/ios_ipad.cfg; sourceTree = "<group>"; };
 		1118840D163B2699009CE41A /* ios_iphone.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios_iphone.cfg; path = ../../../misc/ios_iphone.cfg; sourceTree = "<group>"; };
 		11B1EBAC16920D470038348A /* liballeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liballeg.a; path = ../../nativelibs/fat/lib/liballeg.a; sourceTree = "<group>"; };
+		11E10A5D16CF015200349298 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		11F4FCB7161F7F960060820B /* ac2game.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = ac2game.dat; sourceTree = "<group>"; };
 		11F4FCB8161F7F960060820B /* acsetup.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = acsetup.cfg; sourceTree = "<group>"; };
 		11F4FCB9161F7F960060820B /* audio.vox */ = {isa = PBXFileReference; lastKnownFileType = file; path = audio.vox; sourceTree = "<group>"; };
@@ -1138,6 +1140,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				11E10A5D16CF015200349298 /* Default-568h@2x.png */,
 				60898C2B160779D9009E152F /* Plugins */,
 				60CA3AA7160713FD00CFB3BD /* Engine */,
 				60CA39A8160713D200CFB3BD /* Common */,
@@ -2410,6 +2413,7 @@
 				11F4FCC0161F7F970060820B /* speech.vox in Resources */,
 				1118840C163B2692009CE41A /* ios_ipad.cfg in Resources */,
 				1118840E163B2699009CE41A /* ios_iphone.cfg in Resources */,
+				11E10A5E16CF015200349298 /* Default-568h@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
