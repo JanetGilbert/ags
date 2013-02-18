@@ -96,8 +96,8 @@ enum
 void initialize_output_subsystem()
 {
     Out::Init(0, NULL);
-	Out::AddOutputTarget(TARGET_FILE, new AGS::Engine::Out::CRawFileOutputTarget("agsgame.log"),
-        Out::kVerbose_NoDebug, false);
+	//j Out::AddOutputTarget(TARGET_FILE, new AGS::Engine::Out::CRawFileOutputTarget("agsgame.log"),
+    //j    Out::kVerbose_NoDebug, false);
     Out::AddOutputTarget(TARGET_SYSTEMDEBUGGER, AGSPlatformDriver::GetDriver(),
         Out::kVerbose_WarnErrors, true);
 	Out::AddOutputTarget(TARGET_GAMECONSOLE, new AGS::Engine::Out::CConsoleOutputTarget(),
@@ -150,7 +150,8 @@ found" are logged instead of exiting the program.
 void debug_log(char*texx, ...) {
     // if not in debug mode, don't print it so we don't worry the
     // end player
-    if (play.debug_mode == 0)
+    //j removed debugging
+    /*if (play.debug_mode == 0)
         return;
     static int first_time = 1;
     char displbuf[STD_BUFFER_SIZE];
@@ -158,13 +159,6 @@ void debug_log(char*texx, ...) {
     va_start(ap,texx);
     vsprintf(displbuf,texx,ap);
     va_end(ap);
-
-    /*if (true) {
-    char buffer2[STD_BUFFER_SIZE];
-    strcpy(buffer2, "%");
-    strcat(buffer2, displbuf);
-    quit(buffer2);
-    }*/
 
     //char*openmode = "at";
     if (first_time) {
@@ -181,7 +175,7 @@ void debug_log(char*texx, ...) {
     {
         TextStreamWriter writer(outfil);
         writer.WriteFormat("(in room %d): %s\n",displayed_room,displbuf);
-    }
+    }*/
 }
 
 

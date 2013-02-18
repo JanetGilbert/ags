@@ -1288,7 +1288,7 @@ int initialize_engine(int argc,char*argv[])
     // [IKM] I seriously don't get it why do we need to delete warnings.log
     // in the middle of procedure; some warnings may have already being
     // written there at this point, no?
-    unlink("warnings.log");
+    //j unlink("warnings.log");
 
     engine_init_rand();
 
