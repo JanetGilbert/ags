@@ -2378,7 +2378,7 @@
 			dependencies = (
 			);
 			name = Shivah;
-			productName = "Gemini Rue";
+			productName = "Shivah";
 			productReference = 1D6058910D05DD3D006BFB54 /* Shivah.app */;
 			productType = "com.apple.product-type.application";
 		};
