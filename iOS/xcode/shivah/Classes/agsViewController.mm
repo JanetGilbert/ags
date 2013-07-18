@@ -2,6 +2,7 @@
 
 #import "agsViewController.h"
 #import "EAGLView.h"
+#import "keycode.h"
 
 #import <Crashlytics/Crashlytics.h>
 
@@ -96,6 +97,9 @@ extern "C"
 extern "C" void fakekey(int keypress)
 {
 //#ifdef ALLEGRO_KEYBOARD_HANDLER
+    if (keypress == AGS_KEYCODE_DELETE) {
+      keypress = 8;  
+    }
     
     call_simulate_keypress(keypress);
 //#endif
