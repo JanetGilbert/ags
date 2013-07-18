@@ -23,7 +23,6 @@
 		11CC0A2617762F2B005D9821 /* ios_ipad.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 11CC0A2517762F2B005D9821 /* ios_ipad.cfg */; };
 		11CC0A2817762F3F005D9821 /* ac2game.dat in Resources */ = {isa = PBXBuildFile; fileRef = 11CC0A2717762F3F005D9821 /* ac2game.dat */; };
 		11CC0A2A17762F4E005D9821 /* acsetup.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 11CC0A2917762F4E005D9821 /* acsetup.cfg */; };
-		11CC0A2D17762F7A005D9821 /* music.vox in Resources */ = {isa = PBXBuildFile; fileRef = 11CC0A2B17762F7A005D9821 /* music.vox */; };
 		11CC0A2E17762F7A005D9821 /* speech.vox in Resources */ = {isa = PBXBuildFile; fileRef = 11CC0A2C17762F7A005D9821 /* speech.vox */; };
 		11D7F71F1776396700C3567E /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 11D7F71E1776396700C3567E /* Crashlytics.framework */; };
 		11E10A5E16CF015200349298 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 11E10A5D16CF015200349298 /* Default-568h@2x.png */; };
@@ -392,7 +391,6 @@
 		11CC0A2517762F2B005D9821 /* ios_ipad.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios_ipad.cfg; path = cfg/ios_ipad.cfg; sourceTree = SOURCE_ROOT; };
 		11CC0A2717762F3F005D9821 /* ac2game.dat */ = {isa = PBXFileReference; lastKnownFileType = file; name = ac2game.dat; path = shivah_dat/ac2game.dat; sourceTree = SOURCE_ROOT; };
 		11CC0A2917762F4E005D9821 /* acsetup.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = acsetup.cfg; path = shivah_dat/acsetup.cfg; sourceTree = SOURCE_ROOT; };
-		11CC0A2B17762F7A005D9821 /* music.vox */ = {isa = PBXFileReference; lastKnownFileType = file; name = music.vox; path = shivah_dat/music.vox; sourceTree = SOURCE_ROOT; };
 		11CC0A2C17762F7A005D9821 /* speech.vox */ = {isa = PBXFileReference; lastKnownFileType = file; name = speech.vox; path = shivah_dat/speech.vox; sourceTree = SOURCE_ROOT; };
 		11D7F71C177636EC00C3567E /* Shivah-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Shivah-Info.plist"; sourceTree = "<group>"; };
 		11D7F71E1776396700C3567E /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
@@ -2348,7 +2346,6 @@
 		60CA833915BA1FCC0010D3B4 /* game */ = {
 			isa = PBXGroup;
 			children = (
-				11CC0A2B17762F7A005D9821 /* music.vox */,
 				11CC0A2C17762F7A005D9821 /* speech.vox */,
 				11CC0A2917762F4E005D9821 /* acsetup.cfg */,
 				11CC0A2717762F3F005D9821 /* ac2game.dat */,
@@ -2435,7 +2432,6 @@
 				11CC0A2617762F2B005D9821 /* ios_ipad.cfg in Resources */,
 				11CC0A2817762F3F005D9821 /* ac2game.dat in Resources */,
 				11CC0A2A17762F4E005D9821 /* acsetup.cfg in Resources */,
-				11CC0A2D17762F7A005D9821 /* music.vox in Resources */,
 				11CC0A2E17762F7A005D9821 /* speech.vox in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

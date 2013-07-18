@@ -167,3 +167,13 @@ Plugins/agswadjetutil/vc2008/Release/vc90.pdb
 Engine/media/audio/audio.cpp.old
 
 iOS/xcode/shivah/shivah_dat/music.vox
+
+*.xcbkptlist
+
+*.xcbkptlist
+
+iOS/xcode/shivah/Shivah.xcodeproj/xcuserdata/janetcampbell68.xcuserdatad/xcdebugger/Breakpoints.xcbkptlist
+
+iOS/xcode/shivah/Shivah.xcodeproj/xcuserdata/janetcampbell68.xcuserdatad/xcdebugger/Breakpoints.xcbkptlist
+
+iOS/xcode/shivah/shivah_dat/old/music.vox
