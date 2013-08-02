@@ -1876,7 +1876,7 @@ void restore_game_overlays(DataStream *in)
     }
     //in->ReadArray(&screenover[0],sizeof(ScreenOverlay),numscreenover);
     for (int bb=0;bb<numscreenover;bb++) {
-        if (screenover[bb].pic != NULL)
+        if (screenover[bb].hasSerializedBitmap)
         {
             screenover[bb].pic = read_serialized_bitmap(in);
             screenover[bb].bmp = gfxDriver->CreateDDBFromBitmap(screenover[bb].pic, false);

@@ -21,8 +21,8 @@ using AGS::Common::DataStream;
 void ScreenOverlay::ReadFromFile(DataStream *in)
 {
     // Skipping bmp and pic pointer values
-    in->ReadInt32();
-    in->ReadInt32();
+    in->ReadInt32(); // bmp
+    hasSerializedBitmap = in->ReadInt32() != 0;
     type = in->ReadInt32();
     x = in->ReadInt32();
     y = in->ReadInt32();
@@ -38,8 +38,8 @@ void ScreenOverlay::WriteToFile(DataStream *out)
 {
     char padding[3] = {0,0,0};
     // Writing bitmap "pointers" to correspond to full structure writing
-    out->WriteInt32(0);
-    out->WriteInt32(0);
+    out->WriteInt32(0); // bmp
+    out->WriteInt32(pic ? 1 : 0); // pic
     out->WriteInt32(type);
     out->WriteInt32(x);
     out->WriteInt32(y);
