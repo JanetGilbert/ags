@@ -12,6 +12,7 @@
 //
 //=============================================================================
 
+#include <stdio.h>
 #include "util/wgt2allg.h"
 #include "media/audio/audio.h"
 #include "ac/gamesetupstruct.h"
@@ -29,10 +30,10 @@
 #include "ac/global_audio.h"
 #include "ac/roomstruct.h"
 #include <math.h>
-#include "util/datastream.h"
+#include "util/stream.h"
 #include "core/assetmanager.h"
 
-using AGS::Common::DataStream;
+using AGS::Common::Stream;
 
 AGS::Engine::Mutex _audio_mutex;
 volatile bool _audio_doing_crossfade;
@@ -80,7 +81,7 @@ void register_audio_script_objects()
     {
         game.audioClips[ee].id = ee;
         ccRegisterManagedObject(&game.audioClips[ee], &ccDynamicAudioClip);
-        ccAddExternalSymbol(game.audioClips[ee].scriptName, &game.audioClips[ee]);// was ccAddExternalDynamicObject(game.audioClips[ee].scriptName, &game.audioClips[ee], &ccDynamicAudioClip); in server version
+        ccAddExternalDynamicObject(game.audioClips[ee].scriptName, &game.audioClips[ee], &ccDynamicAudioClip);
     }
 
     calculate_reserved_channel_count();
@@ -142,7 +143,7 @@ const char* get_audio_clip_file_name(ScriptAudioClip *clip)
     if (game.audioClips[clip->id].bundlingType == AUCL_BUNDLE_EXE)
     {
         strcpy(acaudio_buffer, game.audioClips[clip->id].fileName);
-        DataStream *in = Common::AssetManager::OpenAsset(acaudio_buffer);
+        Stream *in = Common::AssetManager::OpenAsset(acaudio_buffer);
         if (in != NULL)
         {
             // CHECKME: so, what was that? a file exists check?
@@ -353,7 +354,7 @@ void queue_audio_clip_to_play(ScriptAudioClip *clip, int priority, int repeat)
     }
     
     if (!psp_audio_multithreaded)
-      update_polled_stuff(false);
+      update_polled_mp3();
 }
 
 ScriptAudioChannel* play_audio_clip_on_channel(int channel, ScriptAudioClip *clip, int priority, int repeat, int fromOffset, SOUNDCLIP *soundfx)
@@ -836,12 +837,12 @@ int calculate_max_volume() {
 
     return newvol;
 }
-
+/* //j removed
 void update_polled_stuff_if_runtime()
 {
     if (!psp_audio_multithreaded)
       update_polled_stuff(true);
-}
+}*/
 
 // add/remove the volume drop to the audio channels while speech is playing
 void apply_volume_drop_modifier(bool applyModifier)
@@ -866,14 +867,9 @@ void apply_volume_drop_modifier(bool applyModifier)
 extern volatile char want_exit;
 extern int frames_per_second;
 
-void update_polled_stuff(bool checkForDebugMessages) {
+void update_polled_mp3() {
     UPDATE_MP3
-/*
-        if (want_exit) {
-            want_exit = 0;
-            quit("||exit!");
-        }
-*/
+
         if (mvolcounter > update_music_at) {
             update_music_volume();
             apply_volume_drop_modifier(false);
@@ -881,14 +877,11 @@ void update_polled_stuff(bool checkForDebugMessages) {
             mvolcounter = 0;
             update_ambient_sound_vol();
         }
-
-        if ((editor_debugging_initialized) && (checkForDebugMessages))
-            check_for_messages_from_editor();
 }
 
 // Update the music, and advance the crossfade on a step
 // (this should only be called once per game loop)
-void update_polled_stuff_and_crossfade () {
+void update_polled_audio_and_crossfade () {
    
   update_polled_stuff_if_runtime ();
 

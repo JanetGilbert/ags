@@ -16,7 +16,6 @@
 // Game loop
 //
 
-#include "util/wgt2allg.h"
 #include "ac/common.h"
 #include "ac/characterextras.h"
 #include "ac/characterinfo.h"
@@ -49,6 +48,7 @@
 #include "main/mainheader.h"
 #include "main/game_run.h"
 #include "main/update.h"
+#include "media/audio/soundclip.h"
 #include "plugin/agsplugin.h"
 #include "script/script.h"
 #include "ac/spritecache.h"
@@ -295,7 +295,7 @@ void check_controls() {
             break;
         }
 
-        run_on_event(GE_GUI_MOUSEUP, wasongui);
+        run_on_event(GE_GUI_MOUSEUP, RuntimeScriptValue().SetInt32(wasongui));
     }
 
     aa=mgetbutton();
@@ -330,13 +330,13 @@ void check_controls() {
                 if ((guis[mongu].mousedownon < 0) && (guis[mongu].clickEventHandler[0] != 0))
                     setevent(EV_IFACECLICK, mongu, -1, aa + 1);
 
-                run_on_event(GE_GUI_MOUSEDOWN, mongu);
+                run_on_event(GE_GUI_MOUSEDOWN, RuntimeScriptValue().SetInt32(mongu));
             }
             wasongui=mongu;
             wasbutdown=aa+1;
         }
         else setevent(EV_TEXTSCRIPT,TS_MCLICK,aa+1);
-        //    else run_text_script_iparam(gameinst,"on_mouse_click",aa+1);
+        //    else RunTextScriptIParam(gameinst,"on_mouse_click",aa+1);
     }
     aa = check_mouse_wheel();
     if (aa < 0)
@@ -498,7 +498,7 @@ void check_controls() {
                 setevent(EV_TEXTSCRIPT,TS_KEYPRESS,kgn);
             }
         }
-        //    run_text_script_iparam(gameinst,"on_key_press",kgn);
+        //    RunTextScriptIParam(gameinst,"on_key_press",kgn);
     }
 
     if ((IsInterfaceEnabled()) && (IsGamePaused() == 0) &&
@@ -730,7 +730,7 @@ void mainloop(bool checkControls, IDriverDependantBitmap *extraBitmap, int extra
 
     game_loop_update_animated_buttons();
 
-    update_polled_stuff_and_crossfade();
+    update_polled_audio_and_crossfade();
 
     game_loop_do_render_and_check_mouse(extraBitmap, extraX, extraY);
     
@@ -910,4 +910,18 @@ void do_main_cycle(int untilwhat,long daaa) {
 // for external modules to call
 void next_iteration() {
     NEXT_ITERATION();
+}
+
+void update_polled_stuff_if_runtime()
+{
+    if (want_exit) {
+        want_exit = 0;
+        quit("||exit!");
+    }
+
+    if (!psp_audio_multithreaded)
+        update_polled_mp3();
+
+    if (editor_debugging_initialized)
+        check_for_messages_from_editor();
 }

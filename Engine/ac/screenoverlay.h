@@ -19,16 +19,15 @@
 #define __AGS_EE_AC__SCREENOVERLAY_H
 
 #include "gfx/ali3d.h"
-#include "util/file.h"
 
 // Forward declaration
-namespace AGS { namespace Common { class DataStream; } }
+namespace AGS { namespace Common { class Bitmap; class Stream; } }
 namespace AGS { namespace Engine { class IDriverDependantBitmap; }}
-using namespace AGS::Engine; // FIXME later
+using namespace AGS; // FIXME later
 
 
 struct ScreenOverlay {
-    IDriverDependantBitmap *bmp;
+    Engine::IDriverDependantBitmap *bmp;
     Common::Bitmap *pic;
     int type,x,y,timeout;
     int bgSpeechForChar;
@@ -37,8 +36,8 @@ struct ScreenOverlay {
     bool positionRelativeToScreen;
     bool hasSerializedBitmap;
 
-    void ReadFromFile(Common::DataStream *in);
-    void WriteToFile(Common::DataStream *out);
+    void ReadFromFile(Common::Stream *in);
+    void WriteToFile(Common::Stream *out);
 };
 
 #endif // __AGS_EE_AC__SCREENOVERLAY_H

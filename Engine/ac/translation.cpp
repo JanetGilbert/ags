@@ -13,7 +13,6 @@
 //=============================================================================
 
 #define USE_CLIB
-#include "util/wgt2allg.h"
 #include "ac/common.h"
 #include "ac/gamesetup.h"
 #include "ac/gamesetupstruct.h"
@@ -23,10 +22,10 @@
 #include "ac/translation.h"
 #include "ac/tree_map.h"
 #include "util/misc.h"
-#include "util/datastream.h"
+#include "util/stream.h"
 #include "core/assetmanager.h"
 
-using AGS::Common::DataStream;
+using AGS::Common::Stream;
 
 extern GameSetup usetup;
 extern GameSetupStruct game;
@@ -57,7 +56,7 @@ bool init_translation (const char *lang) {
 
     transFileLoc = ci_find_file(usetup.data_files_dir, transFileName);
 
-    DataStream *language_file = Common::AssetManager::OpenAsset(transFileLoc);
+    Stream *language_file = Common::AssetManager::OpenAsset(transFileLoc);
     free(transFileLoc);
 
     if (language_file == NULL) 
@@ -144,7 +143,7 @@ bool init_translation (const char *lang) {
             }
         }
         else
-            quit("Unknown Bitmap *type in translation file.");
+            quit("Unknown block type in translation file.");
     }
 
     delete language_file;

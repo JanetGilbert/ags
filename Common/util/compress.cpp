@@ -14,50 +14,26 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "util/wgt2allg.h"
 #include "ac/common.h"	// quit()
+#include "ac/roomstruct.h"
 #include "util/compress.h"
 #include "util/lzw.h"
 #include "util/misc.h"
-#include "util/file.h"     // filelength()
+#include "util/bbop.h"
 
 #ifdef _MANAGED
 // ensure this doesn't get compiled to .NET IL
 #pragma unmanaged
 #endif
 
-#include "util/wgt2allg.h"
-
 #include "util/misc.h"
-
-#include "util/datastream.h"
+#include "util/stream.h"
 #include "util/filestream.h"
-
-using AGS::Common::DataStream;
-
 #include "gfx/bitmap.h"
 
 using AGS::Common::Bitmap;
+using AGS::Common::Stream;
 namespace BitmapHelper = AGS::Common::BitmapHelper;
-
-extern long cliboffset(const char *);
-extern char lib_file_name[13];
-extern void domouse(int);
-extern "C"
-{
-  extern Bitmap *wnewblock(int, int, int, int);
-}
-
-//#ifdef ALLEGRO_BIG_ENDIAN
-//#define ->WriteInt16 __putshort__lilendian
-//#define ->ReadInt16 __getshort__bigendian
-//#else
-//extern "C"
-//{
-  //extern void ->WriteInt16(short, FILE *);
-  //extern short ->ReadInt16(FILE *);
-//}
-//#endif
 
 #ifndef __WGT4_H
 struct color
@@ -71,7 +47,7 @@ long csavecompressed(char *, __block, color[256], long = 0);
 long cloadcompressed(char *, __block, color *, long = 0);
 #endif
 
-void cpackbitl(unsigned char *line, int size, DataStream *out)
+void cpackbitl(unsigned char *line, int size, Stream *out)
 {
   int cnt = 0;                  // bytes encoded
 
@@ -107,7 +83,7 @@ void cpackbitl(unsigned char *line, int size, DataStream *out)
   } // end while
 }
 
-void cpackbitl16(unsigned short *line, int size, DataStream *out)
+void cpackbitl16(unsigned short *line, int size, Stream *out)
 {
   int cnt = 0;                  // bytes encoded
 
@@ -143,7 +119,7 @@ void cpackbitl16(unsigned short *line, int size, DataStream *out)
   } // end while
 }
 
-void cpackbitl32(unsigned int *line, int size, DataStream *out)
+void cpackbitl32(unsigned int *line, int size, Stream *out)
 {
   int cnt = 0;                  // bytes encoded
 
@@ -182,7 +158,7 @@ void cpackbitl32(unsigned int *line, int size, DataStream *out)
 
 long csavecompressed(char *finam, __block tobesaved, color pala[256], long exto)
 {
-  DataStream *outpt;
+  Stream *outpt;
 
   if (exto > 0) {
     outpt = ci_fopen(finam, Common::kFile_Create, Common::kFile_ReadWrite);
@@ -224,7 +200,7 @@ long csavecompressed(char *finam, __block tobesaved, color pala[256], long exto)
   return ofes;
 }
 
-int cunpackbitl(unsigned char *line, int size, DataStream *in)
+int cunpackbitl(unsigned char *line, int size, Stream *in)
 {
   int n = 0;                    // number of bytes decoded
 
@@ -264,7 +240,7 @@ int cunpackbitl(unsigned char *line, int size, DataStream *in)
   return ferror(((Common::FileStream*)in)->GetHandle());
 }
 
-int cunpackbitl16(unsigned short *line, int size, DataStream *in)
+int cunpackbitl16(unsigned short *line, int size, Stream *in)
 {
   int n = 0;                    // number of bytes decoded
 
@@ -304,7 +280,7 @@ int cunpackbitl16(unsigned short *line, int size, DataStream *in)
   return ferror(((Common::FileStream*)in)->GetHandle());
 }
 
-int cunpackbitl32(unsigned int *line, int size, DataStream *in)
+int cunpackbitl32(unsigned int *line, int size, Stream *in)
 {
   int n = 0;                    // number of bytes decoded
 
@@ -346,13 +322,6 @@ int cunpackbitl32(unsigned int *line, int size, DataStream *in)
 
 //=============================================================================
 
-
-//extern void lzwcompress(FILE * f, FILE * out);
-//extern unsigned char *lzwexpand_to_mem(FILE * ii);
-extern long outbytes, maxsize, putbytes;
-extern int _acroom_bpp;  // bytes per pixel of currently loading room
-
-
 char *lztempfnm = "~aclzw.tmp";
 Bitmap *recalced = NULL;
 
@@ -365,13 +334,13 @@ int bmp_bpp(Bitmap*bmpt) {
 }
 
 long save_lzw(char *fnn, Bitmap *bmpp, color *pall, long offe) {
-  DataStream  *lz_temp_s, *out;
+  Stream  *lz_temp_s, *out;
   long  fll, toret, gobacto;
 
   lz_temp_s = ci_fopen(lztempfnm, Common::kFile_CreateAlways, Common::kFile_Write);
   lz_temp_s->WriteInt32(bmpp->GetWidth() * bmpp->GetBPP());
   lz_temp_s->WriteInt32(bmpp->GetHeight());
-  lz_temp_s->WriteArray(&bmpp->GetScanLine(0)[0], bmpp->GetWidth() * bmpp->GetBPP(), bmpp->GetHeight());
+  lz_temp_s->WriteArray(bmpp->GetDataForWriting(), bmpp->GetLineLength(), bmpp->GetHeight());
   delete lz_temp_s;
 
   out = ci_fopen(fnn, Common::kFile_Open, Common::kFile_ReadWrite);
@@ -402,7 +371,7 @@ long save_lzw(char *fnn, Bitmap *bmpp, color *pall, long offe) {
   FILE*iii=clibfopen(fnn,"rb");
   Seek(iii,ooff,SEEK_SET);*/
 
-long load_lzw(DataStream *in, Common::Bitmap *bmm, color *pall) {
+long load_lzw(Stream *in, Common::Bitmap *bmm, color *pall) {
   int          uncompsiz, *loptr;
   unsigned char *membuffer;
   int           arin;
@@ -422,9 +391,9 @@ long load_lzw(DataStream *in, Common::Bitmap *bmm, color *pall) {
 
   loptr = (int *)&membuffer[0];
   membuffer += 8;
-#ifdef ALLEGRO_BIG_ENDIAN
-  loptr[0] = __int_swap_endian(loptr[0]);
-  loptr[1] = __int_swap_endian(loptr[1]);
+#if defined(AGS_BIG_ENDIAN)
+  AGS::Common::BBOp::SwapBytesInt32(loptr[0]);
+  AGS::Common::BBOp::SwapBytesInt32(loptr[1]);
   int bitmapNumPixels = loptr[0]*loptr[1]/_acroom_bpp;
   switch (_acroom_bpp) // bytes per pixel!
   {
@@ -438,7 +407,7 @@ long load_lzw(DataStream *in, Common::Bitmap *bmm, color *pall) {
       short *sp = (short *)membuffer;
       for (int i = 0; i < bitmapNumPixels; ++i)
       {
-        sp[i] = __short_swap_endian(sp[i]);
+        AGS::Common::BBOp::SwapBytesInt16(sp[i]);
       }
       // all done
       break;
@@ -448,13 +417,13 @@ long load_lzw(DataStream *in, Common::Bitmap *bmm, color *pall) {
       int *ip = (int *)membuffer;
       for (int i = 0; i < bitmapNumPixels; ++i)
       {
-        ip[i] = __int_swap_endian(ip[i]);
+        AGS::Common::BBOp::SwapBytesInt32(ip[i]);
       }
       // all done
       break;
     }
   }
-#endif // ALLEGRO_BIG_ENDIAN
+#endif // defined(AGS_BIG_ENDIAN)
 
   delete bmm;
 
@@ -494,14 +463,14 @@ long savecompressed_allegro(char *fnn, Common::Bitmap *bmpp, color *pall, long w
   sss[0] = bmpp->GetWidth();
   sss[1] = bmpp->GetHeight();
 
-  memcpy(&wgtbl[4], &bmpp->GetScanLine(0)[0], bmpp->GetWidth() * bmpp->GetHeight());
+  memcpy(&wgtbl[4], bmpp->GetDataForWriting(), bmpp->GetWidth() * bmpp->GetHeight());
 
   toret = csavecompressed(fnn, wgtbl, pall, write_at);
   free(wgtbl);
   return toret;
 }
 
-long loadcompressed_allegro(DataStream *in, Common::Bitmap **bimpp, color *pall, long read_at) {
+long loadcompressed_allegro(Stream *in, Common::Bitmap **bimpp, color *pall, long read_at) {
   short widd,hitt;
   int   ii;
 

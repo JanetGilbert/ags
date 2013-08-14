@@ -175,8 +175,8 @@ extern volatile int drawing_in_progress;
 		
 		[context presentRenderbuffer:GL_RENDERBUFFER];
 	}
-    
-    drawing_in_progress = 0;
+
+	drawing_in_progress = 0;
 }
 
 - (void)layoutSubviews

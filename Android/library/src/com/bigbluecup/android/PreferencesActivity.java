@@ -1,5 +1,7 @@
 package com.bigbluecup.android;
 
+import java.io.File;
+
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -7,6 +9,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 
@@ -14,6 +17,7 @@ public class PreferencesActivity extends PreferenceActivity
 {
 	private String gameName;
 	private String gameFilename;
+	private String gamePath;
 	private String baseDirectory;
 	private boolean isGlobalConfig;
 	private String translations[];
@@ -35,7 +39,7 @@ public class PreferencesActivity extends PreferenceActivity
 
 
 	@Override
-	protected void onCreate(Bundle bundle)
+	public void onCreate(Bundle bundle)
 	{
 		super.onCreate(bundle);
 		
@@ -53,13 +57,20 @@ public class PreferencesActivity extends PreferenceActivity
 		{
 			setTitle("Global preferences");
 			configureForGlobalPreferences();
+			gamePath = baseDirectory;
 		}
 		else
 		{
 			setTitle(gameName);
+			File f = new File(gameFilename);
+			File g = f.getParentFile();
+			if (g != null)
+				gamePath = g.getPath();
+			else
+				gamePath = baseDirectory;
 		}
 		
-		boolean hasCustomConfig = readConfigFile(baseDirectory + '/' + gameName);
+		boolean hasCustomConfig = readConfigFile(gamePath);
 
 		if (!isGlobalConfig)
 		{
@@ -78,8 +89,9 @@ public class PreferencesActivity extends PreferenceActivity
 		}
 
 		// Load preferences
-		getPreferenceScreen().setPersistent(false);
-		loadPreferencesRecursively(getPreferenceScreen());
+		Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+		loadPreferencesRecursively(getPreferenceScreen(), editor);
+		editor.commit();
 	}
 	
 	
@@ -117,23 +129,23 @@ public class PreferencesActivity extends PreferenceActivity
 	}
 	
 	// Load the preferences from the engine into the preference activity
-	private void loadPreferencesRecursively(PreferenceGroup root)
+	private void loadPreferencesRecursively(PreferenceGroup root, Editor editor)
 	{
-		Editor editor = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit();
-		
 		for (int i = 0; i < root.getPreferenceCount(); i++)
 		{
 			Preference preference = root.getPreference(i);
 			
-			if (preference instanceof android.preference.CheckBoxPreference)
+			if (preference instanceof CheckBoxPreference)
 			{
 				String key = preference.getKey();
 				int key_value = Integer.valueOf(key);
 				int value = PreferencesActivity.readIntConfigValue(key_value);
 				
 				editor.putBoolean(preference.getKey(), (value != 0));
+				CheckBoxPreference checkBox = (CheckBoxPreference)findPreference(preference.getKey());
+				checkBox.setChecked(value != 0);
 			}
-			else if (preference instanceof android.preference.ListPreference)
+			else if (preference instanceof ListPreference)
 			{
 				String key = preference.getKey();
 				int key_value = Integer.valueOf(key);
@@ -141,25 +153,32 @@ public class PreferencesActivity extends PreferenceActivity
 				if (key_value == CONFIG_TRANSLATION)
 				{
 					String value = PreferencesActivity.readStringConfigValue(key_value);
-					
+					ListPreference list = (ListPreference)findPreference(preference.getKey());
+
 					if (value.equals("default"))
+					{
 						editor.putString(preference.getKey(), "Default");
+						list.setValue("Default");
+					}
 					else
+					{
 						editor.putString(preference.getKey(), value);
+						list.setValue(value);
+					}
 				}
 				else
 				{
 					int value = PreferencesActivity.readIntConfigValue(key_value);
 					editor.putString(preference.getKey(), Integer.toString(value));
+					ListPreference list = (ListPreference)findPreference(preference.getKey());
+					list.setValue(Integer.toString(value));
 				}
 			}
-			else if (preference instanceof android.preference.PreferenceCategory)
+			else if (preference instanceof PreferenceCategory)
 			{
-				loadPreferencesRecursively((PreferenceGroup) preference);
+				loadPreferencesRecursively((PreferenceGroup) preference, editor);
 			}
 		}
-		
-		editor.commit();
 	}
 	
 	// Save the preferences
@@ -182,6 +201,9 @@ public class PreferencesActivity extends PreferenceActivity
 				String key = preference.getKey();
 				int key_value = Integer.valueOf(key);
 				String value_string = ((android.preference.ListPreference) preference).getValue();
+				
+				if (value_string == null)
+					continue;
 				
 				if (key_value == CONFIG_TRANSLATION)
 				{
@@ -211,6 +233,8 @@ public class PreferencesActivity extends PreferenceActivity
 		writeConfigFile();
 		
 		super.onDestroy();
+		
+		finish();
 	}
 	
 	// Prevent the activity from being destroyed on a configuration change

@@ -12,15 +12,7 @@
 //
 //=============================================================================
 
-/*
-#ifdef WINDOWS_VERSION
-#include <windows.h>    // for HWND
-#else
-// ???
-#endif
-*/
 #include <stdio.h>
-#include "util/wgt2allg.h"
 #include "ac/common.h"
 #include "ac/roomstruct.h"
 #include "ac/runtime_defines.h"
@@ -31,13 +23,14 @@
 #include "debug/consoleoutputtarget.h"
 #include "debug/rawfileoutputtarget.h"
 #include "media/audio/audio.h"
+#include "media/audio/soundclip.h"
 #include "script/script.h"
 #include "script/script_common.h"
 #include "script/cc_error.h"
 #include "util/filestream.h"
 #include "util/textstreamwriter.h"
 
-using AGS::Common::DataStream;
+using AGS::Common::Stream;
 using AGS::Common::TextStreamWriter;
 
 extern char check_dynamic_sprites_at_exit;
@@ -100,31 +93,22 @@ void initialize_output_subsystem()
     //j    Out::kVerbose_NoDebug, false);
     Out::AddOutputTarget(TARGET_SYSTEMDEBUGGER, AGSPlatformDriver::GetDriver(),
         Out::kVerbose_WarnErrors, true);
-	Out::AddOutputTarget(TARGET_GAMECONSOLE, new AGS::Engine::Out::CConsoleOutputTarget(),
+	Out::AddOutputTarget(TARGET_GAMECONSOLE, new AGS::Engine::Out::ConsoleOutputTarget(),
         Out::kVerbose_Always, false);
-    Out::FPrint("Debug system: output subsystem initialized");
 }
 
 void initialize_debug_system()
 {
     initialize_output_subsystem();
-
-    Out::FPrint("Debug system initialized");
-}
-
-void shutdown_output_subsystem()
-{
-    Out::FPrint("Debug system: shutting down output subsystem...");
-
-    Out::Shutdown();
 }
 
 void shutdown_debug_system()
 {
-    shutdown_output_subsystem();
+    // Shutdown output subsystem
+    Out::Shutdown();
 }
 
-void quitprintf(char*texx, ...) {
+void quitprintf(const char *texx, ...) {
     char displbuf[STD_BUFFER_SIZE];
     va_list ap;
     va_start(ap,texx);
@@ -142,12 +126,10 @@ void write_log(char*msg) {
     platform->WriteDebugString(msg);
 }
 
-
-
 /* The idea of this is that non-essential errors such as "sound file not
 found" are logged instead of exiting the program.
 */
-void debug_log(char*texx, ...) {
+void debug_log(const char *texx, ...) {
     // if not in debug mode, don't print it so we don't worry the
     // end player
     //j removed debugging
@@ -165,7 +147,7 @@ void debug_log(char*texx, ...) {
         //openmode = "wt";
         first_time = 0;
     }
-    DataStream *outfil = Common::File::OpenFileWrite("warnings.log");
+    Stream *outfil = Common::File::OpenFileWrite("warnings.log");
     if (outfil == NULL)
     {
         debug_write_console("* UNABLE TO WRITE TO WARNINGS.LOG");
@@ -179,7 +161,7 @@ void debug_log(char*texx, ...) {
 }
 
 
-void debug_write_console (char *msg, ...) {
+void debug_write_console (const char *msg, ...) {
     char displbuf[STD_BUFFER_SIZE];
     va_list ap;
     va_start(ap,msg);
@@ -188,7 +170,7 @@ void debug_write_console (char *msg, ...) {
     displbuf[99] = 0;
 
     strcpy (debug_line[last_debug_line].text, displbuf);
-    ccInstance*curinst = ccGetCurrentInstance();
+    ccInstance*curinst = ccInstance::GetCurrentInstance();
     if (curinst != NULL) {
         char scriptname[20];
         if (curinst->instanceof == gamescript)
@@ -214,7 +196,7 @@ void debug_write_console (char *msg, ...) {
 
 
 const char *get_cur_script(int numberOfLinesOfCallStack) {
-    ccGetCallStack(ccGetCurrentInstance(), pexbuf, numberOfLinesOfCallStack);
+    ccInstance::GetCurrentInstance()->GetCallStack(pexbuf, numberOfLinesOfCallStack);
 
     if (pexbuf[0] == 0)
         strcpy(pexbuf, ccErrorCallStack);
@@ -442,7 +424,7 @@ void scriptDebugHook (ccInstance *ccinst, int linenum) {
     if (pluginsWantingDebugHooks > 0) {
         // a plugin is handling the debugging
         char scname[40];
-        get_script_name(ccinst, scname);
+        ccinst->GetScriptName(scname);
         platform->RunPluginDebugHooks(scname, linenum);
         return;
     }
@@ -462,7 +444,7 @@ void scriptDebugHook (ccInstance *ccinst, int linenum) {
         return;
     }
 
-    const char *scriptName = ccGetSectionNameAtOffs(ccinst->runningInst->instanceof, ccinst->pc);
+    const char *scriptName = ccinst->runningInst->instanceof->GetSectionName(ccinst->pc);
 
     for (int i = 0; i < numBreakpoints; i++)
     {

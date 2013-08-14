@@ -31,8 +31,6 @@
 #ifndef _AGS_PLUGIN_H
 #define _AGS_PLUGIN_H
 
-#include "util/file.h"
-
 // If the plugin isn't using DDraw, don't require the headers
 #ifndef DIRECTDRAW_VERSION
 typedef void *LPDIRECTDRAW2;
@@ -48,7 +46,7 @@ typedef void *LPDIRECTINPUTDEVICE;
 #endif
 
 // If the user isn't using Allegro or WinGDI, define the BITMAP into something
-#if !defined(ALLEGRO_H) && !defined(_WINGDI_)
+#if !defined(ALLEGRO_H) && !defined(_WINGDI_) && !defined(BITMAP_DEFINED)
 typedef char BITMAP;
 #endif
 
@@ -574,7 +572,7 @@ DLLEXPORT int    AGS_PluginV2 ( ) { return 1; }
 
 #endif // THIS_IS_THE_PLUGIN
 
-namespace AGS { namespace Common { class DataStream; }}
+namespace AGS { namespace Common { class Stream; }}
 using namespace AGS; // FIXME later
 
 void pl_stop_plugins();
@@ -582,6 +580,6 @@ void pl_startup_plugins();
 int  pl_run_plugin_hooks (int event, long data);
 void pl_run_plugin_init_gfx_hooks(const char *driverName, void *data);
 int  pl_run_plugin_debug_hooks (const char *scriptfile, int linenum);
-void pl_read_plugins_from_disk (Common::DataStream *in);
+void pl_read_plugins_from_disk (Common::Stream *in);
 
 #endif

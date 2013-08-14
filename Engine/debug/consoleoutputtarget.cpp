@@ -12,9 +12,9 @@
 //
 //=============================================================================
 
+#include <stdio.h>
 #include <string.h>
 #include "consoleoutputtarget.h"
-#include "util/wgt2allg.h"
 #include "ac/roomstruct.h"
 #include "debug/debug_log.h"
 #include "debug/out.h"
@@ -36,15 +36,15 @@ namespace Engine
 namespace Out
 {
 
-CConsoleOutputTarget::CConsoleOutputTarget()
+ConsoleOutputTarget::ConsoleOutputTarget()
 {
 }
 
-CConsoleOutputTarget::~CConsoleOutputTarget()
+ConsoleOutputTarget::~ConsoleOutputTarget()
 {
 }
 
-void CConsoleOutputTarget::Out(const char *sz_fullmsg)
+void ConsoleOutputTarget::Out(const char *sz_fullmsg)
 {
     AGSPlatformDriver *platform_driver = AGSPlatformDriver::GetDriver();
 
@@ -58,7 +58,7 @@ void CConsoleOutputTarget::Out(const char *sz_fullmsg)
     displbuf[99] = 0;
 
     strcpy (debug_line[last_debug_line].text, displbuf);
-    ccInstance*curinst = ccGetCurrentInstance();
+    ccInstance*curinst = ccInstance::GetCurrentInstance();
     if (curinst != NULL) {
         char scriptname[20];
         if (curinst->instanceof == gamescript)
@@ -72,8 +72,6 @@ void CConsoleOutputTarget::Out(const char *sz_fullmsg)
         sprintf(debug_line[last_debug_line].script,"%s%d",scriptname,currentline);
     }
     else debug_line[last_debug_line].script[0] = 0;
-
-    platform_driver->WriteDebugString("%s (%s)", displbuf, debug_line[last_debug_line].script);
 
     last_debug_line = (last_debug_line + 1) % DEBUG_CONSOLE_NUMLINES;
 

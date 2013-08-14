@@ -16,16 +16,17 @@
 #define USE_ALFONT
 #endif
 
-#include "util/wgt2allg.h"
+#include <stdio.h>
 #include "alfont.h"
 #include "ac/gamestructdefines.h" //FONT_OUTLINE_AUTO
 #include "font/ttffontrenderer.h"
-#include "util/datastream.h"
+#include "util/stream.h"
 #include "gfx/bitmap.h"
 #include "core/assetmanager.h"
+#include "util/wgt2allg.h"
 
 using AGS::Common::Bitmap;
-using AGS::Common::DataStream;
+using AGS::Common::Stream;
 
 // project-specific implementation
 extern bool ShouldAntiAliasText();
@@ -86,10 +87,10 @@ void TTFFontRenderer::RenderText(const char *text, int fontNumber, BITMAP *desti
 
   ALFONT_FONT *alfpt = get_ttf_block(fonts[fontNumber]);
   // Y - 1 because it seems to get drawn down a bit
-  if ((ShouldAntiAliasText()) && (abuf->GetColorDepth() > 8))
-    alfont_textout_aa((BITMAP*)abuf->GetBitmapObject(), alfpt, text, x, y - 1, colour);
+  if ((ShouldAntiAliasText()) && (bitmap_color_depth(destination) > 8))
+    alfont_textout_aa(destination, alfpt, text, x, y - 1, colour);
   else
-    alfont_textout((BITMAP*)abuf->GetBitmapObject(), alfpt, text, x, y - 1, colour);
+    alfont_textout(destination, alfpt, text, x, y - 1, colour);
 }
 
 bool TTFFontRenderer::LoadFromDisk(int fontNumber, int fontSize)
@@ -98,7 +99,7 @@ bool TTFFontRenderer::LoadFromDisk(int fontNumber, int fontSize)
   sprintf(filnm, "agsfnt%d.ttf", fontNumber);
 
   // we read the font in manually to make it load from library file
-  DataStream *reader = Common::AssetManager::OpenAsset(filnm);
+  Stream *reader = Common::AssetManager::OpenAsset(filnm);
   char *membuffer;
 
   if (reader == NULL)

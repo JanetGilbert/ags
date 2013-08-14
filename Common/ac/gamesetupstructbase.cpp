@@ -12,17 +12,14 @@
 //
 //=============================================================================
 
-#include "util/wgt2allg.h"
 #include "ac/gamesetupstructbase.h"
-#include "util/datastream.h"
+#include "util/stream.h"
 
-using AGS::Common::DataStream;
+using AGS::Common::Stream;
 
-void GameSetupStructBase::ReadFromFile(DataStream *in)
+void GameSetupStructBase::ReadFromFile(Stream *in)
 {
-    //#ifdef ALLEGRO_BIG_ENDIAN
     in->Read(&gamename[0], 50);
-    in->Seek(Common::kSeekCurrent, 2);    // skip the array padding
     in->ReadArrayOfInt32(options, 100);
     in->Read(&paluses[0], 256);
     // colors are an array of chars
@@ -31,16 +28,15 @@ void GameSetupStructBase::ReadFromFile(DataStream *in)
     numcharacters = in->ReadInt32();
     playercharacter = in->ReadInt32();
     totalscore = in->ReadInt32();
-    numinvitems = in->ReadInt16();//__getshort__bigendian(fp);
-    in->Seek(Common::kSeekCurrent, 2);    // skip the padding
+    numinvitems = in->ReadInt16();
     numdialog = in->ReadInt32();
     numdlgmessage = in->ReadInt32();
     numfonts = in->ReadInt32();
     color_depth = in->ReadInt32();
     target_win = in->ReadInt32();
     dialog_bullet = in->ReadInt32();
-    hotdot = in->ReadInt16();//__getshort__bigendian(fp);
-    hotdotouter = in->ReadInt16();//__getshort__bigendian(fp);
+    hotdot = in->ReadInt16();
+    hotdotouter = in->ReadInt16();
     uniqueid = in->ReadInt32();
     numgui = in->ReadInt32();
     numcursors = in->ReadInt32();
@@ -55,20 +51,22 @@ void GameSetupStructBase::ReadFromFile(DataStream *in)
     //for (i = 0; i < MAXGLOBALMES; i++)
     //  messages[i] = (char*)in->ReadInt32();
 
+    // The following pointers are used as flags at one point
+    // during game loading, therefore they are initialized with
+    // some values here. These values are never treated as
+    // actual addresses, only as boolean values.
+    // See:
+    // - GameSetupStruct::read_words_dictionary(), dict
+    // - load_game_file(), compiled_script
     dict = (WordsDictionary *) in->ReadInt32();
-    globalscript = (char *) in->ReadInt32();
-    chars = (CharacterInfo *) in->ReadInt32();
+    in->ReadInt32(); // globalscript
+    in->ReadInt32(); // chars
     compiled_script = (ccScript *) in->ReadInt32();
-    //#else
-    //    throw "GameSetupStructBase::ReadFromFile() is not implemented for little-endian platforms and should not be called.";
-    //#endif
 }
 
-void GameSetupStructBase::WriteToFile(DataStream *out)
+void GameSetupStructBase::WriteToFile(Stream *out)
 {
     out->Write(&gamename[0], 50);
-    char padding[2];
-    out->Write(&padding, 2);    // skip the array padding
     out->WriteArrayOfInt32(options, 100);
     out->Write(&paluses[0], 256);
     // colors are an array of chars
@@ -77,16 +75,15 @@ void GameSetupStructBase::WriteToFile(DataStream *out)
     out->WriteInt32(numcharacters);
     out->WriteInt32(playercharacter);
     out->WriteInt32(totalscore);
-    out->WriteInt16(numinvitems);//__getshort__bigendian(fp);
-    out->Write(&padding, 2);    // skip the padding
+    out->WriteInt16(numinvitems);
     out->WriteInt32(numdialog);
     out->WriteInt32(numdlgmessage);
     out->WriteInt32(numfonts);
     out->WriteInt32(color_depth);
     out->WriteInt32(target_win);
     out->WriteInt32(dialog_bullet);
-    out->WriteInt16(hotdot);//__getshort__bigendian(fp);
-    out->WriteInt16(hotdotouter);//__getshort__bigendian(fp);
+    out->WriteInt16(hotdot);
+    out->WriteInt16(hotdotouter);
     out->WriteInt32(uniqueid);
     out->WriteInt32(numgui);
     out->WriteInt32(numcursors);
@@ -96,8 +93,8 @@ void GameSetupStructBase::WriteToFile(DataStream *out)
     out->WriteArrayOfInt32(reserved, 17);
     // write the final ptrs so we know to load dictionary, scripts etc
     out->WriteArrayOfIntPtr32((intptr_t*)messages, MAXGLOBALMES);
-    out->WriteInt32((int32)dict);
-    out->WriteInt32((int32)globalscript);
-    out->WriteInt32((int32)chars);
-    out->WriteInt32((int32)compiled_script);
+    out->WriteInt32(dict ? 1 : 0);
+    out->WriteInt32(0); // globalscript
+    out->WriteInt32(0); // chars
+    out->WriteInt32(compiled_script ? 1 : 0);
 }

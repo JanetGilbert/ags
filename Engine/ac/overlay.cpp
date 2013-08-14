@@ -12,7 +12,7 @@
 //
 //=============================================================================
 
-#include "util/wgt2allg.h"
+#include <stdio.h>
 #include "gfx/ali3d.h"
 #include "ac/overlay.h"
 #include "ac/common.h"
@@ -27,6 +27,7 @@
 #include "ac/string.h"
 #include "gfx/graphicsdriver.h"
 #include "gfx/bitmap.h"
+#include "script/runtimescriptvalue.h"
 
 using AGS::Common::Bitmap;
 
@@ -51,11 +52,11 @@ void Overlay_Remove(ScriptOverlay *sco) {
     sco->Remove();
 }
 
-void Overlay_SetText(ScriptOverlay *scover, int wii, int fontid, int clr, char*texx, ...) {
+void Overlay_SetText(ScriptOverlay *scover, int wii, int fontid, int clr, const char*texx, ...) {
     char displbuf[STD_BUFFER_SIZE];
     va_list ap;
     va_start(ap,texx);
-    my_sprintf(displbuf,get_translation(texx),ap);
+    vsprintf(displbuf,get_translation(texx),ap);
     va_end(ap);
 
     int ovri=find_overlay_of_type(scover->overlayId);
@@ -138,7 +139,7 @@ ScriptOverlay* Overlay_CreateTextual(int x, int y, int width, int font, int colo
     char displbuf[STD_BUFFER_SIZE];
     va_list ap;
     va_start(ap,text);
-    my_sprintf(displbuf,get_translation(text),ap);
+    vsprintf(displbuf,get_translation(text),ap);
     va_end(ap);
 
     multiply_up_coordinates(&x, &y);
@@ -268,4 +269,125 @@ void get_overlay_position(int overlayidx, int *x, int *y) {
     }
     *x = tdxp;
     *y = tdyp;
+}
+
+//=============================================================================
+//
+// Script API Functions
+//
+//=============================================================================
+
+#include "debug/out.h"
+#include "script/script_api.h"
+#include "script/script_runtime.h"
+
+// ScriptOverlay* (int x, int y, int slot, int transparent)
+RuntimeScriptValue Sc_Overlay_CreateGraphical(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_OBJAUTO_PINT4(ScriptOverlay, Overlay_CreateGraphical);
+}
+
+// ScriptOverlay* (int x, int y, int width, int font, int colour, const char* text, ...)
+RuntimeScriptValue Sc_Overlay_CreateTextual(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_SCRIPT_SPRINTF(Overlay_CreateTextual, 6);
+    ScriptOverlay *overlay = Overlay_CreateTextual(params[0].IValue, params[1].IValue, params[2].IValue,
+                                                   params[3].IValue, params[4].IValue, "%s", scsf_buffer);
+    return RuntimeScriptValue().SetDynamicObject(overlay, overlay);
+}
+
+// void (ScriptOverlay *scover, int wii, int fontid, int clr, char*texx, ...)
+RuntimeScriptValue Sc_Overlay_SetText(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_SCRIPT_SPRINTF(Overlay_SetText, 4);
+    Overlay_SetText((ScriptOverlay*)self, params[0].IValue, params[1].IValue, params[2].IValue, "%s", scsf_buffer);
+    return RuntimeScriptValue();
+}
+
+// void (ScriptOverlay *sco)
+RuntimeScriptValue Sc_Overlay_Remove(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID(ScriptOverlay, Overlay_Remove);
+}
+
+// int (ScriptOverlay *scover)
+RuntimeScriptValue Sc_Overlay_GetValid(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(ScriptOverlay, Overlay_GetValid);
+}
+
+// int (ScriptOverlay *scover)
+RuntimeScriptValue Sc_Overlay_GetX(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(ScriptOverlay, Overlay_GetX);
+}
+
+// void (ScriptOverlay *scover, int newx)
+RuntimeScriptValue Sc_Overlay_SetX(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(ScriptOverlay, Overlay_SetX);
+}
+
+// int (ScriptOverlay *scover)
+RuntimeScriptValue Sc_Overlay_GetY(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(ScriptOverlay, Overlay_GetY);
+}
+
+// void (ScriptOverlay *scover, int newy)
+RuntimeScriptValue Sc_Overlay_SetY(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(ScriptOverlay, Overlay_SetY);
+}
+
+//=============================================================================
+//
+// Exclusive API for Plugins
+//
+//=============================================================================
+
+// ScriptOverlay* (int x, int y, int width, int font, int colour, const char* text, ...)
+ScriptOverlay* ScPl_Overlay_CreateTextual(int x, int y, int width, int font, int colour, const char *text, ...)
+{
+    va_list arg_ptr;
+    va_start(arg_ptr, text);
+    const char *scsf_buffer = ScriptVSprintf(ScSfBuffer, 3000, get_translation(text), arg_ptr);
+    va_end(arg_ptr);
+    return Overlay_CreateTextual(x, y, width, font, colour, "%s", scsf_buffer);
+}
+
+// void (ScriptOverlay *scover, int wii, int fontid, int clr, char*texx, ...)
+void ScPl_Overlay_SetText(ScriptOverlay *scover, int wii, int fontid, int clr, char *texx, ...)
+{
+    va_list arg_ptr;
+    va_start(arg_ptr, texx);
+    const char *scsf_buffer = ScriptVSprintf(ScSfBuffer, 3000, get_translation(texx), arg_ptr);
+    va_end(arg_ptr);
+    Overlay_SetText(scover, wii, fontid, clr, "%s", scsf_buffer);
+}
+
+
+void RegisterOverlayAPI()
+{
+    ccAddExternalStaticFunction("Overlay::CreateGraphical^4",   Sc_Overlay_CreateGraphical);
+    ccAddExternalStaticFunction("Overlay::CreateTextual^106",   Sc_Overlay_CreateTextual);
+    ccAddExternalObjectFunction("Overlay::SetText^104",         Sc_Overlay_SetText);
+    ccAddExternalObjectFunction("Overlay::Remove^0",            Sc_Overlay_Remove);
+    ccAddExternalObjectFunction("Overlay::get_Valid",           Sc_Overlay_GetValid);
+    ccAddExternalObjectFunction("Overlay::get_X",               Sc_Overlay_GetX);
+    ccAddExternalObjectFunction("Overlay::set_X",               Sc_Overlay_SetX);
+    ccAddExternalObjectFunction("Overlay::get_Y",               Sc_Overlay_GetY);
+    ccAddExternalObjectFunction("Overlay::set_Y",               Sc_Overlay_SetY);
+
+    /* ----------------------- Registering unsafe exports for plugins -----------------------*/
+
+    ccAddExternalFunctionForPlugin("Overlay::CreateGraphical^4",   (void*)Overlay_CreateGraphical);
+    ccAddExternalFunctionForPlugin("Overlay::CreateTextual^106",   (void*)ScPl_Overlay_CreateTextual);
+    ccAddExternalFunctionForPlugin("Overlay::SetText^104",         (void*)ScPl_Overlay_SetText);
+    ccAddExternalFunctionForPlugin("Overlay::Remove^0",            (void*)Overlay_Remove);
+    ccAddExternalFunctionForPlugin("Overlay::get_Valid",           (void*)Overlay_GetValid);
+    ccAddExternalFunctionForPlugin("Overlay::get_X",               (void*)Overlay_GetX);
+    ccAddExternalFunctionForPlugin("Overlay::set_X",               (void*)Overlay_SetX);
+    ccAddExternalFunctionForPlugin("Overlay::get_Y",               (void*)Overlay_GetY);
+    ccAddExternalFunctionForPlugin("Overlay::set_Y",               (void*)Overlay_SetY);
 }

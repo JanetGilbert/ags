@@ -147,7 +147,9 @@ int     Character_GetSpeakingFrame(CharacterInfo *chaa);
 
 //=============================================================================
 
-#include "ac/movelist.h"
+struct MoveList;
+namespace AGS { namespace Common { class Bitmap; } }
+using namespace AGS; // FIXME later
 
 void animate_character(CharacterInfo *chap, int loopn,int sppd,int rept, int noidleoverride, int direction);
 void walk_character(int chac,int tox,int toy,int ignwal, bool autoWalkAnims);
@@ -183,7 +185,6 @@ int check_click_on_character(int xx,int yy,int mood);
 int is_pos_on_character(int xx,int yy);
 void _DisplaySpeechCore(int chid, char *displbuf);
 void _DisplayThoughtCore(int chid, const char *displbuf);
-int user_to_internal_skip_speech(int userval);
 
 void _displayspeech(char*texx, int aschar, int xx, int yy, int widd, int isThought);
 int get_character_currently_talking();
@@ -193,7 +194,7 @@ int update_lip_sync(int talkview, int talkloop, int *talkframeptr);
 
 extern CharacterInfo*playerchar;
 extern CharacterExtras *charextra;
-extern long _sc_PlayerCharPtr;
+extern int32_t _sc_PlayerCharPtr;
 
 // order of loops to turn character in circle from down to down
 extern int turnlooporder[8];

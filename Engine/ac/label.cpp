@@ -13,7 +13,6 @@
 //=============================================================================
 
 #include <string.h>
-#include "util/wgt2allg.h"
 #include "ac/label.h"
 #include "ac/common.h"
 #include "ac/gamesetupstruct.h"
@@ -65,4 +64,84 @@ void Label_SetFont(GUILabel *guil, int fontnum) {
         guil->font = fontnum;
         guis_need_update = 1;
     }
+}
+
+//=============================================================================
+//
+// Script API Functions
+//
+//=============================================================================
+
+#include "debug/out.h"
+#include "script/script_api.h"
+#include "script/script_runtime.h"
+#include "ac/dynobj/scriptstring.h"
+
+extern ScriptString myScriptStringImpl;
+
+// void (GUILabel *labl, char *buffer)
+RuntimeScriptValue Sc_Label_GetText(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_POBJ(GUILabel, Label_GetText, char);
+}
+
+// void (GUILabel *labl, const char *newtx)
+RuntimeScriptValue Sc_Label_SetText(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_POBJ(GUILabel, Label_SetText, const char);
+}
+
+// int (GUILabel *labl)
+RuntimeScriptValue Sc_Label_GetFont(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(GUILabel, Label_GetFont);
+}
+
+// void (GUILabel *guil, int fontnum)
+RuntimeScriptValue Sc_Label_SetFont(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(GUILabel, Label_SetFont);
+}
+
+// const char* (GUILabel *labl)
+RuntimeScriptValue Sc_Label_GetText_New(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_OBJ(GUILabel, const char, myScriptStringImpl, Label_GetText_New);
+}
+
+// int (GUILabel *labl)
+RuntimeScriptValue Sc_Label_GetColor(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(GUILabel, Label_GetColor);
+}
+
+// void (GUILabel *labl, int colr)
+RuntimeScriptValue Sc_Label_SetColor(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(GUILabel, Label_SetColor);
+}
+
+
+
+void RegisterLabelBoxAPI()
+{
+    ccAddExternalObjectFunction("Label::GetText^1",     Sc_Label_GetText);
+    ccAddExternalObjectFunction("Label::SetText^1",     Sc_Label_SetText);
+    ccAddExternalObjectFunction("Label::get_Font",      Sc_Label_GetFont);
+    ccAddExternalObjectFunction("Label::set_Font",      Sc_Label_SetFont);
+    ccAddExternalObjectFunction("Label::get_Text",      Sc_Label_GetText_New);
+    ccAddExternalObjectFunction("Label::set_Text",      Sc_Label_SetText);
+    ccAddExternalObjectFunction("Label::get_TextColor", Sc_Label_GetColor);
+    ccAddExternalObjectFunction("Label::set_TextColor", Sc_Label_SetColor);
+
+    /* ----------------------- Registering unsafe exports for plugins -----------------------*/
+
+    ccAddExternalFunctionForPlugin("Label::GetText^1",     (void*)Label_GetText);
+    ccAddExternalFunctionForPlugin("Label::SetText^1",     (void*)Label_SetText);
+    ccAddExternalFunctionForPlugin("Label::get_Font",      (void*)Label_GetFont);
+    ccAddExternalFunctionForPlugin("Label::set_Font",      (void*)Label_SetFont);
+    ccAddExternalFunctionForPlugin("Label::get_Text",      (void*)Label_GetText_New);
+    ccAddExternalFunctionForPlugin("Label::set_Text",      (void*)Label_SetText);
+    ccAddExternalFunctionForPlugin("Label::get_TextColor", (void*)Label_GetColor);
+    ccAddExternalFunctionForPlugin("Label::set_TextColor", (void*)Label_SetColor);
 }

@@ -12,8 +12,8 @@
 //
 //=============================================================================
 
+#include <stdio.h>
 #include "ac/global_overlay.h"
-#include "util/wgt2allg.h"
 #include "ac/common.h"
 #include "ac/display.h"
 #include "ac/draw.h"
@@ -48,15 +48,14 @@ void RemoveOverlay(int ovrid) {
 int CreateGraphicOverlay(int xx,int yy,int slott,int trans) {
     multiply_up_coordinates(&xx, &yy);
 
-    Bitmap *screeno=BitmapHelper::CreateBitmap(spritewidth[slott],spriteheight[slott], final_col_dep);
-    wsetscreen(screeno);
-    screeno->Clear(screeno->GetMaskColor());
-    wputblock(0,0,spriteset[slott],trans);
+    Bitmap *screeno=BitmapHelper::CreateTransparentBitmap(spritewidth[slott],spriteheight[slott], final_col_dep);
+    Bitmap *ds = SetVirtualScreen(screeno);
+    wputblock(ds, 0,0,spriteset[slott],trans);
 
     bool hasAlpha = (game.spriteflags[slott] & SPF_ALPHACHANNEL) != 0;
     int nse = add_screen_overlay(xx, yy, OVER_CUSTOM, screeno, hasAlpha);
 
-    wsetscreen(virtual_screen);
+    SetVirtualScreen(virtual_screen);
     return screenover[nse].type;
 }
 
@@ -69,11 +68,11 @@ int CreateTextOverlayCore(int xx, int yy, int wii, int fontid, int clr, const ch
     return _display_main(xx,yy,wii, (char*)tex, blcode,fontid,-clr, 0, allowShrink, false);
 }
 
-int CreateTextOverlay(int xx,int yy,int wii,int fontid,int clr,char*texx, ...) {
+int CreateTextOverlay(int xx,int yy,int wii,int fontid,int clr, const char*texx, ...) {
     char displbuf[STD_BUFFER_SIZE];
     va_list ap;
     va_start(ap,texx);
-    my_sprintf(displbuf,get_translation(texx),ap);
+    vsprintf(displbuf, get_translation(texx), ap);
     va_end(ap);
 
     int allowShrink = 0;
@@ -88,11 +87,11 @@ int CreateTextOverlay(int xx,int yy,int wii,int fontid,int clr,char*texx, ...) {
     return CreateTextOverlayCore(xx, yy, wii, fontid, clr, displbuf, allowShrink);
 }
 
-void SetTextOverlay(int ovrid,int xx,int yy,int wii,int fontid,int clr,char*texx,...) {
+void SetTextOverlay(int ovrid,int xx,int yy,int wii,int fontid,int clr, const char*texx,...) {
     char displbuf[STD_BUFFER_SIZE];
     va_list ap;
     va_start(ap,texx);
-    my_sprintf(displbuf,get_translation(texx),ap);
+    vsprintf(displbuf, get_translation(texx), ap);
     va_end(ap);
     RemoveOverlay(ovrid);
     crovr_id=ovrid;

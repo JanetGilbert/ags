@@ -32,9 +32,9 @@
 #include "ac/dynobj/cc_dynamicobject.h"
 #include "ac/dynobj/managedobjectpool.h"
 #include "script/cc_error.h"
-#include "util/datastream.h"
+#include "util/stream.h"
 
-using AGS::Common::DataStream;
+using AGS::Common::Stream;
 
 ICCStringClass *stringClassImpl = NULL;
 
@@ -45,8 +45,8 @@ void ccSetStringClassImpl(ICCStringClass *theClass) {
 
 // register a memory handle for the object and allow script
 // pointers to point to it
-long ccRegisterManagedObject(const void *object, ICCDynamicObject *callback) {
-    long handl = pool.AddObject((const char*)object, callback);
+int32_t ccRegisterManagedObject(const void *object, ICCDynamicObject *callback, bool plugin_object) {
+    int32_t handl = pool.AddObject((const char*)object, callback, plugin_object);
 
 #ifdef DEBUG_MANAGED_OBJECTS
     char bufff[200];
@@ -58,8 +58,8 @@ long ccRegisterManagedObject(const void *object, ICCDynamicObject *callback) {
 }
 
 // register a de-serialized object
-long ccRegisterUnserializedObject(int index, const void *object, ICCDynamicObject *callback) {
-    return pool.AddObject((const char*)object, callback, index);
+int32_t ccRegisterUnserializedObject(int index, const void *object, ICCDynamicObject *callback, bool plugin_object) {
+    return pool.AddObject((const char*)object, callback, plugin_object, index);
 }
 
 // unregister a particular object
@@ -73,30 +73,30 @@ void ccUnregisterAllObjects() {
 }
 
 // serialize all objects to disk
-void ccSerializeAllObjects(DataStream *out) {
+void ccSerializeAllObjects(Stream *out) {
     pool.WriteToDisk(out);
 }
 
 // un-serialise all objects (will remove all currently registered ones)
-int ccUnserializeAllObjects(DataStream *in, ICCObjectReader *callback) {
+int ccUnserializeAllObjects(Stream *in, ICCObjectReader *callback) {
     // un-register all existing objects, ready for the un-serialization
     ccUnregisterAllObjects();
     return pool.ReadFromDisk(in, callback);
 }
 
 // dispose the object if RefCount==0
-void ccAttemptDisposeObject(long handle) {
+void ccAttemptDisposeObject(int32_t handle) {
     if (pool.HandleToAddress(handle) != NULL)
         pool.CheckDispose(handle);
 }
 
 // translate between object handles and memory addresses
-long ccGetObjectHandleFromAddress(const char *address) {
+int32_t ccGetObjectHandleFromAddress(const char *address) {
     // set to null
     if (address == NULL)
         return 0;
 
-    long handl = pool.AddressToHandle(address);
+    int32_t handl = pool.AddressToHandle(address);
 
 #ifdef DEBUG_MANAGED_OBJECTS
     char bufff[200];
@@ -111,7 +111,7 @@ long ccGetObjectHandleFromAddress(const char *address) {
     return handl;
 }
 
-const char *ccGetObjectAddressFromHandle(long handle) {
+const char *ccGetObjectAddressFromHandle(int32_t handle) {
     if (handle == 0) {
         return NULL;
     }
@@ -130,14 +130,28 @@ const char *ccGetObjectAddressFromHandle(long handle) {
     return addr;
 }
 
-int ccAddObjectReference(long handle) {
+ScriptValueType ccGetObjectAddressAndManagerFromHandle(int32_t handle, void *&object, ICCDynamicObject *&manager)
+{
+    if (handle == 0) {
+        object = NULL;
+        manager = NULL;
+        return kScValUndefined;
+    }
+    ScriptValueType obj_type = pool.HandleToAddressAndManager(handle, object, manager);
+    if (object == NULL) {
+        cc_error("Error retrieving pointer: invalid handle %d", handle);
+    }
+    return obj_type;
+}
+
+int ccAddObjectReference(int32_t handle) {
     if (handle == 0)
         return 0;
 
     return pool.AddRef(handle);
 }
 
-int ccReleaseObjectReference(long handle) {
+int ccReleaseObjectReference(int32_t handle) {
     if (handle == 0)
         return 0;
 

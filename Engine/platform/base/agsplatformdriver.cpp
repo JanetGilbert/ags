@@ -22,20 +22,17 @@
 #include "platform/base/agsplatformdriver.h"
 #include "ac/common.h"
 #include "util/string_utils.h"
-#include "util/datastream.h"
+#include "util/stream.h"
 #include "gfx/bitmap.h"
 #include "plugin/agsplugin.h"
 
-using AGS::Common::DataStream;
-using AGS::Common::String;
+using AGS::Common::Stream;
 using AGS::Common::Bitmap;
 namespace BitmapHelper = AGS::Common::BitmapHelper;
 
 #if defined (AGS_HAS_CD_AUDIO)
 #include "libcda.h"
 #endif
-
-extern Bitmap *abuf; // in wgt2allg
 
 AGSPlatformDriver* AGSPlatformDriver::instance = NULL;
 AGSPlatformDriver *platform = NULL;
@@ -84,7 +81,7 @@ void AGSPlatformDriver::ReplaceSpecialPaths(const char *sourcePath, char *destPa
 
 }
 
-void AGSPlatformDriver::ReadPluginsFromDisk(AGS::Common::DataStream *iii) {
+void AGSPlatformDriver::ReadPluginsFromDisk(AGS::Common::Stream *iii) {
 #if 1
   pl_read_plugins_from_disk(iii);
 #else
@@ -125,8 +122,8 @@ int AGSPlatformDriver::RunPluginDebugHooks(const char *scriptfile, int linenum) 
 void AGSPlatformDriver::InitialiseAbufAtStartup()
 {
     // because loading the game file accesses abuf, it must exist
-    //abuf = BitmapHelper::CreateBitmap(10,10,8); //j this causes a minor memory leak
-    abuf = NULL;
+    // No no no, David Blain, no magic here :P
+    //abuf = BitmapHelper::CreateBitmap(10,10,8);
 }
 
 void AGSPlatformDriver::FinishedUsingGraphicsMode()
@@ -148,7 +145,7 @@ int AGSPlatformDriver::ConvertKeycodeToScanCode(int keycode)
 // IOutputTarget implementation
 //-----------------------------------------------
 void AGSPlatformDriver::Out(const char *sz_fullmsg) {
-    // do nothing
+    this->WriteDebugString(sz_fullmsg);
 }
 
 // ********** CD Player Functions common to Win and Linux ********

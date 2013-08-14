@@ -18,7 +18,6 @@
 
 // Headers, as they are in acroom.cpp
 
-#include "util/wgt2allg.h"
 #include "util/misc.h"
 #include "ac/roomstruct.h"
 
@@ -28,6 +27,5 @@
 
 bool load_room_is_version_bad(roomstruct *rstruc)
 {
-  // CHECKME: agsnative variant has '||' operator here, is this a typo?
-  return ((rstruc->wasversion < 17) | (rstruc->wasversion > ROOM_FILE_VERSION));
+  return ((rstruc->wasversion < kRoomVersion_250b) || (rstruc->wasversion > kRoomVersion_Current));
 }

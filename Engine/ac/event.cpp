@@ -12,8 +12,8 @@
 //
 //=============================================================================
 
+#include <stdio.h>
 #include "event.h"
-#include "util/wgt2allg.h"
 #include "gfx/ali3d.h"
 #include "ac/common.h"
 #include "ac/draw.h"
@@ -28,12 +28,12 @@
 #include "ac/screen.h"
 #include "script/cc_error.h"
 #include "media/audio/audio.h"
+#include "media/audio/soundclip.h"
 #include "platform/base/agsplatformdriver.h"
 #include "plugin/agsplugin.h"
 #include "script/script.h"
 #include "gfx/ddb.h"
 #include "gfx/graphicsdriver.h"
-#include "gfx/bitmap.h"
 
 using AGS::Common::Bitmap;
 namespace BitmapHelper = Common::BitmapHelper;
@@ -66,7 +66,7 @@ int eventClaimed = EVENT_NONE;
 char*tsnames[4]={NULL, REP_EXEC_NAME, "on_key_press","on_mouse_click"};
 
 
-int run_claimable_event(char *tsname, bool includeRoom, int numParams, long param1, long param2, bool *eventWasClaimed) {
+int run_claimable_event(char *tsname, bool includeRoom, int numParams, RuntimeScriptValue *params, bool *eventWasClaimed) {
     *eventWasClaimed = true;
     // Run the room script function, and if it is not claimed,
     // then run the main one
@@ -77,7 +77,7 @@ int run_claimable_event(char *tsname, bool includeRoom, int numParams, long para
     int toret;
 
     if (includeRoom) {
-        toret = run_script_function_if_exist(roominst, tsname, numParams, param1, param2);
+        toret = roominst->RunScriptFunctionIfExists(tsname, numParams, params);
 
         if (eventClaimed == EVENT_CLAIMED) {
             eventClaimed = eventClaimedOldValue;
@@ -87,7 +87,7 @@ int run_claimable_event(char *tsname, bool includeRoom, int numParams, long para
 
     // run script modules
     for (int kk = 0; kk < numScriptModules; kk++) {
-        toret = run_script_function_if_exist(moduleInst[kk], tsname, numParams, param1, param2);
+        toret = moduleInst[kk]->RunScriptFunctionIfExists(tsname, numParams, params);
 
         if (eventClaimed == EVENT_CLAIMED) {
             eventClaimed = eventClaimedOldValue;
@@ -100,13 +100,13 @@ int run_claimable_event(char *tsname, bool includeRoom, int numParams, long para
     return 0;
 }
 
-// runs the global script on_event fnuction
-void run_on_event (int evtype, int wparam) {
+// runs the global script on_event function
+void run_on_event (int evtype, RuntimeScriptValue &wparam) {
     if (inside_script) {
-        curscript->run_another("#on_event", evtype, wparam);
+        curscript->run_another("#on_event", RuntimeScriptValue().SetInt32(evtype), wparam);
     }
     else
-        run_text_script_2iparam(gameinst,"on_event", evtype, wparam);
+        gameinst->RunTextScript2IParam("on_event", RuntimeScriptValue().SetInt32(evtype), wparam);
 }
 
 void run_room_event(int id) {
@@ -122,15 +122,15 @@ void run_room_event(int id) {
     }
 }
 
-void run_event_block_inv(int invNum, int aaa) {
+void run_event_block_inv(int invNum, int event) {
     evblockbasename="inventory%d";
     if (game.invScripts != NULL)
     {
-        run_interaction_script(game.invScripts[invNum], aaa);
+        run_interaction_script(game.invScripts[invNum], event);
     }
     else 
     {
-        run_interaction_event(game.intrInv[invNum], aaa);
+        run_interaction_event(game.intrInv[invNum], event);
     }
 
 }
@@ -147,22 +147,23 @@ void setevent(int evtyp,int ev1,int ev2,int ev3) {
 }
 
 void process_event(EventHappened*evp) {
+    RuntimeScriptValue rval_null;
     if (evp->type==EV_TEXTSCRIPT) {
         int resl=0; ccError=0;
         if (evp->data2 > -1000) {
             if (inside_script) {
                 char nameToExec[50];
                 sprintf (nameToExec, "!%s", tsnames[evp->data1]);
-                curscript->run_another(nameToExec, evp->data2, 0);
+                curscript->run_another(nameToExec, RuntimeScriptValue().SetInt32(evp->data2), rval_null /*0*/);
             }
             else
-                resl=run_text_script_iparam(gameinst,tsnames[evp->data1],evp->data2);
+                resl=gameinst->RunTextScriptIParam(tsnames[evp->data1],RuntimeScriptValue().SetInt32(evp->data2));
         }
         else {
             if (inside_script)
-                curscript->run_another (tsnames[evp->data1], 0, 0);
+                curscript->run_another (tsnames[evp->data1], rval_null, rval_null /*0, 0*/);
             else
-                resl=run_text_script(gameinst,tsnames[evp->data1]);
+                resl=gameinst->RunTextScript(tsnames[evp->data1]);
         }
         //    Display("relt: %d err:%d",resl,scErrorNo);
     }
@@ -196,7 +197,7 @@ void process_event(EventHappened*evp) {
             evblockbasename="room";
             if (evp->data3 == 5) {
                 in_enters_screen ++;
-                run_on_event (GE_ENTER_ROOM, displayed_room);
+                run_on_event (GE_ENTER_ROOM, RuntimeScriptValue().SetInt32(displayed_room));
 
             }
             //platform->WriteDebugString("Running room interaction, event %d", evp->data3);
@@ -252,7 +253,7 @@ void process_event(EventHappened*evp) {
 		Bitmap *screen_bmp = BitmapHelper::GetScreenBitmap();
 
         if ((theTransition == FADE_INSTANT) || (play.screen_tint >= 0))
-            wsetpalette(0,255,palette);
+            set_palette_range(palette, 0, 255, 0);
         else if (theTransition == FADE_NORMAL)
         {
             if (gfxDriver->UsesMemoryBackBuffer())
@@ -268,7 +269,7 @@ void process_event(EventHappened*evp) {
             }
             else
             {
-                wsetpalette(0,255,palette);
+                set_palette_range(palette, 0, 255, 0);
                 gfxDriver->RenderToBackBuffer();
 				gfxDriver->SetMemoryBackBuffer(screen_bmp);
                 screen_bmp->Clear();
@@ -323,7 +324,7 @@ void process_event(EventHappened*evp) {
 
             delete temp_virtual;
             temp_virtual = NULL;
-            wsetpalette(0,255,palette);
+            set_palette_range(palette, 0, 255, 0);
             gfxDriver->DestroyDDB(ddb);
         }
         else if (theTransition == FADE_DISSOLVE) {
@@ -339,7 +340,7 @@ void process_event(EventHappened*evp) {
                 if (game.color_depth == 1) 
                 {
                     fade_interpolate(old_palette,palette,interpal,aa*4,0,255);
-                    wsetpalette(0,255,interpal);
+                    set_palette_range(interpal, 0, 255, 0);
                 }
                 // do the dissolving
                 int maskCol = temp_virtual->GetMaskColor();
@@ -360,7 +361,7 @@ void process_event(EventHappened*evp) {
 
             delete temp_virtual;
             temp_virtual = NULL;
-            wsetpalette(0,255,palette);
+            set_palette_range(palette, 0, 255, 0);
             gfxDriver->DestroyDDB(ddb);
         }
 

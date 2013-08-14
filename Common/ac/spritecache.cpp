@@ -22,25 +22,23 @@
 #pragma warning (disable: 4996 4312)  // disable deprecation warnings
 #endif
 
-#include "util/wgt2allg.h"
-#include "ac/common_defines.h"
+#include "ac/common.h"
 #include "ac/spritecache.h"
+#include "core/assetmanager.h"
+#include "gfx/bitmap.h"
 #include "util/compress.h"
 #include "util/file.h"
-#include "util/filestream.h"
-#include "gfx/bitmap.h"
-#include "core/assetmanager.h"
+#include "util/stream.h"
 
 using AGS::Common::Bitmap;
 namespace BitmapHelper = AGS::Common::BitmapHelper;
 
-using AGS::Common::DataStream;
+using AGS::Common::Stream;
 namespace File = AGS::Common::File;
 
 //#define DEBUG_SPRITECACHE
 // [IKM] We have to forward-declare these because their implementations are in the Engine
 extern void write_log(char *);
-extern void quit(char *);
 extern void initialize_sprite(int);
 extern void pre_save_sprite(int);
 extern void get_new_size_for_sprite(int, int, int, int &, int &);
@@ -50,7 +48,14 @@ extern int spritewidth[], spriteheight[];
 #define START_OF_LIST -1
 #define END_OF_LIST   -1
 // PSP: Use smaller sprite cache due to limited total memory.
-#define DEFAULTCACHESIZE 5000000 //20240000        // max size, in bytes (20 MB)
+#if defined (PSP_VERSION)
+#define DEFAULTCACHESIZE 5000000
+#else
+#define DEFAULTCACHESIZE 20240000        // max size, in bytes (20 MB)
+#endif
+
+const char *spindexid = "SPRINDEX";
+const char *spindexfilename = "sprindex.dat";
 
 
 SpriteCache::SpriteCache(long maxElements)
@@ -464,7 +469,7 @@ int SpriteCache::loadSprite(int index)
 
 const char *spriteFileSig = " Sprite File ";
 
-void SpriteCache::compressSprite(Bitmap *sprite, DataStream *out) {
+void SpriteCache::compressSprite(Bitmap *sprite, Stream *out) {
 
   int depth = sprite->GetColorDepth() / 8;
 
@@ -485,7 +490,7 @@ void SpriteCache::compressSprite(Bitmap *sprite, DataStream *out) {
 
 int SpriteCache::saveToFile(const char *filnam, int lastElement, bool compressOutput)
 {
-  DataStream *output = Common::File::CreateFile(filnam);
+  Stream *output = Common::File::CreateFile(filnam);
   if (output == NULL)
     return -1;
 
@@ -560,7 +565,7 @@ int SpriteCache::saveToFile(const char *filnam, int lastElement, bool compressOu
         output->Seek(Common::kSeekEnd, 0);
       }
       else
-        output->WriteArray(&images[i]->GetScanLine(0)[0], spritewidths[i] * bpss, spriteheights[i]);
+        output->WriteArray(images[i]->GetDataForWriting(), spritewidths[i] * bpss, spriteheights[i]);
 
       continue;
     }
@@ -626,7 +631,7 @@ int SpriteCache::saveToFile(const char *filnam, int lastElement, bool compressOu
   delete output;
 
   // write the sprite index file
-  DataStream *spindex_out = File::CreateFile(spindexfilename);
+  Stream *spindex_out = File::CreateFile(spindexfilename);
   // write "SPRINDEX" id
   spindex_out->WriteArray(&spindexid[0], strlen(spindexid), 1);
   // write version (1)
@@ -758,6 +763,11 @@ int SpriteCache::initFile(const char *filnam)
     if (vers == 5) {
       spriteDataSize = cache_stream->ReadInt32();
     }
+    else if (vers >= 6)
+    {
+      spriteDataSize = this->spritesAreCompressed ? cache_stream->ReadInt32() :
+        wdd * coldep * htt;
+    }
     else {
       spriteDataSize = wdd * coldep * htt;
     }
@@ -773,7 +783,7 @@ bool SpriteCache::loadSpriteIndexFile(int expectedFileID, long spr_initial_offs,
 {
   short numspri_index = 0;
   int vv;
-  DataStream *fidx = Common::AssetManager::OpenAsset((char*)spindexfilename);
+  Stream *fidx = Common::AssetManager::OpenAsset((char*)spindexfilename);
   if (fidx == NULL) 
   {
     return false;

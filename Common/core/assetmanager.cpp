@@ -16,21 +16,19 @@
 #include <stdlib.h>
 #include "core/assetmanager.h"
 #include "debug/assert.h"
-#include "util/datastream.h"
+#include "util/stream.h"
+#include "util/bbop.h"
 
 #if defined (WINDOWS_VERSION)
 #include <io.h>
 #else
-//#include "djcompat.h"
-#include "allegro.h"
+#include <allegro.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #endif
 
 #include "util/misc.h"
-
-
 #include "util/string_utils.h"
 
 namespace AGS
@@ -49,6 +47,8 @@ struct AssetInfo
     int32_t     LibUid;     // uid of library, containing this asset
     int         Offset;     // asset's position in library file (in bytes)
     int         Size;       // asset's size (in bytes)
+
+    AssetInfo();
 };
 
 // Information on multifile asset library
@@ -63,6 +63,7 @@ struct AssetLibInfo
     int         AssetCount; // total number of assets in library
     AssetInfo   AssetInfos[MAX_FILES]; // information on contained assets
 
+    AssetLibInfo();
     void AssignFromMFL(const MultiFileLib &mflib);
     void Unload();
 };
@@ -77,7 +78,22 @@ struct MultiFileLib
   int offset[MAX_FILES];                // file offsets
   int length[MAX_FILES];                // file lengths
   char file_datafile[MAX_FILES];        // index of datafile for each file in split clib
+
+  MultiFileLib();
 };
+
+AssetInfo::AssetInfo()
+    : LibUid(0)
+    , Offset(0)
+    , Size(0)
+{
+}
+
+AssetLibInfo::AssetLibInfo()
+    : AssetCount(0)
+    , PartCount(0)
+{
+}
 
 void AssetLibInfo::AssignFromMFL(const MultiFileLib &mflib)
 {
@@ -102,6 +118,12 @@ void AssetLibInfo::Unload()
     BasePath        = "";
     PartCount       = 0;
     AssetCount      = 0;
+}
+
+MultiFileLib::MultiFileLib()
+    : num_data_files(0)
+    , num_files(0)
+{
 }
 
 AssetManager *AssetManager::_theAssetManager = NULL;
@@ -137,6 +159,12 @@ AssetManager::~AssetManager()
 {
     assert(_theAssetManager != NULL);
     return _theAssetManager ? _theAssetManager->_GetSearchPriority() : kAssetPriorityUndefined;
+}
+
+/* static */ bool AssetManager::IsDataFile(const String &data_file)
+{
+    assert(_theAssetManager != NULL);
+    return _theAssetManager ? _theAssetManager->_IsDataFile(data_file) : false;
 }
 
 /* static */ AssetError AssetManager::SetDataFile(const String &data_file)
@@ -202,7 +230,17 @@ AssetManager::~AssetManager()
     return _theAssetManager ? _theAssetManager->_GetNextPseudoRand() : 0;
 }
 
-/* static */ DataStream *AssetManager::OpenAsset(const String &asset_name,
+/* static */ bool AssetManager::DoesAssetExist(const String &asset_name)
+{
+    assert(_theAssetManager != NULL);
+    if (!_theAssetManager)
+    {
+        return NULL;
+    }
+    return _theAssetManager->_DoesAssetExist(asset_name);
+}
+
+/* static */ Stream *AssetManager::OpenAsset(const String &asset_name,
                                                   FileOpenMode open_mode,
                                                   FileWorkMode work_mode)
 {
@@ -214,7 +252,7 @@ AssetManager::~AssetManager()
     return _theAssetManager->_OpenAsset(asset_name, open_mode, work_mode);
 }
 
-/* static */ DataStream *AssetManager::OpenAsset(const String &data_file,
+/* static */ Stream *AssetManager::OpenAsset(const String &data_file,
                                                   const String &asset_name,
                                                   FileOpenMode open_mode,
                                                   FileWorkMode work_mode)
@@ -252,8 +290,45 @@ AssetSearchPriority AssetManager::_GetSearchPriority()
     return _searchPriority;
 }
 
+bool AssetManager::_IsDataFile(const String &data_file)
+{
+    if (data_file.IsEmpty())
+    {
+        return false;
+    }
+
+    // open data library
+    Stream *ci_s = ci_fopen(data_file, Common::kFile_Open, Common::kFile_Read);
+    if (ci_s == NULL)
+    {
+        return false;
+    }
+
+    long abs_offset = 0; // library offset in this file
+    char clbuff[20];
+    // check multifile lib signature at the beginning of file
+    ci_s->Read(&clbuff[0], 5);
+    if (strncmp(clbuff, _libHeadSig /*"CLIB"*/, 4) != 0)
+    {
+        // signature not found, check signature at the end of file
+        ci_s->Seek(Common::kSeekEnd, -12);
+        ci_s->Read(&clbuff[0], 12);
+        // signature not found, return error code
+        if (strncmp(clbuff, _libTailSig, 12) != 0)
+        {
+            return false;
+        }
+    }
+    delete ci_s;
+    return true;
+}
+
 AssetError AssetManager::_SetDataFile(const String &data_file)
 {
+    if (data_file.IsEmpty())
+    {
+        return kAssetErrNoLibFile;
+    }
     if (_assetLib.BaseFileName.Compare(data_file) == 0)
     {
         return kAssetNoError;
@@ -264,6 +339,10 @@ AssetError AssetManager::_SetDataFile(const String &data_file)
 
 String AssetManager::_GetLibraryForAsset(const String &asset_name)
 {
+    if (asset_name.IsEmpty())
+    {
+        return "";
+    }
     AssetInfo *asset = FindAssetByFileName(asset_name);
     if (!asset)
     {
@@ -276,6 +355,10 @@ String AssetManager::_GetLibraryForAsset(const String &asset_name)
 
 long AssetManager::_GetAssetOffset(const String &asset_name)
 {
+    if (asset_name.IsEmpty())
+    {
+        return -1;
+    }
     AssetInfo *asset = FindAssetByFileName(asset_name);
     if (asset)
     {
@@ -286,6 +369,10 @@ long AssetManager::_GetAssetOffset(const String &asset_name)
 
 long AssetManager::_GetAssetSize(const String &asset_name)
 {
+    if (asset_name.IsEmpty())
+    {
+        return -1;
+    }
     AssetInfo *asset = FindAssetByFileName(asset_name);
     if (asset)
     {
@@ -328,7 +415,13 @@ int AssetManager::_GetNextPseudoRand()
         + 2531011L) >> 16) & 0x7fff );
 }
 
-DataStream *AssetManager::_OpenAsset(const String &asset_name,
+bool AssetManager::_DoesAssetExist(const String &asset_name)
+{
+    return FindAssetByFileName(asset_name) != NULL ||
+        File::TestReadFile(asset_name);
+}
+
+Stream *AssetManager::_OpenAsset(const String &asset_name,
                        FileOpenMode open_mode,
                        FileWorkMode work_mode)
 {
@@ -337,17 +430,11 @@ DataStream *AssetManager::_OpenAsset(const String &asset_name,
 
 AssetError AssetManager::RegisterAssetLib(const String &data_file, const String &password)
 {
-    _assetLib.Unload();
-    // if no lib name, reset current lib name and return
-    if (data_file.IsEmpty())
-    {
-        return kAssetNoError;
-    }
     // base path is current directory
     _assetLib.BasePath = ".";
 
     // open data library
-    DataStream *ci_s = ci_fopen(data_file, Common::kFile_Open, Common::kFile_Read);
+    Stream *ci_s = ci_fopen(data_file, Common::kFile_Open, Common::kFile_Read);
     if (ci_s == NULL)
     {
         return kAssetErrNoLibFile; // can't be opened, return error code
@@ -384,26 +471,15 @@ AssetError AssetManager::RegisterAssetLib(const String &data_file, const String 
     String nammwas = data_file;
     String data_file_fixed = data_file;
     // TODO: this algorythm should be in path/string utils
-    int c = data_file_fixed.FindCharReverse('\\');
-    if (c >= 0)
-    {
-        data_file_fixed = data_file_fixed.Mid(c + 1);
-    }
-    c = data_file_fixed.FindCharReverse('/');
-    if (c >= 0)
-    {
-        data_file_fixed = data_file_fixed.Mid(c + 1);
-    }
-
+    data_file_fixed.TruncateToRightSection('\\');
+    data_file_fixed.TruncateToRightSection('/');
     if (data_file_fixed.Compare(nammwas) != 0)
     {
         // store complete path
         _assetLib.BasePath = nammwas;
-        _assetLib.BasePath = _assetLib.BasePath.Left(nammwas.GetLength() - data_file_fixed.GetLength());
-        if ((_assetLib.BasePath[_assetLib.BasePath.GetLength() - 1] == '\\') || (_assetLib.BasePath[_assetLib.BasePath.GetLength() - 1] == '/'))
-        {
-            _assetLib.BasePath = _assetLib.BasePath.Left(_assetLib.BasePath.GetLength() - 1);
-        }
+        _assetLib.BasePath.TruncateToLeft(nammwas.GetLength() - data_file_fixed.GetLength());
+        _assetLib.BasePath.TrimRight('\\');
+        _assetLib.BasePath.TrimRight('/');
     }
 
     AssetError err;
@@ -427,7 +503,7 @@ AssetError AssetManager::RegisterAssetLib(const String &data_file, const String 
     _assetLib.LibFileNames[0] = data_file_fixed;
     // make a backup of the original file name
     _assetLib.BaseFileName = _assetLib.LibFileNames[0];
-    _assetLib.BaseFileName = _assetLib.BaseFileName.ToLower();
+    _assetLib.BaseFileName.MakeLower();
 
     // apply absolute offset for the assets contained in base data file
     // (since only base data file may be EXE file, other clib parts are always on their own)
@@ -445,7 +521,7 @@ AssetError AssetManager::RegisterAssetLib(const String &data_file, const String 
     return err;
 }
 
-AssetError AssetManager::ReadSingleFileAssetLib(MultiFileLib * mfl, DataStream *ci_s, int lib_version)
+AssetError AssetManager::ReadSingleFileAssetLib(MultiFileLib * mfl, Stream *ci_s, int lib_version)
 {
     int passwmodifier = ci_s->ReadByte();
     ci_s->ReadInt8(); // unused byte
@@ -479,7 +555,7 @@ AssetError AssetManager::ReadSingleFileAssetLib(MultiFileLib * mfl, DataStream *
     return kAssetNoError;
 }
 
-AssetError AssetManager::ReadMultiFileAssetLib(MultiFileLib * mfl, DataStream *ci_s, int lib_version)
+AssetError AssetManager::ReadMultiFileAssetLib(MultiFileLib * mfl, Stream *ci_s, int lib_version)
 {
     if (ci_s->ReadByte() != 0)
     {
@@ -517,7 +593,7 @@ AssetError AssetManager::ReadMultiFileAssetLib(MultiFileLib * mfl, DataStream *c
     return kAssetNoError;
 }
 
-AssetError AssetManager::ReadAssetLibV10(MultiFileLib * mfl, DataStream *ci_s, int lib_version)
+AssetError AssetManager::ReadAssetLibV10(MultiFileLib * mfl, Stream *ci_s, int lib_version)
 {
     // number of clib parts
     mfl->num_data_files = ci_s->ReadInt32();
@@ -553,7 +629,7 @@ AssetError AssetManager::ReadAssetLibV10(MultiFileLib * mfl, DataStream *ci_s, i
     return kAssetNoError;
 }
 
-AssetError AssetManager::ReadAssetLibV20(MultiFileLib * mfl, DataStream *ci_s, int lib_version)
+AssetError AssetManager::ReadAssetLibV20(MultiFileLib * mfl, Stream *ci_s, int lib_version)
 {
     // number of clib parts
     mfl->num_data_files = ci_s->ReadInt32();
@@ -585,7 +661,7 @@ AssetError AssetManager::ReadAssetLibV20(MultiFileLib * mfl, DataStream *ci_s, i
     return kAssetNoError;
 }
 
-AssetError AssetManager::ReadAssetLibV21(MultiFileLib * mfl, DataStream *ci_s, int libver)
+AssetError AssetManager::ReadAssetLibV21(MultiFileLib * mfl, Stream *ci_s, int libver)
 {
     // init randomizer
     int randSeed = ci_s->ReadInt32();
@@ -648,7 +724,7 @@ String AssetManager::MakeLibraryFileNameForAsset(const AssetInfo *asset)
     return lib_filename;
 }
 
-DataStream *AssetManager::OpenAssetFromLib(const String &asset_name, Common::FileOpenMode open_mode, Common::FileWorkMode work_mode)
+Stream *AssetManager::OpenAssetFromLib(const String &asset_name, Common::FileOpenMode open_mode, Common::FileWorkMode work_mode)
 {
     // creating/writing is allowed only for common files on disk
     if (open_mode != Common::kFile_Open || work_mode != Common::kFile_Read)
@@ -665,7 +741,7 @@ DataStream *AssetManager::OpenAssetFromLib(const String &asset_name, Common::Fil
 
     String lib_filename = MakeLibraryFileNameForAsset(asset);
     // open library datafile
-    DataStream *lib_s = ci_fopen(lib_filename, open_mode, work_mode);
+    Stream *lib_s = ci_fopen(lib_filename, open_mode, work_mode);
     if (lib_s)
     {
         // set stream ptr at the beginning of wanted section
@@ -676,9 +752,9 @@ DataStream *AssetManager::OpenAssetFromLib(const String &asset_name, Common::Fil
     return lib_s;
 }
 
-DataStream *AssetManager::OpenAssetFromDir(const String &file_name, Common::FileOpenMode open_mode, Common::FileWorkMode work_mode)
+Stream *AssetManager::OpenAssetFromDir(const String &file_name, Common::FileOpenMode open_mode, Common::FileWorkMode work_mode)
 {
-    DataStream *asset_s = ci_fopen(file_name, open_mode, work_mode);
+    Stream *asset_s = ci_fopen(file_name, open_mode, work_mode);
     if (asset_s)
     {
         // remember size of opened file
@@ -687,9 +763,9 @@ DataStream *AssetManager::OpenAssetFromDir(const String &file_name, Common::File
     return asset_s;
 }
 
-DataStream *AssetManager::OpenAssetByPriority(const String &asset_name, Common::FileOpenMode open_mode, Common::FileWorkMode work_mode)
+Stream *AssetManager::OpenAssetByPriority(const String &asset_name, Common::FileOpenMode open_mode, Common::FileWorkMode work_mode)
 {
-    DataStream *asset_s = NULL;
+    Stream *asset_s = NULL;
     if (_searchPriority == kAssetPriorityDir)
     {
         // check for disk, otherwise use datafile
@@ -711,7 +787,7 @@ DataStream *AssetManager::OpenAssetByPriority(const String &asset_name, Common::
     return asset_s;
 }
 
-void AssetManager::ReadEncArray(void *data, int dataSize, int dataCount, DataStream *ci_s)
+void AssetManager::ReadEncArray(void *data, int dataSize, int dataCount, Stream *ci_s)
 {
     ci_s->ReadArray(data, dataSize, dataCount);
     uint8_t *dataChar = (uint8_t*)data;
@@ -721,7 +797,7 @@ void AssetManager::ReadEncArray(void *data, int dataSize, int dataCount, DataStr
     }
 }
 
-int32_t AssetManager::ReadEncInt32(DataStream *ci_s)
+int32_t AssetManager::ReadEncInt32(Stream *ci_s)
 {
     int numberRead;
     ReadEncArray(&numberRead, 4, 1, ci_s);
@@ -731,7 +807,7 @@ int32_t AssetManager::ReadEncInt32(DataStream *ci_s)
     return numberRead;
 }
 
-void AssetManager::ReadEncString(char *buffer, int maxLength, DataStream *ci_s)
+void AssetManager::ReadEncString(char *buffer, int maxLength, Stream *ci_s)
 {
     int i = 0;
     while ((i == 0) || (buffer[i - 1] != 0))

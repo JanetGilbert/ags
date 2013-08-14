@@ -12,7 +12,7 @@
 //
 //=============================================================================
 
-#include "util/wgt2allg.h"
+#include <stdio.h>
 #include "gfx/ali3d.h"
 #include "ac/global_object.h"
 #include "ac/common.h"
@@ -48,7 +48,6 @@ extern RoomObject*objs;
 extern ViewStruct*views;
 extern GameSetupStruct game;
 extern ObjectCache objcache[MAX_INIT_SPR];
-extern int loaded_game_file_version;
 extern roomstruct thisroom;
 extern CharacterInfo*playerchar;
 extern int displayed_room;
@@ -162,7 +161,7 @@ void SetObjectFrame(int obn,int viw,int lop,int fra) {
     if (objs[obn].frame >= views[viw].loops[objs[obn].loop].numFrames)
         objs[obn].frame = 0;
 
-    if (loaded_game_file_version > 32) // Skip check on 2.x
+    if (loaded_game_file_version > kGameVersion_272) // Skip check on 2.x
     {
         if (views[viw].loops[objs[obn].loop].numFrames == 0) 
             quit("!SetObjectFrame: specified loop has no frames");
@@ -253,19 +252,20 @@ void MergeObject(int obn) {
 
     construct_object_gfx(obn, NULL, &theHeight, true);
 
-    Bitmap *oldabuf = abuf;
-    abuf = thisroom.ebscene[play.bg_frame];
-    if (abuf->GetColorDepth() != actsps[obn]->GetColorDepth())
+    //Bitmap *oldabuf = graphics->bmp;
+    //abuf = thisroom.ebscene[play.bg_frame];
+    Bitmap *bg_frame = thisroom.ebscene[play.bg_frame];
+    if (bg_frame->GetColorDepth() != actsps[obn]->GetColorDepth())
         quit("!MergeObject: unable to merge object due to color depth differences");
 
     int xpos = multiply_up_coordinate(objs[obn].x);
     int ypos = (multiply_up_coordinate(objs[obn].y) - theHeight);
 
-    draw_sprite_support_alpha(xpos, ypos, actsps[obn], objs[obn].num);
+    draw_sprite_support_alpha(bg_frame, xpos, ypos, actsps[obn], objs[obn].num);
     invalidate_screen();
     mark_current_background_dirty();
 
-    abuf = oldabuf;
+    //abuf = oldabuf;
     // mark the sprite as merged
     objs[obn].on = 2;
     DEBUG_CONSOLE("Object %d merged into background", obn);

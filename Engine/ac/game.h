@@ -21,10 +21,9 @@
 
 #include "ac/interaction.h"
 #include "ac/dynobj/scriptviewframe.h"
-#include "util/file.h"
 
 // Forward declaration
-namespace AGS { namespace Common { class DataStream; class String; } }
+namespace AGS { namespace Common { class Bitmap; class Stream; class String; } }
 using namespace AGS; // FIXME later
 
 #define RAGMODE_PRESERVEGLOBALINT 1
@@ -114,7 +113,7 @@ int Game_ChangeTranslation(const char *newFilename);
 void set_game_speed(int fps);
 void setup_for_dialog();
 void restore_after_dialog();
-void get_save_game_path(int slotNum, char *buffer);
+Common::String get_save_game_path(int slotNum);
 int  load_game_and_print_error(int toload);
 void restore_game_dialog();
 void save_game_dialog();
@@ -123,17 +122,19 @@ int  load_game_file();
 void free_do_once_tokens();
 // Free all the memory associated with the game
 void unload_game_file();
-void save_game_data (Common::DataStream *out, Common::Bitmap *screenshot);
+void save_game_data (Common::Stream *out, Common::Bitmap *screenshot);
 void save_game(int slotn, const char*descript);
-int  restore_game_data (Common::DataStream *in, const char *nametouse);
-int  do_game_load(const char *nametouse, int slotNumber, char *descrp, int *wantShot);
-int  load_game(int slotn, char*descrp, int *wantShot);
-void serialize_bitmap(Common::Bitmap *thispic, Common::DataStream *out);
+int  restore_game_data (Common::Stream *in, const char *nametouse);
+int read_savedgame_description(const Common::String &savedgame, Common::String &description);
+int read_savedgame_screenshot(const Common::String &savedgame, int &want_shot);
+int  load_game(int slotNumber);
+int  load_game(const Common::String &path, int slotNumber);
+void serialize_bitmap(Common::Bitmap *thispic, Common::Stream *out);
 void safeguard_string (Common::String &descript);
 // On Windows we could just use IIDFromString but this is platform-independant
 void convert_guid_from_text_to_binary(const char *guidText, unsigned char *buffer);
-Common::Bitmap *read_serialized_bitmap(Common::DataStream *in);
-long write_screen_shot_for_vista(Common::DataStream *out, Common::Bitmap *screenshot);
+Common::Bitmap *read_serialized_bitmap(Common::Stream *in);
+long write_screen_shot_for_vista(Common::Stream *out, Common::Bitmap *screenshot);
 
 void start_skipping_cutscene ();
 void check_skip_cutscene_keypress (int kgn);

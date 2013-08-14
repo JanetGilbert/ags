@@ -16,7 +16,6 @@
 // Game configuration
 //
 
-#include "util/wgt2allg.h"
 #include "ac/gamesetup.h"
 #include "ac/gamestate.h"
 #include "main/mainheader.h"
@@ -25,8 +24,9 @@
 #include "platform/base/override_defines.h" //_getcwd()
 #include "util/filestream.h"
 #include "util/textstreamreader.h"
+#include "util/path.h"
 
-using AGS::Common::DataStream;
+using AGS::Common::Stream;
 using AGS::Common::TextStreamReader;
 using AGS::Common::String;
 
@@ -77,7 +77,7 @@ void INIgetdirec(char *wasgv, char *inifil) {
 }
 
 char *INIreaditem(const char *sectn, const char *entry) {
-    DataStream *fin = Common::File::OpenFileRead(filetouse);
+    Stream *fin = Common::File::OpenFileRead(filetouse);
     if (fin == NULL)
         return NULL;
     TextStreamReader reader(fin);
@@ -100,22 +100,13 @@ char *INIreaditem(const char *sectn, const char *entry) {
                 // we're in the right section, find the entry
                 //fgets (templine, 199, fin);
                 line = reader.ReadLine();
+                if (line.IsEmpty())
+                    continue;
                 if (line[0] == '[')
                     break;
-                if (reader.EOS())
-                    break;
-                // Strip CRLF
-                char *firstchar = line.GetBuffer();
-                char *lastchar = &firstchar[line.GetLength() - 1];
-                while(*lastchar == '\r' || *lastchar == '\n') {
-                    *lastchar = 0;
-                    if (lastchar == firstchar)
-                        break;
-                    lastchar--;
-                }
                 // Have we found the entry?
                 if (strnicmp (line.GetCStr(), entry, strlen(entry)) == 0) {
-                    char *pptr = &line.GetBuffer()[strlen(entry)];
+                    const char *pptr = &line.GetCStr()[strlen(entry)];
                     while ((pptr[0] == ' ') || (pptr[0] == '\t'))
                         pptr++;
                     if (pptr[0] == '=') {
@@ -173,7 +164,6 @@ void read_config_file(char *argv0) {
     // set default dir if no config file
     usetup.data_files_dir = ".";
     usetup.translation = NULL;
-    usetup.main_data_filename = "ac2game.dat";
 #ifdef WINDOWS_VERSION
     usetup.digicard = DIGI_DIRECTAMX(0);
 #endif
@@ -252,22 +242,21 @@ void read_config_file(char *argv0) {
             usetup.no_speech_pack = 0;
 
         usetup.data_files_dir = INIreaditem("misc","datadir");
-        if (usetup.data_files_dir == NULL)
+        if (usetup.data_files_dir.IsEmpty())
             usetup.data_files_dir = ".";
         // strip any trailing slash
+        // TODO: move this to Path namespace later
+        AGS::Common::Path::FixupPath(usetup.data_files_dir);
 #if defined (WINDOWS_VERSION)
-        if ((strlen(usetup.data_files_dir) < 4) && (usetup.data_files_dir[1] == ':'))
-        { }  // if the path is just  d:\  don't strip the slash
-        else if (usetup.data_files_dir[strlen(usetup.data_files_dir)-1] == '\\')
-            usetup.data_files_dir[strlen(usetup.data_files_dir)-1] = 0;
+        // if the path is just x:\ don't strip the slash
+        if (!(usetup.data_files_dir.GetLength() < 4 && usetup.data_files_dir[1] == ':'))
+        {
+            usetup.data_files_dir.TrimRight('/');
+        }
 #else
-        if (usetup.data_files_dir[strlen(usetup.data_files_dir)-1] == '/')
-            usetup.data_files_dir[strlen(usetup.data_files_dir)-1] = 0;
+        usetup.data_files_dir.TrimRight('/');
 #endif
-
         usetup.main_data_filename = INIreaditem ("misc", "datafile");
-        if (usetup.main_data_filename == NULL)
-            usetup.main_data_filename = "ac2game.dat";
 
 #if defined(IOS_VERSION) || defined(PSP_VERSION) || defined(ANDROID_VERSION)
         // PSP: No graphic filters are available.

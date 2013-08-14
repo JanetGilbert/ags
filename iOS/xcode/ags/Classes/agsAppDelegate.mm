@@ -1,4 +1,3 @@
-
 #import "agsAppDelegate.h"
 #import "agsViewController.h"
 
@@ -24,8 +23,6 @@ extern "C" void ios_resume_sound();
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-
-    
 	[[UIApplication sharedApplication] setIdleTimerDisabled:YES];
 	self.window.rootViewController = self.viewController;
     
@@ -40,29 +37,34 @@ extern "C" void ios_resume_sound();
 - (void)applicationWillResignActive:(UIApplication *)application
 {
 	is_in_foreground = 0;
-	while (drawing_in_progress)
+	do
 	{
-		//printf("waiting for drawing to finish...\n");
+		//printf("waiting for drawing to finish %d...\n", drawing_in_progress);
 		usleep(1000 * 100);
 	}
+	while (drawing_in_progress);
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
-    is_in_foreground = 1;
-    ios_resume_sound();
+	is_in_foreground = 1;
+	ios_resume_sound();
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
 {
 }
 
-
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
 	// Handle any background procedures not related to animation here.
 	is_in_foreground = 0;
-    glFinish();
+	while (drawing_in_progress)
+	{
+		//printf("waiting for drawing to finish (background) %d...\n", drawing_in_progress);
+		usleep(1000 * 100);
+	};
+	glFinish();
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application

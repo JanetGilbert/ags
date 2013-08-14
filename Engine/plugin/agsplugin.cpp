@@ -35,6 +35,7 @@
 #include "ac/record.h"
 #include "ac/roomstatus.h"
 #include "ac/string.h"
+#include "font/fonts.h"
 #include "util/string_utils.h"
 #include "debug/debug_log.h"
 #include "debug/debugger.h"
@@ -46,11 +47,14 @@
 #include "script/script.h"
 #include "script/script_runtime.h"
 #include "ac/spritecache.h"
-#include "util/datastream.h"
+#include "util/stream.h"
 #include "gfx/graphicsdriver.h"
 #include "gfx/bitmap.h"
+#include "script/runtimescriptvalue.h"
+#include "debug/out.h"
+#include "ac/dynobj/scriptstring.h"
 
-using AGS::Common::DataStream;
+using AGS::Common::Stream;
 
 using AGS::Common::Bitmap;
 namespace BitmapHelper = AGS::Common::BitmapHelper;
@@ -60,6 +64,7 @@ namespace BitmapHelper = AGS::Common::BitmapHelper;
 #include "../Plugins/AGSflashlight/agsflashlight.h"
 #include "../Plugins/agsblend/agsblend.h"
 #include "../Plugins/ags_snowrain/ags_snowrain.h"
+#include "../Plugins/ags_parallax/ags_parallax.h"
 #if defined(IOS_VERSION)
 #include "../Plugins/agstouch/agstouch.h"
 #include "../Plugins/agswadjetutil/agswadjetutil.h"
@@ -113,6 +118,8 @@ extern int offsetx, offsety;
 extern PluginObjectReader pluginReaders[MAX_PLUGIN_OBJECT_READERS];
 extern int numPluginReaders;
 extern IAGSFontRenderer* fontRenderers[MAX_FONTS];
+extern RuntimeScriptValue GlobalReturnValue;
+extern ScriptString myScriptStringImpl;
 
 // **************** PLUGIN IMPLEMENTATION ****************
 
@@ -159,7 +166,7 @@ const char* IAGSEngine::GetEngineVersion () {
     return get_engine_version();
 }
 void IAGSEngine::RegisterScriptFunction (const char*name, void*addy) {
-    ccAddExternalSymbol ((char*)name, addy);
+    ccAddExternalPluginFunction ((char*)name, addy);
 }
 const char* IAGSEngine::GetGraphicsDriverID()
 {
@@ -174,7 +181,7 @@ BITMAP *IAGSEngine::GetScreen ()
     if (!gfxDriver->UsesMemoryBackBuffer())
         quit("!This plugin is not compatible with the Direct3D driver.");
 
-	return (BITMAP*)BitmapHelper::GetScreenBitmap()->GetBitmapObject();
+	return (BITMAP*)BitmapHelper::GetScreenBitmap()->GetAllegroBitmap();
 }
 BITMAP *IAGSEngine::GetVirtualScreen () 
 {
@@ -182,7 +189,7 @@ BITMAP *IAGSEngine::GetVirtualScreen ()
         quit("!This plugin is not compatible with the Direct3D driver.");
 
 	// [IKM] Aaahh... this is very dangerous, but what can we do?
-	return (BITMAP*)gfxDriver->GetMemoryBackBuffer()->GetBitmapObject();
+	return (BITMAP*)gfxDriver->GetMemoryBackBuffer()->GetAllegroBitmap();
 }
 void IAGSEngine::RequestEventHook (int32 event) {
     if (event >= AGSE_TOOHIGH) 
@@ -232,8 +239,9 @@ int IAGSEngine::GetSavedData (char *buffer, int32 bufsize) {
 }
 void IAGSEngine::DrawText (int32 x, int32 y, int32 font, int32 color, char *text) 
 {
-    wtextcolor (color);
-    draw_and_invalidate_text(x, y, font, text);
+    Common::Bitmap *ds = ::GetVirtualScreen();
+    color_t text_color = ds->GetCompatibleColor(color);
+    draw_and_invalidate_text(ds, x, y, font, text_color, text);
 }
 void IAGSEngine::GetScreenDimensions (int32 *width, int32 *height, int32 *coldepth) {
     if (width != NULL)
@@ -248,7 +256,7 @@ unsigned char ** IAGSEngine::GetRawBitmapSurface (BITMAP *bmp) {
         quit("!IAGSEngine::GetRawBitmapSurface: invalid bitmap for access to surface");
     acquire_bitmap (bmp);
 
-	if (bmp == virtual_screen->GetBitmapObject())
+	if (bmp == virtual_screen->GetAllegroBitmap())
         plugins[this->pluginId].invalidatedRegion = 0;
 
     return bmp->line;
@@ -256,7 +264,7 @@ unsigned char ** IAGSEngine::GetRawBitmapSurface (BITMAP *bmp) {
 void IAGSEngine::ReleaseBitmapSurface (BITMAP *bmp) {
     release_bitmap (bmp);
 
-	if (bmp == virtual_screen->GetBitmapObject()) {
+	if (bmp == virtual_screen->GetAllegroBitmap()) {
         // plugin does not manaually invalidate stuff, so
         // we must invalidate the whole screen to be safe
         if (!plugins[this->pluginId].invalidatedRegion)
@@ -277,7 +285,7 @@ int IAGSEngine::GetCurrentBackground () {
     return play.bg_frame;
 }
 BITMAP *IAGSEngine::GetBackgroundScene (int32 index) {
-    return (BITMAP*)thisroom.ebscene[index]->GetBitmapObject();
+    return (BITMAP*)thisroom.ebscene[index]->GetAllegroBitmap();
 }
 void IAGSEngine::GetBitmapDimensions (BITMAP *bmp, int32 *width, int32 *height, int32 *coldepth) {
     if (bmp == NULL)
@@ -303,29 +311,33 @@ void IAGSEngine::DrawTextWrapped (int32 xx, int32 yy, int32 wid, int32 font, int
 
     break_up_text_into_lines (wid, font, (char*)text);
 
-    wtextcolor(color);
-    wtexttransparent(TEXTFG);
+    Common::Bitmap *ds = ::GetVirtualScreen();
+    color_t text_color = ds->GetCompatibleColor(color);
     multiply_up_coordinates((int*)&xx, (int*)&yy); // stupid! quick tweak
     for (int i = 0; i < numlines; i++)
-        draw_and_invalidate_text(xx, yy + texthit*i, font, lines[i]);
+        draw_and_invalidate_text(ds, xx, yy + texthit*i, font, text_color, lines[i]);
 }
 void IAGSEngine::SetVirtualScreen (BITMAP *bmp) {
 	// [IKM] Very, very dangerous :'(
-	wsetscreen_raw (bmp);
+    SetVirtualScreenRaw (bmp);
 }
 int IAGSEngine::LookupParserWord (const char *word) {
     return find_word_in_dictionary ((char*)word);
 }
 void IAGSEngine::BlitBitmap (int32 x, int32 y, BITMAP *bmp, int32 masked) {
-    wputblock_raw (x, y, bmp, masked);
+    wputblock_raw (::GetVirtualScreen(), x, y, bmp, masked);
     invalidate_rect(x, y, x + bmp->w, y + bmp->h);
 }
 void IAGSEngine::BlitSpriteTranslucent(int32 x, int32 y, BITMAP *bmp, int32 trans) {
     set_trans_blender(0, 0, 0, trans);
-	draw_trans_sprite((BITMAP*)abuf->GetBitmapObject(), bmp, x, y);
+    Common::Bitmap *ds = ::GetVirtualScreen();
+    // FIXME: call corresponding Graphics Blit
+	draw_trans_sprite(ds->GetAllegroBitmap(), bmp, x, y);
 }
 void IAGSEngine::BlitSpriteRotated(int32 x, int32 y, BITMAP *bmp, int32 angle) {
-    rotate_sprite((BITMAP*)abuf->GetBitmapObject(), bmp, x, y, itofix(angle));
+    Common::Bitmap *ds = ::GetVirtualScreen();
+    // FIXME: call corresponding Graphics Blit
+    rotate_sprite(ds->GetAllegroBitmap(), bmp, x, y, itofix(angle));
 }
 
 extern void domouse(int);
@@ -335,7 +347,7 @@ void IAGSEngine::PollSystem () {
 
     NEXT_ITERATION();
     domouse(DOMOUSE_NOCURSOR);
-    update_polled_stuff(true);
+    update_polled_stuff_if_runtime();
     int mbut = mgetbutton();
     if (mbut > NONE)
         pl_run_plugin_hooks (AGSE_MOUSECLICK, mbut);
@@ -360,7 +372,7 @@ AGSColor* IAGSEngine::GetPalette () {
     return (AGSColor*)&palette[0];
 }
 void IAGSEngine::SetPalette (int32 start, int32 finish, AGSColor *cpl) {
-    wsetpalette (start, finish, (color*)cpl);
+    set_palette_range((color*)cpl, start, finish, 0);
 }
 int IAGSEngine::GetNumCharacters () {
     return game.numcharacters;
@@ -402,17 +414,17 @@ void IAGSEngine::FreeBitmap (BITMAP *tofree) {
         destroy_bitmap (tofree);
 }
 BITMAP *IAGSEngine::GetSpriteGraphic (int32 num) {
-    return (BITMAP*)spriteset[num]->GetBitmapObject();
+    return (BITMAP*)spriteset[num]->GetAllegroBitmap();
 }
 BITMAP *IAGSEngine::GetRoomMask (int32 index) {
     if (index == MASK_WALKABLE)
-        return (BITMAP*)thisroom.walls->GetBitmapObject();
+        return (BITMAP*)thisroom.walls->GetAllegroBitmap();
     else if (index == MASK_WALKBEHIND)
-        return (BITMAP*)thisroom.object->GetBitmapObject();
+        return (BITMAP*)thisroom.object->GetAllegroBitmap();
     else if (index == MASK_HOTSPOT)
-        return (BITMAP*)thisroom.lookat->GetBitmapObject();
+        return (BITMAP*)thisroom.lookat->GetAllegroBitmap();
     else if (index == MASK_REGIONS)
-        return (BITMAP*)thisroom.regions->GetBitmapObject();
+        return (BITMAP*)thisroom.regions->GetAllegroBitmap();
     else
         quit("!IAGSEngine::GetRoomMask: invalid mask requested");
     return NULL;
@@ -431,7 +443,7 @@ AGSViewFrame *IAGSEngine::GetViewFrame (int32 view, int32 loop, int32 frame) {
 int IAGSEngine::GetRawPixelColor (int32 color) {
     // Convert the standardized colour to the local gfx mode color
     int result;
-    __my_setcolor(&result, color);
+    __my_setcolor(&result, color, ::GetVirtualScreen()->GetColorDepth());
 
     return result;
 }
@@ -441,7 +453,7 @@ int IAGSEngine::GetWalkbehindBaseline (int32 wa) {
     return croom->walkbehind_base[wa];
 }
 void* IAGSEngine::GetScriptFunctionAddress (const char *funcName) {
-    return ccGetSymbolAddress ((char*)funcName);
+    return ccGetSymbolAddressForPlugin ((char*)funcName);
 }
 int IAGSEngine::GetBitmapTransparentColor(BITMAP *bmp) {
     return bitmap_mask_color (bmp);
@@ -556,11 +568,9 @@ int IAGSEngine::CreateDynamicSprite(int32 coldepth, int32 width, int32 height) {
         quit("!IAGSEngine::CreateDynamicSprite: invalid width/height requested by plugin");
 
     // resize the sprite to the requested size
-    Bitmap *newPic = BitmapHelper::CreateBitmap(width, height, coldepth);
+    Bitmap *newPic = BitmapHelper::CreateTransparentBitmap(width, height, coldepth);
     if (newPic == NULL)
         return 0;
-
-    newPic->Clear(newPic->GetMaskColor());
 
     // add it into the sprite set
     add_dynamic_sprite(gotSlot, newPic);
@@ -595,7 +605,11 @@ int IAGSEngine::CallGameScriptFunction(const char *name, int32 globalScript, int
     if (!globalScript)
         toRun = roominst;
 
-    int toret = run_script_function_if_exist(toRun, (char*)name, numArgs, arg1, arg2, arg3);
+    RuntimeScriptValue params[3];
+    params[0].SetPluginArgument(arg1);
+    params[1].SetPluginArgument(arg2);
+    params[2].SetPluginArgument(arg3);
+    int toret = toRun->RunScriptFunctionIfExists((char*)name, numArgs, params);
     return toret;
 }
 
@@ -666,11 +680,12 @@ void IAGSEngine::QueueGameScriptFunction(const char *name, int32 globalScript, i
     }
     strcat(scNameToRun, name);
 
-    curscript->run_another(scNameToRun, arg1, arg2);
+    curscript->run_another(scNameToRun, RuntimeScriptValue().SetPluginArgument(arg1), RuntimeScriptValue().SetPluginArgument(arg2));
 }
 
 int IAGSEngine::RegisterManagedObject(const void *object, IAGSScriptManagedObject *callback) {
-    return ccRegisterManagedObject(object, (ICCDynamicObject*)callback);
+    GlobalReturnValue.SetPluginObject((void*)object, (ICCDynamicObject*)callback);
+    return ccRegisterManagedObject(object, (ICCDynamicObject*)callback, true);
 }
 
 void IAGSEngine::AddManagedObjectReader(const char *typeName, IAGSManagedObjectReader *reader) {
@@ -691,7 +706,8 @@ void IAGSEngine::AddManagedObjectReader(const char *typeName, IAGSManagedObjectR
 }
 
 void IAGSEngine::RegisterUnserializedObject(int key, const void *object, IAGSScriptManagedObject *callback) {
-    ccRegisterUnserializedObject(key, object, (ICCDynamicObject*)callback);
+    GlobalReturnValue.SetPluginObject((void*)object, (ICCDynamicObject*)callback);
+    ccRegisterUnserializedObject(key, object, (ICCDynamicObject*)callback, true);
 }
 
 int IAGSEngine::GetManagedObjectKeyByAddress(const char *address) {
@@ -699,11 +715,25 @@ int IAGSEngine::GetManagedObjectKeyByAddress(const char *address) {
 }
 
 void* IAGSEngine::GetManagedObjectAddressByKey(int key) {
-    return (void*)ccGetObjectAddressFromHandle(key);
+    void *object;
+    ICCDynamicObject *manager;
+    ScriptValueType obj_type = ccGetObjectAddressAndManagerFromHandle(key, object, manager);
+    if (obj_type == kScValPluginObject)
+    {
+        GlobalReturnValue.SetPluginObject(object, manager);
+    }
+    else
+    {
+        GlobalReturnValue.SetDynamicObject(object, manager);
+    }
+    return object;
 }
 
 const char* IAGSEngine::CreateScriptString(const char *fromText) {
-    return CreateNewScriptString(fromText);
+    const char *string = CreateNewScriptString(fromText);
+    // Should be still standard dynamic object, because not managed by plugin
+    GlobalReturnValue.SetDynamicObject((void*)string, &myScriptStringImpl);
+    return string;
 }
 
 int IAGSEngine::IncrementManagedObjectRefCount(const char *address) {
@@ -833,8 +863,6 @@ void pl_run_plugin_init_gfx_hooks (const char *driverName, void *data) {
 bool pl_use_builtin_plugin(EnginePlugin* apl)
 {
 #if defined(BUILTIN_PLUGINS)
-    strlwr(apl->filename);
-
     if (strncmp(apl->filename, "agsflashlight", strlen("agsflashlight")) == 0)
     {
         apl->engineStartup = agsflashlight::AGS_EngineStartup;
@@ -864,6 +892,17 @@ bool pl_use_builtin_plugin(EnginePlugin* apl)
         apl->onEvent = ags_snowrain::AGS_EngineOnEvent;
         apl->debugHook = ags_snowrain::AGS_EngineDebugHook;
         apl->initGfxHook = ags_snowrain::AGS_EngineInitGfx;
+        apl->available = true;
+        apl->builtin = true;
+        return true;
+    }
+    else if (strncmp(apl->filename, "ags_parallax", strlen("ags_parallax")) == 0)
+    {
+        apl->engineStartup = ags_parallax::AGS_EngineStartup;
+        apl->engineShutdown = ags_parallax::AGS_EngineShutdown;
+        apl->onEvent = ags_parallax::AGS_EngineOnEvent;
+        apl->debugHook = ags_parallax::AGS_EngineDebugHook;
+        apl->initGfxHook = ags_parallax::AGS_EngineInitGfx;
         apl->available = true;
         apl->builtin = true;
         return true;
@@ -900,11 +939,7 @@ bool pl_use_builtin_plugin(EnginePlugin* apl)
     return false;
 }
 
-#include "util/datastream.h"
-
-using AGS::Common::DataStream;
-
-void pl_read_plugins_from_disk (DataStream *in) {
+void pl_read_plugins_from_disk (Stream *in) {
     if (in->ReadInt32() != 1)
         quit("ERROR: unable to load game, invalid version of plugin data");
 
@@ -961,9 +996,18 @@ void pl_read_plugins_from_disk (DataStream *in) {
         }
         else
         {
-          sprintf(buffer, "Plugin loading failed, trying built-in plugins...");
+          AGS::Common::Out::FPrint("Plugin loading failed, trying built-in plugins...");
+          strlwr(apl->filename);
           if (!pl_use_builtin_plugin(apl))
-              continue;
+          {
+            // Plugin loading has failed at this point, try using built-in plugin function stubs
+            if (RegisterPluginStubs((const char*)apl->filename))
+              AGS::Common::Out::FPrint("Placeholder functions for the plugin found.");
+            else
+              AGS::Common::Out::FPrint("No placeholder functions for the plugin found. The game might fail to load.");
+
+            continue;
+          }
         }
 
         if (datasize > 0) {

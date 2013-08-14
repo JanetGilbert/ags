@@ -32,13 +32,16 @@
 #include "ac/lipsync.h"
 #include "ac/objectcache.h"
 #include "ac/roomstatus.h"
+#include "ac/speech.h"
 #include "ac/translation.h"
 #include "ac/viewframe.h"
 #include "ac/dynobj/scriptobject.h"
 #include "ac/dynobj/scriptsystem.h"
 #include "debug/debug_log.h"
 #include "debug/debugger.h"
+#include "debug/out.h"
 #include "font/agsfontrenderer.h"
+#include "font/fonts.h"
 #include "main/config.h"
 #include "main/game_start.h"
 #include "main/graphics_mode.h"
@@ -48,21 +51,24 @@
 #include "ac/spritecache.h"
 #include "util/filestream.h"
 #include "gfx/graphicsdriver.h"
-#include "gfx/bitmap.h"
 #include "core/assetmanager.h"
 #include "util/misc.h"
 #include "platform/util/pe.h"
+#include "util/directory.h"
+#include "util/path.h"
+#include "main/game_file.h"
+#include "debug/out.h"
 
-using AGS::Common::DataStream;
+using AGS::Common::String;
+using AGS::Common::Stream;
 using AGS::Common::Bitmap;
 namespace BitmapHelper = AGS::Common::BitmapHelper;
+namespace Out = AGS::Common::Out;
 
 #ifndef WINDOWS_VERSION
 extern char **global_argv;
 #endif
 
-
-extern char* game_file_name;
 extern char check_dynamic_sprites_at_exit;
 extern int our_eip;
 extern volatile char want_exit, abort_engine;
@@ -97,7 +103,6 @@ extern IDriverDependantBitmap **guibgbmp;
 
 char *music_file;
 char *speech_file;
-WCHAR directoryPathBuffer[MAX_PATH];
 
 Common::AssetError errcod;
 
@@ -107,7 +112,7 @@ extern "C" HWND allegro_wnd;
 
 void engine_read_config(int argc,char*argv[])
 {
-    write_log_debug("Reading config file");
+    Out::FPrint("Reading config file");
 
     our_eip = -200;
     read_config_file(argv[0]);
@@ -126,7 +131,7 @@ int errno;
 
 int engine_init_allegro()
 {
-    write_log_debug("Initializing allegro");
+    Out::FPrint("Initializing allegro");
 
     our_eip = -199;
     // Initialize allegro
@@ -157,7 +162,7 @@ void winclosehook() {
 
 void engine_setup_window()
 {
-    write_log_debug("Setting up window");
+    Out::FPrint("Setting up window");
 
     our_eip = -198;
 #if (ALLEGRO_DATE > 19990103)
@@ -180,7 +185,7 @@ int engine_check_run_setup(int argc,char*argv[])
     // check if Setup needs to be run instead
     if (argc>1) {
         if (stricmp(argv[1],"--setup")==0) { 
-            write_log_debug("Running Setup");
+            Out::FPrint("Running Setup");
 
             if (!platform->RunSetup())
                 return EXIT_NORMAL;
@@ -208,90 +213,12 @@ void engine_force_window()
         usetup.windowed = 0;
 }
 
-int engine_init_game_data_external(int argc,char*argv[])
+void init_game_file_name_from_cmdline()
 {
-    game_file_name = ci_find_file(usetup.data_files_dir, usetup.main_data_filename);
-
-#if defined (LINUX_VERSION) || defined (MAC_VERSION)
-    // Search the exe files for the game data
-    if ((game_file_name == NULL) || (access(game_file_name, F_OK) != 0))
-    {
-        DIR* fd = NULL;
-        struct dirent* entry = NULL;
-        version_info_t version_info;
-
-        if ((fd = opendir(".")))
-        {
-            while ((entry = readdir(fd)))
-            {
-                // Exclude the setup program
-                if (stricmp(entry->d_name, "winsetup.exe") == 0)
-                    continue;
-
-                // Filename must be >= 4 chars long
-                int length = strlen(entry->d_name);
-                if (length < 4)
-                    continue;
-
-                if (stricmp(&(entry->d_name[length - 4]), ".exe") == 0)
-                {
-                    if (!getVersionInformation(entry->d_name, &version_info))
-                        continue;
-                    if (strcmp(version_info.internal_name, "acwin") == 0)
-                    {
-                        game_file_name = (char*)malloc(strlen(entry->d_name) + 1);
-                        strcpy(game_file_name, entry->d_name);
-                        break;
-                    }
-                }
-            }
-            closedir(fd);
-        }
-    }
-#endif
-
-    errcod=Common::AssetManager::SetDataFile(game_file_name);
-    if (errcod != Common::kAssetNoError) {
-        //sprintf(gamefilenamebuf,"%s\\ac2game.ags",usetup.data_files_dir);
-        free(game_file_name);
-        game_file_name = ci_find_file(usetup.data_files_dir, "ac2game.ags");
-
-        errcod = Common::AssetManager::SetDataFile(game_file_name);
-    }
-
-    return RETURN_CONTINUE;
-}
-
-int engine_init_game_data_internal(int argc,char*argv[])
-{
-    usetup.main_data_filename = get_filename(game_file_name);
-
-    if (((strchr(game_file_name, '/') != NULL) ||
-        (strchr(game_file_name, '\\') != NULL)) &&
-        (stricmp(usetup.data_files_dir, ".") == 0)) {
-            // there is a path in the game file name (and the user
-            // has not specified another one)
-            // save the path, so that it can load the VOX files, etc
-            usetup.data_files_dir = (char*)malloc(strlen(game_file_name) + 1);
-            strcpy(usetup.data_files_dir, game_file_name);
-
-            if (strrchr(usetup.data_files_dir, '/') != NULL)
-                strrchr(usetup.data_files_dir, '/')[0] = 0;
-            else if (strrchr(usetup.data_files_dir, '\\') != NULL)
-                strrchr(usetup.data_files_dir, '\\')[0] = 0;
-            else {
-                platform->DisplayAlert("Error processing game file name: slash but no slash");
-                return EXIT_NORMAL;
-            }
-    }
-
-    return RETURN_CONTINUE;
-}
-
-void initialise_game_file_name()
-{
+    game_file_name.Empty();
 #ifdef WINDOWS_VERSION
     WCHAR buffer[MAX_PATH];
+    WCHAR directoryPathBuffer[MAX_PATH];
     LPCWSTR dataFilePath = wArgv[datafile_argv];
     // Hack for Windows in case there are unicode chars in the path.
     // The normal argv[] array has ????? instead of the unicode chars
@@ -307,65 +234,226 @@ void initialise_game_file_name()
     if (GetShortPathNameW(dataFilePath, directoryPathBuffer, MAX_PATH) == 0)
     {
         platform->DisplayAlert("Unable to determine startup path: GetShortPathNameW failed. The specified game file might be missing.");
-        game_file_name = NULL;
         return;
     }
-    game_file_name = (char*)malloc(MAX_PATH);
-    WideCharToMultiByte(CP_ACP, 0, directoryPathBuffer, -1, game_file_name, MAX_PATH, NULL, NULL);
+    char *buf = new char[MAX_PATH];
+    WideCharToMultiByte(CP_ACP, 0, directoryPathBuffer, -1, buf, MAX_PATH, NULL, NULL);
+    game_file_name = buf;
+    delete [] buf;
 #elif defined(PSP_VERSION) || defined(ANDROID_VERSION) || defined(IOS_VERSION)
     game_file_name = psp_game_file_name;
 #else
-    game_file_name = (char*)malloc(MAX_PATH);
-    strcpy(game_file_name, get_filename(global_argv[datafile_argv]));
+    game_file_name = global_argv[datafile_argv];
 #endif
+    AGS::Common::Path::FixupPath(game_file_name);
+}
+
+String find_game_data_in_directory(const char *path)
+{
+    String found_data_file;
+    // TODO: find a way to make this platform-agnostic way
+    // using find-file interface or something
+#if defined (LINUX_VERSION) || defined (MAC_VERSION)
+    DIR* fd = NULL;
+    struct dirent* entry = NULL;
+    version_info_t version_info;
+
+    if ((fd = opendir(path)))
+    {
+        while ((entry = readdir(fd)))
+        {
+            // Filename must be >= 4 chars long
+            int length = strlen(entry->d_name);
+            if (length < 4)
+            {
+                continue;
+            }
+
+            // Exclude the setup program
+            if (stricmp(entry->d_name, "winsetup.exe") == 0)
+            {
+                continue;
+            }
+
+            if (stricmp(&(entry->d_name[length - 4]), ".exe") == 0)
+            {
+                if (!getVersionInformation(entry->d_name, &version_info))
+                    continue;
+                if (strcmp(version_info.internal_name, "acwin") == 0)
+                {
+                    if (AGS::Common::AssetManager::IsDataFile(entry->d_name))
+                    {
+                        found_data_file = entry->d_name;
+                        break;
+                    }
+                }
+            }
+            else if (stricmp(&(entry->d_name[length - 4]), ".ags") == 0 ||
+                stricmp(entry->d_name, "ac2game.dat") == 0)
+            {
+                if (AGS::Common::AssetManager::IsDataFile(entry->d_name))
+                {
+                    found_data_file = entry->d_name;
+                    break;
+                }
+            }
+        }
+        closedir(fd);
+    }
+#elif defined (WINDOWS_VERSION)
+    String path_mask = path;
+    path_mask.Append("/*");
+    WIN32_FIND_DATAA file_data;
+    HANDLE find_handle = FindFirstFileA(path_mask, &file_data);
+    if (find_handle != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            // Filename must be >= 4 chars long
+            int length = strlen(file_data.cFileName);
+            if (length < 4)
+            {
+                continue;
+            }
+
+            // Exclude the setup program
+            if (strcmp(file_data.cFileName, "winsetup.exe") == 0)
+            {
+                continue;
+            }
+
+            if (strcmp(&(file_data.cFileName[length - 4]), ".exe") == 0 ||
+                strcmp(&(file_data.cFileName[length - 4]), ".ags") == 0 ||
+                strcmp(file_data.cFileName, "ac2game.dat") == 0)
+            {
+                if (AGS::Common::AssetManager::IsDataFile(file_data.cFileName))
+                {
+                    found_data_file = file_data.cFileName;
+                    break;
+                }
+            }
+        }
+        while (FindNextFileA(find_handle, &file_data) != FALSE);
+        FindClose(find_handle);
+    }
+#else
+    // TODO ??? (PSP, ANDROID)
+#endif
+    AGS::Common::Path::FixupPath(found_data_file);
+    return found_data_file;
+}
+
+extern char appDirectory[512];
+void initialise_game_file_name()
+{
+    // 1. From command line argument
+    if (datafile_argv > 0)
+    {
+        // set game_file_name from cmd arg (do any convertions if needed)
+        init_game_file_name_from_cmdline();
+        if (game_file_name.GetLast() == '/')
+        {
+            // if it is not a file, assume it is a directory and seek for data file
+            game_file_name = find_game_data_in_directory(game_file_name);
+        }
+    }
+    // 2. From setup
+    else if (!usetup.main_data_filename.IsEmpty())
+    {
+        game_file_name = usetup.main_data_filename;
+        AGS::Common::Path::FixupPath(game_file_name);
+    }
+    // 3. Look in known locations
+    else
+    {
+        // 3.1. Look for attachment in the running executable
+        //
+        // set game_file_name from cmd arg (do any convertions if needed)
+        // this will use argument zero, the executable's name
+        init_game_file_name_from_cmdline();
+        if (!game_file_name.IsEmpty() && Common::AssetManager::IsDataFile(game_file_name))
+        {
+            return;
+        }
+        // 3.2 Look in current directory
+        String cur_dir = AGS::Common::Directory::GetCurrentDirectory();
+        game_file_name = find_game_data_in_directory(cur_dir);
+        if (!game_file_name.IsEmpty())
+        {
+            return;
+        }
+        // 3.3 Look in executable's directory (if it's different from current dir)
+        if (AGS::Common::Path::ComparePaths(appDirectory, cur_dir))
+        {
+            game_file_name = find_game_data_in_directory(appDirectory);
+        }
+    }
+    if (game_file_name.IsEmpty())
+    {
+        AGS::Common::Out::FPrint("Game data file could not be found\n");
+    }
+    else
+    {
+        game_file_name = AGS::Common::Path::MakeAbsolutePath(game_file_name);
+        AGS::Common::Out::FPrint("Game data file: %s\n", game_file_name.GetCStr());
+    }
 }
 
 int engine_init_game_data(int argc,char*argv[])
 {
-    write_log_debug("Initializing game data");
+    Out::FPrint("Initializing game data");
 
     // initialize the data file
     initialise_game_file_name();
-    if (game_file_name == NULL) return EXIT_NORMAL;
-
-    errcod = Common::AssetManager::SetDataFile(game_file_name);  // assume it's appended to exe
+    errcod = Common::AssetManager::SetDataFile(game_file_name);
 
     our_eip = -194;
-    //  char gamefilenamebuf[200];
-
-    int init_res = RETURN_CONTINUE;
-
-    if ((errcod!=Common::kAssetNoError) && (change_to_game_dir == 0)) {
-        // it's not, so look for the file
-        init_res = engine_init_game_data_external(argc, argv);
-    }
-    else {
-        // set the data filename to the EXE name
-        int res = engine_init_game_data_internal(argc, argv);
-    }
-
-    if (init_res != RETURN_CONTINUE) {
-        return init_res;
-    }
-
     our_eip = -193;
 
-    if (errcod!=Common::kAssetNoError) {  // there's a problem
-        if (errcod==Common::kAssetErrNoLibFile) {  // file not found
-            char emsg[STD_BUFFER_SIZE];
-            sprintf (emsg,
+    if (errcod!=Common::kAssetNoError)
+    {  // there's a problem
+        char emsg[STD_BUFFER_SIZE];
+        if (errcod==Common::kAssetErrNoLibFile)
+        {  // file not found
+            sprintf(emsg,
                 "You must create and save a game first in the AGS Editor before you can use "
                 "this engine.\n\n"
                 "If you have just downloaded AGS, you are probably running the wrong executable.\n"
-                "Run AGSEditor.exe to launch the editor.\n\n"
-                "(Unable to find '%s')\n", argv[datafile_argv]);
-            platform->DisplayAlert(emsg);
+                "Run AGSEditor.exe to launch the editor.\n\n");
+            int len = strlen(emsg);
+            if (game_file_name.IsEmpty())
+            {
+                sprintf(emsg + len, "(Unable to find game data file in any of the known locations.)\n");
+            }
+            else
+            {
+                sprintf(emsg + len, "(Unable to find or open '%s'.)\n", game_file_name.GetCStr());
+            }
         }
         else if (errcod==Common::kAssetErrLibAssetCount)
-            platform->DisplayAlert("ERROR: Too many files in data file.");
-        else platform->DisplayAlert("ERROR: The file is corrupt. Make sure you have the correct version of the\n"
-            "editor, and that this really is an AGS game.\n");
+        {
+            sprintf(emsg, "ERROR: Too many files in data file.\n\n%s\n", game_file_name.GetCStr());
+        }
+        else
+        {
+            sprintf(emsg, "ERROR: The file is corrupt. Make sure you have the correct version of the "
+                "editor, and that this really is an AGS game.\n\n%s\n", game_file_name.GetCStr());
+        }
+        platform->DisplayAlert(emsg);
         return EXIT_NORMAL;
+    }
+
+    // Save data file name and data folder
+    usetup.main_data_filename = get_filename(game_file_name);
+    // There is a path in the game file name (and the user/ has not specified
+    // another one) save the path, so that it can load the VOX files, etc
+    if (usetup.data_files_dir.Compare(".") == 0)
+    {
+        int ichar = game_file_name.FindCharReverse('/');
+        if (ichar >= 0)
+        {
+            usetup.data_files_dir = game_file_name.Left(ichar);
+        }
     }
 
     return RETURN_CONTINUE;
@@ -373,14 +461,14 @@ int engine_init_game_data(int argc,char*argv[])
 
 void engine_init_fonts()
 {
-    write_log_debug("Initializing TTF renderer");
+    Out::FPrint("Initializing TTF renderer");
 
     init_font_renderer();
 }
 
 int engine_init_mouse()
 {
-    write_log_debug("Initializing mouse");
+    Out::FPrint("Initializing mouse");
 
 #ifdef _DEBUG
     // Quantify fails with the mouse for some reason
@@ -397,7 +485,7 @@ int engine_init_mouse()
 
 int engine_check_memory()
 {
-    write_log_debug("Checking memory");
+    Out::FPrint("Checking memory");
 
     char*memcheck=(char*)malloc(4000000);
     if (memcheck==NULL) {
@@ -426,7 +514,7 @@ int engine_init_speech()
         so that pack functions, etc. will have the right case later */
         speech_file = ci_find_file(usetup.data_files_dir, "speech.vox");
 
-        DataStream *speech_s = ci_fopen(speech_file);
+        Stream *speech_s = ci_fopen(speech_file);
 
         if (speech_s == NULL)
         {
@@ -439,14 +527,14 @@ int engine_init_speech()
         if (speech_s) {
             delete speech_s;
 
-            write_log_debug("Initializing speech vox");
+            Out::FPrint("Initializing speech vox");
 
             //if (Common::AssetManager::SetDataFile(useloc,"")!=0) {
             if (Common::AssetManager::SetDataFile(speech_file)!=Common::kAssetNoError) {
                 platform->DisplayAlert("Unable to initialize speech sample file - check for corruption and that\nit belongs to this game.\n");
                 return EXIT_NORMAL;
             }
-            DataStream *speechsync = Common::AssetManager::OpenAsset("syncdata.dat");
+            Stream *speechsync = Common::AssetManager::OpenAsset("syncdata.dat");
             if (speechsync != NULL) {
                 // this game has voice lip sync
                 if (speechsync->ReadInt32() != 4)
@@ -489,7 +577,7 @@ int engine_init_music()
     /* Don't need to use ci_fopen here, because we've used ci_find_file to get
     the case insensitive matched filename already */
     // Use ci_fopen anyway because it can handle NULL filenames.
-    DataStream *music_s = ci_fopen(music_file);
+    Stream *music_s = ci_fopen(music_file);
 
     if (music_s == NULL)
     {
@@ -502,7 +590,7 @@ int engine_init_music()
     if (music_s) {
         delete music_s;
 
-        write_log_debug("Initializing audio vox");
+        Out::FPrint("Initializing audio vox");
 
         //if (Common::AssetManager::SetDataFile(useloc,"")!=0) {
         if (Common::AssetManager::SetDataFile(music_file)!=Common::kAssetNoError) {
@@ -520,7 +608,7 @@ int engine_init_music()
 void engine_init_keyboard()
 {
 #ifdef ALLEGRO_KEYBOARD_HANDLER
-    write_log_debug("Initializing keyboard");
+    Out::FPrint("Initializing keyboard");
 
     install_keyboard();
 #endif
@@ -528,7 +616,7 @@ void engine_init_keyboard()
 
 void engine_init_timer()
 {
-    write_log_debug("Install timer");
+    Out::FPrint("Install timer");
 
     platform->WriteConsole("Checking sound inits.\n");
     if (opts.mod_player) reserve_voices(16,-1);
@@ -559,7 +647,7 @@ void engine_init_sound()
 
 #endif
 
-    write_log_debug("Initialize sound drivers");
+    Out::FPrint("Initialize sound drivers");
 
     // PSP: Disable sound by config file.
     if (!psp_audio_enabled)
@@ -616,10 +704,10 @@ void engine_init_debug()
 void atexit_handler() {
     if (proper_exit==0) {
         sprintf(pexbuf,"\nError: the program has exited without requesting it.\n"
-            "Program pointer: %+03d  (write this number down), ACI version " ACI_VERSION_TEXT "\n"
+            "Program pointer: %+03d  (write this number down), ACI version %s\n"
             "If you see a list of numbers above, please write them down and contact\n"
             "Chris Jones. Otherwise, note down any other information displayed.\n",
-            our_eip);
+            EngineVersion.LongString.GetCStr(), our_eip);
         platform->DisplayAlert(pexbuf);
     }
 
@@ -628,19 +716,11 @@ void atexit_handler() {
 
     if (!(speech_file == NULL))
         free(speech_file);
-
-    // Deliberately commented out, because chances are game_file_name
-    // was not allocated on the heap, it points to argv[0] or
-    // the gamefilenamebuf memory
-    // It will get freed by the system anyway, leaving it in can
-    // cause a crash on exit
-    /*if (!(game_file_name == NULL))
-    free(game_file_name);*/
 }
 
 void engine_init_exit_handler()
 {
-    write_log_debug("Install exit handler");
+    Out::FPrint("Install exit handler");
 
     atexit(atexit_handler);
 }
@@ -653,21 +733,21 @@ void engine_init_rand()
 
 void engine_init_pathfinder()
 {
-    write_log_debug("Initialize path finder library");
+    Out::FPrint("Initialize path finder library");
 
     init_pathfinder();
 }
 
 void engine_pre_init_gfx()
 {
-    write_log_debug("Initialize gfx");
+    //Out::FPrint("Initialize gfx");
 
-    platform->InitialiseAbufAtStartup();
+    //platform->InitialiseAbufAtStartup();
 }
 
 int engine_load_game_data()
 {
-    write_log_debug("Load game data");
+    Out::FPrint("Load game data");
 
     our_eip=-17;
     int ee=load_game_file();
@@ -715,7 +795,7 @@ void engine_init_title()
     set_window_title(game.gamename);
 #endif
 
-    write_log_debug(game.gamename);
+    Out::FPrint(game.gamename);
 }
 
 void engine_init_directories()
@@ -750,7 +830,7 @@ int check_write_access() {
   // The Save Game Dir is the only place that we should write to
   char tempPath[MAX_PATH];
   sprintf(tempPath, "%s""tmptest.tmp", saveGameDirectory);
-  DataStream *temp_s = Common::File::CreateFile(tempPath);
+  Stream *temp_s = Common::File::CreateFile(tempPath);
   if (!temp_s)
     return 0;
 
@@ -769,7 +849,7 @@ int check_write_access() {
 
 int engine_check_disk_space()
 {
-    write_log_debug("Checking for disk space");
+    Out::FPrint("Checking for disk space");
 
     //init_language_text("en");
     if (check_write_access()==0) {
@@ -807,7 +887,7 @@ void engine_init_modxm_player()
         opts.mod_player = 0;
 
     if (opts.mod_player) {
-        write_log_debug("Initializing MOD/XM player");
+        Out::FPrint("Initializing MOD/XM player");
 
         if (init_mod_player(NUM_MOD_DIGI_VOICES) < 0) {
             platform->DisplayAlert("Warning: install_mod: MOD player failed to initialize.");
@@ -816,21 +896,21 @@ void engine_init_modxm_player()
     }
 #else
     opts.mod_player = 0;
-    write_log_debug("Compiled without MOD/XM player");
+    Out::FPrint("Compiled without MOD/XM player");
 #endif
 }
 
 void show_preload () {
     // ** Do the preload graphic if available
     color temppal[256];
-	Bitmap *splashsc = BitmapHelper::CreateRawObjectOwner( load_pcx("preload.pcx",temppal) );
+	Bitmap *splashsc = BitmapHelper::CreateRawBitmapOwner( load_pcx("preload.pcx",temppal) );
     if (splashsc != NULL) {
         if (splashsc->GetColorDepth() == 8)
-            wsetpalette(0,255,temppal);
+            set_palette_range(temppal, 0, 255, 0);
 		Bitmap *screen_bmp = BitmapHelper::GetScreenBitmap();
-        Bitmap *tsc = BitmapHelper::CreateBitmap(splashsc->GetWidth(),splashsc->GetHeight(),screen_bmp->GetColorDepth());
-        tsc->Blit(splashsc,0,0,0,0,tsc->GetWidth(),tsc->GetHeight());
-		screen_bmp->Clear();
+        Bitmap *tsc = BitmapHelper::CreateBitmapCopy(splashsc, screen_bmp->GetColorDepth());
+
+		screen_bmp->Fill(0);
         screen_bmp->StretchBlt(tsc, RectWH(0, 0, scrnwid,scrnhit), Common::kBitmap_Transparency);
 
         gfxDriver->ClearDrawList();
@@ -853,14 +933,14 @@ void show_preload () {
 
 void engine_show_preload()
 {
-    write_log_debug("Check for preload image");
+    Out::FPrint("Check for preload image");
 
     show_preload ();
 }
 
 int engine_init_sprites()
 {
-    write_log_debug("Initialize sprites");
+    Out::FPrint("Initialize sprites");
 
     if (spriteset.initFile ("acsprset.spr")) 
     {
@@ -878,13 +958,13 @@ int engine_init_sprites()
 
 void engine_setup_screen()
 {
-    write_log_debug("Set up screen");
+    Out::FPrint("Set up screen");
 
     virtual_screen=BitmapHelper::CreateBitmap(scrnwid,scrnhit,final_col_dep);
     virtual_screen->Clear();
     gfxDriver->SetMemoryBackBuffer(virtual_screen);
     //  ignore_mouseoff_bitmap = virtual_screen;
-	abuf=BitmapHelper::GetScreenBitmap();
+    SetVirtualScreen(BitmapHelper::GetScreenBitmap());
     our_eip=-7;
 
     for (int ee = 0; ee < MAX_INIT_SPR + game.numcharacters; ee++)
@@ -1030,7 +1110,7 @@ void init_game_settings() {
     play.digital_master_volume = 100;
     play.screen_flipped=0;
     play.offsets_locked=0;
-    play.cant_skip_speech = user_to_internal_skip_speech(game.options[OPT_NOSKIPTEXT]);
+    play.cant_skip_speech = user_to_internal_skip_speech((SkipSpeechStyle)game.options[OPT_NOSKIPTEXT]);
     play.sound_volume = 255;
     play.speech_volume = 255;
     play.normal_font = 0;
@@ -1122,7 +1202,7 @@ void init_game_settings() {
 
 void engine_init_game_settings()
 {
-    write_log_debug("Initialize game settings");
+    Out::FPrint("Initialize game settings");
 
     init_game_settings();
 }
@@ -1136,7 +1216,8 @@ void engine_init_game_shit()
     scsystem.vsync = 0;
     scsystem.viewport_width = divide_down_coordinate(scrnwid);
     scsystem.viewport_height = divide_down_coordinate(scrnhit);
-    strcpy(scsystem.aci_version, ACI_VERSION_TEXT);
+    // ScriptSystem::aci_version is only 10 chars long
+    strncpy(scsystem.aci_version, EngineVersion.LongString, 10);
     scsystem.os = platform->GetSystemOSID();
 
     if (usetup.windowed)
@@ -1153,7 +1234,7 @@ void engine_init_game_shit()
     our_eip=-4;
     mousey=100;  // stop icon bar popping up
     init_invalid_regions(final_scrn_hit);
-    wsetscreen(virtual_screen);
+    SetVirtualScreen(virtual_screen);
     our_eip = -41;
 
     gfxDriver->SetRenderOffset(get_screen_x_adjustment(virtual_screen), get_screen_y_adjustment(virtual_screen));
@@ -1182,7 +1263,7 @@ void engine_start_multithreaded_audio()
 
 void engine_prepare_to_start_game()
 {
-    write_log_debug("Prepare to start game");
+    Out::FPrint("Prepare to start game");
 
     engine_init_game_shit();
     engine_start_multithreaded_audio();
@@ -1194,9 +1275,7 @@ void engine_prepare_to_start_game()
 }
 
 // TODO: move to test unit
-#include "gfx/allegrobitmap.h"
-using AGS::Common::AllegroBitmap;
-AllegroBitmap *test_allegro_bitmap;
+Bitmap *test_allegro_bitmap;
 IDriverDependantBitmap *test_allegro_ddb;
 void allegro_bitmap_test_init()
 {
@@ -1294,7 +1373,7 @@ int initialize_engine(int argc,char*argv[])
 
     engine_init_pathfinder();
 
-    engine_pre_init_gfx();
+    //engine_pre_init_gfx();
 
     LOCK_VARIABLE(timerloop);
     LOCK_FUNCTION(dj_timer_handler);
@@ -1400,7 +1479,7 @@ extern char*printfworkingspace;
 
 int initialize_engine_with_exception_handling(int argc,char*argv[])
 {
-    write_log_debug("Installing exception handler");
+    Out::FPrint("Installing exception handler");
 
 #ifdef USE_CUSTOM_EXCEPTION_HANDLER
     __try 
@@ -1414,10 +1493,10 @@ int initialize_engine_with_exception_handling(int argc,char*argv[])
     __except (CustomExceptionHandler ( GetExceptionInformation() )) 
     {
         strcpy (tempmsg, "");
-        sprintf (printfworkingspace, "An exception 0x%X occurred in ACWIN.EXE at EIP = 0x%08X %s; program pointer is %+d, ACI version " ACI_VERSION_TEXT ", gtags (%d,%d)\n\n"
+        sprintf (printfworkingspace, "An exception 0x%X occurred in ACWIN.EXE at EIP = 0x%08X %s; program pointer is %+d, ACI version %s, gtags (%d,%d)\n\n"
             "AGS cannot continue, this exception was fatal. Please note down the numbers above, remember what you were doing at the time and post the details on the AGS Technical Forum.\n\n%s\n\n"
             "Most versions of Windows allow you to press Ctrl+C now to copy this entire message to the clipboard for easy reporting.\n\n%s (code %d)",
-            excinfo.ExceptionCode, excinfo.ExceptionAddress, tempmsg, our_eip, eip_guinum, eip_guiobj, get_cur_script(5),
+            excinfo.ExceptionCode, excinfo.ExceptionAddress, tempmsg, our_eip, EngineVersion.LongString.GetCStr(), eip_guinum, eip_guiobj, get_cur_script(5),
             (miniDumpResultCode == 0) ? "An error file CrashInfo.dmp has been created. You may be asked to upload this file when reporting this problem on the AGS Forums." : 
             "Unable to create an error dump file.", miniDumpResultCode);
         MessageBoxA(allegro_wnd, printfworkingspace, "Illegal exception", MB_ICONSTOP | MB_OK);
@@ -1428,5 +1507,5 @@ int initialize_engine_with_exception_handling(int argc,char*argv[])
 }
 
 const char *get_engine_version() {
-    return ACI_VERSION_TEXT;
+    return EngineVersion.LongString.GetCStr();
 }

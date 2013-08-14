@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="Common.Lib"
 	ProjectGUID="{463A715C-3EF3-47C7-AC7F-D97660149C49}"
 	RootNamespace="CommonLib"
@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(SolutionDir)\..\Common&quot;;&quot;$(SolutionDir)\..\Common\libinclude&quot;;&quot;$(SolutionDir)\..\Windows\include&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_WINDOWS;VS2005;_CRT_SECURE_NO_WARNINGS;ALLEGRO_STATICLINK;WINDOWS_VERSION;DISABLE_MPEG_AUDIO"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_WINDOWS;VS2005;_CRT_SECURE_NO_WARNINGS;ALLEGRO_STATICLINK;ALLEGRO_NO_ASM;WINDOWS_VERSION;DISABLE_MPEG_AUDIO"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -290,6 +290,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Common\util\directory.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Common\util\file.cpp"
 					>
 				</File>
@@ -303,6 +307,18 @@
 				</File>
 				<File
 					RelativePath="..\..\Common\util\misc.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Common\util\path.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Common\util\proxystream.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Common\util\stream.cpp"
 					>
 				</File>
 				<File
@@ -331,10 +347,6 @@
 				>
 				<File
 					RelativePath="..\..\Common\script\cc_error.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Common\script\cc_instance.cpp"
 					>
 				</File>
 				<File
@@ -417,6 +429,10 @@
 				</File>
 				<File
 					RelativePath="..\..\Common\ac\dialogtopic.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Common\ac\game_version.h"
 					>
 				</File>
 				<File
@@ -572,11 +588,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Common\util\directory.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Common\util\file.h"
 					>
 				</File>
 				<File
 					RelativePath="..\..\Common\util\filestream.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Common\util\geometry.h"
 					>
 				</File>
 				<File
@@ -589,6 +613,14 @@
 				</File>
 				<File
 					RelativePath="..\..\Common\util\misc.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Common\util\path.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Common\util\proxystream.h"
 					>
 				</File>
 				<File
@@ -633,10 +665,6 @@
 				>
 				<File
 					RelativePath="..\..\Common\script\cc_error.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Common\script\cc_instance.h"
 					>
 				</File>
 				<File
@@ -697,6 +725,14 @@
 				</File>
 				<File
 					RelativePath="..\..\Common\gfx\bitmap.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="api"
+				>
+				<File
+					RelativePath="..\..\Common\api\stream_api.h"
 					>
 				</File>
 			</Filter>

@@ -15,28 +15,29 @@
 #if defined(WINDOWS_VERSION)
 #include <io.h>
 #endif
-
 #include <stdio.h>
 #include "util/filestream.h"
 #include "util/math.h"
+
+// TODO: use fstat on Windows too?
+#if !defined (WINDOWS_VERSION)
+#include <sys/stat.h>
+long int filelength(int fhandle)
+{
+    struct stat statbuf;
+    fstat(fhandle, &statbuf);
+    return statbuf.st_size;
+}
+#endif
 
 namespace AGS
 {
 namespace Common
 {
 
-FileStream::FileStream(const String &file_name, FileOpenMode open_mode, FileWorkMode work_mode)
-    : DataStream(kDefaultSystemEndianess, kLittleEndian)
-    , _file(NULL)
-    , _openMode(open_mode)
-    , _workMode(work_mode)
-{
-    Open(file_name, open_mode, work_mode);
-}
-
 FileStream::FileStream(const String &file_name, FileOpenMode open_mode, FileWorkMode work_mode,
-            DataEndianess caller_endianess, DataEndianess stream_endianess)
-    : DataStream(caller_endianess, stream_endianess)
+            DataEndianess stream_endianess)
+    : DataStream(stream_endianess)
     , _file(NULL)
     , _openMode(open_mode)
     , _workMode(work_mode)
@@ -49,6 +50,15 @@ FileStream::~FileStream()
     Close();
 }
 
+void FileStream::Close()
+{
+    if (_file)
+    {
+        fclose(_file);
+    }
+    _file = NULL;
+}
+
 bool FileStream::IsValid() const
 {
     return _file != NULL;
@@ -59,19 +69,25 @@ bool FileStream::EOS() const
     return !IsValid() || feof(_file) != 0;
 }
 
-int FileStream::GetLength() const
+size_t FileStream::GetLength() const
 {
     if (IsValid())
     {
-        return filelength(fileno(_file));
+        long len = filelength(fileno(_file));
+        return len > 0 ? (size_t)len : 0;
     }
 
     return 0;
 }
 
-int FileStream::GetPosition() const
+size_t FileStream::GetPosition() const
 {
-    return IsValid() ? ftell(_file) : 0;
+    if (IsValid())
+    {
+        long pos = ftell(_file);
+        return pos > 0 ? (size_t)pos : 0;
+    }
+    return 0;
 }
 
 bool FileStream::CanRead() const
@@ -89,116 +105,45 @@ bool FileStream::CanSeek() const
     return IsValid();
 }
 
-void FileStream::Close()
+size_t FileStream::Read(void *buffer, size_t size)
 {
-    if (_file)
-    {
-        fclose(_file);
-    }
-    _file = NULL;
-}
-
-int FileStream::ReadByte()
-{
-    if (CanRead())
-    {
-        return fgetc(_file);
-    }
-    return 0;
-}
-
-int16_t FileStream::ReadInt16()
-{
-    if (CanRead())
-    {
-        int16_t val;
-        fread(&val, sizeof(int16_t), 1, _file);
-        ConvertInt16(val);
-        return val;
-    }
-    return 0;
-}
-
-int32_t FileStream::ReadInt32()
-{
-    if (CanRead())
-    {
-        int32_t val = getw(_file);
-        ConvertInt32(val);
-        return val;
-    }
-    return 0;
-}
-
-int64_t FileStream::ReadInt64()
-{
-    if (CanRead())
-    {
-        int64_t val;
-        fread(&val, sizeof(int64_t), 1, _file);
-        ConvertInt64(val);
-        return val;
-    }
-    return 0;
-}
-
-int FileStream::Read(void *buffer, int32_t size)
-{
-    if (CanRead())
+    if (_file && buffer)
     {
         return fread(buffer, sizeof(uint8_t), size, _file);
     }
     return 0;
 }
 
-int FileStream::WriteByte(uint8_t val)
+int32_t FileStream::ReadByte()
 {
-    if (CanWrite())
+    if (_file)
     {
-        return fputc(val, _file);
+        return fgetc(_file);
     }
-    return 0;
+    return -1;
 }
 
-void FileStream::WriteInt16(int16_t val)
+size_t FileStream::Write(const void *buffer, size_t size)
 {
-    if (CanWrite())
-    {
-        ConvertInt16(val);
-        fwrite(&val, sizeof(int16_t), 1, _file);
-    }
-}
-
-void FileStream::WriteInt32(int32_t val)
-{
-    if (CanWrite())
-    {
-        ConvertInt32(val);
-        putw(val, _file);
-    }
-}
- 
-void FileStream::WriteInt64(int64_t val)
-{
-    if (CanWrite())
-    {
-        ConvertInt64(val);
-        fwrite(&val, sizeof(int64_t), 1, _file);
-    }
-}
-
-int FileStream::Write(const void *buffer, int size)
-{
-    if (CanWrite())
+    if (_file && buffer)
     {
         return fwrite(buffer, sizeof(uint8_t), size, _file);
     }
     return 0;
 }
 
-int FileStream::Seek(StreamSeek seek, int pos)
+int32_t FileStream::WriteByte(uint8_t val)
 {
-    if (!CanSeek())
+    if (_file)
+    {
+        return fputc(val, _file);
+    }
+    return -1;
+}
+
+size_t FileStream::Seek(StreamSeek seek, int pos)
+{
+    if (!_file)
     {
         return 0;
     }
@@ -209,9 +154,12 @@ int FileStream::Seek(StreamSeek seek, int pos)
     case kSeekBegin:    stdclib_seek = SEEK_SET; break;
     case kSeekCurrent:  stdclib_seek = SEEK_CUR; break;
     case kSeekEnd:      stdclib_seek = SEEK_END; break;
+    default:
+        // TODO: warning to the log
+        return 0;
     }
 
-    int result = fseek(_file, pos, stdclib_seek);
+    fseek(_file, pos, stdclib_seek);
     return GetPosition();
 }
 
@@ -225,7 +173,7 @@ void FileStream::Open(const String &file_name, FileOpenMode open_mode, FileWorkM
         {
             mode.AppendChar('r');
         }
-        else
+        else if (work_mode == kFile_Write || work_mode == kFile_ReadWrite)
         {
             mode.Append("r+");
         }
@@ -236,21 +184,27 @@ void FileStream::Open(const String &file_name, FileOpenMode open_mode, FileWorkM
         {
             mode.AppendChar('a');
         }
-        else
+        else if (work_mode == kFile_Read || work_mode == kFile_ReadWrite)
         {
             mode.Append("a+");
         }
     }
-    else // kFile_CreateAlways
+    else if (open_mode == kFile_CreateAlways)
     {
         if (work_mode == kFile_Write)
         {
             mode.AppendChar('w');
         }
-        else
+        else if (work_mode == kFile_Read || work_mode == kFile_ReadWrite)
         {
             mode.Append("w+");
         }
+    }
+
+    if (mode.IsEmpty())
+    {
+        // TODO: warning to the log
+        return;
     }
 
     mode.AppendChar('b');

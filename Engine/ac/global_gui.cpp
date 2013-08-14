@@ -12,7 +12,6 @@
 //
 //=============================================================================
 
-#include "util/wgt2allg.h"
 #include "ac/common.h"
 #include "ac/display.h"
 #include "ac/draw.h"
@@ -25,6 +24,7 @@
 #include "ac/string.h"
 #include "debug/debug_log.h"
 #include "gui/guimain.h"
+#include "script/runtimescriptvalue.h"
 
 extern GameSetupStruct game;
 extern GUIMain*guis;
@@ -161,7 +161,7 @@ void CentreGUI (int ifn) {
   GUI_Centre(&scrGui[ifn]);
 }
 
-int GetTextWidth(char *text, int fontnum) {
+int GetTextWidth(const char *text, int fontnum) {
   VALIDATE_STRING(text);
   if ((fontnum < 0) || (fontnum >= game.numfonts))
     quit("!GetTextWidth: invalid font number.");
@@ -169,7 +169,7 @@ int GetTextWidth(char *text, int fontnum) {
   return divide_down_coordinate(wgettextwidth_compensate(text, fontnum));
 }
 
-int GetTextHeight(char *text, int fontnum, int width) {
+int GetTextHeight(const char *text, int fontnum, int width) {
   VALIDATE_STRING(text);
   if ((fontnum < 0) || (fontnum >= game.numfonts))
     quit("!GetTextHeight: invalid font number.");

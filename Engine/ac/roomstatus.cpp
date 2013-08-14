@@ -14,25 +14,21 @@
 
 #include <string.h> // memset
 #include <stdlib.h> // free
-#include "roomstatus.h"
-#include "util/datastream.h"
+#include "ac/common.h"
+#include "ac/roomstatus.h"
+#include "util/alignedstream.h"
 
-using AGS::Common::DataStream;
+using AGS::Common::AlignedStream;
+using AGS::Common::Stream;
 
-void RoomStatus::ReadFromFile(DataStream *in)
+void RoomStatus::ReadFromFile_v321(Stream *in)
 {
-//#ifdef ALLEGRO_BIG_ENDIAN
     beenhere = in->ReadInt32();
     numobj = in->ReadInt32();
-    for (int i = 0; i < MAX_INIT_SPR; ++i)
-    {
-        obj[i].ReadFromFile(in);
-    }
+    ReadRoomObjects_Aligned(in);
     in->ReadArrayOfInt16(flagstates, MAX_FLAGS);
-    // might need to skip 2 if MAX_FLAGS is odd
-    in->Seek(Common::kSeekCurrent, 2*(MAX_FLAGS%2));
     tsdatasize = in->ReadInt32();
-    tsdata = (char *) in->ReadInt32();
+    in->ReadInt32(); // tsdata
     for (int i = 0; i < MAX_HOTSPOTS; ++i)
     {
         intrHotspot[i].ReadFromFile(in);
@@ -49,27 +45,17 @@ void RoomStatus::ReadFromFile(DataStream *in)
     in->ReadArrayOfInt8((int8_t*)hotspot_enabled, MAX_HOTSPOTS);
     in->ReadArrayOfInt8((int8_t*)region_enabled, MAX_REGIONS);
     in->ReadArrayOfInt16(walkbehind_base, MAX_OBJ);
-    in->Seek(Common::kSeekCurrent, get_padding(MAX_HOTSPOTS+MAX_REGIONS+2*MAX_OBJ));
     in->ReadArrayOfInt32(interactionVariableValues, MAX_GLOBAL_VARIABLES);
-//#else
-//    throw "RoomStatus::ReadFromFile() is not implemented for little-endian platforms and should not be called.";
-//#endif
 }
-void RoomStatus::WriteToFile(DataStream *out)
+
+void RoomStatus::WriteToFile_v321(Stream *out)
 {
-//#ifdef ALLEGRO_BIG_ENDIAN
-    char pad[4];
     out->WriteInt32(beenhere);
     out->WriteInt32(numobj);
-    for (int i = 0; i < MAX_INIT_SPR; ++i)
-    {
-        obj[i].WriteToFile(out);
-    }
+    WriteRoomObjects_Aligned(out);
     out->WriteArrayOfInt16(flagstates, MAX_FLAGS);
-    // might need to skip 2 if MAX_FLAGS is odd
-    out->Write(pad, 2*(MAX_FLAGS%2));
     out->WriteInt32(tsdatasize);
-    out->WriteInt32((int)tsdata);
+    out->WriteInt32(0); // tsdata
     for (int i = 0; i < MAX_HOTSPOTS; ++i)
     {
         intrHotspot[i].WriteToFile(out);
@@ -86,11 +72,27 @@ void RoomStatus::WriteToFile(DataStream *out)
     out->Write(hotspot_enabled, MAX_HOTSPOTS);
     out->Write(region_enabled, MAX_REGIONS);
     out->WriteArrayOfInt16(walkbehind_base, MAX_OBJ);
-    out->Write(pad, get_padding(MAX_HOTSPOTS+MAX_REGIONS+2*MAX_OBJ));
     out->WriteArrayOfInt32(interactionVariableValues,MAX_GLOBAL_VARIABLES);
-//#else
-//    throw "RoomStatus::WriteToFile() is not implemented for little-endian platforms and should not be called.";
-//#endif
+}
+
+void RoomStatus::ReadRoomObjects_Aligned(Common::Stream *in)
+{
+    AlignedStream align_s(in, Common::kAligned_Read);
+    for (int i = 0; i < MAX_INIT_SPR; ++i)
+    {
+        obj[i].ReadFromFile(&align_s);
+        align_s.Reset();
+    }
+}
+
+void RoomStatus::WriteRoomObjects_Aligned(Common::Stream *out)
+{
+    AlignedStream align_s(out, Common::kAligned_Write);
+    for (int i = 0; i < MAX_INIT_SPR; ++i)
+    {
+        obj[i].WriteToFile(&align_s);
+        align_s.Reset();
+    }
 }
 
 // JJS: Replacement for the global roomstats array in the original engine.
@@ -118,8 +120,6 @@ bool isRoomStatusValid(int room)
     return (room_statuses[room] != NULL);
 }
 
-extern int loaded_game_file_version;
-
 void resetRoomStatuses()
 {
     for (int i = 0; i < MAX_ROOMS; i++)
@@ -133,7 +133,7 @@ void resetRoomStatuses()
             // pointer that are also referenced in the current room struct.
             // If they are freed here this will lead to an access violation when the
             // room unloading function tries to frees them.
-            if (loaded_game_file_version <= 32)
+            if (loaded_game_file_version <= kGameVersion_272)
             {
                 room_statuses[i]->tsdatasize = 0;
                 room_statuses[i]->tsdata = 0;

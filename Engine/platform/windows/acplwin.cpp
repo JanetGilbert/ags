@@ -18,7 +18,7 @@
 
 // ********* WINDOWS *********
 
-#include "util/wgt2allg.h"
+#include <stdio.h>
 #include "gfx/ali3d.h"
 #include "ac/common.h"
 #include "ac/draw.h"
@@ -27,15 +27,16 @@
 #include "ac/global_display.h"
 #include "ac/runtime_defines.h"
 #include "ac/string.h"
+#include "gfx/graphicsdriver.h"
+#include "gfx/bitmap.h"
 #include "main/engine.h"
 #include "media/audio/audio.h"
 #include "platform/base/agsplatformdriver.h"
 #include "plugin/agsplugin.h"
-#include "util/datastream.h"
-#include "gfx/graphicsdriver.h"
-#include "gfx/bitmap.h"
+#include "util/file.h"
+#include "util/stream.h"
 
-using AGS::Common::DataStream;
+using AGS::Common::Stream;
 using AGS::Common::Bitmap;
 
 extern GameSetupStruct game;
@@ -85,7 +86,6 @@ extern void dxmedia_resume_video();
 extern char lastError[200];
 extern int acwsetup(const char*, const char*);
 extern void set_icon();
-extern char* game_file_name;
 
 struct AGSWin32 : AGSPlatformDriver {
   AGSWin32();
@@ -113,11 +113,6 @@ struct AGSWin32 : AGSPlatformDriver {
   virtual void RegisterGameWithGameExplorer();
   virtual void UnRegisterGameWithGameExplorer();
   virtual int  ConvertKeycodeToScanCode(int keyCode);
-
-  //-----------------------------------------------
-  // IOutputTarget implementation
-  //-----------------------------------------------
-  virtual void Out(const char *sz_fullmsg);
 
 private:
   void add_game_to_game_explorer(IGameExplorer* pFwGameExplorer, GUID *guid, const char *guidAsText, bool allUsers);
@@ -642,7 +637,7 @@ void AGSWin32::Delay(int millis)
     millis -= 5;
     // don't allow it to check for debug messages, since this Delay()
     // call might be from within a debugger polling loop
-    update_polled_stuff(false);
+    update_polled_mp3();
   }
 
   if (millis > 0)
@@ -693,7 +688,7 @@ int AGSWin32::InitializeCDPlayer() {
 void AGSWin32::PlayVideo(const char *name, int skip, int flags) {
 
   char useloc[250];
-  sprintf(useloc,"%s\\%s",usetup.data_files_dir, name);
+  sprintf(useloc,"%s\\%s",usetup.data_files_dir.GetCStr(), name);
 
   bool useSound = true;
   if (flags >= 10) {
@@ -735,7 +730,7 @@ void AGSWin32::PlayVideo(const char *name, int skip, int flags) {
       init_mod_player(NUM_MOD_DIGI_VOICES);
   }
 
-  wsetpalette (0, 255, palette);
+  set_palette_range(palette, 0, 255, 0);
 }
 
 void AGSWin32::AboutToQuitGame() 
@@ -801,13 +796,6 @@ AGSPlatformDriver* AGSPlatformDriver::GetDriver() {
   return instance;
 }
 
-//-----------------------------------------------
-// IOutputTarget implementation
-//-----------------------------------------------
-void AGSWin32::Out(const char *sz_fullmsg) {
-    this->WriteDebugString(sz_fullmsg);
-}
-
 
 // *********** WINDOWS-SPECIFIC PLUGIN API FUNCTIONS *************
 
@@ -827,7 +815,7 @@ LPDIRECTDRAWSURFACE2 IAGSEngine::GetBitmapSurface (BITMAP *bmp)
 
   BMP_EXTRA_INFO *bei = (BMP_EXTRA_INFO*)bmp->extra;
 
-  if (bmp == virtual_screen->GetBitmapObject())
+  if (bmp == virtual_screen->GetAllegroBitmap())
     invalidate_screen();
 
   return bei->surf;

@@ -17,9 +17,11 @@
 #include "ac/interaction.h"
 #include "ac/common.h"
 #include "util/string_utils.h"      // fputstring, etc
-#include "util/datastream.h"
+#include "util/alignedstream.h"
+#include "util/string.h"
 
-using AGS::Common::DataStream;
+using AGS::Common::AlignedStream;
+using AGS::Common::Stream;
 using AGS::Common::String;
 
 InteractionVariable globalvars[MAX_GLOBAL_VARIABLES] = {{"Global 1", 0, 0}};
@@ -32,45 +34,29 @@ NewInteractionValue::NewInteractionValue() {
 }
 
 
-void NewInteractionValue::ReadFromFile(DataStream *in)
+void NewInteractionValue::ReadFromFile(Stream *in)
 {
-//#ifdef ALLEGRO_BIG_ENDIAN
     in->Read(&valType, 1);
-    char pad[3];
-    in->Read(pad, 3);
     val = in->ReadInt32();
     extra = in->ReadInt32();
-//#else
-//    throw "NewInteractionValue::ReadFromFile() is not implemented for little-endian platforms and should not be called.";
-//#endif
 }
 
-void NewInteractionValue::WriteToFile(DataStream *out)
+void NewInteractionValue::WriteToFile(Stream *out)
 {
-//#ifdef ALLEGRO_BIG_ENDIAN
     out->Write(&valType, 1);
-    char pad[3];
-    out->Write(pad, 3);
     out->WriteInt32(val);
     out->WriteInt32(extra);
-//#else
-//    throw "NewInteractionValue::WriteToFile() is not implemented for little-endian platforms and should not be called.";
-//#endif
 }
 
 
-void InteractionVariable::ReadFromFile(DataStream *in)
+void InteractionVariable::ReadFromFile(Stream *in)
 {
-//#ifdef ALLEGRO_BIG_ENDIAN
     in->Read(name, 23);
     type = in->ReadInt8();
     value = in->ReadInt32();
-//#else
-//    throw "InteractionVariable::WriteToFile() is not implemented for little-endian platforms and should not be called.";
-//#endif
 }
 
-void InteractionVariable::WriteToFile(Common::DataStream *out)
+void InteractionVariable::WriteToFile(Common::Stream *out)
 {
     out->Write(name, 23);
     out->WriteInt8(type);
@@ -99,37 +85,43 @@ void NewInteractionCommand::remove () {
 
 void NewInteractionCommand::reset() { remove(); }
 
-void NewInteractionCommand::ReadFromFile(DataStream *in)
+void NewInteractionCommand::ReadNewInteractionValues_Aligned(Stream *in)
 {
-//#ifdef ALLEGRO_BIG_ENDIAN
-    in->ReadInt32(); // skip the vtbl ptr
-    type = in->ReadInt32();
+    AlignedStream align_s(in, Common::kAligned_Read);
     for (int i = 0; i < MAX_ACTION_ARGS; ++i)
     {
-        data[i].ReadFromFile(in);
+        data[i].ReadFromFile(&align_s);
+        align_s.Reset();
     }
+}
+
+void NewInteractionCommand::ReadFromFile_v321(Stream *in)
+{
+    in->ReadInt32(); // skip the vtbl ptr
+    type = in->ReadInt32();
+    ReadNewInteractionValues_Aligned(in);
     // all that matters is whether or not these are null...
     children = (NewInteractionAction *) (long)in->ReadInt32();
     parent = (NewInteractionCommandList *) (long)in->ReadInt32();
-//#else
-//    throw "NewInteractionCommand::ReadFromFile() is not implemented for little-endian platforms and should not be called.";
-//#endif
 }
 
-void NewInteractionCommand::WriteToFile(DataStream *out)
+void NewInteractionCommand::WriteNewInteractionValues_Aligned(Stream *out)
 {
-//#ifdef ALLEGRO_BIG_ENDIAN
-    out->WriteInt32(0); // write dummy vtbl ptr 
-    out->WriteInt32(type);
+    AlignedStream align_s(out, Common::kAligned_Write);
     for (int i = 0; i < MAX_ACTION_ARGS; ++i)
     {
-        data[i].WriteToFile(out);
+        data[i].WriteToFile(&align_s);
+        align_s.Reset();
     }
+}
+
+void NewInteractionCommand::WriteToFile_v321(Stream *out)
+{
+    out->WriteInt32(0); // write dummy vtbl ptr 
+    out->WriteInt32(type);
+    WriteNewInteractionValues_Aligned(out);
     out->WriteInt32((long)children);
     out->WriteInt32((long)parent);
-//#else
-//    throw "NewInteractionCommand::WriteToFile() is not implemented for little-endian platforms and should not be called.";
-//#endif
 }
 
 NewInteractionCommandList::NewInteractionCommandList () {
@@ -151,6 +143,26 @@ void NewInteractionCommandList::reset () {
   }
   numCommands = 0;
   timesRun = 0;
+}
+
+void NewInteractionCommandList::ReadInteractionCommands_Aligned(Stream *in)
+{
+    AlignedStream align_s(in, Common::kAligned_Read);
+    for (int iteratorCount = 0; iteratorCount < numCommands; ++iteratorCount)
+    {
+        command[iteratorCount].ReadFromFile_v321(&align_s);
+        align_s.Reset();
+    }
+}
+
+void NewInteractionCommandList::WriteInteractionCommands_Aligned(Stream *out)
+{
+    AlignedStream align_s(out, Common::kAligned_Write);
+    for (int iteratorCount = 0; iteratorCount < numCommands; ++iteratorCount)
+    {
+        command[iteratorCount].WriteToFile_v321(&align_s);
+        align_s.Reset();
+    }
 }
 
 NewInteraction::NewInteraction() { 
@@ -178,9 +190,8 @@ NewInteraction::~NewInteraction() {
     reset();
 }
 
-void NewInteraction::ReadFromFile(DataStream *in)
+void NewInteraction::ReadFromFile(Stream *in)
 {
-//#ifdef ALLEGRO_BIG_ENDIAN
     // it's all ints! <- JJS: No, it's not! There are pointer too.
 
   numEvents = in->ReadInt32();
@@ -191,14 +202,9 @@ void NewInteraction::ReadFromFile(DataStream *in)
     response[i] = (NewInteractionCommandList*)in->ReadInt32();
 
 //    in->ReadArray(&numEvents, sizeof(int), sizeof(NewInteraction)/sizeof(int));
-//#else
-//    throw "NewInteraction::ReadFromFile() is not implemented for little-endian platforms and should not be called.";
-//#endif
 }
-void NewInteraction::WriteToFile(DataStream *out)
+void NewInteraction::WriteToFile(Stream *out)
 {
-//#ifdef ALLEGRO_BIG_ENDIAN
-
   out->WriteInt32(numEvents);
   out->WriteArray(&eventTypes, sizeof(*eventTypes), MAX_NEWINTERACTION_EVENTS);
   out->WriteArray(&timesRun, sizeof(*timesRun), MAX_NEWINTERACTION_EVENTS);
@@ -207,9 +213,6 @@ void NewInteraction::WriteToFile(DataStream *out)
     out->WriteInt32((int)(response[i] != NULL));
 
 //    fwrite(&numEvents, sizeof(int), sizeof(NewInteraction)/sizeof(int), fp);
-//#else
-//    throw "NewInteraction::WriteToFile() is not implemented for little-endian platforms and should not be called.";
-//#endif
 }
 
 
@@ -222,27 +225,21 @@ InteractionScripts::~InteractionScripts() {
         delete[] scriptFuncNames[i];
 }
 
-
-void serialize_command_list (NewInteractionCommandList *nicl, DataStream *out) {
+void serialize_command_list (NewInteractionCommandList *nicl, Stream *out) {
   if (nicl == NULL)
     return;
   out->WriteInt32 (nicl->numCommands);
   out->WriteInt32 (nicl->timesRun);
-//#ifdef ALLEGRO_BIG_ENDIAN
-  for (int iteratorCount = 0; iteratorCount < nicl->numCommands; ++iteratorCount)
-  {
-      nicl->command[iteratorCount].WriteToFile(out);
-  }
-//#else
-//  out->WriteArray (&nicl->command[0], sizeof(NewInteractionCommand), nicl->numCommands);  
-//#endif  // ALLEGRO_BIG_ENDIAN
+
+  nicl->WriteInteractionCommands_Aligned(out);
+
   for (int k = 0; k < nicl->numCommands; k++) {
     if (nicl->command[k].children != NULL)
       serialize_command_list (nicl->command[k].get_child_list(), out);
   }
 }
 
-void serialize_new_interaction (NewInteraction *nint, DataStream *out) {
+void serialize_new_interaction (NewInteraction *nint, Stream *out) {
   int a;
 
   out->WriteInt32 (1);  // Version
@@ -259,18 +256,13 @@ void serialize_new_interaction (NewInteraction *nint, DataStream *out) {
   }
 }
 
-NewInteractionCommandList *deserialize_command_list (DataStream *in) {
+NewInteractionCommandList *deserialize_command_list (Stream *in) {
   NewInteractionCommandList *nicl = new NewInteractionCommandList;
   nicl->numCommands = in->ReadInt32();
   nicl->timesRun = in->ReadInt32();
-//#ifdef ALLEGRO_BIG_ENDIAN
-  for (int iteratorCount = 0; iteratorCount < nicl->numCommands; ++iteratorCount)
-  {
-      nicl->command[iteratorCount].ReadFromFile(in);
-  }
-//#else
-//  in->ReadArray (&nicl->command[0], sizeof(NewInteractionCommand), nicl->numCommands);  
-//#endif  // ALLEGRO_BIG_ENDIAN
+
+  nicl->ReadInteractionCommands_Aligned(in);
+
   for (int k = 0; k < nicl->numCommands; k++) {
     if (nicl->command[k].children != NULL) {
       nicl->command[k].children = deserialize_command_list (in);
@@ -281,7 +273,7 @@ NewInteractionCommandList *deserialize_command_list (DataStream *in) {
 }
 
 NewInteraction *nitemp;
-NewInteraction *deserialize_new_interaction (DataStream *in) {
+NewInteraction *deserialize_new_interaction (Stream *in) {
   int a;
 
   if (in->ReadInt32() != 1)
@@ -307,7 +299,7 @@ NewInteraction *deserialize_new_interaction (DataStream *in) {
   return nitemp;
 }
 
-void deserialize_interaction_scripts(DataStream *in, InteractionScripts *scripts)
+void deserialize_interaction_scripts(Stream *in, InteractionScripts *scripts)
 {
   int numEvents = in->ReadInt32();
   if (numEvents > MAX_NEWINTERACTION_EVENTS)
@@ -317,7 +309,7 @@ void deserialize_interaction_scripts(DataStream *in, InteractionScripts *scripts
   String buffer;
   for (int i = 0; i < numEvents; i++)
   {
-    buffer = in->ReadString(200);
+    buffer.Read(in, 200);
     scripts->scriptFuncNames[i] = new char[buffer.GetLength() + 1];
     strcpy(scripts->scriptFuncNames[i], buffer);
   }

@@ -14,16 +14,12 @@
 
 #include <stdio.h>
 #include "ac/messageinfo.h"
-#include "util/datastream.h"
+#include "util/stream.h"
 
-using AGS::Common::DataStream;
+using AGS::Common::Stream;
 
-void MessageInfo::ReadFromFile(DataStream *in)
+void MessageInfo::ReadFromFile(Stream *in)
 {
-//#ifdef ALLEGRO_BIG_ENDIAN
     displayas = in->ReadInt8();
     flags = in->ReadInt8();
-//#else
-//    throw "DialogTopic::ReadFromFile() is not implemented for little-endian platforms and should not be called.";
-//#endif
 }

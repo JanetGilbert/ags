@@ -18,7 +18,7 @@
 #include "script/systemimports.h"
 
 
-extern void quit(char *);
+extern void quit(const char *);
 
 struct CompareStringsPartial : ICompareStrings {
     virtual int compare(const char *left, const char *right) {
@@ -28,40 +28,24 @@ struct CompareStringsPartial : ICompareStrings {
 CompareStringsPartial ccCompareStringsPartial;
 
 SystemImports simp;
+SystemImports simp_for_plugin;
 
-/*
-void SystemImports::remove_all_script_exports()
-{
-int o;
-
-// Cut off at the first script exports - used to reset script system
-// Although FreeInstance removes them anyway, we might be
-// in AbortAndDestroy so we can't free it yet
-for (o = 0; o < numimports; o++) {
-if (isScriptImp[o]) {
-numimports = o;
-break;
-}
-}
-
-}*/
-
-int SystemImports::add(char *namm, char *add, ccInstance *anotherscr = NULL)
+int SystemImports::add(const char *name, const RuntimeScriptValue &value, ccInstance *anotherscr)
 {
     int ixof;
 
-    if ((ixof = get_index_of(namm)) >= 0) {
+    if ((ixof = get_index_of(name)) >= 0) {
         // Only allow override if not a script-exported function
         if (anotherscr == NULL) {
-            addr[ixof] = add;
-            isScriptImp[ixof] = anotherscr;
+            imports[ixof].Value = value;
+            imports[ixof].InstancePtr = anotherscr;
         }
         return 0;
     }
 
     ixof = numimports;
     for (int ii = 0; ii < numimports; ii++) {
-        if (name[ii] == NULL) {
+        if (imports[ii].Name == NULL) {
             ixof = ii;
             break;
         }
@@ -72,47 +56,48 @@ int SystemImports::add(char *namm, char *add, ccInstance *anotherscr = NULL)
         if (this->bufferSize > 50000)
             return -1;  // something has gone badly wrong
         this->bufferSize += 1000;
-        this->name = (char**)realloc(this->name, sizeof(char*) * this->bufferSize);
-        this->addr = (char**)realloc(this->addr, sizeof(char*) * this->bufferSize);
-        this->isScriptImp = (ccInstance**)realloc(this->isScriptImp, sizeof(ccInstance*) * this->bufferSize);
+        this->imports = (ScriptImport*)realloc(this->imports, sizeof(ScriptImport) * this->bufferSize);
     }
 
-    btree.addEntry(namm, ixof);
-    name[ixof] = namm;
-    addr[ixof] = add;
-    isScriptImp[ixof] = anotherscr;
+    btree.addEntry(name, ixof);
+    imports[ixof].Name          = name; // TODO: rather make a string copy here for safety reasons
+    imports[ixof].Value         = value;
+    imports[ixof].InstancePtr   = anotherscr;
 
     if (ixof == numimports)
         numimports++;
     return 0;
 }
 
-void SystemImports::remove(char *nameToRemove) {
+void SystemImports::remove(const char *nameToRemove) {
     int idx = get_index_of(nameToRemove);
     if (idx < 0)
         return;
-    btree.removeEntry(name[idx]);
-    name[idx] = NULL;
-    addr[idx] = NULL;
-    isScriptImp[idx] = 0;
-    /*numimports--;
-    for (int ii = idx; ii < numimports; ii++) {
-    this->name[ii] = this->name[ii + 1];
-    addr[ii] = addr[ii + 1];
-    isScriptImp[ii] = isScriptImp[ii + 1];
-    }*/
+    btree.removeEntry(imports[idx].Name);
+    imports[idx].Name = NULL;
+    imports[idx].Value.Invalidate();
+    imports[idx].InstancePtr = NULL;
 }
 
-char *SystemImports::get_addr_of(char *namw)
+const ScriptImport *SystemImports::getByName(const char *name)
 {
-    int o = get_index_of(namw);
+    int o = get_index_of(name);
     if (o < 0)
         return NULL;
 
-    return addr[o];
+    return &imports[o];
 }
 
-int SystemImports::get_index_of(char *namw)
+const ScriptImport *SystemImports::getByIndex(int index)
+{
+    if (index < 0 || index > numimports)
+    {
+        return NULL;
+    }
+    return &imports[index];
+}
+
+int SystemImports::get_index_of(const char *namw)
 {
     int bestMatch = -1;
     char altName[200];
@@ -127,16 +112,6 @@ int SystemImports::get_index_of(char *namw)
     if (idx >= 0)
         return idx;
 
-    /*
-    int o;
-    for (o = 0; o < numimports; o++) {
-    if (strcmp(name[o], namw) == 0)
-    return o;
-    // if it's a function with a mangled name, allow it
-    if (strncmp(name[o], altName, strlen(altName)) == 0)
-    return o;
-    }*/
-
     if ((strlen(namw) > 3) && 
         ((namw[strlen(namw) - 2] == '^') || (namw[strlen(namw) - 3] == '^'))) {
             // Function with number of prametrs on the end
@@ -150,40 +125,24 @@ int SystemImports::get_index_of(char *namw)
     return -1;
 }
 
-ccInstance* SystemImports::is_script_import(char *namw)
+void SystemImports::RemoveScriptExports(ccInstance *inst)
 {
-    if (namw == NULL) {
-        quit("is_script_import: NULL pointer passed");
+    if (!inst)
+    {
+        return;
     }
 
-    int idx = get_index_of(namw);
-    if (idx < 0)
-        return NULL;
-
-    return isScriptImp[idx];
-}
-
-// Remove all symbols whose addresses are in the supplied range
-void SystemImports::remove_range(char *from, unsigned long dist)
-{
-    unsigned long startaddr = (unsigned long)from;
-    for (int o = 0; o < numimports; o++) {
-        if (name[o] == NULL)
+    for (int i = 0; i < numimports; ++i)
+    {
+        if (imports[i].Name == NULL)
             continue;
 
-        unsigned long thisaddr = (unsigned long)addr[o];
-        if ((thisaddr >= startaddr) && (thisaddr < startaddr + dist)) {
-            btree.removeEntry(name[o]);
-            name[o] = NULL;
-            addr[o] = NULL;
-            isScriptImp[o] = 0;
-            /*numimports--;
-            for (int p = o; p < numimports; p++) {
-            name[p] = name[p + 1];
-            addr[p] = addr[p + 1];
-            isScriptImp[p] = isScriptImp[p + 1];
-            }
-            o--;*/
+        if (imports[i].InstancePtr == inst)
+        {
+            btree.removeEntry(imports[i].Name);
+            imports[i].Name = NULL;
+            imports[i].Value.Invalidate();
+            imports[i].InstancePtr = 0;
         }
     }
 }

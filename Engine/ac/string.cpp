@@ -22,12 +22,14 @@
 #include "ac/dynobj/scriptstring.h"
 #include "debug/debug_log.h"
 #include "util/string_utils.h"
+#include "script/runtimescriptvalue.h"
 
 extern char lines[MAXLINE][200];
 extern int  numlines;
 extern GameSetupStruct game;
 extern GameState play;
 extern int longestline;
+extern ScriptString myScriptStringImpl;
 
 int String_IsNullOrEmpty(const char *thisString) 
 {
@@ -69,7 +71,9 @@ const char* String_Truncate(const char *thisString, int length) {
         quit("!String.Truncate: invalid length");
 
     if (length >= (int)strlen(thisString))
+    {
         return thisString;
+    }
 
     char *buffer = (char*)malloc(length + 1);
     strncpy(buffer, thisString, length);
@@ -182,7 +186,7 @@ const char* String_Format(const char *texx, ...) {
 
     va_list ap;
     va_start(ap,texx);
-    my_sprintf(displbuf, get_translation(texx), ap);
+    vsprintf(displbuf, get_translation(texx), ap);
     va_end(ap);
 
     return CreateNewScriptString(displbuf);
@@ -194,7 +198,7 @@ int String_GetChars(const char *texx, int index) {
     return texx[index];
 }
 
-int StringToInt(char*stino) {
+int StringToInt(const char*stino) {
     return atoi(stino);
 }
 
@@ -287,7 +291,7 @@ void split_lines_rightleft (char *todis, int wii, int fonnt) {
         prevline[0] = prevlwas;
 }
 
-char *reverse_text(char *text) {
+char *reverse_text(const char *text) {
     int stlen = strlen(text), rr;
     char *backwards = (char*)malloc(stlen + 1);
     for (rr = 0; rr < stlen; rr++)
@@ -296,21 +300,7 @@ char *reverse_text(char *text) {
     return backwards;
 }
 
-void wouttext_reverseifnecessary(int x, int y, int font, char *text) {
-    char *backwards = NULL;
-    char *otext = text;
-    if (game.options[OPT_RIGHTLEFTWRITE]) {
-        backwards = reverse_text(text);
-        otext = backwards;
-    }
-
-    wouttext_outline(x, y, font, otext);
-
-    if (backwards)
-        free(backwards);
-}
-
-void break_up_text_into_lines(int wii,int fonnt,char*todis) {
+void break_up_text_into_lines(int wii,int fonnt, const char*todis) {
     if (fonnt == -1)
         fonnt = play.normal_font;
 
@@ -374,98 +364,192 @@ void my_strncpy(char *dest, const char *src, int len) {
         strcpy(dest, src);
 }
 
-// 64 bit: Not sure if this function is 64 bit ready
-// Custom printf, needed because floats are pushed as 8 bytes
-void my_sprintf(char *buffer, const char *fmt, va_list ap) {
-    int bufidx = 0;
-    const char *curptr = fmt;
-    const char *endptr;
-    char spfbuffer[STD_BUFFER_SIZE];
-    char fmtstring[100];
-    int numargs = -1;
+//=============================================================================
+//
+// Script API Functions
+//
+//=============================================================================
 
-    while (1) {
-        // copy across everything until the next % (or end of string)
-        endptr = strchr(curptr, '%');
-        if (endptr == NULL)
-            endptr = &curptr[strlen(curptr)];
-        while (curptr < endptr) {
-            buffer[bufidx] = *curptr;
-            curptr++;
-            bufidx++;
-        }
-        // at this point, curptr and endptr should be equal and pointing
-        // to the % or \0
-        if (*curptr == 0)
-            break;
-        if (curptr[1] == '%') {
-            // "%%", so just write a % to the output
-            buffer[bufidx] = '%';
-            bufidx++;
-            curptr += 2;
-            continue;
-        }
-        // find the end of the % clause
-        while ((*endptr != 'd') && (*endptr != 'f') && (*endptr != 'c') &&
-            (*endptr != 0) && (*endptr != 's') && (*endptr != 'x') &&
-            (*endptr != 'X'))
-            endptr++;
+#include "debug/out.h"
+#include "script/script_api.h"
+#include "script/script_runtime.h"
+#include "ac/math.h"
 
-        if (numargs >= 0) {
-            numargs--;
-            // if there are not enough arguments, just copy the %d
-            // to the output string rather than trying to format it
-            if (numargs < 0)
-                endptr = &curptr[strlen(curptr)];
-        }
+// int (const char *thisString)
+RuntimeScriptValue Sc_String_IsNullOrEmpty(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT_POBJ(String_IsNullOrEmpty, const char);
+}
 
-        if (*endptr == 0) {
-            // something like %p which we don't support, so just write
-            // the % to the output
-            buffer[bufidx] = '%';
-            bufidx++;
-            curptr++;
-            continue;
-        }
-        // move endptr to 1 after the end character
-        endptr++;
+// const char* (const char *thisString, const char *extrabit)
+RuntimeScriptValue Sc_String_Append(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_OBJ_POBJ(const char, const char, myScriptStringImpl, String_Append, const char);
+}
 
-        // copy the %d or whatever
-        strncpy(fmtstring, curptr, (endptr - curptr));
-        fmtstring[endptr - curptr] = 0;
+// const char* (const char *thisString, char extraOne)
+RuntimeScriptValue Sc_String_AppendChar(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_OBJ_PINT(const char, const char, myScriptStringImpl, String_AppendChar);
+}
 
-        unsigned int theArg = va_arg(ap, unsigned int);
+// int (const char *thisString, const char *otherString, bool caseSensitive)
+RuntimeScriptValue Sc_String_CompareTo(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT_POBJ_PBOOL(const char, String_CompareTo, const char);
+}
 
-        // use sprintf to parse the actual %02d type thing
-        if (endptr[-1] == 'f') {
-            // floats are pushed as 8-bytes, so ensure that it knows this is a float
-            float floatArg;
-            memcpy(&floatArg, &theArg, sizeof(float));
-            sprintf(spfbuffer, fmtstring, floatArg);
-        }
-/*      64 bit: Not compatible
-        else if ((theArg == (int)buffer) && (endptr[-1] == 's'))
-            quit("Cannot use destination as argument to StrFormat");
-*/
-        else if ((theArg < 0x10000) && (endptr[-1] == 's'))
-            quit("!One of the string arguments supplied was not a string");
-        else if (endptr[-1] == 's')
-        {
-            strncpy(spfbuffer, (const char*)theArg, STD_BUFFER_SIZE);
-            spfbuffer[STD_BUFFER_SIZE - 1] = 0;
-        }
-        else 
-            sprintf(spfbuffer, fmtstring, theArg);
+// int  (const char *s1, const char *s2)
+RuntimeScriptValue Sc_StrContains(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT_POBJ(const char, StrContains, const char);
+}
 
-        // use the formatted text
-        buffer[bufidx] = 0;
+// const char* (const char *srcString)
+RuntimeScriptValue Sc_String_Copy(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_OBJ(const char, const char, myScriptStringImpl, String_Copy);
+}
 
-        if (bufidx + strlen(spfbuffer) >= STD_BUFFER_SIZE)
-            quitprintf("!String.Format: buffer overrun: maximum formatted string length %d chars, this string: %d chars", STD_BUFFER_SIZE, bufidx + strlen(spfbuffer));
+// int (const char *thisString, const char *checkForString, bool caseSensitive)
+RuntimeScriptValue Sc_String_EndsWith(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT_POBJ_PBOOL(const char, String_EndsWith, const char);
+}
 
-        strcat(buffer, spfbuffer);
-        bufidx += strlen(spfbuffer);
-        curptr = endptr;
-    }
-    buffer[bufidx] = 0;
+// const char* (const char *texx, ...)
+RuntimeScriptValue Sc_String_Format(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_SCRIPT_SPRINTF(String_Format, 1);
+    return RuntimeScriptValue().SetDynamicObject((void*)String_Format("%s", scsf_buffer), &myScriptStringImpl);
+}
+
+// const char* (const char *thisString)
+RuntimeScriptValue Sc_String_LowerCase(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_OBJ(const char, const char, myScriptStringImpl, String_LowerCase);
+}
+
+// const char* (const char *thisString, const char *lookForText, const char *replaceWithText, bool caseSensitive)
+RuntimeScriptValue Sc_String_Replace(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_OBJ_POBJ2_PBOOL(const char, const char, myScriptStringImpl, String_Replace, const char, const char);
+}
+
+// const char* (const char *thisString, int index, char newChar)
+RuntimeScriptValue Sc_String_ReplaceCharAt(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_OBJ_PINT2(const char, const char, myScriptStringImpl, String_ReplaceCharAt);
+}
+
+// int (const char *thisString, const char *checkForString, bool caseSensitive)
+RuntimeScriptValue Sc_String_StartsWith(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT_POBJ_PBOOL(const char, String_StartsWith, const char);
+}
+
+// const char* (const char *thisString, int index, int length)
+RuntimeScriptValue Sc_String_Substring(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_OBJ_PINT2(const char, const char, myScriptStringImpl, String_Substring);
+}
+
+// const char* (const char *thisString, int length)
+RuntimeScriptValue Sc_String_Truncate(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_OBJ_PINT(const char, const char, myScriptStringImpl, String_Truncate);
+}
+
+// const char* (const char *thisString)
+RuntimeScriptValue Sc_String_UpperCase(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_OBJ(const char, const char, myScriptStringImpl, String_UpperCase);
+}
+
+// FLOAT_RETURN_TYPE (const char *theString);
+RuntimeScriptValue Sc_StringToFloat(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(const char, StringToFloat);
+}
+
+// int (char*stino)
+RuntimeScriptValue Sc_StringToInt(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(const char, StringToInt);
+}
+
+// int (const char *texx, int index)
+RuntimeScriptValue Sc_String_GetChars(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT_PINT(const char, String_GetChars);
+}
+
+RuntimeScriptValue Sc_strlen(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    ASSERT_SELF(strlen)
+    return RuntimeScriptValue().SetInt32(strlen((const char*)self));
+}
+
+//=============================================================================
+//
+// Exclusive API for Plugins
+//
+//=============================================================================
+
+// const char* (const char *texx, ...)
+const char *ScPl_String_Format(const char *texx, ...)
+{
+    va_list arg_ptr;
+    va_start(arg_ptr, texx);
+    const char *scsf_buffer = ScriptVSprintf(ScSfBuffer, 3000, get_translation(texx), arg_ptr);
+    va_end(arg_ptr);
+    return String_Format("%s", scsf_buffer);
+}
+
+
+void RegisterStringAPI()
+{
+    ccAddExternalStaticFunction("String::IsNullOrEmpty^1",  Sc_String_IsNullOrEmpty);
+    ccAddExternalObjectFunction("String::Append^1",         Sc_String_Append);
+    ccAddExternalObjectFunction("String::AppendChar^1",     Sc_String_AppendChar);
+    ccAddExternalObjectFunction("String::CompareTo^2",      Sc_String_CompareTo);
+    ccAddExternalObjectFunction("String::Contains^1",       Sc_StrContains);
+    ccAddExternalObjectFunction("String::Copy^0",           Sc_String_Copy);
+    ccAddExternalObjectFunction("String::EndsWith^2",       Sc_String_EndsWith);
+    ccAddExternalStaticFunction("String::Format^101",       Sc_String_Format);
+    ccAddExternalObjectFunction("String::IndexOf^1",        Sc_StrContains);
+    ccAddExternalObjectFunction("String::LowerCase^0",      Sc_String_LowerCase);
+    ccAddExternalObjectFunction("String::Replace^3",        Sc_String_Replace);
+    ccAddExternalObjectFunction("String::ReplaceCharAt^2",  Sc_String_ReplaceCharAt);
+    ccAddExternalObjectFunction("String::StartsWith^2",     Sc_String_StartsWith);
+    ccAddExternalObjectFunction("String::Substring^2",      Sc_String_Substring);
+    ccAddExternalObjectFunction("String::Truncate^1",       Sc_String_Truncate);
+    ccAddExternalObjectFunction("String::UpperCase^0",      Sc_String_UpperCase);
+    ccAddExternalObjectFunction("String::get_AsFloat",      Sc_StringToFloat);
+    ccAddExternalObjectFunction("String::get_AsInt",        Sc_StringToInt);
+    ccAddExternalObjectFunction("String::geti_Chars",       Sc_String_GetChars);
+    ccAddExternalObjectFunction("String::get_Length",       Sc_strlen);
+
+    /* ----------------------- Registering unsafe exports for plugins -----------------------*/
+
+    ccAddExternalFunctionForPlugin("String::IsNullOrEmpty^1",  (void*)String_IsNullOrEmpty);
+    ccAddExternalFunctionForPlugin("String::Append^1",         (void*)String_Append);
+    ccAddExternalFunctionForPlugin("String::AppendChar^1",     (void*)String_AppendChar);
+    ccAddExternalFunctionForPlugin("String::CompareTo^2",      (void*)String_CompareTo);
+    ccAddExternalFunctionForPlugin("String::Contains^1",       (void*)StrContains);
+    ccAddExternalFunctionForPlugin("String::Copy^0",           (void*)String_Copy);
+    ccAddExternalFunctionForPlugin("String::EndsWith^2",       (void*)String_EndsWith);
+    ccAddExternalFunctionForPlugin("String::Format^101",       (void*)ScPl_String_Format);
+    ccAddExternalFunctionForPlugin("String::IndexOf^1",        (void*)StrContains);
+    ccAddExternalFunctionForPlugin("String::LowerCase^0",      (void*)String_LowerCase);
+    ccAddExternalFunctionForPlugin("String::Replace^3",        (void*)String_Replace);
+    ccAddExternalFunctionForPlugin("String::ReplaceCharAt^2",  (void*)String_ReplaceCharAt);
+    ccAddExternalFunctionForPlugin("String::StartsWith^2",     (void*)String_StartsWith);
+    ccAddExternalFunctionForPlugin("String::Substring^2",      (void*)String_Substring);
+    ccAddExternalFunctionForPlugin("String::Truncate^1",       (void*)String_Truncate);
+    ccAddExternalFunctionForPlugin("String::UpperCase^0",      (void*)String_UpperCase);
+    ccAddExternalFunctionForPlugin("String::get_AsFloat",      (void*)StringToFloat);
+    ccAddExternalFunctionForPlugin("String::get_AsInt",        (void*)StringToInt);
+    ccAddExternalFunctionForPlugin("String::geti_Chars",       (void*)String_GetChars);
+    ccAddExternalFunctionForPlugin("String::get_Length",       (void*)strlen);
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="AGS.Native"
 	ProjectGUID="{65A387AF-C78C-492B-AB93-E13C6090355D}"
 	RootNamespace="AGS.Native"
@@ -113,7 +113,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy $(TargetPath) $(SolutionDir)References"
+				CommandLine="copy $(TargetPath) $(SolutionDir)\..\Editor\References"
 			/>
 		</Configuration>
 		<Configuration
@@ -185,7 +185,7 @@
 				AdditionalLibraryDirectories="&quot;$(SolutionDir)\..\Solutions\.lib\$(ConfigurationName)&quot;;&quot;$(SolutionDir)\..\Windows\lib&quot;"
 				IgnoreDefaultLibraryNames="LIBCMT.lib"
 				ModuleDefinitionFile=""
-				GenerateDebugInformation="false"
+				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -213,7 +213,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy $(TargetPath) $(SolutionDir)References"
+				CommandLine="copy $(TargetPath) $(SolutionDir)\..\Editor\References"
 			/>
 		</Configuration>
 	</Configurations>
@@ -268,6 +268,10 @@
 			</File>
 			<File
 				RelativePath=".\NativeMethods.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Native\script_agsnative.cpp"
 				>
 			</File>
 			<File

@@ -13,7 +13,7 @@
 //=============================================================================
 
 #define USE_CLIB
-#include "util/wgt2allg.h"
+#include <stdio.h>
 #include "ac/global_game.h"
 #include "ac/common.h"
 #include "ac/view.h"
@@ -52,9 +52,10 @@
 #include "script/script_runtime.h"
 #include "ac/spritecache.h"
 #include "gfx/graphicsdriver.h"
-#include "gfx/bitmap.h"
 #include "core/assetmanager.h"
+#include "main/game_file.h"
 
+using AGS::Common::String;
 using AGS::Common::Bitmap;
 namespace BitmapHelper = AGS::Common::BitmapHelper;
 
@@ -71,7 +72,6 @@ extern SpriteCache spriteset;
 extern int frames_per_second;
 extern int time_between_timers;
 extern char gamefilenamebuf[200];
-extern char* game_file_name;
 extern GameSetup usetup;
 extern unsigned int load_new_game;
 extern int load_new_game_restore;
@@ -96,7 +96,7 @@ void GiveScore(int amnt)
     if ((amnt > 0) && (play.score_sound >= 0))
         play_audio_clip_by_index(play.score_sound);
 
-    run_on_event (GE_GOT_SCORE, amnt);
+    run_on_event (GE_GOT_SCORE, RuntimeScriptValue().SetInt32(amnt));
 }
 
 void restart_game() {
@@ -106,7 +106,7 @@ void restart_game() {
         return;
     }
     int errcod;
-    if ((errcod = load_game(RESTART_POINT_SAVE_GAME_NUMBER, NULL, NULL))!=0)
+    if ((errcod = load_game(RESTART_POINT_SAVE_GAME_NUMBER))!=0)
         quitprintf("unable to restart game (error:%s)", load_game_errors[-errcod]);
 
 }
@@ -120,17 +120,17 @@ void RestoreGameSlot(int slnum) {
         curscript->queue_action(ePSARestoreGame, slnum, "RestoreGameSlot");
         return;
     }
-    load_game(slnum, NULL, NULL);
+    load_game(slnum);
 }
 
 void DeleteSaveSlot (int slnum) {
-    char nametouse[260];
-    get_save_game_path(slnum, nametouse);
+    String nametouse;
+    nametouse = get_save_game_path(slnum);
     unlink (nametouse);
     if ((slnum >= 1) && (slnum <= MAXSAVEGAMES)) {
-        char thisname[260];
+        String thisname;
         for (int i = MAXSAVEGAMES; i > slnum; i--) {
-            get_save_game_path(i, thisname);
+            thisname = get_save_game_path(i);
             if (Common::File::TestReadFile(thisname)) {
                 // Rename the highest save game to fill in the gap
                 rename (thisname, nametouse);
@@ -159,8 +159,12 @@ int IsGamePaused() {
 
 int GetSaveSlotDescription(int slnum,char*desbuf) {
     VALIDATE_STRING(desbuf);
-    if (load_game(slnum, desbuf, NULL) == 0)
+    String description;
+    if (read_savedgame_description(get_save_game_path(slnum), description) == 0)
+    {
+        strcpy(desbuf, description);
         return 1;
+    }
     sprintf(desbuf,"INVALID SLOT %d", slnum);
     return 0;
 }
@@ -169,7 +173,7 @@ int LoadSaveSlotScreenshot(int slnum, int width, int height) {
     int gotSlot;
     multiply_up_coordinates(&width, &height);
 
-    if (load_game(slnum, NULL, &gotSlot) != 0)
+    if (read_savedgame_screenshot(get_save_game_path(slnum), gotSlot) != 0)
         return 0;
 
     if (gotSlot == 0)
@@ -180,7 +184,6 @@ int LoadSaveSlotScreenshot(int slnum, int width, int height) {
 
     // resize the sprite to the requested size
     Bitmap *newPic = BitmapHelper::CreateBitmap(width, height, spriteset[gotSlot]->GetColorDepth());
-
     newPic->StretchBlt(spriteset[gotSlot],
         RectWH(0, 0, spritewidth[gotSlot], spriteheight[gotSlot]),
         RectWH(0, 0, width, height));
@@ -212,7 +215,7 @@ int GetGlobalInt(int index) {
     return play.globalscriptvars[index];
 }
 
-void SetGlobalString (int index, char *newval) {
+void SetGlobalString (int index, const char *newval) {
     if ((index<0) | (index >= MAXGLOBALSTRINGS))
         quit("!SetGlobalString: invalid index");
     DEBUG_CONSOLE("GlobalString %d set to '%s'", index, newval);
@@ -227,7 +230,7 @@ void GetGlobalString (int index, char *strval) {
     strcpy (strval, play.globalstrings[index]);
 }
 
-int RunAGSGame (char *newgame, unsigned int mode, int data) {
+int RunAGSGame (const char *newgame, unsigned int mode, int data) {
 
     can_run_delayed_command();
 
@@ -244,14 +247,14 @@ int RunAGSGame (char *newgame, unsigned int mode, int data) {
     if ((mode & RAGMODE_LOADNOW) == 0) {
         // need to copy, since the script gets destroyed
         get_current_dir_path(gamefilenamebuf, newgame);
-        game_file_name = &gamefilenamebuf[0];
+        game_file_name = gamefilenamebuf;
         usetup.main_data_filename = game_file_name;
         play.takeover_data = data;
         load_new_game_restore = -1;
 
         if (inside_script) {
             curscript->queue_action(ePSARunAGSGame, mode | RAGMODE_LOADNOW, "RunAGSGame");
-            ccAbortInstance (ccGetCurrentInstance ());
+            ccInstance::GetCurrentInstance()->Abort();
         }
         else
             load_new_game = mode | RAGMODE_LOADNOW;
@@ -267,9 +270,10 @@ int RunAGSGame (char *newgame, unsigned int mode, int data) {
     unload_game_file();
 
     if (Common::AssetManager::SetDataFile(game_file_name) != Common::kAssetNoError)
-        quitprintf("!RunAGSGame: unable to load new game file '%s'", game_file_name);
+        quitprintf("!RunAGSGame: unable to load new game file '%s'", game_file_name.GetCStr());
 
-    abuf->Clear();
+    Bitmap *ds = GetVirtualScreen();
+    ds->Fill(0);
     show_preload();
 
     if ((result = load_game_file ()) != 0) {
@@ -290,7 +294,7 @@ int RunAGSGame (char *newgame, unsigned int mode, int data) {
     play.screen_is_faded_out = 1;
 
     if (load_new_game_restore >= 0) {
-        load_game (load_new_game_restore, NULL, NULL);
+        load_game (load_new_game_restore);
         load_new_game_restore = -1;
     }
     else
@@ -720,7 +724,7 @@ int IsKeyPressed (int keycode) {
 #endif
 }
 
-int SaveScreenShot(char*namm) {
+int SaveScreenShot(const char*namm) {
     char fileName[MAX_PATH];
 
     if (strchr(namm,'.') == NULL)
@@ -733,14 +737,14 @@ int SaveScreenShot(char*namm) {
         Bitmap *buffer = BitmapHelper::CreateBitmap(scrnwid, scrnhit, 32);
         gfxDriver->GetCopyOfScreenIntoBitmap(buffer);
 
-		if (!BitmapHelper::SaveToFile(buffer, fileName, palette)!=0)
+		if (!buffer->SaveToFile(fileName, palette)!=0)
         {
             delete buffer;
             return 0;
         }
         delete buffer;
     }
-	else if (!BitmapHelper::SaveToFile(virtual_screen, fileName, palette)!=0)
+	else if (!virtual_screen->SaveToFile(fileName, palette)!=0)
         return 0; // failed
 
     return 1;  // successful
@@ -859,11 +863,11 @@ void SetNormalFont (int fontnum) {
     play.normal_font = fontnum;
 }
 
-void _sc_AbortGame(char*texx, ...) {
+void _sc_AbortGame(const char*texx, ...) {
     char displbuf[STD_BUFFER_SIZE] = "!?";
     va_list ap;
     va_start(ap,texx);
-    my_sprintf(&displbuf[2], get_translation(texx), ap);
+    vsprintf(&displbuf[2], get_translation(texx), ap);
     va_end(ap);
 
     quit(displbuf);
@@ -892,7 +896,7 @@ void SetGraphicalVariable (const char *varName, int p_value) {
 }
 
 void scrWait(int nloops) {
-    if ((nloops < 1) && (loaded_game_file_version >= 27)) // 2.62+
+    if ((nloops < 1) && (loaded_game_file_version >= kGameVersion_262)) // 2.62+
         quit("!Wait: must wait at least 1 loop");
 
     play.wait_counter = nloops;
@@ -901,7 +905,7 @@ void scrWait(int nloops) {
 }
 
 int WaitKey(int nloops) {
-    if ((nloops < 1) && (loaded_game_file_version >= 27)) // 2.62+
+    if ((nloops < 1) && (loaded_game_file_version >= kGameVersion_262)) // 2.62+
         quit("!WaitKey: must wait at least 1 loop");
 
     play.wait_counter = nloops;
@@ -913,7 +917,7 @@ int WaitKey(int nloops) {
 }
 
 int WaitMouseKey(int nloops) {
-    if ((nloops < 1) && (loaded_game_file_version >= 27)) // 2.62+
+    if ((nloops < 1) && (loaded_game_file_version >= kGameVersion_262)) // 2.62+
         quit("!WaitMouseKey: must wait at least 1 loop");
 
     play.wait_counter = nloops;

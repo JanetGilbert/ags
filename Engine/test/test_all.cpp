@@ -19,7 +19,9 @@
 
 void Test_DoAllTests()
 {
+    Test_ScriptSprintf();
     Test_String();
+    Test_Version();
     Test_File();
 }
 

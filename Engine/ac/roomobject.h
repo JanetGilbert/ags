@@ -18,9 +18,7 @@
 #ifndef __AGS_EE_AC__ROOMOBJECT_H
 #define __AGS_EE_AC__ROOMOBJECT_H
 
-#include "util/file.h"
-
-namespace AGS { namespace Common { class DataStream; }}
+namespace AGS { namespace Common { class Stream; }}
 using namespace AGS; // FIXME later
 
 // This struct is only used in save games and by plugins
@@ -51,8 +49,8 @@ struct RoomObject {
 	void update_cycle_view_forwards();
 	void update_cycle_view_backwards();
 
-    void ReadFromFile(Common::DataStream *in);
-    void WriteToFile(Common::DataStream *out);
+    void ReadFromFile(Common::Stream *in);
+    void WriteToFile(Common::Stream *out);
 };
 
 #endif // __AGS_EE_AC__ROOMOBJECT_H

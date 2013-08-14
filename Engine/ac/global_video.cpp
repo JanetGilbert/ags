@@ -13,8 +13,8 @@
 //=============================================================================
 
 #define USE_CLIB
+#include <stdio.h>
 #include "ac/global_video.h"
-#include "util/wgt2allg.h"
 #include "gfx/ali3d.h"
 #include "ac/common.h"
 #include "ac/draw.h"
@@ -26,18 +26,19 @@
 #include "ac/record.h"
 #include "debug/debug_log.h"
 #include "debug/debugger.h"
+#include "debug/out.h"
 #include "media/video/video.h"
-#include "util/datastream.h"
+#include "util/stream.h"
 #include "gfx/graphicsdriver.h"
 #include "gfx/bitmap.h"
 #include "core/assetmanager.h"
 
-using AGS::Common::DataStream;
+using AGS::Common::Stream;
 
 using AGS::Common::Bitmap;
 namespace BitmapHelper = AGS::Common::BitmapHelper;
+namespace Out = AGS::Common::Out;
 
-extern int loaded_game_file_version;
 extern GameSetup usetup;
 extern GameSetupStruct game;
 extern GameState play;
@@ -59,13 +60,13 @@ void play_flc_file(int numb,int playflags) {
     color oldpal[256];
 
     // AGS 2.x: If the screen is faded out, fade in again when playing a movie.
-    if (loaded_game_file_version <= 32)
+    if (loaded_game_file_version <= kGameVersion_272)
         play.screen_is_faded_out = 0;
 
     if (play.fast_forward)
         return;
 
-    wreadpalette(0,255,oldpal);
+    get_palette_range(oldpal, 0, 255);
 
     int clearScreenAtStart = 1;
     canabort = playflags % 10;
@@ -83,7 +84,7 @@ void play_flc_file(int numb,int playflags) {
         clearScreenAtStart = 0;
 
     char flicnam[20]; sprintf(flicnam,"flic%d.flc",numb);
-    DataStream*in=Common::AssetManager::OpenAsset(flicnam);
+    Stream*in=Common::AssetManager::OpenAsset(flicnam);
     if (in==NULL) { sprintf(flicnam,"flic%d.fli",numb);
     in=Common::AssetManager::OpenAsset(flicnam); }
     if (in==NULL) {
@@ -117,16 +118,16 @@ void play_flc_file(int numb,int playflags) {
     fli_target = BitmapHelper::CreateBitmap(screen_bmp->GetWidth(), screen_bmp->GetHeight(), final_col_dep);
     fli_ddb = gfxDriver->CreateDDBFromBitmap(fli_target, false, true);
 
-	if (play_fli(flicnam,(BITMAP*)fli_buffer->GetBitmapObject(),0,fli_callback)==FLI_ERROR)
+	if (play_fli(flicnam,(BITMAP*)fli_buffer->GetAllegroBitmap(),0,fli_callback)==FLI_ERROR)
     {
         // This is not a fatal error that should prevent the game from continuing
         //quit("FLI/FLC animation play error");
-        write_log_debug("FLI/FLC animation play error");
+        Out::FPrint("FLI/FLC animation play error");
     }
 
     delete fli_buffer;
 	screen_bmp->Clear();
-    wsetpalette(0,255,oldpal);
+    set_palette_range(oldpal, 0, 255, 0);
     render_to_screen(screen_bmp, 0, 0);
 
     delete fli_target;
@@ -136,7 +137,7 @@ void play_flc_file(int numb,int playflags) {
     
     delete hicol_buf;
     hicol_buf=NULL;
-    //  wsetscreen(screen); wputblock(0,0,backbuffer,0);
+    //  SetVirtualScreen(screen); wputblock(0,0,backbuffer,0);
     while (mgetbutton()!=NONE) ;
     invalidate_screen();
 }

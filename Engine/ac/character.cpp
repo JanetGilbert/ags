@@ -16,7 +16,6 @@
 //
 //=============================================================================
 
-#include "util/wgt2allg.h"
 #include "ac/character.h"
 #include "ac/common.h"
 #include "ac/gamesetupstruct.h"
@@ -53,10 +52,14 @@
 #include "util/string_utils.h"
 #include <math.h>
 #include "gfx/graphicsdriver.h"
-#include "gfx/bitmap.h"
 #include "platform/base/override_defines.h"
+#include "script/runtimescriptvalue.h"
+#include "ac/dynobj/cc_character.h"
+#include "ac/dynobj/cc_inventory.h"
+#include "script/script_runtime.h"
 
 using AGS::Common::Bitmap;
+using AGS::Common::Graphics;
 namespace BitmapHelper = AGS::Common::BitmapHelper;
 
 extern GameSetupStruct game;
@@ -87,6 +90,8 @@ extern int scrnwid,scrnhit;
 extern int current_screen_resolution_multiplier;
 extern int cur_mode;
 extern int screen_is_dirty;
+extern CCCharacter ccDynamicCharacter;
+extern CCInventory ccDynamicInv;
 
 //--------------------------------
 
@@ -100,7 +105,7 @@ extern int screen_is_dirty;
 
 CharacterExtras *charextra;
 CharacterInfo*playerchar;
-long _sc_PlayerCharPtr = 0;
+int32_t _sc_PlayerCharPtr = 0;
 int char_lowest_yp;
 
 // Sierra-style speech settings
@@ -108,6 +113,9 @@ int face_talking=-1,facetalkview=0,facetalkwait=0,facetalkframe=0;
 int facetalkloop=0, facetalkrepeat = 0, facetalkAllowBlink = 1;
 int facetalkBlinkLoop = 0;
 CharacterInfo *facetalkchar = NULL;
+// Do override default portrait position during QFG4-style speech overlay update
+bool facetalk_qfg4_override_placement_x = false;
+bool facetalk_qfg4_override_placement_y = false;
 
 // lip-sync speech settings
 int loops_per_character, text_lips_offset, char_speaking = -1;
@@ -138,7 +146,7 @@ void Character_AddInventory(CharacterInfo *chaa, ScriptInvItem *invi, int addInd
             if (charextra[charid].invorder[ee] == inum) {
                 // They already have the item, so don't add it to the list
                 if (chaa == playerchar)
-                    run_on_event (GE_ADD_INV, inum);
+                    run_on_event (GE_ADD_INV, RuntimeScriptValue().SetInt32(inum));
                 return;
             }
         }
@@ -162,7 +170,7 @@ void Character_AddInventory(CharacterInfo *chaa, ScriptInvItem *invi, int addInd
     charextra[charid].invorder_count++;
     guis_need_update = 1;
     if (chaa == playerchar)
-        run_on_event (GE_ADD_INV, inum);
+        run_on_event (GE_ADD_INV, RuntimeScriptValue().SetInt32(inum));
 
 }
 
@@ -256,7 +264,7 @@ void Character_ChangeRoom(CharacterInfo *chaa, int room, int x, int y) {
     if ((x != SCR_NO_VALUE) && (y != SCR_NO_VALUE)) {
         new_room_pos = 0;
 
-        if (loaded_game_file_version <= 32)
+        if (loaded_game_file_version <= kGameVersion_272)
         {
             // Set position immediately on 2.x.
             chaa->x = x;
@@ -327,7 +335,7 @@ void Character_FaceLocation(CharacterInfo *char1, int xx, int yy, int blockingSt
 
     // Use a different logic on 2.x. This fixes some edge cases where
     // FaceLocation() is used to select a specific loop.
-    if (loaded_game_file_version <= 32)
+    if (loaded_game_file_version <= kGameVersion_272)
     {
         bool can_right = ((views[char1->view].numLoops >= 3) && (views[char1->view].loops[2].numFrames > 0));
         bool can_left = ((views[char1->view].numLoops >= 2) && (views[char1->view].loops[1].numFrames > 0));
@@ -647,7 +655,7 @@ void Character_LoseInventory(CharacterInfo *chap, ScriptInvItem *invi) {
     guis_need_update = 1;
 
     if (chap == playerchar)
-        run_on_event (GE_LOSE_INV, inum);
+        run_on_event (GE_LOSE_INV, RuntimeScriptValue().SetInt32(inum));
 }
 
 void Character_PlaceOnWalkableArea(CharacterInfo *chap) 
@@ -682,7 +690,7 @@ void Character_Say(CharacterInfo *chaa, const char *texx, ...) {
     char displbuf[STD_BUFFER_SIZE];
     va_list ap;
     va_start(ap,texx);
-    my_sprintf(displbuf,get_translation(texx),ap);
+    vsprintf(displbuf, get_translation(texx), ap);
     va_end(ap);
 
     _DisplaySpeechCore(chaa->index_id, displbuf);
@@ -715,8 +723,11 @@ ScriptOverlay* Character_SayBackground(CharacterInfo *chaa, const char *texx) {
 
 void Character_SetAsPlayer(CharacterInfo *chaa) {
 
-    // set to same character, so ignore
-    if (game.playercharacter == chaa->index_id)
+    // Set to same character, so ignore.
+    // But only on versions > 2.61. The relevant entry in the 2.62 changelog is:
+    //  - Fixed SetPlayerCharacter to do nothing at all if you pass the current
+    //    player character to it (previously it was resetting the inventory layout)
+    if ((loaded_game_file_version > kGameVersion_261) && (game.playercharacter == chaa->index_id))
         return;
 
     setup_player_character(chaa->index_id);
@@ -732,7 +743,7 @@ void Character_SetAsPlayer(CharacterInfo *chaa) {
     // Ignore invalid room numbers for the character and just place him in
     // the current room for 2.x. Following script calls to NewRoom() will
     // make sure this still works as intended.
-    if ((loaded_game_file_version <= 32) && (playerchar->room < 0))
+    if ((loaded_game_file_version <= kGameVersion_272) && (playerchar->room < 0))
         playerchar->room = displayed_room;
 
     if (displayed_room != playerchar->room)
@@ -875,7 +886,7 @@ void Character_Think(CharacterInfo *chaa, const char *texx, ...) {
     char displbuf[STD_BUFFER_SIZE];
     va_list ap;
     va_start(ap,texx);
-    my_sprintf(displbuf,get_translation(texx),ap);
+    vsprintf(displbuf, get_translation(texx), ap);
     va_end(ap);
 
     _DisplayThoughtCore(chaa->index_id, displbuf);
@@ -1351,7 +1362,7 @@ void Character_SetSpeechColor(CharacterInfo *chaa, int ncol) {
     chaa->talkcolor = ncol;
 }
 
-void Character_SetSpeechAnimationDelay(CharacterInfo *chaa, int newDelay) 
+void Character_SetSpeechAnimationDelay(CharacterInfo *chaa, int newDelay)
 {
     if (game.options[OPT_OLDTALKANIMSPD])
         quit("!Character.SpeechAnimationDelay cannot be set when legacy speech animation speed is enabled");
@@ -1669,7 +1680,7 @@ void fix_player_sprite(MoveList*cmls,CharacterInfo*chinf) {
     no_diagonal = useDiagonal (chinf);
 
     // Different logic for 2.x.
-    if (loaded_game_file_version <= 32)
+    if (loaded_game_file_version <= kGameVersion_272)
     {
         bool can_right = ((views[chinf->view].numLoops >= 3) && (views[chinf->view].loops[2].numFrames > 0));
         bool can_left = ((views[chinf->view].numLoops >= 2) && (views[chinf->view].loops[1].numFrames > 0));
@@ -1817,8 +1828,6 @@ int doNextCharMoveStep (CharacterInfo *chi, int &char_index, CharacterExtras *ch
     return 0;
 }
 
-extern int engineNeedsAsInt;
-
 int find_nearest_walkable_area_within(int *xx, int *yy, int range, int step)
 {
     int ex, ey, nearest = 99999, thisis, nearx = 0, neary = 0;
@@ -1881,7 +1890,7 @@ void find_nearest_walkable_area (int *xx, int *yy) {
 
     int pixValue = thisroom.walls->GetPixel(convert_to_low_res(xx[0]), convert_to_low_res(yy[0]));
     // only fix this code if the game was built with 2.61 or above
-    if (pixValue == 0 || (engineNeedsAsInt >=261 && pixValue < 1))
+    if (pixValue == 0 || (loaded_game_file_version >= kGameVersion_261 && pixValue < 1))
     {
         // First, check every 2 pixels within immediate area
         if (!find_nearest_walkable_area_within(xx, yy, 20, 2))
@@ -2009,6 +2018,9 @@ void setup_player_character(int charid) {
     game.playercharacter = charid;
     playerchar = &game.chars[charid];
     _sc_PlayerCharPtr = ccGetObjectHandleFromAddress((char*)playerchar);
+    if (loaded_game_file_version < kGameVersion_270) {
+        ccAddExternalDynamicObject("player", playerchar, &ccDynamicCharacter);
+    }
 }
 
 void animate_character(CharacterInfo *chap, int loopn,int sppd,int rept, int noidleoverride, int direction) {
@@ -2193,7 +2205,7 @@ int my_getpixel(Bitmap *blk, int x, int y) {
 
     // strip the alpha channel
 	// TODO: is there a way to do this vtable thing with Bitmap?
-	BITMAP *al_bmp = (BITMAP*)blk->GetBitmapObject();
+	BITMAP *al_bmp = (BITMAP*)blk->GetAllegroBitmap();
     return al_bmp->vtable->getpixel(al_bmp, x, y) & 0x00ffffff;
 }
 
@@ -2244,29 +2256,6 @@ void _DisplayThoughtCore(int chid, const char *displbuf) {
 
     _displayspeech ((char*)displbuf, chid, xpp, ypp, width, 1);
 }
-
-int user_to_internal_skip_speech(int userval) {
-    // 0 = click mouse or key to skip
-    if (userval == 0)
-        return SKIP_AUTOTIMER | SKIP_KEYPRESS | SKIP_MOUSECLICK;
-    // 1 = key only
-    else if (userval == 1)
-        return SKIP_AUTOTIMER | SKIP_KEYPRESS;
-    // 2 = can't skip at all
-    else if (userval == 2)
-        return SKIP_AUTOTIMER;
-    // 3 = only on keypress, no auto timer
-    else if (userval == 3)
-        return SKIP_KEYPRESS | SKIP_MOUSECLICK;
-    // 4 = mouse only
-    else if (userval == 4)
-        return SKIP_AUTOTIMER | SKIP_MOUSECLICK;
-    else
-        quit("user_to_internal_skip_speech: unknown userval");
-
-    return 0;
-}
-
 
 void _displayspeech(char*texx, int aschar, int xx, int yy, int widd, int isThought) {
     if (!is_valid_character(aschar))
@@ -2522,12 +2511,30 @@ void _displayspeech(char*texx, int aschar, int xx, int yy, int widd, int isThoug
                 bwidth = widd - bigx;
 
             our_eip=153;
-            int draw_yp = 0, ovr_yp = get_fixed_pixel_size(20);
+            int ovr_yp = get_fixed_pixel_size(20);
+            int view_frame_x = 0;
+            int view_frame_y = 0;
+            facetalk_qfg4_override_placement_x = false;
+            facetalk_qfg4_override_placement_y = false;
+
             if (game.options[OPT_SPEECHTYPE] == 3) {
                 // QFG4-style whole screen picture
                 closeupface = BitmapHelper::CreateBitmap(scrnwid, scrnhit, spriteset[viptr->loops[0].frames[0].pic]->GetColorDepth());
                 closeupface->Clear(0);
-                draw_yp = scrnhit/2 - spriteheight[viptr->loops[0].frames[0].pic]/2;
+                if (xx < 0 && play.speech_portrait_placement)
+                {
+                    facetalk_qfg4_override_placement_x = true;
+                    view_frame_x = play.speech_portrait_x;
+                }
+                if (yy < 0 && play.speech_portrait_placement)
+                {
+                    facetalk_qfg4_override_placement_y = true;
+                    view_frame_y = play.speech_portrait_y;
+                }
+                else
+                {
+                    view_frame_y = scrnhit/2 - spriteheight[viptr->loops[0].frames[0].pic]/2;
+                }
                 bigx = scrnwid/2 - get_fixed_pixel_size(20);
                 ovr_type = OVER_COMPLETE;
                 ovr_yp = 0;
@@ -2535,25 +2542,35 @@ void _displayspeech(char*texx, int aschar, int xx, int yy, int widd, int isThoug
             }
             else {
                 // KQ6-style close-up face picture
-                if (yy < 0)
+                if (yy < 0 && play.speech_portrait_placement)
+                {
+                    ovr_yp = play.speech_portrait_y;
+                }
+                else if (yy < 0)
                     ovr_yp = adjust_y_for_guis (ovr_yp);
                 else
                     ovr_yp = yy;
 
-                closeupface = BitmapHelper::CreateBitmap(bigx+1,bigy+1,spriteset[viptr->loops[0].frames[0].pic]->GetColorDepth());
-                closeupface->Clear(closeupface->GetMaskColor());
+                closeupface = BitmapHelper::CreateTransparentBitmap(bigx+1,bigy+1,spriteset[viptr->loops[0].frames[0].pic]->GetColorDepth());
                 ovr_type = OVER_PICTURE;
 
                 if (yy < 0)
                     tdyp = ovr_yp + get_textwindow_top_border_height(play.speech_textwindow_gui);
             }
-            //->Blit(closeupface,spriteset[viptr->frames[0][0].pic],0,draw_yp);
-            DrawViewFrame(closeupface, &viptr->loops[0].frames[0], 0, draw_yp);
+            DrawViewFrame(closeupface, &viptr->loops[0].frames[0], view_frame_x, view_frame_y);
 
             int overlay_x = get_fixed_pixel_size(10);
-
             if (xx < 0) {
-                tdxp = get_fixed_pixel_size(16) + bigx + get_textwindow_border_width(play.speech_textwindow_gui) / 2;
+                tdxp = bigx + get_textwindow_border_width(play.speech_textwindow_gui) / 2;
+                if (play.speech_portrait_placement)
+                {
+                    overlay_x = play.speech_portrait_x;
+                    tdxp += overlay_x + get_fixed_pixel_size(6);
+                }
+                else
+                {
+                    tdxp += get_fixed_pixel_size(16);
+                }
 
                 int maxWidth = (scrnwid - tdxp) - get_fixed_pixel_size(5) - 
                     get_textwindow_border_width (play.speech_textwindow_gui) / 2;
@@ -2572,8 +2589,19 @@ void _displayspeech(char*texx, int aschar, int xx, int yy, int widd, int isThoug
             // if the portrait's on the right, swap it round
             if (portrait_on_right) {
                 if ((xx < 0) || (widd < 0)) {
-                    overlay_x = (scrnwid - bigx) - get_fixed_pixel_size(5);
                     tdxp = get_fixed_pixel_size(9);
+                    if (play.speech_portrait_placement)
+                    {
+                        overlay_x = (scrnwid - bigx) - play.speech_portrait_x;
+                        int maxWidth = overlay_x - tdxp - get_fixed_pixel_size(9) - 
+                            get_textwindow_border_width (play.speech_textwindow_gui) / 2;
+                        if (bwidth > maxWidth)
+                            bwidth = maxWidth;
+                    }
+                    else
+                    {
+                        overlay_x = (scrnwid - bigx) - get_fixed_pixel_size(5);
+                    }
                 }
                 else {
                     overlay_x = (xx + widd - bigx) - get_fixed_pixel_size(5);
@@ -2677,7 +2705,7 @@ void _displayspeech(char*texx, int aschar, int xx, int yy, int widd, int isThoug
         speakingChar->view=oldview;
 
         // Don't reset the loop in 2.x games
-        if (loaded_game_file_version > 32)
+        if (loaded_game_file_version > kGameVersion_272)
             speakingChar->loop = oldloop;
 
         speakingChar->animating=0;
@@ -2760,4 +2788,990 @@ int update_lip_sync(int talkview, int talkloop, int *talkframeptr) {
 
     talkframeptr[0] = talkframe;
     return talkwait;
+}
+
+//=============================================================================
+//
+// Script API Functions
+//
+//=============================================================================
+
+#include "debug/out.h"
+#include "script/script_api.h"
+#include "script/script_runtime.h"
+#include "ac/dynobj/scriptstring.h"
+
+extern ScriptString myScriptStringImpl;
+
+// void | CharacterInfo *chaa, ScriptInvItem *invi, int addIndex
+RuntimeScriptValue Sc_Character_AddInventory(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_POBJ_PINT(CharacterInfo, Character_AddInventory, ScriptInvItem);
+}
+
+// void | CharacterInfo *chaa, int x, int y
+RuntimeScriptValue Sc_Character_AddWaypoint(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT2(CharacterInfo, Character_AddWaypoint);
+}
+
+// void | CharacterInfo *chaa, int loop, int delay, int repeat, int blocking, int direction
+RuntimeScriptValue Sc_Character_Animate(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT5(CharacterInfo, Character_Animate);
+}
+
+// void | CharacterInfo *chaa, int room, int x, int y
+RuntimeScriptValue Sc_Character_ChangeRoom(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT3(CharacterInfo, Character_ChangeRoom);
+}
+
+// void | CharacterInfo *chaa, int room, int newPos
+RuntimeScriptValue Sc_Character_ChangeRoomAutoPosition(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT2(CharacterInfo, Character_ChangeRoomAutoPosition);
+}
+
+// void | CharacterInfo *chap, int vii
+RuntimeScriptValue Sc_Character_ChangeView(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_ChangeView);
+}
+
+// void | CharacterInfo *char1, CharacterInfo *char2, int blockingStyle
+RuntimeScriptValue Sc_Character_FaceCharacter(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_POBJ_PINT(CharacterInfo, Character_FaceCharacter, CharacterInfo);
+}
+
+// void | CharacterInfo *char1, int xx, int yy, int blockingStyle
+RuntimeScriptValue Sc_Character_FaceLocation(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT3(CharacterInfo, Character_FaceLocation);
+}
+
+// void | CharacterInfo *char1, ScriptObject *obj, int blockingStyle
+RuntimeScriptValue Sc_Character_FaceObject(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_POBJ_PINT(CharacterInfo, Character_FaceObject, ScriptObject);
+}
+
+// void | CharacterInfo *chaa, CharacterInfo *tofollow, int distaway, int eagerness
+RuntimeScriptValue Sc_Character_FollowCharacter(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_POBJ_PINT2(CharacterInfo, Character_FollowCharacter, CharacterInfo);
+}
+
+// int (CharacterInfo *chaa, const char *property)
+RuntimeScriptValue Sc_Character_GetProperty(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT_POBJ(CharacterInfo, Character_GetProperty, const char);
+}
+
+// void (CharacterInfo *chaa, const char *property, char *bufer)
+RuntimeScriptValue Sc_Character_GetPropertyText(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_POBJ2(CharacterInfo, Character_GetPropertyText, const char, char);
+}
+
+// const char* (CharacterInfo *chaa, const char *property)
+RuntimeScriptValue Sc_Character_GetTextProperty(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_OBJ_POBJ(CharacterInfo, const char, myScriptStringImpl, Character_GetTextProperty, const char);
+}
+
+// int (CharacterInfo *chaa, ScriptInvItem *invi)
+RuntimeScriptValue Sc_Character_HasInventory(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT_POBJ(CharacterInfo, Character_HasInventory, ScriptInvItem);
+}
+
+// int (CharacterInfo *char1, CharacterInfo *char2)
+RuntimeScriptValue Sc_Character_IsCollidingWithChar(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT_POBJ(CharacterInfo, Character_IsCollidingWithChar, CharacterInfo);
+}
+
+// int (CharacterInfo *chin, ScriptObject *objid)
+RuntimeScriptValue Sc_Character_IsCollidingWithObject(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT_POBJ(CharacterInfo, Character_IsCollidingWithObject, ScriptObject);
+}
+
+// void (CharacterInfo *chap, int vii)
+RuntimeScriptValue Sc_Character_LockView(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_LockView);
+}
+
+// void (CharacterInfo *chap, int vii, int loop, int align)
+RuntimeScriptValue Sc_Character_LockViewAligned(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT3(CharacterInfo, Character_LockViewAligned);
+}
+
+// void (CharacterInfo *chaa, int view, int loop, int frame)
+RuntimeScriptValue Sc_Character_LockViewFrame(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT3(CharacterInfo, Character_LockViewFrame);
+}
+
+// void (CharacterInfo *chap, int vii, int xoffs, int yoffs)
+RuntimeScriptValue Sc_Character_LockViewOffset(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT3(CharacterInfo, Character_LockViewOffset);
+}
+
+// void (CharacterInfo *chap, ScriptInvItem *invi)
+RuntimeScriptValue Sc_Character_LoseInventory(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_POBJ(CharacterInfo, Character_LoseInventory, ScriptInvItem);
+}
+
+// void (CharacterInfo *chaa, int x, int y, int blocking, int direct) 
+RuntimeScriptValue Sc_Character_Move(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT4(CharacterInfo, Character_Move);
+}
+
+// void (CharacterInfo *chap) 
+RuntimeScriptValue Sc_Character_PlaceOnWalkableArea(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID(CharacterInfo, Character_PlaceOnWalkableArea);
+}
+
+// void (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_RemoveTint(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID(CharacterInfo, Character_RemoveTint);
+}
+
+// void (CharacterInfo *chaa, int mood)
+RuntimeScriptValue Sc_Character_RunInteraction(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_RunInteraction);
+}
+
+// void (CharacterInfo *chaa, const char *texx, ...)
+RuntimeScriptValue Sc_Character_Say(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_SCRIPT_SPRINTF(Character_Say, 1);
+    Character_Say((CharacterInfo*)self, "%s", scsf_buffer);
+    return RuntimeScriptValue();
+}
+
+// void (CharacterInfo *chaa, int x, int y, int width, const char *texx)
+RuntimeScriptValue Sc_Character_SayAt(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT3_POBJ(CharacterInfo, Character_SayAt, const char);
+}
+
+// ScriptOverlay* (CharacterInfo *chaa, const char *texx)
+RuntimeScriptValue Sc_Character_SayBackground(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_OBJAUTO_POBJ(CharacterInfo, ScriptOverlay, Character_SayBackground, const char);
+}
+
+// void (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_SetAsPlayer(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID(CharacterInfo, Character_SetAsPlayer);
+}
+
+// void (CharacterInfo *chaa, int iview, int itime)
+RuntimeScriptValue Sc_Character_SetIdleView(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT2(CharacterInfo, Character_SetIdleView);
+}
+
+/*
+RuntimeScriptValue Sc_Character_SetOption(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+}
+*/
+
+// void (CharacterInfo *chaa, int xspeed, int yspeed)
+RuntimeScriptValue Sc_Character_SetSpeed(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT2(CharacterInfo, Character_SetSpeed);
+}
+
+// void (CharacterInfo *charp)
+RuntimeScriptValue Sc_Character_StopMoving(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID(CharacterInfo, Character_StopMoving);
+}
+
+// void (CharacterInfo *chaa, const char *texx, ...)
+RuntimeScriptValue Sc_Character_Think(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_SCRIPT_SPRINTF(Character_Think, 1);
+    Character_Think((CharacterInfo*)self, "%s", scsf_buffer);
+    return RuntimeScriptValue();
+}
+
+//void (CharacterInfo *chaa, int red, int green, int blue, int opacity, int luminance)
+RuntimeScriptValue Sc_Character_Tint(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT5(CharacterInfo, Character_Tint);
+}
+
+// void (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_UnlockView(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID(CharacterInfo, Character_UnlockView);
+}
+
+// void (CharacterInfo *chaa, int x, int y, int blocking, int direct)
+RuntimeScriptValue Sc_Character_Walk(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT4(CharacterInfo, Character_Walk);
+}
+
+// void (CharacterInfo *chaa, int xx, int yy, int blocking)
+RuntimeScriptValue Sc_Character_WalkStraight(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT3(CharacterInfo, Character_WalkStraight);
+}
+
+// CharacterInfo *(int xx, int yy)
+RuntimeScriptValue Sc_GetCharacterAtLocation(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_OBJ_PINT2(CharacterInfo, ccDynamicCharacter, GetCharacterAtLocation);
+}
+
+// ScriptInvItem* (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetActiveInventory(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_OBJ(CharacterInfo, ScriptInvItem, ccDynamicInv, Character_GetActiveInventory);
+}
+
+// void (CharacterInfo *chaa, ScriptInvItem* iit)
+RuntimeScriptValue Sc_Character_SetActiveInventory(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_POBJ(CharacterInfo, Character_SetActiveInventory, ScriptInvItem);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetAnimating(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetAnimating);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetAnimationSpeed(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetAnimationSpeed);
+}
+
+// void (CharacterInfo *chaa, int newval)
+RuntimeScriptValue Sc_Character_SetAnimationSpeed(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetAnimationSpeed);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetBaseline(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetBaseline);
+}
+
+// void (CharacterInfo *chaa, int basel)
+RuntimeScriptValue Sc_Character_SetBaseline(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetBaseline);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetBlinkInterval(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetBlinkInterval);
+}
+
+// void (CharacterInfo *chaa, int interval)
+RuntimeScriptValue Sc_Character_SetBlinkInterval(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetBlinkInterval);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetBlinkView(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetBlinkView);
+}
+
+// void (CharacterInfo *chaa, int vii)
+RuntimeScriptValue Sc_Character_SetBlinkView(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetBlinkView);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetBlinkWhileThinking(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetBlinkWhileThinking);
+}
+
+// void (CharacterInfo *chaa, int yesOrNo)
+RuntimeScriptValue Sc_Character_SetBlinkWhileThinking(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetBlinkWhileThinking);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetBlockingHeight(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetBlockingHeight);
+}
+
+// void (CharacterInfo *chaa, int hit)
+RuntimeScriptValue Sc_Character_SetBlockingHeight(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetBlockingHeight);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetBlockingWidth(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetBlockingWidth);
+}
+
+// void (CharacterInfo *chaa, int wid)
+RuntimeScriptValue Sc_Character_SetBlockingWidth(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetBlockingWidth);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetClickable(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetClickable);
+}
+
+// void (CharacterInfo *chaa, int clik)
+RuntimeScriptValue Sc_Character_SetClickable(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetClickable);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetDiagonalWalking(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetDiagonalWalking);
+}
+
+// void (CharacterInfo *chaa, int yesorno)
+RuntimeScriptValue Sc_Character_SetDiagonalWalking(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetDiagonalWalking);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetFrame(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetFrame);
+}
+
+// void (CharacterInfo *chaa, int newval)
+RuntimeScriptValue Sc_Character_SetFrame(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetFrame);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetHasExplicitTint(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetHasExplicitTint);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetID(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetID);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetIdleView(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetIdleView);
+}
+
+// int (CharacterInfo *chaa, int index)
+RuntimeScriptValue Sc_Character_GetIInventoryQuantity(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT_PINT(CharacterInfo, Character_GetIInventoryQuantity);
+}
+
+// void (CharacterInfo *chaa, int index, int quant)
+RuntimeScriptValue Sc_Character_SetIInventoryQuantity(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT2(CharacterInfo, Character_SetIInventoryQuantity);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetIgnoreLighting(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetIgnoreLighting);
+}
+
+// void (CharacterInfo *chaa, int yesorno)
+RuntimeScriptValue Sc_Character_SetIgnoreLighting(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetIgnoreLighting);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetIgnoreScaling(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetIgnoreScaling);
+}
+
+// void (CharacterInfo *chaa, int yesorno)
+RuntimeScriptValue Sc_Character_SetIgnoreScaling(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetIgnoreScaling);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetIgnoreWalkbehinds(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetIgnoreWalkbehinds);
+}
+
+// void (CharacterInfo *chaa, int yesorno)
+RuntimeScriptValue Sc_Character_SetIgnoreWalkbehinds(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetIgnoreWalkbehinds);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetLoop(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetLoop);
+}
+
+// void (CharacterInfo *chaa, int newval)
+RuntimeScriptValue Sc_Character_SetLoop(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetLoop);
+}
+
+// void (CharacterInfo *chaa, int yesorno)
+RuntimeScriptValue Sc_Character_SetManualScaling(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetManualScaling);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetMovementLinkedToAnimation(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetMovementLinkedToAnimation);
+}
+
+// void (CharacterInfo *chaa, int yesorno)
+RuntimeScriptValue Sc_Character_SetMovementLinkedToAnimation(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetMovementLinkedToAnimation);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetMoving(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetMoving);
+}
+
+// const char* (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetName(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_OBJ(CharacterInfo, const char, myScriptStringImpl, Character_GetName);
+}
+
+// void (CharacterInfo *chaa, const char *newName)
+RuntimeScriptValue Sc_Character_SetName(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_POBJ(CharacterInfo, Character_SetName, const char);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetNormalView(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetNormalView);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetPreviousRoom(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetPreviousRoom);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetRoom(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetRoom);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetScaleMoveSpeed(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetScaleMoveSpeed);
+}
+
+// void (CharacterInfo *chaa, int yesorno)
+RuntimeScriptValue Sc_Character_SetScaleMoveSpeed(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetScaleMoveSpeed);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetScaleVolume(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetScaleVolume);
+}
+
+// void (CharacterInfo *chaa, int yesorno)
+RuntimeScriptValue Sc_Character_SetScaleVolume(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetScaleVolume);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetScaling(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetScaling);
+}
+
+// void (CharacterInfo *chaa, int zoomlevel)
+RuntimeScriptValue Sc_Character_SetScaling(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetScaling);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetSolid(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetSolid);
+}
+
+// void (CharacterInfo *chaa, int yesorno)
+RuntimeScriptValue Sc_Character_SetSolid(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetSolid);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetSpeaking(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetSpeaking);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetSpeakingFrame(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetSpeakingFrame);
+}
+
+// int (CharacterInfo *cha)
+RuntimeScriptValue Sc_GetCharacterSpeechAnimationDelay(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, GetCharacterSpeechAnimationDelay);
+}
+
+// void (CharacterInfo *chaa, int newDelay)
+RuntimeScriptValue Sc_Character_SetSpeechAnimationDelay(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetSpeechAnimationDelay);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetSpeechColor(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetSpeechColor);
+}
+
+// void (CharacterInfo *chaa, int ncol)
+RuntimeScriptValue Sc_Character_SetSpeechColor(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetSpeechColor);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetSpeechView(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetSpeechView);
+}
+
+// void (CharacterInfo *chaa, int vii)
+RuntimeScriptValue Sc_Character_SetSpeechView(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetSpeechView);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetThinkView(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetThinkView);
+}
+
+// void (CharacterInfo *chaa, int vii)
+RuntimeScriptValue Sc_Character_SetThinkView(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetThinkView);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetTransparency(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetTransparency);
+}
+
+// void (CharacterInfo *chaa, int trans)
+RuntimeScriptValue Sc_Character_SetTransparency(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetTransparency);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetTurnBeforeWalking(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetTurnBeforeWalking);
+}
+
+// void (CharacterInfo *chaa, int yesorno)
+RuntimeScriptValue Sc_Character_SetTurnBeforeWalking(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetTurnBeforeWalking);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetView(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetView);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetWalkSpeedX(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetWalkSpeedX);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetWalkSpeedY(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetWalkSpeedY);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetX(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetX);
+}
+
+// void (CharacterInfo *chaa, int newval)
+RuntimeScriptValue Sc_Character_SetX(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetX);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetY(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetY);
+}
+
+// void (CharacterInfo *chaa, int newval)
+RuntimeScriptValue Sc_Character_SetY(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetY);
+}
+
+// int (CharacterInfo *chaa)
+RuntimeScriptValue Sc_Character_GetZ(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(CharacterInfo, Character_GetZ);
+}
+
+// void (CharacterInfo *chaa, int newval)
+RuntimeScriptValue Sc_Character_SetZ(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(CharacterInfo, Character_SetZ);
+}
+
+//=============================================================================
+//
+// Exclusive API for Plugins
+//
+//=============================================================================
+
+// void (CharacterInfo *chaa, const char *texx, ...)
+void ScPl_Character_Say(CharacterInfo *chaa, const char *texx, ...)
+{
+    va_list arg_ptr;
+    va_start(arg_ptr, texx);
+    const char *scsf_buffer = ScriptVSprintf(ScSfBuffer, 3000, get_translation(texx), arg_ptr);
+    va_end(arg_ptr);
+    Character_Say(chaa, "%s", scsf_buffer);
+}
+
+// void (CharacterInfo *chaa, const char *texx, ...)
+void ScPl_Character_Think(CharacterInfo *chaa, const char *texx, ...)
+{
+    va_list arg_ptr;
+    va_start(arg_ptr, texx);
+    const char *scsf_buffer = ScriptVSprintf(ScSfBuffer, 3000, get_translation(texx), arg_ptr);
+    va_end(arg_ptr);
+    Character_Think(chaa, "%s", scsf_buffer);
+}
+
+void RegisterCharacterAPI()
+{
+    ccAddExternalObjectFunction("Character::AddInventory^2",            Sc_Character_AddInventory);
+	ccAddExternalObjectFunction("Character::AddWaypoint^2",             Sc_Character_AddWaypoint);
+	ccAddExternalObjectFunction("Character::Animate^5",                 Sc_Character_Animate);
+	ccAddExternalObjectFunction("Character::ChangeRoom^3",              Sc_Character_ChangeRoom);
+	ccAddExternalObjectFunction("Character::ChangeRoomAutoPosition^2",  Sc_Character_ChangeRoomAutoPosition);
+	ccAddExternalObjectFunction("Character::ChangeView^1",              Sc_Character_ChangeView);
+	ccAddExternalObjectFunction("Character::FaceCharacter^2",           Sc_Character_FaceCharacter);
+	ccAddExternalObjectFunction("Character::FaceLocation^3",            Sc_Character_FaceLocation);
+	ccAddExternalObjectFunction("Character::FaceObject^2",              Sc_Character_FaceObject);
+	ccAddExternalObjectFunction("Character::FollowCharacter^3",         Sc_Character_FollowCharacter);
+	ccAddExternalObjectFunction("Character::GetProperty^1",             Sc_Character_GetProperty);
+	ccAddExternalObjectFunction("Character::GetPropertyText^2",         Sc_Character_GetPropertyText);
+	ccAddExternalObjectFunction("Character::GetTextProperty^1",         Sc_Character_GetTextProperty);
+	ccAddExternalObjectFunction("Character::HasInventory^1",            Sc_Character_HasInventory);
+	ccAddExternalObjectFunction("Character::IsCollidingWithChar^1",     Sc_Character_IsCollidingWithChar);
+	ccAddExternalObjectFunction("Character::IsCollidingWithObject^1",   Sc_Character_IsCollidingWithObject);
+	ccAddExternalObjectFunction("Character::LockView^1",                Sc_Character_LockView);
+	ccAddExternalObjectFunction("Character::LockViewAligned^3",         Sc_Character_LockViewAligned);
+	ccAddExternalObjectFunction("Character::LockViewFrame^3",           Sc_Character_LockViewFrame);
+	ccAddExternalObjectFunction("Character::LockViewOffset^3",          Sc_Character_LockViewOffset);
+	ccAddExternalObjectFunction("Character::LoseInventory^1",           Sc_Character_LoseInventory);
+	ccAddExternalObjectFunction("Character::Move^4",                    Sc_Character_Move);
+	ccAddExternalObjectFunction("Character::PlaceOnWalkableArea^0",     Sc_Character_PlaceOnWalkableArea);
+	ccAddExternalObjectFunction("Character::RemoveTint^0",              Sc_Character_RemoveTint);
+	ccAddExternalObjectFunction("Character::RunInteraction^1",          Sc_Character_RunInteraction);
+	ccAddExternalObjectFunction("Character::Say^101",                   Sc_Character_Say);
+	ccAddExternalObjectFunction("Character::SayAt^4",                   Sc_Character_SayAt);
+	ccAddExternalObjectFunction("Character::SayBackground^1",           Sc_Character_SayBackground);
+	ccAddExternalObjectFunction("Character::SetAsPlayer^0",             Sc_Character_SetAsPlayer);
+	ccAddExternalObjectFunction("Character::SetIdleView^2",             Sc_Character_SetIdleView);
+	//ccAddExternalObjectFunction("Character::SetOption^2",             Sc_Character_SetOption);
+	ccAddExternalObjectFunction("Character::SetWalkSpeed^2",            Sc_Character_SetSpeed);
+	ccAddExternalObjectFunction("Character::StopMoving^0",              Sc_Character_StopMoving);
+	ccAddExternalObjectFunction("Character::Think^101",                 Sc_Character_Think);
+	ccAddExternalObjectFunction("Character::Tint^5",                    Sc_Character_Tint);
+	ccAddExternalObjectFunction("Character::UnlockView^0",              Sc_Character_UnlockView);
+	ccAddExternalObjectFunction("Character::Walk^4",                    Sc_Character_Walk);
+	ccAddExternalObjectFunction("Character::WalkStraight^3",            Sc_Character_WalkStraight);
+
+	ccAddExternalStaticFunction("Character::GetAtScreenXY^2",           Sc_GetCharacterAtLocation);
+
+	ccAddExternalObjectFunction("Character::get_ActiveInventory",       Sc_Character_GetActiveInventory);
+	ccAddExternalObjectFunction("Character::set_ActiveInventory",       Sc_Character_SetActiveInventory);
+	ccAddExternalObjectFunction("Character::get_Animating",             Sc_Character_GetAnimating);
+	ccAddExternalObjectFunction("Character::get_AnimationSpeed",        Sc_Character_GetAnimationSpeed);
+	ccAddExternalObjectFunction("Character::set_AnimationSpeed",        Sc_Character_SetAnimationSpeed);
+	ccAddExternalObjectFunction("Character::get_Baseline",              Sc_Character_GetBaseline);
+	ccAddExternalObjectFunction("Character::set_Baseline",              Sc_Character_SetBaseline);
+	ccAddExternalObjectFunction("Character::get_BlinkInterval",         Sc_Character_GetBlinkInterval);
+	ccAddExternalObjectFunction("Character::set_BlinkInterval",         Sc_Character_SetBlinkInterval);
+	ccAddExternalObjectFunction("Character::get_BlinkView",             Sc_Character_GetBlinkView);
+	ccAddExternalObjectFunction("Character::set_BlinkView",             Sc_Character_SetBlinkView);
+	ccAddExternalObjectFunction("Character::get_BlinkWhileThinking",    Sc_Character_GetBlinkWhileThinking);
+	ccAddExternalObjectFunction("Character::set_BlinkWhileThinking",    Sc_Character_SetBlinkWhileThinking);
+	ccAddExternalObjectFunction("Character::get_BlockingHeight",        Sc_Character_GetBlockingHeight);
+	ccAddExternalObjectFunction("Character::set_BlockingHeight",        Sc_Character_SetBlockingHeight);
+	ccAddExternalObjectFunction("Character::get_BlockingWidth",         Sc_Character_GetBlockingWidth);
+	ccAddExternalObjectFunction("Character::set_BlockingWidth",         Sc_Character_SetBlockingWidth);
+	ccAddExternalObjectFunction("Character::get_Clickable",             Sc_Character_GetClickable);
+	ccAddExternalObjectFunction("Character::set_Clickable",             Sc_Character_SetClickable);
+	ccAddExternalObjectFunction("Character::get_DiagonalLoops",         Sc_Character_GetDiagonalWalking);
+	ccAddExternalObjectFunction("Character::set_DiagonalLoops",         Sc_Character_SetDiagonalWalking);
+	ccAddExternalObjectFunction("Character::get_Frame",                 Sc_Character_GetFrame);
+	ccAddExternalObjectFunction("Character::set_Frame",                 Sc_Character_SetFrame);
+	ccAddExternalObjectFunction("Character::get_HasExplicitTint",       Sc_Character_GetHasExplicitTint);
+	ccAddExternalObjectFunction("Character::get_ID",                    Sc_Character_GetID);
+	ccAddExternalObjectFunction("Character::get_IdleView",              Sc_Character_GetIdleView);
+	ccAddExternalObjectFunction("Character::geti_InventoryQuantity",    Sc_Character_GetIInventoryQuantity);
+	ccAddExternalObjectFunction("Character::seti_InventoryQuantity",    Sc_Character_SetIInventoryQuantity);
+	ccAddExternalObjectFunction("Character::get_IgnoreLighting",        Sc_Character_GetIgnoreLighting);
+	ccAddExternalObjectFunction("Character::set_IgnoreLighting",        Sc_Character_SetIgnoreLighting);
+	ccAddExternalObjectFunction("Character::get_IgnoreScaling",         Sc_Character_GetIgnoreScaling);
+	ccAddExternalObjectFunction("Character::set_IgnoreScaling",         Sc_Character_SetIgnoreScaling);
+	ccAddExternalObjectFunction("Character::get_IgnoreWalkbehinds",     Sc_Character_GetIgnoreWalkbehinds);
+	ccAddExternalObjectFunction("Character::set_IgnoreWalkbehinds",     Sc_Character_SetIgnoreWalkbehinds);
+	ccAddExternalObjectFunction("Character::get_Loop",                  Sc_Character_GetLoop);
+	ccAddExternalObjectFunction("Character::set_Loop",                  Sc_Character_SetLoop);
+	ccAddExternalObjectFunction("Character::get_ManualScaling",         Sc_Character_GetIgnoreScaling);
+	ccAddExternalObjectFunction("Character::set_ManualScaling",         Sc_Character_SetManualScaling);
+	ccAddExternalObjectFunction("Character::get_MovementLinkedToAnimation",Sc_Character_GetMovementLinkedToAnimation);
+	ccAddExternalObjectFunction("Character::set_MovementLinkedToAnimation",Sc_Character_SetMovementLinkedToAnimation);
+	ccAddExternalObjectFunction("Character::get_Moving",                Sc_Character_GetMoving);
+	ccAddExternalObjectFunction("Character::get_Name",                  Sc_Character_GetName);
+	ccAddExternalObjectFunction("Character::set_Name",                  Sc_Character_SetName);
+	ccAddExternalObjectFunction("Character::get_NormalView",            Sc_Character_GetNormalView);
+	ccAddExternalObjectFunction("Character::get_PreviousRoom",          Sc_Character_GetPreviousRoom);
+	ccAddExternalObjectFunction("Character::get_Room",                  Sc_Character_GetRoom);
+	ccAddExternalObjectFunction("Character::get_ScaleMoveSpeed",        Sc_Character_GetScaleMoveSpeed);
+	ccAddExternalObjectFunction("Character::set_ScaleMoveSpeed",        Sc_Character_SetScaleMoveSpeed);
+	ccAddExternalObjectFunction("Character::get_ScaleVolume",           Sc_Character_GetScaleVolume);
+	ccAddExternalObjectFunction("Character::set_ScaleVolume",           Sc_Character_SetScaleVolume);
+	ccAddExternalObjectFunction("Character::get_Scaling",               Sc_Character_GetScaling);
+	ccAddExternalObjectFunction("Character::set_Scaling",               Sc_Character_SetScaling);
+	ccAddExternalObjectFunction("Character::get_Solid",                 Sc_Character_GetSolid);
+	ccAddExternalObjectFunction("Character::set_Solid",                 Sc_Character_SetSolid);
+	ccAddExternalObjectFunction("Character::get_Speaking",              Sc_Character_GetSpeaking);
+	ccAddExternalObjectFunction("Character::get_SpeakingFrame",         Sc_Character_GetSpeakingFrame);
+	ccAddExternalObjectFunction("Character::get_SpeechAnimationDelay",  Sc_GetCharacterSpeechAnimationDelay);
+	ccAddExternalObjectFunction("Character::set_SpeechAnimationDelay",  Sc_Character_SetSpeechAnimationDelay);
+	ccAddExternalObjectFunction("Character::get_SpeechColor",           Sc_Character_GetSpeechColor);
+	ccAddExternalObjectFunction("Character::set_SpeechColor",           Sc_Character_SetSpeechColor);
+	ccAddExternalObjectFunction("Character::get_SpeechView",            Sc_Character_GetSpeechView);
+	ccAddExternalObjectFunction("Character::set_SpeechView",            Sc_Character_SetSpeechView);
+	ccAddExternalObjectFunction("Character::get_ThinkView",             Sc_Character_GetThinkView);
+	ccAddExternalObjectFunction("Character::set_ThinkView",             Sc_Character_SetThinkView);
+	ccAddExternalObjectFunction("Character::get_Transparency",          Sc_Character_GetTransparency);
+	ccAddExternalObjectFunction("Character::set_Transparency",          Sc_Character_SetTransparency);
+	ccAddExternalObjectFunction("Character::get_TurnBeforeWalking",     Sc_Character_GetTurnBeforeWalking);
+	ccAddExternalObjectFunction("Character::set_TurnBeforeWalking",     Sc_Character_SetTurnBeforeWalking);
+	ccAddExternalObjectFunction("Character::get_View",                  Sc_Character_GetView);
+	ccAddExternalObjectFunction("Character::get_WalkSpeedX",            Sc_Character_GetWalkSpeedX);
+	ccAddExternalObjectFunction("Character::get_WalkSpeedY",            Sc_Character_GetWalkSpeedY);
+	ccAddExternalObjectFunction("Character::get_X",                     Sc_Character_GetX);
+	ccAddExternalObjectFunction("Character::set_X",                     Sc_Character_SetX);
+	ccAddExternalObjectFunction("Character::get_x",                     Sc_Character_GetX);
+	ccAddExternalObjectFunction("Character::set_x",                     Sc_Character_SetX);
+	ccAddExternalObjectFunction("Character::get_Y",                     Sc_Character_GetY);
+	ccAddExternalObjectFunction("Character::set_Y",                     Sc_Character_SetY);
+	ccAddExternalObjectFunction("Character::get_y",                     Sc_Character_GetY);
+	ccAddExternalObjectFunction("Character::set_y",                     Sc_Character_SetY);
+	ccAddExternalObjectFunction("Character::get_Z",                     Sc_Character_GetZ);
+	ccAddExternalObjectFunction("Character::set_Z",                     Sc_Character_SetZ);
+	ccAddExternalObjectFunction("Character::get_z",                     Sc_Character_GetZ);
+	ccAddExternalObjectFunction("Character::set_z",                     Sc_Character_SetZ);
+
+    /* ----------------------- Registering unsafe exports for plugins -----------------------*/
+
+    ccAddExternalFunctionForPlugin("Character::AddInventory^2",            (void*)Character_AddInventory);
+    ccAddExternalFunctionForPlugin("Character::AddWaypoint^2",             (void*)Character_AddWaypoint);
+    ccAddExternalFunctionForPlugin("Character::Animate^5",                 (void*)Character_Animate);
+    ccAddExternalFunctionForPlugin("Character::ChangeRoom^3",              (void*)Character_ChangeRoom);
+    ccAddExternalFunctionForPlugin("Character::ChangeRoomAutoPosition^2",  (void*)Character_ChangeRoomAutoPosition);
+    ccAddExternalFunctionForPlugin("Character::ChangeView^1",              (void*)Character_ChangeView);
+    ccAddExternalFunctionForPlugin("Character::FaceCharacter^2",           (void*)Character_FaceCharacter);
+    ccAddExternalFunctionForPlugin("Character::FaceLocation^3",            (void*)Character_FaceLocation);
+    ccAddExternalFunctionForPlugin("Character::FaceObject^2",              (void*)Character_FaceObject);
+    ccAddExternalFunctionForPlugin("Character::FollowCharacter^3",         (void*)Character_FollowCharacter);
+    ccAddExternalFunctionForPlugin("Character::GetProperty^1",             (void*)Character_GetProperty);
+    ccAddExternalFunctionForPlugin("Character::GetPropertyText^2",         (void*)Character_GetPropertyText);
+    ccAddExternalFunctionForPlugin("Character::GetTextProperty^1",         (void*)Character_GetTextProperty);
+    ccAddExternalFunctionForPlugin("Character::HasInventory^1",            (void*)Character_HasInventory);
+    ccAddExternalFunctionForPlugin("Character::IsCollidingWithChar^1",     (void*)Character_IsCollidingWithChar);
+    ccAddExternalFunctionForPlugin("Character::IsCollidingWithObject^1",   (void*)Character_IsCollidingWithObject);
+    ccAddExternalFunctionForPlugin("Character::LockView^1",                (void*)Character_LockView);
+    ccAddExternalFunctionForPlugin("Character::LockViewAligned^3",         (void*)Character_LockViewAligned);
+    ccAddExternalFunctionForPlugin("Character::LockViewFrame^3",           (void*)Character_LockViewFrame);
+    ccAddExternalFunctionForPlugin("Character::LockViewOffset^3",          (void*)Character_LockViewOffset);
+    ccAddExternalFunctionForPlugin("Character::LoseInventory^1",           (void*)Character_LoseInventory);
+    ccAddExternalFunctionForPlugin("Character::Move^4",                    (void*)Character_Move);
+    ccAddExternalFunctionForPlugin("Character::PlaceOnWalkableArea^0",     (void*)Character_PlaceOnWalkableArea);
+    ccAddExternalFunctionForPlugin("Character::RemoveTint^0",              (void*)Character_RemoveTint);
+    ccAddExternalFunctionForPlugin("Character::RunInteraction^1",          (void*)Character_RunInteraction);
+    ccAddExternalFunctionForPlugin("Character::Say^101",                   (void*)ScPl_Character_Say);
+    ccAddExternalFunctionForPlugin("Character::SayAt^4",                   (void*)Character_SayAt);
+    ccAddExternalFunctionForPlugin("Character::SayBackground^1",           (void*)Character_SayBackground);
+    ccAddExternalFunctionForPlugin("Character::SetAsPlayer^0",             (void*)Character_SetAsPlayer);
+    ccAddExternalFunctionForPlugin("Character::SetIdleView^2",             (void*)Character_SetIdleView);
+    //ccAddExternalFunctionForPlugin("Character::SetOption^2",             (void*)Character_SetOption);
+    ccAddExternalFunctionForPlugin("Character::SetWalkSpeed^2",            (void*)Character_SetSpeed);
+    ccAddExternalFunctionForPlugin("Character::StopMoving^0",              (void*)Character_StopMoving);
+    ccAddExternalFunctionForPlugin("Character::Think^101",                 (void*)ScPl_Character_Think);
+    ccAddExternalFunctionForPlugin("Character::Tint^5",                    (void*)Character_Tint);
+    ccAddExternalFunctionForPlugin("Character::UnlockView^0",              (void*)Character_UnlockView);
+    ccAddExternalFunctionForPlugin("Character::Walk^4",                    (void*)Character_Walk);
+    ccAddExternalFunctionForPlugin("Character::WalkStraight^3",            (void*)Character_WalkStraight);
+    ccAddExternalFunctionForPlugin("Character::GetAtScreenXY^2",           (void*)GetCharacterAtLocation);
+    ccAddExternalFunctionForPlugin("Character::get_ActiveInventory",       (void*)Character_GetActiveInventory);
+    ccAddExternalFunctionForPlugin("Character::set_ActiveInventory",       (void*)Character_SetActiveInventory);
+    ccAddExternalFunctionForPlugin("Character::get_Animating",             (void*)Character_GetAnimating);
+    ccAddExternalFunctionForPlugin("Character::get_AnimationSpeed",        (void*)Character_GetAnimationSpeed);
+    ccAddExternalFunctionForPlugin("Character::set_AnimationSpeed",        (void*)Character_SetAnimationSpeed);
+    ccAddExternalFunctionForPlugin("Character::get_Baseline",              (void*)Character_GetBaseline);
+    ccAddExternalFunctionForPlugin("Character::set_Baseline",              (void*)Character_SetBaseline);
+    ccAddExternalFunctionForPlugin("Character::get_BlinkInterval",         (void*)Character_GetBlinkInterval);
+    ccAddExternalFunctionForPlugin("Character::set_BlinkInterval",         (void*)Character_SetBlinkInterval);
+    ccAddExternalFunctionForPlugin("Character::get_BlinkView",             (void*)Character_GetBlinkView);
+    ccAddExternalFunctionForPlugin("Character::set_BlinkView",             (void*)Character_SetBlinkView);
+    ccAddExternalFunctionForPlugin("Character::get_BlinkWhileThinking",    (void*)Character_GetBlinkWhileThinking);
+    ccAddExternalFunctionForPlugin("Character::set_BlinkWhileThinking",    (void*)Character_SetBlinkWhileThinking);
+    ccAddExternalFunctionForPlugin("Character::get_BlockingHeight",        (void*)Character_GetBlockingHeight);
+    ccAddExternalFunctionForPlugin("Character::set_BlockingHeight",        (void*)Character_SetBlockingHeight);
+    ccAddExternalFunctionForPlugin("Character::get_BlockingWidth",         (void*)Character_GetBlockingWidth);
+    ccAddExternalFunctionForPlugin("Character::set_BlockingWidth",         (void*)Character_SetBlockingWidth);
+    ccAddExternalFunctionForPlugin("Character::get_Clickable",             (void*)Character_GetClickable);
+    ccAddExternalFunctionForPlugin("Character::set_Clickable",             (void*)Character_SetClickable);
+    ccAddExternalFunctionForPlugin("Character::get_DiagonalLoops",         (void*)Character_GetDiagonalWalking);
+    ccAddExternalFunctionForPlugin("Character::set_DiagonalLoops",         (void*)Character_SetDiagonalWalking);
+    ccAddExternalFunctionForPlugin("Character::get_Frame",                 (void*)Character_GetFrame);
+    ccAddExternalFunctionForPlugin("Character::set_Frame",                 (void*)Character_SetFrame);
+    ccAddExternalFunctionForPlugin("Character::get_HasExplicitTint",       (void*)Character_GetHasExplicitTint);
+    ccAddExternalFunctionForPlugin("Character::get_ID",                    (void*)Character_GetID);
+    ccAddExternalFunctionForPlugin("Character::get_IdleView",              (void*)Character_GetIdleView);
+    ccAddExternalFunctionForPlugin("Character::geti_InventoryQuantity",    (void*)Character_GetIInventoryQuantity);
+    ccAddExternalFunctionForPlugin("Character::seti_InventoryQuantity",    (void*)Character_SetIInventoryQuantity);
+    ccAddExternalFunctionForPlugin("Character::get_IgnoreLighting",        (void*)Character_GetIgnoreLighting);
+    ccAddExternalFunctionForPlugin("Character::set_IgnoreLighting",        (void*)Character_SetIgnoreLighting);
+    ccAddExternalFunctionForPlugin("Character::get_IgnoreScaling",         (void*)Character_GetIgnoreScaling);
+    ccAddExternalFunctionForPlugin("Character::set_IgnoreScaling",         (void*)Character_SetIgnoreScaling);
+    ccAddExternalFunctionForPlugin("Character::get_IgnoreWalkbehinds",     (void*)Character_GetIgnoreWalkbehinds);
+    ccAddExternalFunctionForPlugin("Character::set_IgnoreWalkbehinds",     (void*)Character_SetIgnoreWalkbehinds);
+    ccAddExternalFunctionForPlugin("Character::get_Loop",                  (void*)Character_GetLoop);
+    ccAddExternalFunctionForPlugin("Character::set_Loop",                  (void*)Character_SetLoop);
+    ccAddExternalFunctionForPlugin("Character::get_ManualScaling",         (void*)Character_GetIgnoreScaling);
+    ccAddExternalFunctionForPlugin("Character::set_ManualScaling",         (void*)Character_SetManualScaling);
+    ccAddExternalFunctionForPlugin("Character::get_MovementLinkedToAnimation",(void*)Character_GetMovementLinkedToAnimation);
+    ccAddExternalFunctionForPlugin("Character::set_MovementLinkedToAnimation",(void*)Character_SetMovementLinkedToAnimation);
+    ccAddExternalFunctionForPlugin("Character::get_Moving",                (void*)Character_GetMoving);
+    ccAddExternalFunctionForPlugin("Character::get_Name",                  (void*)Character_GetName);
+    ccAddExternalFunctionForPlugin("Character::set_Name",                  (void*)Character_SetName);
+    ccAddExternalFunctionForPlugin("Character::get_NormalView",            (void*)Character_GetNormalView);
+    ccAddExternalFunctionForPlugin("Character::get_PreviousRoom",          (void*)Character_GetPreviousRoom);
+    ccAddExternalFunctionForPlugin("Character::get_Room",                  (void*)Character_GetRoom);
+    ccAddExternalFunctionForPlugin("Character::get_ScaleMoveSpeed",        (void*)Character_GetScaleMoveSpeed);
+    ccAddExternalFunctionForPlugin("Character::set_ScaleMoveSpeed",        (void*)Character_SetScaleMoveSpeed);
+    ccAddExternalFunctionForPlugin("Character::get_ScaleVolume",           (void*)Character_GetScaleVolume);
+    ccAddExternalFunctionForPlugin("Character::set_ScaleVolume",           (void*)Character_SetScaleVolume);
+    ccAddExternalFunctionForPlugin("Character::get_Scaling",               (void*)Character_GetScaling);
+    ccAddExternalFunctionForPlugin("Character::set_Scaling",               (void*)Character_SetScaling);
+    ccAddExternalFunctionForPlugin("Character::get_Solid",                 (void*)Character_GetSolid);
+    ccAddExternalFunctionForPlugin("Character::set_Solid",                 (void*)Character_SetSolid);
+    ccAddExternalFunctionForPlugin("Character::get_Speaking",              (void*)Character_GetSpeaking);
+    ccAddExternalFunctionForPlugin("Character::get_SpeakingFrame",         (void*)Character_GetSpeakingFrame);
+    ccAddExternalFunctionForPlugin("Character::get_SpeechAnimationDelay",  (void*)GetCharacterSpeechAnimationDelay);
+    ccAddExternalFunctionForPlugin("Character::set_SpeechAnimationDelay",  (void*)Character_SetSpeechAnimationDelay);
+    ccAddExternalFunctionForPlugin("Character::get_SpeechColor",           (void*)Character_GetSpeechColor);
+    ccAddExternalFunctionForPlugin("Character::set_SpeechColor",           (void*)Character_SetSpeechColor);
+    ccAddExternalFunctionForPlugin("Character::get_SpeechView",            (void*)Character_GetSpeechView);
+    ccAddExternalFunctionForPlugin("Character::set_SpeechView",            (void*)Character_SetSpeechView);
+    ccAddExternalFunctionForPlugin("Character::get_ThinkView",             (void*)Character_GetThinkView);
+    ccAddExternalFunctionForPlugin("Character::set_ThinkView",             (void*)Character_SetThinkView);
+    ccAddExternalFunctionForPlugin("Character::get_Transparency",          (void*)Character_GetTransparency);
+    ccAddExternalFunctionForPlugin("Character::set_Transparency",          (void*)Character_SetTransparency);
+    ccAddExternalFunctionForPlugin("Character::get_TurnBeforeWalking",     (void*)Character_GetTurnBeforeWalking);
+    ccAddExternalFunctionForPlugin("Character::set_TurnBeforeWalking",     (void*)Character_SetTurnBeforeWalking);
+    ccAddExternalFunctionForPlugin("Character::get_View",                  (void*)Character_GetView);
+    ccAddExternalFunctionForPlugin("Character::get_WalkSpeedX",            (void*)Character_GetWalkSpeedX);
+    ccAddExternalFunctionForPlugin("Character::get_WalkSpeedY",            (void*)Character_GetWalkSpeedY);
+    ccAddExternalFunctionForPlugin("Character::get_X",                     (void*)Character_GetX);
+    ccAddExternalFunctionForPlugin("Character::set_X",                     (void*)Character_SetX);
+    ccAddExternalFunctionForPlugin("Character::get_x",                     (void*)Character_GetX);
+    ccAddExternalFunctionForPlugin("Character::set_x",                     (void*)Character_SetX);
+    ccAddExternalFunctionForPlugin("Character::get_Y",                     (void*)Character_GetY);
+    ccAddExternalFunctionForPlugin("Character::set_Y",                     (void*)Character_SetY);
+    ccAddExternalFunctionForPlugin("Character::get_y",                     (void*)Character_GetY);
+    ccAddExternalFunctionForPlugin("Character::set_y",                     (void*)Character_SetY);
+    ccAddExternalFunctionForPlugin("Character::get_Z",                     (void*)Character_GetZ);
+    ccAddExternalFunctionForPlugin("Character::set_Z",                     (void*)Character_SetZ);
+    ccAddExternalFunctionForPlugin("Character::get_z",                     (void*)Character_GetZ);
+    ccAddExternalFunctionForPlugin("Character::set_z",                     (void*)Character_SetZ);
 }

@@ -13,7 +13,6 @@
 //=============================================================================
 
 #define USE_CLIB
-#include "util/wgt2allg.h"
 #include "ac/file.h"
 #include "ac/common.h"
 #include "ac/gamesetup.h"
@@ -25,10 +24,13 @@
 #include "debug/debugger.h"
 #include "util/misc.h"
 #include "platform/base/agsplatformdriver.h"
-#include "util/datastream.h"
+#include "util/stream.h"
 #include "core/assetmanager.h"
+#include "main/game_file.h"
+#include "util/string.h"
 
-using AGS::Common::DataStream;
+using AGS::Common::Stream;
+using AGS::Common::String;
 
 #if defined (AGS_RUNTIME_PATCH_ALLEGRO)
 #include <dlfcn.h>
@@ -56,7 +58,6 @@ extern GameSetupStruct game;
 extern char saveGameDirectory[260];
 extern AGSPlatformDriver *platform;
 
-extern char* game_file_name;
 extern int MAXSTRLEN;
 
 // object-based File routines
@@ -119,19 +120,19 @@ void File_WriteRawLine(sc_File *fil, const char *towrite) {
 }
 
 void File_ReadRawLine(sc_File *fil, char* buffer) {
-  check_valid_file_handle(fil->handle, "File.ReadRawLine");
+  Stream *in = get_valid_file_stream_from_handle(fil->handle, "File.ReadRawLine");
   check_strlen(buffer);
   int i = 0;
   while (i < MAXSTRLEN - 1) {
-    buffer[i] = fil->handle->ReadInt8();
+    buffer[i] = in->ReadInt8();
     if (buffer[i] == 13) {
       // CR -- skip LF and abort
-      fil->handle->ReadInt8();
+      in->ReadInt8();
       break;
     }
     if (buffer[i] == 10)  // LF only -- abort
       break;
-    if (fil->handle->EOS())  // EOF -- abort
+    if (in->EOS())  // EOF -- abort
       break;
     i++;
   }
@@ -149,17 +150,17 @@ void File_ReadString(sc_File *fil, char *toread) {
 }
 
 const char* File_ReadStringBack(sc_File *fil) {
-  check_valid_file_handle(fil->handle, "File.ReadStringBack");
-  if (fil->handle->EOS()) {
+  Stream *in = get_valid_file_stream_from_handle(fil->handle, "File.ReadStringBack");
+  if (in->EOS()) {
     return CreateNewScriptString("");
   }
 
-  int lle = fil->handle->ReadInt32();
+  int lle = in->ReadInt32();
   if ((lle >= 20000) || (lle < 1))
     quit("!File.ReadStringBack: file was not written by WriteString");
 
   char *retVal = (char*)malloc(lle);
-  fil->handle->Read(retVal, lle);
+  in->Read(retVal, lle);
 
   return CreateNewScriptString(retVal, false);
 }
@@ -177,13 +178,13 @@ int File_ReadRawInt(sc_File *fil) {
 }
 
 int File_GetEOF(sc_File *fil) {
-  if (fil->handle == NULL)
+  if (fil->handle <= 0)
     return 1;
   return FileIsEOF(fil->handle);
 }
 
 int File_GetError(sc_File *fil) {
-  if (fil->handle == NULL)
+  if (fil->handle <= 0)
     return 1;
   return FileIsError(fil->handle);
 }
@@ -296,21 +297,51 @@ void get_current_dir_path(char* buffer, const char *fileName)
     }
 }
 
-DataStream *valid_handles[MAX_OPEN_SCRIPT_FILES+1];
+ScriptFileHandle valid_handles[MAX_OPEN_SCRIPT_FILES + 1];
+// [IKM] NOTE: this is not precisely the number of files opened at this moment,
+// but rather maximal number of handles that were used simultaneously during game run
 int num_open_script_files = 0;
-int check_valid_file_handle(DataStream *hann, char*msg) {
-  int aa;
-  if (hann != NULL) {
-    for (aa=0; aa < num_open_script_files; aa++) {
-      if (hann == valid_handles[aa])
-        return aa;
+ScriptFileHandle *check_valid_file_handle_ptr(Common::Stream *stream_ptr, const char *operation_name)
+{
+  if (stream_ptr)
+  {
+      for (int i = 0; i < num_open_script_files; ++i)
+      {
+          if (stream_ptr == valid_handles[i].stream)
+          {
+              return &valid_handles[i];
+          }
+      }
+  }
+
+  String exmsg = String::FromFormat("!%s: invalid file handle; file not previously opened or has been closed", operation_name);
+  quit(exmsg);
+  return NULL;
+}
+
+ScriptFileHandle *check_valid_file_handle_int32(int32_t handle, const char *operation_name)
+{
+  if (handle > 0)
+  {
+    for (int i = 0; i < num_open_script_files; ++i)
+    {
+        if (handle == valid_handles[i].handle)
+        {
+            return &valid_handles[i];
+        }
     }
   }
-  char exmsg[100];
-  sprintf(exmsg,"!%s: invalid file handle; file not previously opened or has been closed",msg);
+
+  String exmsg = String::FromFormat("!%s: invalid file handle; file not previously opened or has been closed", operation_name);
   quit(exmsg);
-  return -1;
-  }
+  return NULL;
+}
+
+Stream *get_valid_file_stream_from_handle(int32_t handle, const char *operation_name)
+{
+    ScriptFileHandle *sc_handle = check_valid_file_handle_int32(handle, operation_name);
+    return sc_handle ? sc_handle->stream : NULL;
+}
 
 bool validate_user_file_path(const char *fnmm, char *output, bool currentDirOnly)
 {
@@ -355,4 +386,161 @@ bool validate_user_file_path(const char *fnmm, char *output, bool currentDirOnly
   }
 
   return true;
+}
+
+//=============================================================================
+//
+// Script API Functions
+//
+//=============================================================================
+
+#include "debug/out.h"
+#include "script/script_api.h"
+#include "script/script_runtime.h"
+#include "ac/dynobj/scriptstring.h"
+
+extern ScriptString myScriptStringImpl;
+
+// int (const char *fnmm)
+RuntimeScriptValue Sc_File_Delete(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT_POBJ(File_Delete, const char);
+}
+
+// int (const char *fnmm)
+RuntimeScriptValue Sc_File_Exists(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT_POBJ(File_Exists, const char);
+}
+
+// void *(const char *fnmm, int mode)
+RuntimeScriptValue Sc_sc_OpenFile(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_OBJAUTO_POBJ_PINT(sc_File, sc_OpenFile, const char);
+}
+
+// void (sc_File *fil)
+RuntimeScriptValue Sc_File_Close(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID(sc_File, File_Close);
+}
+
+// int (sc_File *fil)
+RuntimeScriptValue Sc_File_ReadInt(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(sc_File, File_ReadInt);
+}
+
+// int (sc_File *fil)
+RuntimeScriptValue Sc_File_ReadRawChar(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(sc_File, File_ReadRawChar);
+}
+
+// int (sc_File *fil)
+RuntimeScriptValue Sc_File_ReadRawInt(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(sc_File, File_ReadRawInt);
+}
+
+// void (sc_File *fil, char* buffer)
+RuntimeScriptValue Sc_File_ReadRawLine(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_POBJ(sc_File, File_ReadRawLine, char);
+}
+
+// const char* (sc_File *fil)
+RuntimeScriptValue Sc_File_ReadRawLineBack(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_OBJ(sc_File, const char, myScriptStringImpl, File_ReadRawLineBack);
+}
+
+// void (sc_File *fil, char *toread)
+RuntimeScriptValue Sc_File_ReadString(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_POBJ(sc_File, File_ReadString, char);
+}
+
+// const char* (sc_File *fil)
+RuntimeScriptValue Sc_File_ReadStringBack(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_OBJ(sc_File, const char, myScriptStringImpl, File_ReadStringBack);
+}
+
+// void (sc_File *fil, int towrite)
+RuntimeScriptValue Sc_File_WriteInt(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(sc_File, File_WriteInt);
+}
+
+// void (sc_File *fil, int towrite)
+RuntimeScriptValue Sc_File_WriteRawChar(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(sc_File, File_WriteRawChar);
+}
+
+// void (sc_File *fil, const char *towrite)
+RuntimeScriptValue Sc_File_WriteRawLine(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_POBJ(sc_File, File_WriteRawLine, const char);
+}
+
+// void (sc_File *fil, const char *towrite)
+RuntimeScriptValue Sc_File_WriteString(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_POBJ(sc_File, File_WriteString, const char);
+}
+
+// int (sc_File *fil)
+RuntimeScriptValue Sc_File_GetEOF(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(sc_File, File_GetEOF);
+}
+
+// int (sc_File *fil)
+RuntimeScriptValue Sc_File_GetError(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(sc_File, File_GetError);
+}
+
+
+void RegisterFileAPI()
+{
+    ccAddExternalStaticFunction("File::Delete^1",           Sc_File_Delete);
+    ccAddExternalStaticFunction("File::Exists^1",           Sc_File_Exists);
+    ccAddExternalStaticFunction("File::Open^2",             Sc_sc_OpenFile);
+    ccAddExternalObjectFunction("File::Close^0",            Sc_File_Close);
+    ccAddExternalObjectFunction("File::ReadInt^0",          Sc_File_ReadInt);
+    ccAddExternalObjectFunction("File::ReadRawChar^0",      Sc_File_ReadRawChar);
+    ccAddExternalObjectFunction("File::ReadRawInt^0",       Sc_File_ReadRawInt);
+    ccAddExternalObjectFunction("File::ReadRawLine^1",      Sc_File_ReadRawLine);
+    ccAddExternalObjectFunction("File::ReadRawLineBack^0",  Sc_File_ReadRawLineBack);
+    ccAddExternalObjectFunction("File::ReadString^1",       Sc_File_ReadString);
+    ccAddExternalObjectFunction("File::ReadStringBack^0",   Sc_File_ReadStringBack);
+    ccAddExternalObjectFunction("File::WriteInt^1",         Sc_File_WriteInt);
+    ccAddExternalObjectFunction("File::WriteRawChar^1",     Sc_File_WriteRawChar);
+    ccAddExternalObjectFunction("File::WriteRawLine^1",     Sc_File_WriteRawLine);
+    ccAddExternalObjectFunction("File::WriteString^1",      Sc_File_WriteString);
+    ccAddExternalObjectFunction("File::get_EOF",            Sc_File_GetEOF);
+    ccAddExternalObjectFunction("File::get_Error",          Sc_File_GetError);
+
+    /* ----------------------- Registering unsafe exports for plugins -----------------------*/
+
+    ccAddExternalFunctionForPlugin("File::Delete^1",           (void*)File_Delete);
+    ccAddExternalFunctionForPlugin("File::Exists^1",           (void*)File_Exists);
+    ccAddExternalFunctionForPlugin("File::Open^2",             (void*)sc_OpenFile);
+    ccAddExternalFunctionForPlugin("File::Close^0",            (void*)File_Close);
+    ccAddExternalFunctionForPlugin("File::ReadInt^0",          (void*)File_ReadInt);
+    ccAddExternalFunctionForPlugin("File::ReadRawChar^0",      (void*)File_ReadRawChar);
+    ccAddExternalFunctionForPlugin("File::ReadRawInt^0",       (void*)File_ReadRawInt);
+    ccAddExternalFunctionForPlugin("File::ReadRawLine^1",      (void*)File_ReadRawLine);
+    ccAddExternalFunctionForPlugin("File::ReadRawLineBack^0",  (void*)File_ReadRawLineBack);
+    ccAddExternalFunctionForPlugin("File::ReadString^1",       (void*)File_ReadString);
+    ccAddExternalFunctionForPlugin("File::ReadStringBack^0",   (void*)File_ReadStringBack);
+    ccAddExternalFunctionForPlugin("File::WriteInt^1",         (void*)File_WriteInt);
+    ccAddExternalFunctionForPlugin("File::WriteRawChar^1",     (void*)File_WriteRawChar);
+    ccAddExternalFunctionForPlugin("File::WriteRawLine^1",     (void*)File_WriteRawLine);
+    ccAddExternalFunctionForPlugin("File::WriteString^1",      (void*)File_WriteString);
+    ccAddExternalFunctionForPlugin("File::get_EOF",            (void*)File_GetEOF);
+    ccAddExternalFunctionForPlugin("File::get_Error",          (void*)File_GetError);
 }

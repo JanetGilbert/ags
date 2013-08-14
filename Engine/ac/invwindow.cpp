@@ -12,7 +12,6 @@
 //
 //=============================================================================
 
-#include "util/wgt2allg.h"
 #include "ac/invwindow.h"
 #include "ac/common.h"
 #include "ac/characterextras.h"
@@ -30,7 +29,9 @@
 #include "media/audio/audio.h"
 #include "platform/base/agsplatformdriver.h"
 #include "ac/spritecache.h"
-#include "gfx/bitmap.h"
+#include "script/runtimescriptvalue.h"
+#include "ac/dynobj/cc_character.h"
+#include "ac/dynobj/cc_inventory.h"
 
 using AGS::Common::Bitmap;
 namespace BitmapHelper = AGS::Common::BitmapHelper;
@@ -50,6 +51,8 @@ extern volatile int timerloop;
 extern int evblocknum;
 extern CharacterInfo*playerchar;
 extern AGSPlatformDriver *platform;
+extern CCCharacter ccDynamicCharacter;
+extern CCInventory ccDynamicInv;
 
 int in_inv_screen = 0, inv_screen_newroom = -1;
 
@@ -172,9 +175,10 @@ int __actual_invscreen() {
     int MAX_ITEMAREA_HEIGHT = ((scrnhit - BUTTONAREAHEIGHT) - get_fixed_pixel_size(20));
     in_inv_screen++;
     inv_screen_newroom = -1;
+    Bitmap *ds = NULL;
 
 start_actinv:
-    wsetscreen(virtual_screen);
+    ds = SetVirtualScreen(virtual_screen);
 
     DisplayInvItem dii[MAX_INV];
     int numitems=0,ww,widest=0,highest=0;
@@ -221,45 +225,43 @@ start_actinv:
     int windowxp=scrnwid/2-windowwid/2;
     int windowyp=scrnhit/2-windowhit/2;
     int buttonyp=windowyp+windowhit-BUTTONAREAHEIGHT;
-    wsetcolor(play.sierra_inv_color);
-    abuf->FillRect(Rect(windowxp,windowyp,windowxp+windowwid,windowyp+windowhit), currentcolor);
-    wsetcolor(0); 
+    color_t draw_color = ds->GetCompatibleColor(play.sierra_inv_color);
+    ds->FillRect(Rect(windowxp,windowyp,windowxp+windowwid,windowyp+windowhit), draw_color);
+    draw_color = ds->GetCompatibleColor(0); 
     int bartop = windowyp + get_fixed_pixel_size(2);
     int barxp = windowxp + get_fixed_pixel_size(2);
-    abuf->FillRect(Rect(barxp,bartop, windowxp + windowwid - get_fixed_pixel_size(2),buttonyp-1), currentcolor);
+    ds->FillRect(Rect(barxp,bartop, windowxp + windowwid - get_fixed_pixel_size(2),buttonyp-1), draw_color);
     for (ww = top_item; ww < numitems; ww++) {
         if (ww >= top_item + num_visible_items)
             break;
         Bitmap *spof=spriteset[dii[ww].sprnum];
-        wputblock(barxp+1+((ww-top_item)%4)*widest+widest/2-wgetblockwidth(spof)/2,
-            bartop+1+((ww-top_item)/4)*highest+highest/2-wgetblockheight(spof)/2,spof,1);
+        wputblock(ds, barxp+1+((ww-top_item)%4)*widest+widest/2-spof->GetWidth()/2,
+            bartop+1+((ww-top_item)/4)*highest+highest/2-spof->GetHeight()/2,spof,1);
     }
     if ((spriteset[2041] == NULL) || (spriteset[2042] == NULL) || (spriteset[2043] == NULL))
         quit("!InventoryScreen: one or more of the inventory screen graphics have been deleted");
 #define BUTTONWID spritewidth[2042]
     // Draw select, look and OK buttons
-    wputblock(windowxp+2, buttonyp + get_fixed_pixel_size(2), spriteset[2041], 1);
-    wputblock(windowxp+3+BUTTONWID, buttonyp + get_fixed_pixel_size(2), spriteset[2042], 1);
-    wputblock(windowxp+4+BUTTONWID*2, buttonyp + get_fixed_pixel_size(2), spriteset[2043], 1);
+    wputblock(ds, windowxp+2, buttonyp + get_fixed_pixel_size(2), spriteset[2041], 1);
+    wputblock(ds, windowxp+3+BUTTONWID, buttonyp + get_fixed_pixel_size(2), spriteset[2042], 1);
+    wputblock(ds, windowxp+4+BUTTONWID*2, buttonyp + get_fixed_pixel_size(2), spriteset[2043], 1);
 
     // Draw Up and Down buttons if required
     const int ARROWBUTTONWID = 11;
-    Bitmap *arrowblock = BitmapHelper::CreateBitmap (ARROWBUTTONWID, ARROWBUTTONWID);
-    arrowblock->Clear(arrowblock->GetMaskColor());
-    int usecol;
-    __my_setcolor(&usecol, 0);
+    Bitmap *arrowblock = BitmapHelper::CreateTransparentBitmap (ARROWBUTTONWID, ARROWBUTTONWID);
+    draw_color = arrowblock->GetCompatibleColor(0);
     if (play.sierra_inv_color == 0)
-        __my_setcolor(&usecol, 14);
+        draw_color = ds->GetCompatibleColor(14);
 
-    arrowblock->DrawLine(Line(ARROWBUTTONWID/2, 2, ARROWBUTTONWID-2, 9), usecol);
-    arrowblock->DrawLine(Line(ARROWBUTTONWID/2, 2, 2, 9), usecol);
-    arrowblock->DrawLine(Line(2, 9, ARROWBUTTONWID-2, 9), usecol);
-	arrowblock->FloodFill(ARROWBUTTONWID/2, 4, usecol);
+    arrowblock->DrawLine(Line(ARROWBUTTONWID/2, 2, ARROWBUTTONWID-2, 9), draw_color);
+    arrowblock->DrawLine(Line(ARROWBUTTONWID/2, 2, 2, 9), draw_color);
+    arrowblock->DrawLine(Line(2, 9, ARROWBUTTONWID-2, 9), draw_color);
+	arrowblock->FloodFill(ARROWBUTTONWID/2, 4, draw_color);
 
     if (top_item > 0)
-        wputblock(windowxp+windowwid-ARROWBUTTONWID, buttonyp + get_fixed_pixel_size(2), arrowblock, 1);
+        wputblock(ds, windowxp+windowwid-ARROWBUTTONWID, buttonyp + get_fixed_pixel_size(2), arrowblock, 1);
     if (top_item + num_visible_items < numitems)
-        abuf->FlipBlt(arrowblock, windowxp+windowwid-ARROWBUTTONWID, buttonyp + get_fixed_pixel_size(4) + ARROWBUTTONWID, Common::kBitmap_VFlip);
+        arrowblock->FlipBlt(arrowblock, windowxp+windowwid-ARROWBUTTONWID, buttonyp + get_fixed_pixel_size(4) + ARROWBUTTONWID, Common::kBitmap_VFlip);
     delete arrowblock;
 
     domouse(1);
@@ -269,7 +271,7 @@ start_actinv:
         timerloop = 0;
         NEXT_ITERATION();
         domouse(0);
-        update_polled_stuff_and_crossfade();
+        update_polled_audio_and_crossfade();
         write_screen();
 
         int isonitem=((mousey-bartop)/highest)*ICONSPERLINE+(mousex-barxp)/widest;
@@ -373,13 +375,13 @@ start_actinv:
         int rectxp=barxp+1+(wasonitem%4)*widest;
         int rectyp=bartop+1+((wasonitem - top_item)/4)*highest;
         if (wasonitem>=0) {
-            wsetcolor(0);
-            abuf->DrawRect(Rect(rectxp,rectyp,rectxp+widest-1,rectyp+highest-1), currentcolor);
+            draw_color = ds->GetCompatibleColor(0);
+            ds->DrawRect(Rect(rectxp,rectyp,rectxp+widest-1,rectyp+highest-1), draw_color);
         }
-        if (isonitem>=0) { wsetcolor(14);//opts.invrectcol);
+        if (isonitem>=0) { draw_color = ds->GetCompatibleColor(14);//opts.invrectcol);
         rectxp=barxp+1+(isonitem%4)*widest;
         rectyp=bartop+1+((isonitem - top_item)/4)*highest;
-        abuf->DrawRect(Rect(rectxp,rectyp,rectxp+widest-1,rectyp+highest-1), currentcolor);
+        ds->DrawRect(Rect(rectxp,rectyp,rectxp+widest-1,rectyp+highest-1), draw_color);
         }
         domouse(1);
         }
@@ -404,4 +406,135 @@ int invscreen() {
     guis_need_update = 1;
     set_cursor_mode(MODE_USE);
     return selt;
+}
+
+//=============================================================================
+//
+// Script API Functions
+//
+//=============================================================================
+
+#include "debug/out.h"
+#include "script/script_api.h"
+#include "script/script_runtime.h"
+
+// void (GUIInv *guii)
+RuntimeScriptValue Sc_InvWindow_ScrollDown(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID(GUIInv, InvWindow_ScrollDown);
+}
+
+// void (GUIInv *guii)
+RuntimeScriptValue Sc_InvWindow_ScrollUp(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID(GUIInv, InvWindow_ScrollUp);
+}
+
+// CharacterInfo* (GUIInv *guii)
+RuntimeScriptValue Sc_InvWindow_GetCharacterToUse(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_OBJ(GUIInv, CharacterInfo, ccDynamicCharacter, InvWindow_GetCharacterToUse);
+}
+
+// void (GUIInv *guii, CharacterInfo *chaa)
+RuntimeScriptValue Sc_InvWindow_SetCharacterToUse(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_POBJ(GUIInv, InvWindow_SetCharacterToUse, CharacterInfo);
+}
+
+// ScriptInvItem* (GUIInv *guii, int index)
+RuntimeScriptValue Sc_InvWindow_GetItemAtIndex(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_OBJ_PINT(GUIInv, ScriptInvItem, ccDynamicInv, InvWindow_GetItemAtIndex);
+}
+
+// int (GUIInv *guii)
+RuntimeScriptValue Sc_InvWindow_GetItemCount(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(GUIInv, InvWindow_GetItemCount);
+}
+
+// int (GUIInv *guii)
+RuntimeScriptValue Sc_InvWindow_GetItemHeight(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(GUIInv, InvWindow_GetItemHeight);
+}
+
+// void (GUIInv *guii, int newhit)
+RuntimeScriptValue Sc_InvWindow_SetItemHeight(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(GUIInv, InvWindow_SetItemHeight);
+}
+
+// int (GUIInv *guii)
+RuntimeScriptValue Sc_InvWindow_GetItemWidth(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(GUIInv, InvWindow_GetItemWidth);
+}
+
+// void (GUIInv *guii, int newwidth)
+RuntimeScriptValue Sc_InvWindow_SetItemWidth(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(GUIInv, InvWindow_SetItemWidth);
+}
+
+// int (GUIInv *guii)
+RuntimeScriptValue Sc_InvWindow_GetItemsPerRow(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(GUIInv, InvWindow_GetItemsPerRow);
+}
+
+// int (GUIInv *guii)
+RuntimeScriptValue Sc_InvWindow_GetRowCount(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(GUIInv, InvWindow_GetRowCount);
+}
+
+// int (GUIInv *guii)
+RuntimeScriptValue Sc_InvWindow_GetTopItem(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(GUIInv, InvWindow_GetTopItem);
+}
+
+// void (GUIInv *guii, int topitem)
+RuntimeScriptValue Sc_InvWindow_SetTopItem(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(GUIInv, InvWindow_SetTopItem);
+}
+
+
+
+void RegisterInventoryWindowAPI()
+{
+    ccAddExternalObjectFunction("InvWindow::ScrollDown^0",          Sc_InvWindow_ScrollDown);
+    ccAddExternalObjectFunction("InvWindow::ScrollUp^0",            Sc_InvWindow_ScrollUp);
+    ccAddExternalObjectFunction("InvWindow::get_CharacterToUse",    Sc_InvWindow_GetCharacterToUse);
+    ccAddExternalObjectFunction("InvWindow::set_CharacterToUse",    Sc_InvWindow_SetCharacterToUse);
+    ccAddExternalObjectFunction("InvWindow::geti_ItemAtIndex",      Sc_InvWindow_GetItemAtIndex);
+    ccAddExternalObjectFunction("InvWindow::get_ItemCount",         Sc_InvWindow_GetItemCount);
+    ccAddExternalObjectFunction("InvWindow::get_ItemHeight",        Sc_InvWindow_GetItemHeight);
+    ccAddExternalObjectFunction("InvWindow::set_ItemHeight",        Sc_InvWindow_SetItemHeight);
+    ccAddExternalObjectFunction("InvWindow::get_ItemWidth",         Sc_InvWindow_GetItemWidth);
+    ccAddExternalObjectFunction("InvWindow::set_ItemWidth",         Sc_InvWindow_SetItemWidth);
+    ccAddExternalObjectFunction("InvWindow::get_ItemsPerRow",       Sc_InvWindow_GetItemsPerRow);
+    ccAddExternalObjectFunction("InvWindow::get_RowCount",          Sc_InvWindow_GetRowCount);
+    ccAddExternalObjectFunction("InvWindow::get_TopItem",           Sc_InvWindow_GetTopItem);
+    ccAddExternalObjectFunction("InvWindow::set_TopItem",           Sc_InvWindow_SetTopItem);
+
+    /* ----------------------- Registering unsafe exports for plugins -----------------------*/
+
+    ccAddExternalFunctionForPlugin("InvWindow::ScrollDown^0",          (void*)InvWindow_ScrollDown);
+    ccAddExternalFunctionForPlugin("InvWindow::ScrollUp^0",            (void*)InvWindow_ScrollUp);
+    ccAddExternalFunctionForPlugin("InvWindow::get_CharacterToUse",    (void*)InvWindow_GetCharacterToUse);
+    ccAddExternalFunctionForPlugin("InvWindow::set_CharacterToUse",    (void*)InvWindow_SetCharacterToUse);
+    ccAddExternalFunctionForPlugin("InvWindow::geti_ItemAtIndex",      (void*)InvWindow_GetItemAtIndex);
+    ccAddExternalFunctionForPlugin("InvWindow::get_ItemCount",         (void*)InvWindow_GetItemCount);
+    ccAddExternalFunctionForPlugin("InvWindow::get_ItemHeight",        (void*)InvWindow_GetItemHeight);
+    ccAddExternalFunctionForPlugin("InvWindow::set_ItemHeight",        (void*)InvWindow_SetItemHeight);
+    ccAddExternalFunctionForPlugin("InvWindow::get_ItemWidth",         (void*)InvWindow_GetItemWidth);
+    ccAddExternalFunctionForPlugin("InvWindow::set_ItemWidth",         (void*)InvWindow_SetItemWidth);
+    ccAddExternalFunctionForPlugin("InvWindow::get_ItemsPerRow",       (void*)InvWindow_GetItemsPerRow);
+    ccAddExternalFunctionForPlugin("InvWindow::get_RowCount",          (void*)InvWindow_GetRowCount);
+    ccAddExternalFunctionForPlugin("InvWindow::get_TopItem",           (void*)InvWindow_GetTopItem);
+    ccAddExternalFunctionForPlugin("InvWindow::set_TopItem",           (void*)InvWindow_SetTopItem);
 }

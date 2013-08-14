@@ -13,7 +13,6 @@
 //=============================================================================
 
 #include "ac/global_button.h"
-#include "util/wgt2allg.h"
 #include "ac/common.h"
 #include "ac/button.h"
 #include "ac/gamesetupstruct.h"
@@ -24,7 +23,7 @@
 extern GameSetupStruct game;
 extern GUIMain*guis;
 
-void SetButtonText(int guin,int objn,char*newtx) {
+void SetButtonText(int guin,int objn, const char*newtx) {
     VALIDATE_STRING(newtx);
     if ((guin<0) | (guin>=game.numgui))
         quit("!SetButtonText: invalid GUI number");

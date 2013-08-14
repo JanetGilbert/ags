@@ -74,19 +74,14 @@ String TextStreamReader::ReadString(int length)
     {
         return "";
     }
-
-    String str;
-    char *buffer    = str.GetBuffer(length);
-    int chars_read  = _stream->Read(buffer, length);
-    str.ReleaseBuffer(chars_read);
     // TODO: remove carriage-return characters
-    return str;
+    return String::FromStreamCount(_stream, length);
 }
 
 String TextStreamReader::ReadLine()
 {
     // TODO
-    // Probably it is possible to group DataStream::ReadString with this,
+    // Probably it is possible to group Stream::ReadString with this,
     // both use similar algorythm, difference is only in terminator chars
 
     if (!_stream)
@@ -143,9 +138,8 @@ String TextStreamReader::ReadLine()
         _stream->Seek(kSeekCurrent, line_break_position - chars_read_last + 1 /* beyond line feed */);
     }
 
+    str.TrimRight('\r');
     return str;
-
-    // TODO: remove carriage-return characters
 }
 
 String TextStreamReader::ReadAll()

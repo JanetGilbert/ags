@@ -31,59 +31,25 @@
 #include "ac/dynobj/all_dynamicclasses.h"
 #include "ac/dynobj/all_scriptclasses.h"
 #include "debug/debug_log.h"
+#include "font/fonts.h"
 #include "gui/guilabel.h"
 #include "main/main.h"
 #include "platform/base/agsplatformdriver.h"
 #include "script/exports.h"
 #include "script/script.h"
-#include "util/datastream.h"
+#include "util/stream.h"
 #include "gfx/bitmap.h"
+#include "gfx/blender.h"
 #include "core/assetmanager.h"
+#include "ac/statobj/agsstaticobject.h"
+#include "ac/statobj/staticarray.h"
+#include "util/alignedstream.h"
 
+using AGS::Common::AlignedStream;
 using AGS::Common::Bitmap;
+using AGS::Common::Stream;
+using AGS::Common::String;
 
-using AGS::Common::DataStream;
-/*
-
-Game data versions and changes:
--------------------------------
-
-12 : 2.3 + 2.4
-
-Versions above are incompatible at the moment.
-
-19 : 2.5.1
-22 : 2.5.5
-
-Variable number of sprites.
-24 : 2.5.6
-25 : 2.6.0
-
-Encrypted global messages and dialogs.
-26 : 2.6.1
-
-Wait() must be called with parameter > 0
-27 : 2.6.2
-
-Script modules. Fixes bug in the inventory display.
-31 : 2.7.0
-32 : 2.7.2
-
-Interactions are now scripts. The number for "not set" changed from 0 to -1 for
-a lot of variables (views, sounds).
-37 : 3.0 + 3.1.0
-
-Dialogs are now scripts. New character animation speed.
-39 : 3.1.1
-40 : 3.1.2
-
-Audio clips
-41 : 3.2.0
-42 : 3.2.1
-
-*/
-
-extern int engineNeedsAsInt; // defined in ac_game
 extern char saveGameSuffix[MAX_SG_EXT_LENGTH + 1];
 
 // Old dialog support
@@ -130,7 +96,7 @@ extern ccScript* dialogScriptsScript;
 extern ccScript *scriptModules[MAX_SCRIPT_MODULES];
 extern ccInstance *moduleInst[MAX_SCRIPT_MODULES];
 extern ccInstance *moduleInstFork[MAX_SCRIPT_MODULES];
-extern char *moduleRepExecAddr[MAX_SCRIPT_MODULES];
+extern RuntimeScriptValue moduleRepExecAddr[MAX_SCRIPT_MODULES];
 extern int numScriptModules;
 extern GameState play;
 extern char **characterScriptObjNames;
@@ -143,16 +109,25 @@ extern Bitmap **actspswb;
 extern IDriverDependantBitmap* *actspswbbmp;
 extern CachedActSpsData* actspswbcache;
 
+extern AGSStaticObject GlobalStaticManager;
 
-int filever;
+StaticArray StaticCharacterArray;
+StaticArray StaticObjectArray;
+StaticArray StaticGUIArray;
+StaticArray StaticHotspotArray;
+StaticArray StaticRegionArray;
+StaticArray StaticInventoryArray;
+StaticArray StaticDialogArray;
+
+GameDataVersion filever;
 // PSP specific variables:
 int psp_is_old_datafile = 0; // Set for 3.1.1 and 3.1.2 datafiles
-char* game_file_name = NULL;
+String game_file_name;
 
 
-DataStream * game_file_open()
+Stream * game_file_open()
 {
-	DataStream*in = Common::AssetManager::OpenAsset("game28.dta"); // 3.x data file name
+	Stream*in = Common::AssetManager::OpenAsset("game28.dta"); // 3.x data file name
     if (in==NULL) {
         in = Common::AssetManager::OpenAsset("ac2game.dta"); // 2.x data file name
     }
@@ -160,17 +135,17 @@ DataStream * game_file_open()
 	return in;
 }
 
-int game_file_read_version(DataStream *in)
+int game_file_read_version(Stream *in)
 {
 	char teststr[31];
 
 	teststr[30]=0;
     in->Read(&teststr[0],30);
-    filever=in->ReadInt32();
+    filever=(GameDataVersion)in->ReadInt32();
 
-    if (filever < 42) {
+    if (filever < kGameVersion_321) {
         // Allow loading of 2.x+ datafiles
-        if (filever < 18) // < 2.5.0
+        if (filever < kGameVersion_250) // < 2.5.0
         {
             delete in;
             return -2;
@@ -179,36 +154,30 @@ int game_file_read_version(DataStream *in)
     }
 
 	int engineverlen = in->ReadInt32();
-    char engineneeds[20];
-    // MACPORT FIX 13/6/5: switch 'size' and 'nmemb' so it doesn't treat the string as an int
-    in->Read(&engineneeds[0], engineverlen);
-    engineneeds[engineverlen] = 0;
+    String version_string = String::FromStreamCount(in, engineverlen);
+    AGS::Engine::Version requested_engine_version(version_string);
 
-    if (filever > GAME_FILE_VERSION) {
-        platform->DisplayAlert("This game requires a newer version of AGS (%s). It cannot be run.", engineneeds);
+    if (filever > kGameVersion_Current) {
+        platform->DisplayAlert("This game requires a newer version of AGS (%s). It cannot be run.",
+            requested_engine_version.LongString.GetCStr());
         delete in;
         return -2;
     }
 
-    if (strcmp (engineneeds, ACI_VERSION_TEXT) > 0)
-        platform->DisplayAlert("This game requires a newer version of AGS (%s). It may not run correctly.", engineneeds);
-
-    {
-        int major, minor;
-        sscanf(engineneeds, "%d.%d", &major, &minor);
-        engineNeedsAsInt = 100*major + minor;
-    }
+    if (requested_engine_version > EngineVersion)
+        platform->DisplayAlert("This game requires a newer version of AGS (%s). It may not run correctly.",
+        requested_engine_version.LongString.GetCStr());
 
     loaded_game_file_version = filever;
 
 	return RETURN_CONTINUE;
 }
 
-void game_file_read_dialog_script(DataStream *in)
+void game_file_read_dialog_script(Stream *in)
 {
-	if (filever > 37) // 3.1.1+ dialog script
+	if (filever > kGameVersion_310) // 3.1.1+ dialog script
     {
-        dialogScriptsScript = fread_script(in);
+        dialogScriptsScript = ccScript::CreateFromStream(in);
         if (dialogScriptsScript == NULL)
             quit("Dialog scripts load failed; need newer version?");
     }
@@ -218,21 +187,21 @@ void game_file_read_dialog_script(DataStream *in)
     }
 }
 
-void game_file_read_script_modules(DataStream *in)
+void game_file_read_script_modules(Stream *in)
 {
-	if (filever >= 31) // 2.7.0+ script modules
+	if (filever >= kGameVersion_270) // 2.7.0+ script modules
     {
         numScriptModules = in->ReadInt32();
         if (numScriptModules > MAX_SCRIPT_MODULES)
             quit("too many script modules; need newer version?");
 
         for (int bb = 0; bb < numScriptModules; bb++) {
-            scriptModules[bb] = fread_script(in);
+            scriptModules[bb] = ccScript::CreateFromStream(in);
             if (scriptModules[bb] == NULL)
                 quit("Script module load failure; need newer version?");
             moduleInst[bb] = NULL;
             moduleInstFork[bb] = NULL;
-            moduleRepExecAddr[bb] = NULL;
+            moduleRepExecAddr[bb].Invalidate();
         }
     }
     else
@@ -241,9 +210,19 @@ void game_file_read_script_modules(DataStream *in)
     }
 }
 
-void game_file_read_views(DataStream *in)
+void ReadViewStruct272_Aligned(ViewStruct272* oldv, Stream *in)
 {
-	if (filever > 32) // 3.x views
+    AlignedStream align_s(in, Common::kAligned_Read);
+    for (int iteratorCount = 0; iteratorCount < game.numviews; ++iteratorCount)
+    {
+        oldv[iteratorCount].ReadFromFile(&align_s);
+        align_s.Reset();
+    }
+}
+
+void game_file_read_views(Stream *in)
+{
+	if (filever > kGameVersion_272) // 3.x views
     {
         for (int iteratorCount = 0; iteratorCount < game.numviews; ++iteratorCount)
         {
@@ -253,10 +232,7 @@ void game_file_read_views(DataStream *in)
     else // 2.x views
     {
         ViewStruct272* oldv = (ViewStruct272*)calloc(game.numviews, sizeof(ViewStruct272));
-        for (int iteratorCount = 0; iteratorCount < game.numviews; ++iteratorCount)
-        {
-            oldv[iteratorCount].ReadFromFile(in);
-        }
+        ReadViewStruct272_Aligned(oldv, in);
         Convert272ViewsToNew(game.numviews, oldv, views);
         free(oldv);
     }
@@ -286,20 +262,16 @@ void game_file_set_default_glmsg()
     set_default_glmsg (995, "Are you sure you want to quit?");
 }
 
-void game_file_read_dialogs(DataStream *in)
+void game_file_read_dialogs(Stream *in)
 {
 	dialog=(DialogTopic*)malloc(sizeof(DialogTopic)*game.numdialog+5);
 
-//#ifdef ALLEGRO_BIG_ENDIAN
     for (int iteratorCount = 0; iteratorCount < game.numdialog; ++iteratorCount)
     {
         dialog[iteratorCount].ReadFromFile(in);
     }
-//#else
-//    in->ReadArray(&dialog[0],sizeof(DialogTopic),game.numdialog);  
-//#endif
 
-    if (filever <= 37) // Dialog script
+    if (filever <= kGameVersion_300) // Dialog script
     {
         old_dialog_scripts = (unsigned char**)malloc(game.numdialog * sizeof(unsigned char**));
 
@@ -318,7 +290,7 @@ void game_file_read_dialogs(DataStream *in)
         old_speech_lines = (char**)malloc(10000 * sizeof(char**));
         i = 0;
 
-        if (filever <= 25)
+        if (filever <= kGameVersion_260)
         {
             // Plain text on <= 2.60
             char buffer[1000];
@@ -376,7 +348,7 @@ void game_file_read_dialogs(DataStream *in)
     }
 }
 
-void game_file_read_gui(DataStream *in)
+void game_file_read_gui(Stream *in)
 {
 	read_gui(in,guis,&game, &guis);
 
@@ -390,7 +362,7 @@ void game_file_read_gui(DataStream *in)
 
 void game_file_set_score_sound(GameSetupStruct::GAME_STRUCT_READ_DATA &read_data)
 {
-    if (read_data.filever >= 41) {
+    if (read_data.filever >= kGameVersion_320) {
         play.score_sound = read_data.score_sound;
     }
     else {
@@ -430,7 +402,7 @@ void init_and_register_characters()
         characterScriptObjNames[ee] = (char*)malloc(strlen(game.chars[ee].scrname) + 5);
         strcpy(characterScriptObjNames[ee], game.chars[ee].scrname);
 
-        ccAddExternalSymbol(characterScriptObjNames[ee], &game.chars[ee]);
+        ccAddExternalDynamicObject(characterScriptObjNames[ee], &game.chars[ee], &ccDynamicCharacter);
     }
 }
 
@@ -463,7 +435,7 @@ void init_and_register_invitems()
         ccRegisterManagedObject(&scrInv[ee], &ccDynamicInv);
 
         if (game.invScriptNames[ee][0] != 0)
-            ccAddExternalSymbol(game.invScriptNames[ee], &scrInv[ee]);
+            ccAddExternalDynamicObject(game.invScriptNames[ee], &scrInv[ee], &ccDynamicInv);
     }
 }
 
@@ -476,7 +448,7 @@ void init_and_register_dialogs()
         ccRegisterManagedObject(&scrDialog[ee], &ccDynamicDialog);
 
         if (game.dialogScriptNames[ee][0] != 0)
-            ccAddExternalSymbol(game.dialogScriptNames[ee], &scrDialog[ee]);
+            ccAddExternalDynamicObject(game.dialogScriptNames[ee], &scrDialog[ee], &ccDynamicDialog);
     }
 }
 
@@ -512,7 +484,7 @@ void init_and_register_guis()
         // scrGui[ee].gui = &guis[ee];
         scrGui[ee].id = ee;
 
-        ccAddExternalSymbol(guiScriptObjNames[ee], &scrGui[ee]);
+        ccAddExternalDynamicObject(guiScriptObjNames[ee], &scrGui[ee], &ccDynamicGUI);
         ccRegisterManagedObject(&scrGui[ee], &ccDynamicGUI);
     }
 
@@ -547,7 +519,6 @@ void init_and_register_game_objects()
 	init_and_register_guis();
     init_and_register_fonts();    
 
-    wtexttransparent(TEXTFG);
     play.fade_effect=game.options[OPT_FADETYPE];
 
     our_eip=-21;
@@ -565,15 +536,39 @@ void init_and_register_game_objects()
     long dorsHandle = ccRegisterManagedObject(dialogOptionsRenderingSurface, dialogOptionsRenderingSurface);
     ccAddObjectReference(dorsHandle);
 
-    ccAddExternalSymbol("character",&game.chars[0]);
+    StaticCharacterArray.Create(&ccDynamicCharacter, sizeof(CharacterInfo), sizeof(CharacterInfo));
+    StaticObjectArray.Create(&ccDynamicObject, sizeof(ScriptObject), sizeof(ScriptObject));
+    StaticGUIArray.Create(&ccDynamicGUI, sizeof(ScriptGUI), sizeof(ScriptGUI));
+    StaticHotspotArray.Create(&ccDynamicHotspot, sizeof(ScriptHotspot), sizeof(ScriptHotspot));
+    StaticRegionArray.Create(&ccDynamicRegion, sizeof(ScriptRegion), sizeof(ScriptRegion));
+    StaticInventoryArray.Create(&ccDynamicInv, sizeof(ScriptInvItem), sizeof(ScriptInvItem));
+    StaticDialogArray.Create(&ccDynamicDialog, sizeof(ScriptDialog), sizeof(ScriptDialog));
+
+    ccAddExternalStaticArray("character",&game.chars[0], &StaticCharacterArray);
     setup_player_character(game.playercharacter);
-    ccAddExternalSymbol("player", &_sc_PlayerCharPtr);
-    ccAddExternalSymbol("object",&scrObj[0]);
-    ccAddExternalSymbol("gui",&scrGui[0]);
-    ccAddExternalSymbol("hotspot",&scrHotspot[0]);
-    ccAddExternalSymbol("region",&scrRegion[0]);
-    ccAddExternalSymbol("inventory",&scrInv[0]);
-    ccAddExternalSymbol("dialog", &scrDialog[0]);
+    if (loaded_game_file_version >= kGameVersion_270) {
+        ccAddExternalStaticObject("player", &_sc_PlayerCharPtr, &GlobalStaticManager);
+    }
+    ccAddExternalStaticArray("object",&scrObj[0], &StaticObjectArray);
+    ccAddExternalStaticArray("gui",&scrGui[0], &StaticGUIArray);
+    ccAddExternalStaticArray("hotspot",&scrHotspot[0], &StaticHotspotArray);
+    ccAddExternalStaticArray("region",&scrRegion[0], &StaticRegionArray);
+    ccAddExternalStaticArray("inventory",&scrInv[0], &StaticInventoryArray);
+    ccAddExternalStaticArray("dialog", &scrDialog[0], &StaticDialogArray);
+}
+
+void ReadGameSetupStructBase_Aligned(Stream *in)
+{
+    GameSetupStructBase *gameBase = (GameSetupStructBase *) &game;
+    AlignedStream align_s(in, Common::kAligned_Read);
+    gameBase->ReadFromFile(&align_s);
+}
+
+void WriteGameSetupStructBase_Aligned(Stream *out)
+{
+    GameSetupStructBase *gameBase = (GameSetupStructBase *) &game;
+    AlignedStream align_s(out, Common::kAligned_Write);
+    gameBase->WriteToFile(&align_s);
 }
 
 int load_game_file() {
@@ -587,7 +582,7 @@ int load_game_file() {
 	// Start reading from file
 	//-----------------------------------------------------------
 
-    DataStream *in = game_file_open();
+    Stream *in = game_file_open();
 	if (in==NULL)
 		return -1;
 
@@ -606,18 +601,20 @@ int load_game_file() {
     game.invScripts = NULL;
     memset(&game.spriteflags[0], 0, MAX_SPRITES);
 
-//#ifdef ALLEGRO_BIG_ENDIAN
-    GameSetupStructBase *gameBase = (GameSetupStructBase *) &game;
-    gameBase->ReadFromFile(in);
-//#else
-//    in->ReadArray(&game, sizeof (GameSetupStructBase), 1);
-//#endif
+    ReadGameSetupStructBase_Aligned(in);
 
-    if (filever <= 37) // <= 3.1
+    if (filever <= kGameVersion_300)
     {
         // Fix animation speed for old formats
         game.options[OPT_OLDTALKANIMSPD] = 1;
     }
+    // 3.20: Fixed GUI AdditiveOpacity mode not working properly if you tried to have a non-alpha sprite on an alpha GUI
+    if (loaded_game_file_version < kGameVersion_320)
+    {
+        // Force new style rendering for gui sprites with alpha channel
+        game.options[OPT_NEWGUIALPHA] = 1;
+    }
+    init_blenders((GameGuiAlphaRenderingStyle)game.options[OPT_NEWGUIALPHA]);
 
     if (game.numfonts > MAX_FONTS)
         quit("!This game requires a newer version of AGS. Too many fonts for this version to handle.");
@@ -635,7 +632,7 @@ int load_game_file() {
     if (game.compiled_script == NULL)
         quit("No global script in game; data load error");
 
-    gamescript = fread_script(in);
+    gamescript = ccScript::CreateFromStream(in);
     if (gamescript == NULL)
         quit("Global script load failed; need newer version?");
 
@@ -662,7 +659,7 @@ int load_game_file() {
 
     our_eip=-14;
 
-    if (filever <= 19) // <= 2.1 skip unknown data
+    if (filever <= kGameVersion_251) // <= 2.1 skip unknown data
     {
         int count = in->ReadInt32();
         in->Seek(Common::kSeekCurrent, count * 0x204);
@@ -681,7 +678,7 @@ int load_game_file() {
 
 	game_file_read_gui(in);
 
-    if (filever >= 25) // >= 2.60
+    if (filever >= kGameVersion_260) // >= 2.60
     {
         platform->ReadPluginsFromDisk(in);
     }

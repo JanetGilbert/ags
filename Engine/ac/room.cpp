@@ -13,7 +13,6 @@
 //=============================================================================
 
 #define USE_CLIB
-#include "util/wgt2allg.h"
 #include "util/string_utils.h" //strlwr()
 #include "gfx/ali3d.h"
 #include "ac/common.h"
@@ -50,20 +49,24 @@
 #include "script/cc_instance.h"
 #include "debug/debug_log.h"
 #include "debug/debugger.h"
+#include "debug/out.h"
 #include "media/audio/audio.h"
 #include "platform/base/agsplatformdriver.h"
 #include "plugin/agsplugin.h"
 #include "script/script.h"
 #include "script/script_runtime.h"
 #include "ac/spritecache.h"
-#include "util/datastream.h"
+#include "util/stream.h"
 #include "gfx/graphicsdriver.h"
-#include "gfx/bitmap.h"
 #include "core/assetmanager.h"
+#include "ac/dynobj/all_dynamicclasses.h"
+#include "gfx/bitmap.h"
 
-using AGS::Common::DataStream;
 using AGS::Common::Bitmap;
+using AGS::Common::Stream;
+using AGS::Common::String;
 namespace BitmapHelper = AGS::Common::BitmapHelper;
+namespace Out = AGS::Common::Out;
 
 #if !defined (WINDOWS_VERSION)
 // for toupper
@@ -121,6 +124,9 @@ extern int mouse_z_was;
 
 extern Bitmap **guibg;
 extern IDriverDependantBitmap **guibgbmp;
+
+extern CCHotspot ccDynamicHotspot;
+extern CCObject ccDynamicObject;
 
 RGB_MAP rgb_table;  // for 256-col antialiasing
 int new_room_flags=0;
@@ -209,13 +215,13 @@ Bitmap *fix_bitmap_size(Bitmap *todubl) {
         return todubl;
 
     //  Bitmap *tempb=BitmapHelper::CreateBitmap(scrnwid,scrnhit);
+    //todubl->SetClip(Rect(0,0,oldw-1,oldh-1)); // CHECKME! [IKM] Not sure this is needed here
     Bitmap *tempb=BitmapHelper::CreateBitmap(newWidth, newHeight, todubl->GetColorDepth());
     tempb->SetClip(Rect(0,0,tempb->GetWidth()-1,tempb->GetHeight()-1));
-    todubl->SetClip(Rect(0,0,oldw-1,oldh-1));
-    tempb->Clear();
+    tempb->Fill(0);
     tempb->StretchBlt(todubl, RectWH(0,0,oldw,oldh), RectWH(0,0,tempb->GetWidth(),tempb->GetHeight()));
-    delete todubl; todubl=tempb;
-    return todubl;
+    delete todubl;
+    return tempb;
 }
 
 
@@ -228,9 +234,7 @@ void save_room_data_segment () {
     croom->tsdatasize = roominst->globaldatasize;
     if (croom->tsdatasize > 0) {
         croom->tsdata=(char*)malloc(croom->tsdatasize+10);
-        ccFlattenGlobalData (roominst);
         memcpy(croom->tsdata,&roominst->globaldata[0],croom->tsdatasize);
-        ccUnFlattenGlobalData (roominst);
     }
 
 }
@@ -242,11 +246,12 @@ void unload_old_room() {
     if (displayed_room < 0)
         return;
 
-    platform->WriteDebugString("Unloading room %d", displayed_room);
+    Out::FPrint("Unloading room %d", displayed_room);
 
     current_fade_out_effect();
 
-    abuf->Clear();
+    Bitmap *ds = GetVirtualScreen();
+    ds->Fill(0);
     for (ff=0;ff<croom->numobj;ff++)
         objs[ff].moving = 0;
 
@@ -267,8 +272,8 @@ void unload_old_room() {
     if (croom==NULL) ;
     else if (roominst!=NULL) {
         save_room_data_segment();
-        ccFreeInstance(roominstFork);
-        ccFreeInstance(roominst);
+        delete roominstFork;
+        delete roominst;
         roominstFork = NULL;
         roominst=NULL;
     }
@@ -385,25 +390,26 @@ extern int convert_16bit_bgr;
 
 #define NO_GAME_ID_IN_ROOM_FILE 16325
 // forchar = playerchar on NewRoom, or NULL if restore saved game
-void load_new_room(int newnum,CharacterInfo*forchar) {
+void load_new_room(int newnum, CharacterInfo*forchar) {
 
-    platform->WriteDebugString("Loading room %d", newnum);
+    Out::FPrint("Loading room %d", newnum);
 
-    char rmfile[20];
+    String room_filename;
     int cc;
     done_es_error = 0;
     play.room_changes ++;
     set_color_depth(8);
     displayed_room=newnum;
 
-    sprintf(rmfile,"room%d.crm",newnum);
+    room_filename.Format("room%d.crm", newnum);
     if (newnum == 0) {
         // support both room0.crm and intro.crm
-        DataStream *inpu = Common::AssetManager::OpenAsset(rmfile);
-        if (inpu == NULL)
-            strcpy(rmfile, "intro.crm");
-        else
-            delete inpu; // [IKM] How very appropriate
+        // 2.70: Renamed intro.crm to room0.crm, to stop it causing confusion
+        if (loaded_game_file_version < kGameVersion_270 && Common::AssetManager::DoesAssetExist("intro.crm") ||
+            loaded_game_file_version >= kGameVersion_270 && !Common::AssetManager::DoesAssetExist(room_filename))
+        {
+            room_filename = "intro.crm";
+        }
     }
     // reset these back, because they might have been changed.
     delete thisroom.object;
@@ -417,11 +423,11 @@ void load_new_room(int newnum,CharacterInfo*forchar) {
     // load the room from disk
     our_eip=200;
     thisroom.gameId = NO_GAME_ID_IN_ROOM_FILE;
-    load_room(rmfile, &thisroom, (game.default_resolution > 2));
+    load_room(room_filename, &thisroom, (game.default_resolution > 2));
 
     if ((thisroom.gameId != NO_GAME_ID_IN_ROOM_FILE) &&
         (thisroom.gameId != game.uniqueid)) {
-            quitprintf("!Unable to load '%s'. This room file is assigned to a different game.", rmfile);
+            quitprintf("!Unable to load '%s'. This room file is assigned to a different game.", room_filename.GetCStr());
     }
 
     if ((game.default_resolution > 2) && (game.options[OPT_NATIVECOORDINATES] == 0))
@@ -491,8 +497,9 @@ void load_new_room(int newnum,CharacterInfo*forchar) {
     if (usetup.want_letterbox) {
         int abscreen=0;
 
-        if (abuf==BitmapHelper::GetScreenBitmap()) abscreen=1;
-        else if (abuf==virtual_screen) abscreen=2;
+        Bitmap *ds = GetVirtualScreen();
+        if (ds==BitmapHelper::GetScreenBitmap()) abscreen=1;
+        else if (ds==virtual_screen) abscreen=2;
         // if this is a 640x480 room and we're in letterbox mode, full-screen it
         int newScreenHeight = final_scrn_hit;
         if (multiply_up_coordinate(thisroom.height) < final_scrn_hit) {
@@ -532,8 +539,10 @@ void load_new_room(int newnum,CharacterInfo*forchar) {
 
         gfxDriver->SetRenderOffset(get_screen_x_adjustment(virtual_screen), get_screen_y_adjustment(virtual_screen));
 
-		if (abscreen==1) abuf=BitmapHelper::GetScreenBitmap();
-        else if (abscreen==2) abuf=virtual_screen;
+		if (abscreen==1) //abuf=BitmapHelper::GetScreenBitmap();
+            SetVirtualScreen( BitmapHelper::GetScreenBitmap() );
+        else if (abscreen==2) //abuf=virtual_screen;
+            SetVirtualScreen( virtual_screen );
 
         update_polled_stuff_if_runtime();
     }
@@ -553,11 +562,10 @@ void load_new_room(int newnum,CharacterInfo*forchar) {
     // Make a backup copy of the walkable areas prior to
     // any RemoveWalkableArea commands
     delete walkareabackup;
-    walkareabackup=BitmapHelper::CreateBitmap(thisroom.walls->GetWidth(),thisroom.walls->GetHeight());
+    // copy the walls screen
+    walkareabackup=BitmapHelper::CreateBitmapCopy(thisroom.walls);
 
     our_eip=204;
-    // copy the walls screen
-    walkareabackup->Blit(thisroom.walls,0,0,0,0,thisroom.walls->GetWidth(),thisroom.walls->GetHeight());
     update_polled_stuff_if_runtime();
     redo_walkable_areas();
     // fix walk-behinds to current screen resolution
@@ -617,7 +625,7 @@ void load_new_room(int newnum,CharacterInfo*forchar) {
             croom->obj[cc].x=thisroom.sprs[cc].x;
             croom->obj[cc].y=thisroom.sprs[cc].y;
 
-            if (thisroom.wasversion <= 26)
+            if (thisroom.wasversion <= kRoomVersion_300a)
                 croom->obj[cc].y += divide_down_coordinate(spriteheight[thisroom.sprs[cc].sprnum]);
 
             croom->obj[cc].num=thisroom.sprs[cc].sprnum;
@@ -691,7 +699,7 @@ void load_new_room(int newnum,CharacterInfo*forchar) {
         if (thisroom.objectscriptnames[cc][0] == 0)
             continue;
 
-        if (thisroom.wasversion >= 26) 
+        if (thisroom.wasversion >= kRoomVersion_300a) 
         {
             strcpy(objectScriptObjNames[cc], thisroom.objectscriptnames[cc]);
         }
@@ -703,14 +711,14 @@ void load_new_room(int newnum,CharacterInfo*forchar) {
                 objectScriptObjNames[cc][1] = toupper(objectScriptObjNames[cc][1]);
         }
 
-        ccAddExternalSymbol(objectScriptObjNames[cc], &scrObj[cc]);
+        ccAddExternalDynamicObject(objectScriptObjNames[cc], &scrObj[cc], &ccDynamicObject);
     }
 
     for (cc = 0; cc < MAX_HOTSPOTS; cc++) {
         if (thisroom.hotspotScriptNames[cc][0] == 0)
             continue;
 
-        ccAddExternalSymbol(thisroom.hotspotScriptNames[cc], &scrHotspot[cc]);
+        ccAddExternalDynamicObject(thisroom.hotspotScriptNames[cc], &scrHotspot[cc], &ccDynamicHotspot);
     }
 
     our_eip=206;
@@ -782,7 +790,6 @@ void load_new_room(int newnum,CharacterInfo*forchar) {
             if (croom->tsdatasize != roominst->globaldatasize)
                 quit("room script data segment size has changed");
             memcpy(&roominst->globaldata[0],croom->tsdata,croom->tsdatasize);
-            ccUnFlattenGlobalData (roominst);
         }
     }
     our_eip=207;
@@ -943,7 +950,7 @@ extern int psp_clear_cache_on_room_change;
 void new_room(int newnum,CharacterInfo*forchar) {
     EndSkippingUntilCharStops();
 
-    platform->WriteDebugString("Room change requested to room %d", newnum);
+    Out::FPrint("Room change requested to room %d", newnum);
 
     update_polled_stuff_if_runtime();
 
@@ -953,7 +960,7 @@ void new_room(int newnum,CharacterInfo*forchar) {
     // player leaves screen event
     run_room_event(8);
     // Run the global OnRoomLeave event
-    run_on_event (GE_LEAVE_ROOM, displayed_room);
+    run_on_event (GE_LEAVE_ROOM, RuntimeScriptValue().SetInt32(displayed_room));
 
     platform->RunPluginHooks(AGSE_LEAVEROOM, displayed_room);
 
@@ -1039,7 +1046,7 @@ void check_new_room() {
 void compile_room_script() {
     ccError = 0;
 
-    roominst = ccCreateInstance(thisroom.compiled_script);
+    roominst = ccInstance::CreateFromScript(thisroom.compiled_script);
 
     if ((ccError!=0) || (roominst==NULL)) {
         char thiserror[400];
@@ -1047,7 +1054,7 @@ void compile_room_script() {
         quit(thiserror);
     }
 
-    roominstFork = ccForkInstance(roominst);
+    roominstFork = roominst->Fork();
     if (roominstFork == NULL)
         quitprintf("Unable to create forked room instance: %s", ccErrorString);
 
@@ -1082,4 +1089,121 @@ void on_background_frame_change () {
     // close as possible to the screen update to prevent flicker problem)
     if (game.color_depth == 1)
         bg_just_changed = 1;
+}
+
+//=============================================================================
+//
+// Script API Functions
+//
+//=============================================================================
+
+#include "debug/out.h"
+#include "script/script_api.h"
+#include "script/script_runtime.h"
+#include "ac/dynobj/scriptstring.h"
+
+extern ScriptString myScriptStringImpl;
+
+// ScriptDrawingSurface* (int backgroundNumber)
+RuntimeScriptValue Sc_Room_GetDrawingSurfaceForBackground(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_OBJAUTO_PINT(ScriptDrawingSurface, Room_GetDrawingSurfaceForBackground);
+}
+
+// const char* (const char *property)
+RuntimeScriptValue Sc_Room_GetTextProperty(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_OBJ_POBJ(const char, myScriptStringImpl, Room_GetTextProperty, const char);
+}
+
+// int ()
+RuntimeScriptValue Sc_Room_GetBottomEdge(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Room_GetBottomEdge);
+}
+
+// int ()
+RuntimeScriptValue Sc_Room_GetColorDepth(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Room_GetColorDepth);
+}
+
+// int ()
+RuntimeScriptValue Sc_Room_GetHeight(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Room_GetHeight);
+}
+
+// int ()
+RuntimeScriptValue Sc_Room_GetLeftEdge(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Room_GetLeftEdge);
+}
+
+// const char* (int index)
+RuntimeScriptValue Sc_Room_GetMessages(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_OBJ_PINT(const char, myScriptStringImpl, Room_GetMessages);
+}
+
+// int ()
+RuntimeScriptValue Sc_Room_GetMusicOnLoad(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Room_GetMusicOnLoad);
+}
+
+// int ()
+RuntimeScriptValue Sc_Room_GetObjectCount(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Room_GetObjectCount);
+}
+
+// int ()
+RuntimeScriptValue Sc_Room_GetRightEdge(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Room_GetRightEdge);
+}
+
+// int ()
+RuntimeScriptValue Sc_Room_GetTopEdge(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Room_GetTopEdge);
+}
+
+// int ()
+RuntimeScriptValue Sc_Room_GetWidth(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Room_GetWidth);
+}
+
+
+void RegisterRoomAPI()
+{
+    ccAddExternalStaticFunction("Room::GetDrawingSurfaceForBackground^1",   Sc_Room_GetDrawingSurfaceForBackground);
+    ccAddExternalStaticFunction("Room::GetTextProperty^1",                  Sc_Room_GetTextProperty);
+    ccAddExternalStaticFunction("Room::get_BottomEdge",                     Sc_Room_GetBottomEdge);
+    ccAddExternalStaticFunction("Room::get_ColorDepth",                     Sc_Room_GetColorDepth);
+    ccAddExternalStaticFunction("Room::get_Height",                         Sc_Room_GetHeight);
+    ccAddExternalStaticFunction("Room::get_LeftEdge",                       Sc_Room_GetLeftEdge);
+    ccAddExternalStaticFunction("Room::geti_Messages",                      Sc_Room_GetMessages);
+    ccAddExternalStaticFunction("Room::get_MusicOnLoad",                    Sc_Room_GetMusicOnLoad);
+    ccAddExternalStaticFunction("Room::get_ObjectCount",                    Sc_Room_GetObjectCount);
+    ccAddExternalStaticFunction("Room::get_RightEdge",                      Sc_Room_GetRightEdge);
+    ccAddExternalStaticFunction("Room::get_TopEdge",                        Sc_Room_GetTopEdge);
+    ccAddExternalStaticFunction("Room::get_Width",                          Sc_Room_GetWidth);
+
+    /* ----------------------- Registering unsafe exports for plugins -----------------------*/
+
+    ccAddExternalFunctionForPlugin("Room::GetDrawingSurfaceForBackground^1",   (void*)Room_GetDrawingSurfaceForBackground);
+    ccAddExternalFunctionForPlugin("Room::GetTextProperty^1",                  (void*)Room_GetTextProperty);
+    ccAddExternalFunctionForPlugin("Room::get_BottomEdge",                     (void*)Room_GetBottomEdge);
+    ccAddExternalFunctionForPlugin("Room::get_ColorDepth",                     (void*)Room_GetColorDepth);
+    ccAddExternalFunctionForPlugin("Room::get_Height",                         (void*)Room_GetHeight);
+    ccAddExternalFunctionForPlugin("Room::get_LeftEdge",                       (void*)Room_GetLeftEdge);
+    ccAddExternalFunctionForPlugin("Room::geti_Messages",                      (void*)Room_GetMessages);
+    ccAddExternalFunctionForPlugin("Room::get_MusicOnLoad",                    (void*)Room_GetMusicOnLoad);
+    ccAddExternalFunctionForPlugin("Room::get_ObjectCount",                    (void*)Room_GetObjectCount);
+    ccAddExternalFunctionForPlugin("Room::get_RightEdge",                      (void*)Room_GetRightEdge);
+    ccAddExternalFunctionForPlugin("Room::get_TopEdge",                        (void*)Room_GetTopEdge);
+    ccAddExternalFunctionForPlugin("Room::get_Width",                          (void*)Room_GetWidth);
 }

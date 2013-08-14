@@ -15,46 +15,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "ac/view.h"
-#include "util/wgt2allg.h"
-#include "util/file.h"
-#include "util/datastream.h"
+#include "util/alignedstream.h"
 
-using AGS::Common::DataStream;
+using AGS::Common::AlignedStream;
+using AGS::Common::Stream;
 
-void ViewFrame::ReadFromFile(DataStream *in)
+void ViewFrame::ReadFromFile(Stream *in)
 {
-//#ifdef ALLEGRO_BIG_ENDIAN
     pic = in->ReadInt32();
-    xoffs = in->ReadInt16();//__getshort__bigendian(fp);
-    yoffs = in->ReadInt16();//__getshort__bigendian(fp);
-    speed = in->ReadInt16();//__getshort__bigendian(fp);
-    in->Seek(Common::kSeekCurrent, 2);
+    xoffs = in->ReadInt16();
+    yoffs = in->ReadInt16();
+    speed = in->ReadInt16();
     flags = in->ReadInt32();
     sound = in->ReadInt32();
     reserved_for_future[0] = in->ReadInt32();
     reserved_for_future[1] = in->ReadInt32();
-//#else
-//    pic = in->ReadInt32();
-//    in->ReadArray(&xoffs, 2, 1);
-//    in->ReadArray(&yoffs, 2, 1);
-//    in->ReadArray(&speed, 2, 1);
-//    Seek(fp, 2, Common::kSeekCurrent);
-//    flags = in->ReadInt32();
-//    sound = in->ReadInt32();
-//    reserved_for_future[0] = in->ReadInt32();
-//    reserved_for_future[1] = in->ReadInt32();
-//#endif
 }
 
-void ViewFrame::WriteToFile(DataStream *out)
+void ViewFrame::WriteToFile(Stream *out)
 {
-    char padding[3] = {0,0,0};
-
     out->WriteInt32(pic);
-    out->WriteInt16(xoffs);//__getshort__bigendian(fp);
-    out->WriteInt16(yoffs);//__getshort__bigendian(fp);
-    out->WriteInt16(speed);//__getshort__bigendian(fp);
-    out->Write(padding, 2);
+    out->WriteInt16(xoffs);
+    out->WriteInt16(yoffs);
+    out->WriteInt16(speed);
     out->WriteInt32(flags);
     out->WriteInt32(sound);
     out->WriteInt32(reserved_for_future[0]);
@@ -83,48 +66,42 @@ void ViewLoopNew::Dispose()
     }
 }
 
-void ViewLoopNew::WriteToFile(DataStream *out)
+void ViewLoopNew::WriteToFile_v321(Stream *out)
 {
     out->WriteInt16(numFrames);
     out->WriteInt32(flags);
-    for (int i = 0; i < numFrames; ++i)
-    {
-        frames[i].WriteToFile(out);
-    }
-    //out->WriteArray(frames, sizeof(ViewFrame), numFrames);
+    WriteFrames_Aligned(out);
 }
 
-
-void ViewLoopNew::ReadFromFile(DataStream *in)
+void ViewLoopNew::WriteFrames_Aligned(Stream *out)
 {
-//#ifdef ALLEGRO_BIG_ENDIAN
-
-    // [IKM] 2012-06-13
-    // A shoutout from earlier days (or years?) of AGS :)
-    // (I guess "Steve" is Steve McCrea)
-
-    /* STEVE PLEASE VALIDATE THAT THIS CODE IS OK */
-
-    Initialize(in->ReadInt16()/*__getshort__bigendian(iii)*/);
-    flags = in->ReadInt32();
-
+    AlignedStream align_s(out, Common::kAligned_Write);
     for (int i = 0; i < numFrames; ++i)
     {
-        frames[i].ReadFromFile(in);
+        frames[i].WriteToFile(&align_s);
+        align_s.Reset();
     }
+}
 
-//#else
-
-//    Initialize(->ReadInt16(iii));
-//    flags = ->ReadInt32(iii);
-
-//    in->ReadArray(frames, sizeof(ViewFrame), numFrames, iii);
-
-//#endif
+void ViewLoopNew::ReadFromFile_v321(Stream *in)
+{
+    Initialize(in->ReadInt16());
+    flags = in->ReadInt32();
+    ReadFrames_Aligned(in);
 
     // an extra frame is allocated in memory to prevent
     // crashes with empty loops -- set its picture to teh BLUE CUP!!
     frames[numFrames].pic = 0;
+}
+
+void ViewLoopNew::ReadFrames_Aligned(Stream *in)
+{
+    AlignedStream align_s(in, Common::kAligned_Read);
+    for (int i = 0; i < numFrames; ++i)
+    {
+        frames[i].ReadFromFile(&align_s);
+        align_s.Reset();
+    }
 }
 
 void ViewStruct::Initialize(int loopCount)
@@ -145,39 +122,32 @@ void ViewStruct::Dispose()
     }
 }
 
-void ViewStruct::WriteToFile(DataStream *out)
+void ViewStruct::WriteToFile(Stream *out)
 {
     out->WriteInt16(numLoops);
     for (int i = 0; i < numLoops; i++)
     {
-        loops[i].WriteToFile(out);
+        loops[i].WriteToFile_v321(out);
     }
 }
 
-void ViewStruct::ReadFromFile(DataStream *in)
+void ViewStruct::ReadFromFile(Stream *in)
 {
-//#ifdef ALLEGRO_BIG_ENDIAN
-    Initialize(in->ReadInt16()/*__getshort__bigendian(iii)*/);
-//#else
-//    Initialize(->ReadInt16(iii));
-//#endif
+    Initialize(in->ReadInt16());
 
     for (int i = 0; i < numLoops; i++)
     {
-        loops[i].ReadFromFile(in);
+        loops[i].ReadFromFile_v321(in);
     }
 }
 
-void ViewStruct272::ReadFromFile(DataStream *in)
+void ViewStruct272::ReadFromFile(Stream *in)
 {
-//#ifdef ALLEGRO_BIG_ENDIAN
-    numloops = in->ReadInt16();//__getshort__bigendian(fp);
+    numloops = in->ReadInt16();
     for (int i = 0; i < 16; ++i)
     {
-        numframes[i] = in->ReadInt16();//__getshort__bigendian(fp);
+        numframes[i] = in->ReadInt16();
     }
-    // skip padding if there is any
-    in->Seek(Common::kSeekCurrent, 2*(2 - ((16+1)%2)));
     in->ReadArrayOfInt32(loopflags, 16);
     for (int j = 0; j < 16; ++j)
     {
@@ -186,22 +156,6 @@ void ViewStruct272::ReadFromFile(DataStream *in)
             frames[j][i].ReadFromFile(in);
         }
     }
-//#else
-//    in->ReadArray(&numloops, 2, 1);
-//    for (int i = 0; i < 16; ++i)
-//    {
-//        in->ReadArray(&numframes[i], 2, 1);
-//    }
-//    Seek(fp, 2*(2 - ((16+1)%2)), Common::kSeekCurrent);
-//    in->ReadArray(loopflags, sizeof(int), 16);
-//    for (int j = 0; j < 16; ++j)
-//    {
-//        for (int i = 0; i < 20; ++i)
-//        {
-//            frames[j][i].ReadFromFile(fp);
-//        }
-//    }
-//#endif
 }
 
 void Convert272ViewsToNew (int numof, ViewStruct272 *oldv, ViewStruct *newv) {

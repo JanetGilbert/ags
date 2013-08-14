@@ -20,9 +20,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "util/datastream.h"
+#include "ac/common.h"
+#include "util/stream.h"
 
-using AGS::Common::DataStream;
+using AGS::Common::Stream;
 using namespace AGS; // FIXME later
 
 #ifdef _MANAGED
@@ -34,12 +35,8 @@ using namespace AGS; // FIXME later
 #include <io.h>
 #endif
 
-extern void quit(char *);
-
 int insert(int, int);
 void _delete(int);
-//void lzwcompress(FILE *, FILE *);
-//void lzwexpand(FILE *, FILE *);
 
 #define N 4096
 #define F 16
@@ -61,6 +58,8 @@ int insert(int i, int run)
 {
   int c, j, k, l, n, match;
   int *p;
+
+  c = NIL;
 
   k = l = 1;
   match = THRESHOLD - 1;
@@ -127,7 +126,7 @@ void _delete(int z)
   }
 }
 
-void lzwcompress(Common::DataStream *lzw_in, Common::DataStream *out)
+void lzwcompress(Common::Stream *lzw_in, Common::Stream *out)
 {
   int ch, i, run, len, match, size, mask;
   char buf[17];
@@ -203,7 +202,7 @@ void lzwcompress(Common::DataStream *lzw_in, Common::DataStream *out)
 
 int expand_to_mem = 0;
 unsigned char *membfptr = NULL;
-void myputc(int ccc, DataStream *out)
+void myputc(int ccc, Stream *out)
 {
   if (maxsize > 0) {
     putbytes++;
@@ -219,7 +218,7 @@ void myputc(int ccc, DataStream *out)
     out->WriteInt8(ccc);
 }
 
-void lzwexpand(DataStream *lzw_in, DataStream *out)
+void lzwexpand(Stream *lzw_in, Stream *out)
 {
   int bits, ch, i, j, len, mask;
   char *lzbuffer;
@@ -270,7 +269,7 @@ void lzwexpand(DataStream *lzw_in, DataStream *out)
   expand_to_mem = 0;
 }
 
-unsigned char *lzwexpand_to_mem(Common::DataStream *in)
+unsigned char *lzwexpand_to_mem(Common::Stream *in)
 {
   unsigned char *membuff = (unsigned char *)malloc(maxsize + 10);
   expand_to_mem = 1;

@@ -12,13 +12,15 @@
 //
 //=============================================================================
 
-#include "util/wgt2allg.h"
 #include "ac/common.h"
 #include "ac/gamesetupstruct.h"
 #include "ac/properties.h"
 #include "ac/string.h"
+#include "ac/dynobj/scriptstring.h"
+#include "script/runtimescriptvalue.h"
 
 extern GameSetupStruct game;
+extern ScriptString myScriptStringImpl;
 
 // begin custom property functions
 

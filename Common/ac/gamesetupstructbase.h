@@ -22,11 +22,10 @@
 #include "ac/wordsdictionary.h"  // WordsDictionary
 #include "ac/gamestructdefines.h"
 #include "script/cc_script.h"           // ccScript
-#include "util/file.h"
-#include "util/wgt2allg.h"
+#include "util/wgt2allg.h" // color (allegro RGB)
 
 // Forward declaration
-namespace AGS { namespace Common { class DataStream; } }
+namespace AGS { namespace Common { class Stream; } }
 using namespace AGS; // FIXME later
 
 // This struct is written directly to the disk file // [IKM] not really anymore
@@ -64,9 +63,16 @@ struct GameSetupStructBase {
     char             *globalscript;
     CharacterInfo    *chars;
     ccScript         *compiled_script;
+    // [IKM] 2013-03-30
+    // NOTE: it looks like nor 'globalscript', not 'compiled_script' are used
+    // to store actual script data anytime; 'ccScript* gamescript' global
+    // pointer is used for that instead.
+    // 'compiled_script' member is used once as a flag, to indicate that there's
+    // a global script data to be loaded; 'globalscript' is not used anywhere
+    // for anything useful.
 
-    void ReadFromFile(Common::DataStream *in);
-    void WriteToFile(Common::DataStream *out);
+    void ReadFromFile(Common::Stream *in);
+    void WriteToFile(Common::Stream *out);
 };
 
 #endif // __AGS_CN_AC__GAMESETUPSTRUCTBASE_H

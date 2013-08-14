@@ -17,9 +17,9 @@
 #include "gui/guimain.h"
 #include "util/string_utils.h"  // fputstring, etc
 #include "ac/common.h"		// quit()
-#include "util/datastream.h"
+#include "util/stream.h"
 
-using AGS::Common::DataStream;
+using AGS::Common::Stream;
 
 void GUIObject::init() {
   int jj;
@@ -36,7 +36,7 @@ int GUIObject::IsDisabled() {
   return 0;
 }
 
-void GUIObject::WriteToFile(DataStream *out)
+void GUIObject::WriteToFile(Stream *out)
 {
   // MACPORT FIX: swap
   out->WriteArrayOfInt32((int32_t*)&flags, BASEGOBJ_SIZE);
@@ -47,11 +47,11 @@ void GUIObject::WriteToFile(DataStream *out)
     fputstring(eventHandlers[kk], out);
 }
 
-void GUIObject::ReadFromFile(DataStream *in, int version)
+void GUIObject::ReadFromFile(Stream *in, GuiVersion gui_version)
 {
   // MACPORT FIX: swap
   in->ReadArrayOfInt32((int32_t*)&flags, BASEGOBJ_SIZE);
-  if (version >= 106)
+  if (gui_version >= kGuiVersion_unkn_106)
     fgetstring_limit(scriptName, in, MAX_GUIOBJ_SCRIPTNAME_LEN);
   else
     scriptName[0] = 0;
@@ -60,7 +60,7 @@ void GUIObject::ReadFromFile(DataStream *in, int version)
   for (kk = 0; kk < GetNumEvents(); kk++)
     eventHandlers[kk][0] = 0;
 
-  if (version >= 108) {
+  if (gui_version >= kGuiVersion_unkn_108) {
     int numev = in->ReadInt32();
     if (numev > GetNumEvents())
       quit("Error: too many control events, need newer version");

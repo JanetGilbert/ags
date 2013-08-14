@@ -13,7 +13,6 @@
 //=============================================================================
 
 #include "ac/mouse.h"
-#include "util/wgt2allg.h"
 #include "gfx/ali3d.h"
 #include "ac/common.h"
 #include "ac/characterinfo.h"
@@ -31,7 +30,6 @@
 #include "device/mousew32.h"
 #include "ac/spritecache.h"
 #include "gfx/graphicsdriver.h"
-#include "gfx/bitmap.h"
 
 using AGS::Common::Bitmap;
 namespace BitmapHelper = AGS::Common::BitmapHelper;
@@ -107,29 +105,28 @@ void set_mouse_cursor(int newcurs) {
         ((game.hotdot > 0) || (game.invhotdotsprite > 0)) ) {
             // If necessary, create a copy of the cursor and put the hotspot
             // dot onto it
-            dotted_mouse_cursor = BitmapHelper::CreateBitmap(mousecurs[0]->GetWidth(),mousecurs[0]->GetHeight(),mousecurs[0]->GetColorDepth());
-            dotted_mouse_cursor->Blit (mousecurs[0], 0, 0, 0, 0, mousecurs[0]->GetWidth(), mousecurs[0]->GetHeight());
+            dotted_mouse_cursor = BitmapHelper::CreateBitmapCopy(mousecurs[0]);
 
             if (game.invhotdotsprite > 0) {
-                Bitmap *abufWas = abuf;
-                abuf = dotted_mouse_cursor;
+                //Bitmap *abufWas = abuf;
+                //abuf = dotted_mouse_cursor;
 
-                draw_sprite_support_alpha(
+                draw_sprite_support_alpha(dotted_mouse_cursor,
                     hotspotx - spritewidth[game.invhotdotsprite] / 2,
                     hotspoty - spriteheight[game.invhotdotsprite] / 2,
                     spriteset[game.invhotdotsprite],
                     game.invhotdotsprite);
 
-                abuf = abufWas;
+                //abuf = abufWas;
             }
             else {
                 putpixel_compensate (dotted_mouse_cursor, hotspotx, hotspoty,
-                    (dotted_mouse_cursor->GetColorDepth() > 8) ? get_col8_lookup (game.hotdot) : game.hotdot);
+                    (dotted_mouse_cursor->GetColorDepth() > 8) ? GetVirtualScreen()->GetCompatibleColor (game.hotdot) : game.hotdot);
 
                 if (game.hotdotouter > 0) {
                     int outercol = game.hotdotouter;
                     if (dotted_mouse_cursor->GetColorDepth () > 8)
-                        outercol = get_col8_lookup(game.hotdotouter);
+                        outercol = GetVirtualScreen()->GetCompatibleColor(game.hotdotouter);
 
                     putpixel_compensate (dotted_mouse_cursor, hotspotx + get_fixed_pixel_size(1), hotspoty, outercol);
                     putpixel_compensate (dotted_mouse_cursor, hotspotx, hotspoty + get_fixed_pixel_size(1), outercol);
@@ -342,12 +339,13 @@ void update_cached_mouse_cursor()
 void set_new_cursor_graphic (int spriteslot) {
     mousecurs[0] = spriteset[spriteslot];
 
-    if ((spriteslot < 1) || (mousecurs[0] == NULL))
+    // It looks like spriteslot 0 can be used in games with version 2.72 and lower.
+    // The NULL check should ensure that the sprite is valid anyway.
+    if (((spriteslot < 1) && (loaded_game_file_version > kGameVersion_272)) || (mousecurs[0] == NULL))
     {
         if (blank_mouse_cursor == NULL)
         {
-            blank_mouse_cursor = BitmapHelper::CreateBitmap(1, 1, final_col_dep);
-            blank_mouse_cursor->Clear(blank_mouse_cursor->GetMaskColor());
+            blank_mouse_cursor = BitmapHelper::CreateTransparentBitmap(1, 1, final_col_dep);
         }
         mousecurs[0] = blank_mouse_cursor;
     }
@@ -385,4 +383,168 @@ int find_next_enabled_cursor(int startwith) {
         set_cursor_mode(testing);
 
     return testing;
+}
+
+
+//=============================================================================
+//
+// Script API Functions
+//
+//=============================================================================
+
+#include "debug/out.h"
+#include "script/script_api.h"
+#include "script/script_runtime.h"
+#include "ac/global_game.h"
+
+// void  (int curs, int newslot)
+RuntimeScriptValue Sc_ChangeCursorGraphic(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID_PINT2(ChangeCursorGraphic);
+}
+
+// void  (int curs, int x, int y)
+RuntimeScriptValue Sc_ChangeCursorHotspot(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID_PINT3(ChangeCursorHotspot);
+}
+
+// void (int curs, int newview)
+RuntimeScriptValue Sc_Mouse_ChangeModeView(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID_PINT2(Mouse_ChangeModeView);
+}
+
+// void (int modd)
+RuntimeScriptValue Sc_disable_cursor_mode(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID_PINT(disable_cursor_mode);
+}
+
+// void (int modd)
+RuntimeScriptValue Sc_enable_cursor_mode(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID_PINT(enable_cursor_mode);
+}
+
+// int (int curs)
+RuntimeScriptValue Sc_Mouse_GetModeGraphic(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT_PINT(Mouse_GetModeGraphic);
+}
+
+// int (int which)
+RuntimeScriptValue Sc_IsButtonDown(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT_PINT(IsButtonDown);
+}
+
+// void ();
+RuntimeScriptValue Sc_SaveCursorForLocationChange(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID(SaveCursorForLocationChange);
+}
+
+// void  ()
+RuntimeScriptValue Sc_SetNextCursor(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID(SetNextCursor);
+}
+
+// void  (int x1, int y1, int x2, int y2)
+RuntimeScriptValue Sc_SetMouseBounds(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID_PINT4(SetMouseBounds);
+}
+
+// void  (int newx, int newy)
+RuntimeScriptValue Sc_SetMousePosition(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID_PINT2(SetMousePosition);
+}
+
+// void ()
+RuntimeScriptValue Sc_RefreshMouse(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID(RefreshMouse);
+}
+
+// void ()
+RuntimeScriptValue Sc_set_default_cursor(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID(set_default_cursor);
+}
+
+// void (int newcurs)
+RuntimeScriptValue Sc_set_mouse_cursor(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID_PINT(set_mouse_cursor);
+}
+
+// int ()
+RuntimeScriptValue Sc_GetCursorMode(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(GetCursorMode);
+}
+
+// void (int newmode)
+RuntimeScriptValue Sc_set_cursor_mode(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID_PINT(set_cursor_mode);
+}
+
+// int ()
+RuntimeScriptValue Sc_Mouse_GetVisible(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Mouse_GetVisible);
+}
+
+// void (int isOn)
+RuntimeScriptValue Sc_Mouse_SetVisible(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID_PINT(Mouse_SetVisible);
+}
+
+
+void RegisterMouseAPI()
+{
+    ccAddExternalStaticFunction("Mouse::ChangeModeGraphic^2",       Sc_ChangeCursorGraphic);
+    ccAddExternalStaticFunction("Mouse::ChangeModeHotspot^3",       Sc_ChangeCursorHotspot);
+    ccAddExternalStaticFunction("Mouse::ChangeModeView^2",          Sc_Mouse_ChangeModeView);
+    ccAddExternalStaticFunction("Mouse::DisableMode^1",             Sc_disable_cursor_mode);
+    ccAddExternalStaticFunction("Mouse::EnableMode^1",              Sc_enable_cursor_mode);
+    ccAddExternalStaticFunction("Mouse::GetModeGraphic^1",          Sc_Mouse_GetModeGraphic);
+    ccAddExternalStaticFunction("Mouse::IsButtonDown^1",            Sc_IsButtonDown);
+    ccAddExternalStaticFunction("Mouse::SaveCursorUntilItLeaves^0", Sc_SaveCursorForLocationChange);
+    ccAddExternalStaticFunction("Mouse::SelectNextMode^0",          Sc_SetNextCursor);
+    ccAddExternalStaticFunction("Mouse::SetBounds^4",               Sc_SetMouseBounds);
+    ccAddExternalStaticFunction("Mouse::SetPosition^2",             Sc_SetMousePosition);
+    ccAddExternalStaticFunction("Mouse::Update^0",                  Sc_RefreshMouse);
+    ccAddExternalStaticFunction("Mouse::UseDefaultGraphic^0",       Sc_set_default_cursor);
+    ccAddExternalStaticFunction("Mouse::UseModeGraphic^1",          Sc_set_mouse_cursor);
+    ccAddExternalStaticFunction("Mouse::get_Mode",                  Sc_GetCursorMode);
+    ccAddExternalStaticFunction("Mouse::set_Mode",                  Sc_set_cursor_mode);
+    ccAddExternalStaticFunction("Mouse::get_Visible",               Sc_Mouse_GetVisible);
+    ccAddExternalStaticFunction("Mouse::set_Visible",               Sc_Mouse_SetVisible);
+
+    /* ----------------------- Registering unsafe exports for plugins -----------------------*/
+
+    ccAddExternalFunctionForPlugin("Mouse::ChangeModeGraphic^2",       (void*)ChangeCursorGraphic);
+    ccAddExternalFunctionForPlugin("Mouse::ChangeModeHotspot^3",       (void*)ChangeCursorHotspot);
+    ccAddExternalFunctionForPlugin("Mouse::ChangeModeView^2",          (void*)Mouse_ChangeModeView);
+    ccAddExternalFunctionForPlugin("Mouse::DisableMode^1",             (void*)disable_cursor_mode);
+    ccAddExternalFunctionForPlugin("Mouse::EnableMode^1",              (void*)enable_cursor_mode);
+    ccAddExternalFunctionForPlugin("Mouse::GetModeGraphic^1",          (void*)Mouse_GetModeGraphic);
+    ccAddExternalFunctionForPlugin("Mouse::IsButtonDown^1",            (void*)IsButtonDown);
+    ccAddExternalFunctionForPlugin("Mouse::SaveCursorUntilItLeaves^0", (void*)SaveCursorForLocationChange);
+    ccAddExternalFunctionForPlugin("Mouse::SelectNextMode^0",          (void*)SetNextCursor);
+    ccAddExternalFunctionForPlugin("Mouse::SetBounds^4",               (void*)SetMouseBounds);
+    ccAddExternalFunctionForPlugin("Mouse::SetPosition^2",             (void*)SetMousePosition);
+    ccAddExternalFunctionForPlugin("Mouse::Update^0",                  (void*)RefreshMouse);
+    ccAddExternalFunctionForPlugin("Mouse::UseDefaultGraphic^0",       (void*)set_default_cursor);
+    ccAddExternalFunctionForPlugin("Mouse::UseModeGraphic^1",          (void*)set_mouse_cursor);
+    ccAddExternalFunctionForPlugin("Mouse::get_Mode",                  (void*)GetCursorMode);
+    ccAddExternalFunctionForPlugin("Mouse::set_Mode",                  (void*)set_cursor_mode);
+    ccAddExternalFunctionForPlugin("Mouse::get_Visible",               (void*)Mouse_GetVisible);
+    ccAddExternalFunctionForPlugin("Mouse::set_Visible",               (void*)Mouse_SetVisible);
 }

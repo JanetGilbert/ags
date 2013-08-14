@@ -16,7 +16,7 @@
 //
 //=============================================================================
 
-#include "util/wgt2allg.h"
+#include <stdio.h>
 #include "ac/global_character.h"
 #include "ac/common.h"
 #include "ac/view.h"
@@ -56,7 +56,7 @@ extern int scrnwid,scrnhit;
 // defined in character unit
 extern CharacterExtras *charextra;
 extern CharacterInfo*playerchar;
-extern long _sc_PlayerCharPtr;
+extern int32_t _sc_PlayerCharPtr;
 extern CharacterInfo*playerchar;
 
 
@@ -531,20 +531,20 @@ void DisplayThought(int chid, const char*texx, ...) {
     char displbuf[STD_BUFFER_SIZE];
     va_list ap;
     va_start(ap,texx);
-    my_sprintf(displbuf,get_translation(texx),ap);
+    vsprintf(displbuf, get_translation(texx), ap);
     va_end(ap);
 
     _DisplayThoughtCore(chid, displbuf);
 }
 
-void __sc_displayspeech(int chid,char*texx, ...) {
+void __sc_displayspeech(int chid, const char*texx, ...) {
     if ((chid<0) || (chid>=game.numcharacters))
         quit("!DisplaySpeech: invalid character specified");
 
     char displbuf[STD_BUFFER_SIZE];
     va_list ap;
     va_start(ap,texx);
-    my_sprintf(displbuf, get_translation(texx), ap);
+    vsprintf(displbuf, get_translation(texx), ap);
     va_end(ap);
 
     _DisplaySpeechCore(chid, displbuf);
@@ -553,13 +553,13 @@ void __sc_displayspeech(int chid,char*texx, ...) {
 
 // **** THIS IS UNDOCUMENTED BECAUSE IT DOESN'T WORK PROPERLY
 // **** AT 640x400 AND DOESN'T USE THE RIGHT SPEECH STYLE
-void DisplaySpeechAt (int xx, int yy, int wii, int aschar, char*spch) {
+void DisplaySpeechAt (int xx, int yy, int wii, int aschar, const char*spch) {
     multiply_up_coordinates(&xx, &yy);
     wii = multiply_up_coordinate(wii);
     _displayspeech (get_translation(spch), aschar, xx, yy, wii, 0);
 }
 
-int DisplaySpeechBackground(int charid,char*speel) {
+int DisplaySpeechBackground(int charid, const char*speel) {
     // remove any previous background speech for this character
     int cc;
     for (cc = 0; cc < numscreenover; cc++) {

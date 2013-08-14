@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(SolutionDir)\..\Common&quot;;&quot;$(SolutionDir)\..\Common\libinclude&quot;;&quot;$(SolutionDir)\..\Engine&quot;;&quot;$(SolutionDir)\..\Plugins&quot;;&quot;$(SolutionDir)\..\Windows\include&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;VS2005;_CRT_SECURE_NO_WARNINGS;ALLEGRO_STATICLINK;THIS_IS_THE_ENGINE;WINDOWS_VERSION;DISABLE_MPEG_AUDIO;BUILTIN_PLUGINS;AGS_HAS_CD_AUDIO"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;VS2005;_CRT_SECURE_NO_WARNINGS;ALLEGRO_STATICLINK;ALLEGRO_NO_ASM;WINDOWS_VERSION;DISABLE_MPEG_AUDIO;AGS_HAS_CD_AUDIO"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -121,7 +121,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="&quot;$(SolutionDir)\..\Common&quot;;&quot;$(SolutionDir)\..\Common\libinclude&quot;;&quot;$(SolutionDir)\..\Engine&quot;;&quot;$(SolutionDir)\..\Plugins&quot;;&quot;$(SolutionDir)\..\Windows\include&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;VS2005;_CRT_SECURE_NO_WARNINGS;ALLEGRO_STATICLINK;THIS_IS_THE_ENGINE;WINDOWS_VERSION;DISABLE_MPEG_AUDIO;ALLEGRO_NO_ASM;BUILTIN_PLUGINS;AGS_HAS_CD_AUDIO"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;VS2005;_CRT_SECURE_NO_WARNINGS;ALLEGRO_STATICLINK;WINDOWS_VERSION;DISABLE_MPEG_AUDIO;ALLEGRO_NO_ASM;AGS_HAS_CD_AUDIO"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -266,6 +266,10 @@
 				</File>
 				<File
 					RelativePath="..\..\Engine\ac\gamestate.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Engine\ac\global_api.cpp"
 					>
 				</File>
 				<File
@@ -501,6 +505,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Engine\ac\richgamemedia.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Engine\ac\room.cpp"
 					>
 				</File>
@@ -530,6 +538,10 @@
 				</File>
 				<File
 					RelativePath="..\..\Engine\ac\slider.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Engine\ac\speech.cpp"
 					>
 				</File>
 				<File
@@ -676,6 +688,18 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="statobj"
+					>
+					<File
+						RelativePath="..\..\Engine\ac\statobj\agsstaticobject.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\Engine\ac\statobj\staticarray.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="gfx"
@@ -698,6 +722,10 @@
 				</File>
 				<File
 					RelativePath="..\..\Engine\gfx\color_engine.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Engine\gfx\gfx_util.cpp"
 					>
 				</File>
 				<File
@@ -781,123 +809,7 @@
 				Name="script"
 				>
 				<File
-					RelativePath="..\..\Engine\script\ex_audio.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_builtin_plugins.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_button.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_character.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_datetime.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_dialog.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_drawingsurface.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_dynamicsprite.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_file.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_game.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_global.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_gui.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_guicontrol.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_hotspot.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_inventoryitem.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_invwindow.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_label.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_listbox.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_math.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_mouse.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_object.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_overlay.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_parser.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_region.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_room.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_slider.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_string.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_system.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_textbox.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\ex_viewframe.cpp"
+					RelativePath="..\..\Engine\script\cc_instance.cpp"
 					>
 				</File>
 				<File
@@ -909,7 +821,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Engine\script\runtimescriptvalue.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Engine\script\script.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Engine\script\script_api.cpp"
 					>
 				</File>
 				<File
@@ -1068,6 +988,10 @@
 					RelativePath="..\..\Engine\main\udpate.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\Engine\main\version.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="platform"
@@ -1137,7 +1061,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Engine\test\test_sprintf.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Engine\test\test_string.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Engine\test\test_version.cpp"
 					>
 				</File>
 			</Filter>
@@ -1491,6 +1423,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Engine\ac\speech.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Engine\ac\sprite.h"
 					>
 				</File>
@@ -1682,6 +1618,22 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="statobj"
+					>
+					<File
+						RelativePath="..\..\Engine\ac\statobj\agsstaticobject.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\Engine\ac\statobj\staticarray.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\Engine\ac\statobj\staticobject.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="plugin"
@@ -1708,6 +1660,10 @@
 				</File>
 				<File
 					RelativePath="..\..\Engine\gfx\ddb.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Engine\gfx\gfx_util.h"
 					>
 				</File>
 				<File
@@ -1759,7 +1715,7 @@
 				Name="script"
 				>
 				<File
-					RelativePath="..\..\Engine\script\ex_defines.h"
+					RelativePath="..\..\Engine\script\cc_instance.h"
 					>
 				</File>
 				<File
@@ -1775,19 +1731,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Engine\script\runtimescriptvalue.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Engine\script\script.h"
 					>
 				</File>
 				<File
+					RelativePath="..\..\Engine\script\script_api.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Engine\script\script_runtime.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\spans.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\script\symbol_registry.h"
 					>
 				</File>
 				<File
@@ -1980,6 +1936,10 @@
 				</File>
 				<File
 					RelativePath="..\..\Engine\main\update.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Engine\main\version.h"
 					>
 				</File>
 			</Filter>
@@ -2469,22 +2429,6 @@
 					>
 				</File>
 			</Filter>
-		</Filter>
-		<Filter
-			Name="Plugins"
-			>
-			<File
-				RelativePath="..\..\Plugins\ags_snowrain\ags_snowrain.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Plugins\agsblend\AGSBlend.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Plugins\AGSflashlight\agsflashlight.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Common Header Files"

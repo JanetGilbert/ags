@@ -18,8 +18,8 @@
 #ifndef __AGS_EE_DEBUG__RAWFILEOUTPUTTARGET_H
 #define __AGS_EE_DEBUG__RAWFILEOUTPUTTARGET_H
 
+#include <stdio.h>
 #include "debug/outputtarget.h"
-#include "util/file.h"
 
 namespace AGS
 {
@@ -28,11 +28,11 @@ namespace Engine
 
 namespace Out
 {
-    class CRawFileOutputTarget : public AGS::Common::Out::IOutputTarget
+    class RawFileOutputTarget : public AGS::Common::Out::IOutputTarget
     {
     public:
-        CRawFileOutputTarget(const char *sz_filepath);
-        virtual ~CRawFileOutputTarget();
+        RawFileOutputTarget(const char *sz_filepath);
+        virtual ~RawFileOutputTarget();
 
         virtual void Out(const char *sz_fullmsg);
 

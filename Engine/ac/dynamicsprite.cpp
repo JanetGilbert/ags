@@ -13,7 +13,6 @@
 //=============================================================================
 
 #include <math.h>
-#include "util/wgt2allg.h"
 #include "ac/dynamicsprite.h"
 #include "ac/common.h"
 #include "ac/charactercache.h"
@@ -33,7 +32,7 @@
 #include "ac/spritecache.h"
 #include "platform/base/override_defines.h"
 #include "gfx/graphicsdriver.h"
-#include "gfx/bitmap.h"
+#include "script/runtimescriptvalue.h"
 
 using AGS::Common::Bitmap;
 namespace BitmapHelper = AGS::Common::BitmapHelper;
@@ -53,7 +52,7 @@ extern int final_scrn_wid,final_scrn_hit,final_col_dep;
 extern int scrnwid,scrnhit;
 extern color palette[256];
 extern Bitmap *virtual_screen;
-extern IGraphicsDriver *gfxDriver;
+extern AGS::Engine::IGraphicsDriver *gfxDriver;
 
 char check_dynamic_sprites_at_exit = 1;
 
@@ -114,7 +113,6 @@ void DynamicSprite_Resize(ScriptDynamicSprite *sds, int width, int height) {
 
     // resize the sprite to the requested size
     Bitmap *newPic = BitmapHelper::CreateBitmap(width, height, spriteset[sds->slot]->GetColorDepth());
-
     newPic->StretchBlt(spriteset[sds->slot],
         RectWH(0, 0, spritewidth[sds->slot], spriteheight[sds->slot]),
         RectWH(0, 0, width, height));
@@ -132,8 +130,7 @@ void DynamicSprite_Flip(ScriptDynamicSprite *sds, int direction) {
         quit("!DynamicSprite.Flip: sprite has been deleted");
 
     // resize the sprite to the requested size
-    Bitmap *newPic = BitmapHelper::CreateBitmap(spritewidth[sds->slot], spriteheight[sds->slot], spriteset[sds->slot]->GetColorDepth());
-    newPic->Clear(newPic->GetMaskColor());
+    Bitmap *newPic = BitmapHelper::CreateTransparentBitmap(spritewidth[sds->slot], spriteheight[sds->slot], spriteset[sds->slot]->GetColorDepth());
 
     if (direction == 1)
         newPic->FlipBlt(spriteset[sds->slot], 0, 0, Common::kBitmap_HFlip);
@@ -232,8 +229,7 @@ void DynamicSprite_ChangeCanvasSize(ScriptDynamicSprite *sds, int width, int hei
     multiply_up_coordinates(&x, &y);
     multiply_up_coordinates(&width, &height);
 
-    Bitmap *newPic = BitmapHelper::CreateBitmap(width, height, spriteset[sds->slot]->GetColorDepth());
-    newPic->Clear(newPic->GetMaskColor());
+    Bitmap *newPic = BitmapHelper::CreateTransparentBitmap(width, height, spriteset[sds->slot]->GetColorDepth());
     // blit it into the enlarged image
     newPic->Blit(spriteset[sds->slot], 0, 0, x, y, spritewidth[sds->slot], spriteheight[sds->slot]);
 
@@ -294,8 +290,7 @@ void DynamicSprite_Rotate(ScriptDynamicSprite *sds, int angle, int width, int he
     angle = (angle * 256) / 360;
 
     // resize the sprite to the requested size
-    Bitmap *newPic = BitmapHelper::CreateBitmap(width, height, spriteset[sds->slot]->GetColorDepth());
-    newPic->Clear(newPic->GetMaskColor());
+    Bitmap *newPic = BitmapHelper::CreateTransparentBitmap(width, height, spriteset[sds->slot]->GetColorDepth());
 
     // rotate the sprite about its centre
     // (+ width%2 fixes one pixel offset problem)
@@ -313,7 +308,7 @@ void DynamicSprite_Tint(ScriptDynamicSprite *sds, int red, int green, int blue, 
     Bitmap *source = spriteset[sds->slot];
     Bitmap *newPic = BitmapHelper::CreateBitmap(source->GetWidth(), source->GetHeight(), source->GetColorDepth());
 
-    tint_image(source, newPic, red, green, blue, saturation, (luminance * 25) / 10);
+    tint_image(newPic, source, red, green, blue, saturation, (luminance * 25) / 10);
 
     delete source;
     // replace the bitmap in the sprite set
@@ -330,7 +325,7 @@ int DynamicSprite_SaveToFile(ScriptDynamicSprite *sds, const char* namm) {
     if (strchr(namm,'.') == NULL)
         strcat(fileName, ".bmp");
 
-	if (!BitmapHelper::SaveToFile(spriteset[sds->slot], fileName, palette))
+	if (!spriteset[sds->slot]->SaveToFile(fileName, palette))
         return 0; // failed
 
     return 1;  // successful
@@ -339,7 +334,8 @@ int DynamicSprite_SaveToFile(ScriptDynamicSprite *sds, const char* namm) {
 ScriptDynamicSprite* DynamicSprite_CreateFromSaveGame(int sgslot, int width, int height) {
     int slotnum = LoadSaveSlotScreenshot(sgslot, width, height);
     if (slotnum) {
-        return new ScriptDynamicSprite(slotnum);
+        ScriptDynamicSprite *new_spr = new ScriptDynamicSprite(slotnum);
+        return new_spr;
     }
     return NULL;
 }
@@ -347,7 +343,8 @@ ScriptDynamicSprite* DynamicSprite_CreateFromSaveGame(int sgslot, int width, int
 ScriptDynamicSprite* DynamicSprite_CreateFromFile(const char *filename) {
     int slotnum = LoadImageFile(filename);
     if (slotnum) {
-        return new ScriptDynamicSprite(slotnum);
+        ScriptDynamicSprite *new_spr = new ScriptDynamicSprite(slotnum);
+        return new_spr;
     }
     return NULL;
 }
@@ -394,7 +391,6 @@ ScriptDynamicSprite* DynamicSprite_CreateFromScreenShot(int width, int height) {
     {
         // resize the sprite to the requested size
         newPic = BitmapHelper::CreateBitmap(width, height, virtual_screen->GetColorDepth());
-
         newPic->StretchBlt(virtual_screen,
             RectWH(0, 0, virtual_screen->GetWidth(), virtual_screen->GetHeight()),
             RectWH(0, 0, width, height));
@@ -402,7 +398,8 @@ ScriptDynamicSprite* DynamicSprite_CreateFromScreenShot(int width, int height) {
 
     // replace the bitmap in the sprite set
     add_dynamic_sprite(gotSlot, gfxDriver->ConvertBitmapToSupportedColourDepth(newPic));
-    return new ScriptDynamicSprite(gotSlot);
+    ScriptDynamicSprite *new_spr = new ScriptDynamicSprite(gotSlot);
+    return new_spr;
 }
 
 ScriptDynamicSprite* DynamicSprite_CreateFromExistingSprite(int slot, int preserveAlphaChannel) {
@@ -415,17 +412,16 @@ ScriptDynamicSprite* DynamicSprite_CreateFromExistingSprite(int slot, int preser
         quitprintf("DynamicSprite.CreateFromExistingSprite: sprite %d does not exist", slot);
 
     // create a new sprite as a copy of the existing one
-    Bitmap *newPic = BitmapHelper::CreateBitmap(spritewidth[slot], spriteheight[slot], spriteset[slot]->GetColorDepth());
+    Bitmap *newPic = BitmapHelper::CreateBitmapCopy(spriteset[slot]);
     if (newPic == NULL)
         return NULL;
-
-    newPic->Blit(spriteset[slot], 0, 0, 0, 0, spritewidth[slot], spriteheight[slot]);
 
     bool hasAlpha = (preserveAlphaChannel) && ((game.spriteflags[slot] & SPF_ALPHACHANNEL) != 0);
 
     // replace the bitmap in the sprite set
     add_dynamic_sprite(gotSlot, newPic, hasAlpha);
-    return new ScriptDynamicSprite(gotSlot);
+    ScriptDynamicSprite *new_spr = new ScriptDynamicSprite(gotSlot);
+    return new_spr;
 }
 
 ScriptDynamicSprite* DynamicSprite_CreateFromDrawingSurface(ScriptDrawingSurface *sds, int x, int y, int width, int height) 
@@ -438,23 +434,24 @@ ScriptDynamicSprite* DynamicSprite_CreateFromDrawingSurface(ScriptDrawingSurface
     sds->MultiplyCoordinates(&x, &y);
     sds->MultiplyCoordinates(&width, &height);
 
-    sds->StartDrawing();
+    Bitmap *ds = sds->StartDrawing();
 
-    if ((x < 0) || (y < 0) || (x + width > abuf->GetWidth()) || (y + height > abuf->GetHeight()))
+    if ((x < 0) || (y < 0) || (x + width > ds->GetWidth()) || (y + height > ds->GetHeight()))
         quit("!DynamicSprite.CreateFromDrawingSurface: requested area is outside the surface");
 
-    int colDepth = abuf->GetColorDepth();
+    int colDepth = ds->GetColorDepth();
 
     Bitmap *newPic = BitmapHelper::CreateBitmap(width, height, colDepth);
     if (newPic == NULL)
         return NULL;
 
-    newPic->Blit(abuf, x, y, 0, 0, width, height);
+    newPic->Blit(ds, x, y, 0, 0, width, height);
 
     sds->FinishedDrawingReadOnly();
 
     add_dynamic_sprite(gotSlot, newPic, (sds->hasAlphaChannel != 0));
-    return new ScriptDynamicSprite(gotSlot);
+    ScriptDynamicSprite *new_spr = new ScriptDynamicSprite(gotSlot);
+    return new_spr;
 }
 
 ScriptDynamicSprite* DynamicSprite_Create(int width, int height, int alphaChannel) 
@@ -465,16 +462,16 @@ ScriptDynamicSprite* DynamicSprite_Create(int width, int height, int alphaChanne
     if (gotSlot <= 0)
         return NULL;
 
-    Bitmap *newPic = BitmapHelper::CreateBitmap(width, height, final_col_dep);
+    Bitmap *newPic = BitmapHelper::CreateTransparentBitmap(width, height, final_col_dep);
     if (newPic == NULL)
         return NULL;
-    newPic->Clear(newPic->GetMaskColor());
 
     if ((alphaChannel) && (final_col_dep < 32))
         alphaChannel = false;
 
     add_dynamic_sprite(gotSlot, gfxDriver->ConvertBitmapToSupportedColourDepth(newPic), alphaChannel != 0);
-    return new ScriptDynamicSprite(gotSlot);
+    ScriptDynamicSprite *new_spr = new ScriptDynamicSprite(gotSlot);
+    return new_spr;
 }
 
 ScriptDynamicSprite* DynamicSprite_CreateFromExistingSprite_Old(int slot) 
@@ -516,7 +513,8 @@ ScriptDynamicSprite* DynamicSprite_CreateFromBackground(int frame, int x1, int y
 
     // replace the bitmap in the sprite set
     add_dynamic_sprite(gotSlot, newPic);
-    return new ScriptDynamicSprite(gotSlot);
+    ScriptDynamicSprite *new_spr = new ScriptDynamicSprite(gotSlot);
+    return new_spr;
 }
 
 //=============================================================================
@@ -582,4 +580,198 @@ void free_dynamic_sprite (int gotSlot) {
         objcache[tt].sppic = -1;
     }
   }
+}
+
+//=============================================================================
+//
+// Script API Functions
+//
+//=============================================================================
+
+#include "debug/out.h"
+#include "script/script_api.h"
+#include "script/script_runtime.h"
+
+// void (ScriptDynamicSprite *sds, int width, int height, int x, int y)
+RuntimeScriptValue Sc_DynamicSprite_ChangeCanvasSize(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT4(ScriptDynamicSprite, DynamicSprite_ChangeCanvasSize);
+}
+
+// void (ScriptDynamicSprite *sds, int sourceSprite)
+RuntimeScriptValue Sc_DynamicSprite_CopyTransparencyMask(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(ScriptDynamicSprite, DynamicSprite_CopyTransparencyMask);
+}
+
+// void (ScriptDynamicSprite *sds, int x1, int y1, int width, int height)
+RuntimeScriptValue Sc_DynamicSprite_Crop(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT4(ScriptDynamicSprite, DynamicSprite_Crop);
+}
+
+// void (ScriptDynamicSprite *sds)
+RuntimeScriptValue Sc_DynamicSprite_Delete(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID(ScriptDynamicSprite, DynamicSprite_Delete);
+}
+
+// void (ScriptDynamicSprite *sds, int direction)
+RuntimeScriptValue Sc_DynamicSprite_Flip(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(ScriptDynamicSprite, DynamicSprite_Flip);
+}
+
+// ScriptDrawingSurface* (ScriptDynamicSprite *dss)
+RuntimeScriptValue Sc_DynamicSprite_GetDrawingSurface(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_OBJAUTO(ScriptDynamicSprite, ScriptDrawingSurface, DynamicSprite_GetDrawingSurface);
+}
+
+// void (ScriptDynamicSprite *sds, int width, int height)
+RuntimeScriptValue Sc_DynamicSprite_Resize(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT2(ScriptDynamicSprite, DynamicSprite_Resize);
+}
+
+// void (ScriptDynamicSprite *sds, int angle, int width, int height)
+RuntimeScriptValue Sc_DynamicSprite_Rotate(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT3(ScriptDynamicSprite, DynamicSprite_Rotate);
+}
+
+// int (ScriptDynamicSprite *sds, const char* namm)
+RuntimeScriptValue Sc_DynamicSprite_SaveToFile(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT_POBJ(ScriptDynamicSprite, DynamicSprite_SaveToFile, const char);
+}
+
+// void (ScriptDynamicSprite *sds, int red, int green, int blue, int saturation, int luminance)
+RuntimeScriptValue Sc_DynamicSprite_Tint(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT5(ScriptDynamicSprite, DynamicSprite_Tint);
+}
+
+// int (ScriptDynamicSprite *sds)
+RuntimeScriptValue Sc_DynamicSprite_GetColorDepth(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(ScriptDynamicSprite, DynamicSprite_GetColorDepth);
+}
+
+// int (ScriptDynamicSprite *sds)
+RuntimeScriptValue Sc_DynamicSprite_GetGraphic(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(ScriptDynamicSprite, DynamicSprite_GetGraphic);
+}
+
+// int (ScriptDynamicSprite *sds)
+RuntimeScriptValue Sc_DynamicSprite_GetHeight(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(ScriptDynamicSprite, DynamicSprite_GetHeight);
+}
+
+// int (ScriptDynamicSprite *sds)
+RuntimeScriptValue Sc_DynamicSprite_GetWidth(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(ScriptDynamicSprite, DynamicSprite_GetWidth);
+}
+
+// ScriptDynamicSprite* (int width, int height, int alphaChannel)
+RuntimeScriptValue Sc_DynamicSprite_Create(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_OBJAUTO_PINT3(ScriptDynamicSprite, DynamicSprite_Create);
+}
+
+// ScriptDynamicSprite* (int frame, int x1, int y1, int width, int height)
+RuntimeScriptValue Sc_DynamicSprite_CreateFromBackground(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_OBJAUTO_PINT5(ScriptDynamicSprite, DynamicSprite_CreateFromBackground);
+}
+
+// ScriptDynamicSprite* (ScriptDrawingSurface *sds, int x, int y, int width, int height)
+RuntimeScriptValue Sc_DynamicSprite_CreateFromDrawingSurface(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_OBJAUTO_POBJ_PINT4(ScriptDynamicSprite, DynamicSprite_CreateFromDrawingSurface, ScriptDrawingSurface);
+}
+
+// ScriptDynamicSprite* (int slot)
+RuntimeScriptValue Sc_DynamicSprite_CreateFromExistingSprite_Old(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_OBJAUTO_PINT(ScriptDynamicSprite, DynamicSprite_CreateFromExistingSprite_Old);
+}
+
+// ScriptDynamicSprite* (int slot, int preserveAlphaChannel)
+RuntimeScriptValue Sc_DynamicSprite_CreateFromExistingSprite(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_OBJAUTO_PINT2(ScriptDynamicSprite, DynamicSprite_CreateFromExistingSprite);
+}
+
+// ScriptDynamicSprite* (const char *filename)
+RuntimeScriptValue Sc_DynamicSprite_CreateFromFile(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_OBJAUTO_POBJ(ScriptDynamicSprite, DynamicSprite_CreateFromFile, const char);
+}
+
+// ScriptDynamicSprite* (int sgslot, int width, int height)
+RuntimeScriptValue Sc_DynamicSprite_CreateFromSaveGame(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_OBJAUTO_PINT3(ScriptDynamicSprite, DynamicSprite_CreateFromSaveGame);
+}
+
+// ScriptDynamicSprite* (int width, int height)
+RuntimeScriptValue Sc_DynamicSprite_CreateFromScreenShot(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_OBJAUTO_PINT2(ScriptDynamicSprite, DynamicSprite_CreateFromScreenShot);
+}
+
+
+void RegisterDynamicSpriteAPI()
+{
+    ccAddExternalObjectFunction("DynamicSprite::ChangeCanvasSize^4",        Sc_DynamicSprite_ChangeCanvasSize);
+    ccAddExternalObjectFunction("DynamicSprite::CopyTransparencyMask^1",    Sc_DynamicSprite_CopyTransparencyMask);
+    ccAddExternalObjectFunction("DynamicSprite::Crop^4",                    Sc_DynamicSprite_Crop);
+    ccAddExternalObjectFunction("DynamicSprite::Delete",                    Sc_DynamicSprite_Delete);
+    ccAddExternalObjectFunction("DynamicSprite::Flip^1",                    Sc_DynamicSprite_Flip);
+    ccAddExternalObjectFunction("DynamicSprite::GetDrawingSurface^0",       Sc_DynamicSprite_GetDrawingSurface);
+    ccAddExternalObjectFunction("DynamicSprite::Resize^2",                  Sc_DynamicSprite_Resize);
+    ccAddExternalObjectFunction("DynamicSprite::Rotate^3",                  Sc_DynamicSprite_Rotate);
+    ccAddExternalObjectFunction("DynamicSprite::SaveToFile^1",              Sc_DynamicSprite_SaveToFile);
+    ccAddExternalObjectFunction("DynamicSprite::Tint^5",                    Sc_DynamicSprite_Tint);
+    ccAddExternalObjectFunction("DynamicSprite::get_ColorDepth",            Sc_DynamicSprite_GetColorDepth);
+    ccAddExternalObjectFunction("DynamicSprite::get_Graphic",               Sc_DynamicSprite_GetGraphic);
+    ccAddExternalObjectFunction("DynamicSprite::get_Height",                Sc_DynamicSprite_GetHeight);
+    ccAddExternalObjectFunction("DynamicSprite::get_Width",                 Sc_DynamicSprite_GetWidth);
+    ccAddExternalStaticFunction("DynamicSprite::Create^3",                  Sc_DynamicSprite_Create);
+    ccAddExternalStaticFunction("DynamicSprite::CreateFromBackground",      Sc_DynamicSprite_CreateFromBackground);
+    ccAddExternalStaticFunction("DynamicSprite::CreateFromDrawingSurface^5", Sc_DynamicSprite_CreateFromDrawingSurface);
+    ccAddExternalStaticFunction("DynamicSprite::CreateFromExistingSprite^1", Sc_DynamicSprite_CreateFromExistingSprite_Old);
+    ccAddExternalStaticFunction("DynamicSprite::CreateFromExistingSprite^2", Sc_DynamicSprite_CreateFromExistingSprite);
+    ccAddExternalStaticFunction("DynamicSprite::CreateFromFile",            Sc_DynamicSprite_CreateFromFile);
+    ccAddExternalStaticFunction("DynamicSprite::CreateFromSaveGame",        Sc_DynamicSprite_CreateFromSaveGame);
+    ccAddExternalStaticFunction("DynamicSprite::CreateFromScreenShot",      Sc_DynamicSprite_CreateFromScreenShot);
+
+    /* ----------------------- Registering unsafe exports for plugins -----------------------*/
+
+    ccAddExternalFunctionForPlugin("DynamicSprite::ChangeCanvasSize^4",        (void*)DynamicSprite_ChangeCanvasSize);
+    ccAddExternalFunctionForPlugin("DynamicSprite::CopyTransparencyMask^1",    (void*)DynamicSprite_CopyTransparencyMask);
+    ccAddExternalFunctionForPlugin("DynamicSprite::Crop^4",                    (void*)DynamicSprite_Crop);
+    ccAddExternalFunctionForPlugin("DynamicSprite::Delete",                    (void*)DynamicSprite_Delete);
+    ccAddExternalFunctionForPlugin("DynamicSprite::Flip^1",                    (void*)DynamicSprite_Flip);
+    ccAddExternalFunctionForPlugin("DynamicSprite::GetDrawingSurface^0",       (void*)DynamicSprite_GetDrawingSurface);
+    ccAddExternalFunctionForPlugin("DynamicSprite::Resize^2",                  (void*)DynamicSprite_Resize);
+    ccAddExternalFunctionForPlugin("DynamicSprite::Rotate^3",                  (void*)DynamicSprite_Rotate);
+    ccAddExternalFunctionForPlugin("DynamicSprite::SaveToFile^1",              (void*)DynamicSprite_SaveToFile);
+    ccAddExternalFunctionForPlugin("DynamicSprite::Tint^5",                    (void*)DynamicSprite_Tint);
+    ccAddExternalFunctionForPlugin("DynamicSprite::get_ColorDepth",            (void*)DynamicSprite_GetColorDepth);
+    ccAddExternalFunctionForPlugin("DynamicSprite::get_Graphic",               (void*)DynamicSprite_GetGraphic);
+    ccAddExternalFunctionForPlugin("DynamicSprite::get_Height",                (void*)DynamicSprite_GetHeight);
+    ccAddExternalFunctionForPlugin("DynamicSprite::get_Width",                 (void*)DynamicSprite_GetWidth);
+    ccAddExternalFunctionForPlugin("DynamicSprite::Create^3",                  (void*)DynamicSprite_Create);
+    ccAddExternalFunctionForPlugin("DynamicSprite::CreateFromBackground",      (void*)DynamicSprite_CreateFromBackground);
+    ccAddExternalFunctionForPlugin("DynamicSprite::CreateFromDrawingSurface^5", (void*)DynamicSprite_CreateFromDrawingSurface);
+    ccAddExternalFunctionForPlugin("DynamicSprite::CreateFromExistingSprite^1", (void*)DynamicSprite_CreateFromExistingSprite_Old);
+    ccAddExternalFunctionForPlugin("DynamicSprite::CreateFromExistingSprite^2", (void*)DynamicSprite_CreateFromExistingSprite);
+    ccAddExternalFunctionForPlugin("DynamicSprite::CreateFromFile",            (void*)DynamicSprite_CreateFromFile);
+    ccAddExternalFunctionForPlugin("DynamicSprite::CreateFromSaveGame",        (void*)DynamicSprite_CreateFromSaveGame);
+    ccAddExternalFunctionForPlugin("DynamicSprite::CreateFromScreenShot",      (void*)DynamicSprite_CreateFromScreenShot);
 }

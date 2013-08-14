@@ -13,7 +13,7 @@
 //=============================================================================
 
 #include <stdarg.h>
-#include "util/wgt2allg.h"
+#include <stdio.h>
 #include "ac/common.h"
 #include "ac/character.h"
 #include "ac/display.h"
@@ -27,6 +27,7 @@
 #include "ac/global_translation.h"
 #include "ac/roomstruct.h"
 #include "ac/runtime_defines.h"
+#include "ac/speech.h"
 #include "ac/string.h"
 #include "ac/topbarsettings.h"
 #include "debug/debug_log.h"
@@ -40,23 +41,23 @@ extern int scrnwid,scrnhit;
 extern GameSetupStruct game;
 extern int screen_is_dirty;
 
-void Display(char*texx, ...) {
+void Display(const char*texx, ...) {
     char displbuf[STD_BUFFER_SIZE];
     va_list ap;
     va_start(ap,texx);
-    my_sprintf(displbuf, get_translation(texx), ap);
+    vsprintf(displbuf, get_translation(texx), ap);
     va_end(ap);
     DisplayAtY (-1, displbuf);
 }
 
-void DisplayTopBar(int ypos, int ttexcol, int backcol, char *title, char*texx, ...) {
+void DisplayTopBar(int ypos, int ttexcol, int backcol, const char *title, const char*texx, ...) {
 
     strcpy(topBar.text, get_translation(title));
 
     char displbuf[3001];
     va_list ap;
     va_start(ap,texx);
-    my_sprintf(displbuf, get_translation(texx), ap);
+    vsprintf(displbuf, get_translation(texx), ap);
     va_end(ap);
 
     if (ypos > 0)
@@ -83,7 +84,7 @@ void DisplayTopBar(int ypos, int ttexcol, int backcol, char *title, char*texx, .
 }
 
 // Display a room/global message in the bar
-void DisplayMessageBar(int ypos, int ttexcol, int backcol, char *title, int msgnum) {
+void DisplayMessageBar(int ypos, int ttexcol, int backcol, const char *title, int msgnum) {
     char msgbufr[3001];
     get_message_text(msgnum, msgbufr);
     DisplayTopBar(ypos, ttexcol, backcol, title, "%s", msgbufr);
@@ -139,11 +140,11 @@ void DisplayMessage(int msnum) {
     DisplayMessageAtY (msnum, -1);
 }
 
-void DisplayAt(int xxp,int yyp,int widd,char*texx, ...) {
+void DisplayAt(int xxp,int yyp,int widd, const char*texx, ...) {
     char displbuf[STD_BUFFER_SIZE];
     va_list ap;
     va_start(ap,texx);
-    my_sprintf(displbuf, get_translation(texx), ap);
+    vsprintf(displbuf, get_translation(texx), ap);
     va_end(ap);
 
     multiply_up_coordinates(&xxp, &yyp);
@@ -154,7 +155,7 @@ void DisplayAt(int xxp,int yyp,int widd,char*texx, ...) {
     _display_at(xxp,yyp,widd,displbuf,1,0, 0, 0, false);
 }
 
-void DisplayAtY (int ypos, char *texx) {
+void DisplayAtY (int ypos, const char *texx) {
     if ((ypos < -1) || (ypos >= GetMaxScreenHeight()))
         quitprintf("!DisplayAtY: invalid Y co-ordinate supplied (used: %d; valid: 0..%d)", ypos, GetMaxScreenHeight());
 
@@ -187,15 +188,15 @@ void SetSpeechStyle (int newstyle) {
     game.options[OPT_SPEECHTYPE] = newstyle;
 }
 
-// 0 = click mouse or key to skip
-// 1 = key only
-// 2 = can't skip at all
-// 3 = only on keypress, no auto timer
-// 4 = mouseclick only
-void SetSkipSpeech (int newval) {
-    if ((newval < 0) || (newval > 4))
-        quit("!SetSkipSpeech: invalid skip mode specified (0-4)");
+void SetSkipSpeech (SkipSpeechStyle newval) {
+    if ((newval < kSkipSpeechFirst) || (newval > kSkipSpeechLast))
+        quit("!SetSkipSpeech: invalid skip mode specified");
 
     DEBUG_CONSOLE("SkipSpeech style set to %d", newval);
-    play.cant_skip_speech = user_to_internal_skip_speech(newval);
+    play.cant_skip_speech = user_to_internal_skip_speech((SkipSpeechStyle)newval);
+}
+
+SkipSpeechStyle GetSkipSpeech()
+{
+    return internal_skip_speech_to_user(play.cant_skip_speech);
 }

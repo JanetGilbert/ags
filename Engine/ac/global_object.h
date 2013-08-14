@@ -18,6 +18,9 @@
 #ifndef __AGS_EE_AC__GLOBALOBJECT_H
 #define __AGS_EE_AC__GLOBALOBJECT_H
 
+namespace AGS { namespace Common { class Bitmap; } }
+using namespace AGS; // FIXME later
+
 // TODO: merge with other Rect declared in bitmap unit
 struct _Rect {
     int x1,y1,x2,y2;

@@ -19,11 +19,13 @@
 #include "ac/dynobj/cc_dynamicarray.h" // globalDynamicArray, constants
 #include "util/string_utils.h"               // fputstring, etc
 #include "script/cc_error.h"
-#include "util/datastream.h"
+#include "util/stream.h"
 
-using AGS::Common::DataStream;
+using AGS::Common::Stream;
 
-void ManagedObjectPool::ManagedObject::init(long theHandle, const char *theAddress, ICCDynamicObject *theCallback) {
+void ManagedObjectPool::ManagedObject::init(int32_t theHandle, const char *theAddress,
+                                            ICCDynamicObject *theCallback, ScriptValueType objType) {
+    obj_type = objType;
     handle = theHandle;
     addr = theAddress;
     callback = theCallback;
@@ -95,15 +97,15 @@ void ManagedObjectPool::ManagedObject::SubRefNoDispose() {
 #endif
 }
 
-long ManagedObjectPool::AddRef(long handle) {
+int32_t ManagedObjectPool::AddRef(int32_t handle) {
         return objects[handle].AddRef();
 }
 
-int ManagedObjectPool::CheckDispose(long handle) {
+int ManagedObjectPool::CheckDispose(int32_t handle) {
     return objects[handle].CheckDispose();
 }
 
-long ManagedObjectPool::SubRef(long handle) {
+int32_t ManagedObjectPool::SubRef(int32_t handle) {
     if ((disableDisposeForObject != NULL) && 
         (objects[handle].addr == disableDisposeForObject))
         objects[handle].SubRefNoDispose();
@@ -112,17 +114,23 @@ long ManagedObjectPool::SubRef(long handle) {
     return objects[handle].refCount;
 }
 
-long ManagedObjectPool::AddressToHandle(const char *addr) {
+int32_t ManagedObjectPool::AddressToHandle(const char *addr) {
     // this function is only called when a pointer is set
     // SLOW LOOP ALERT, improve at some point
-    for (int kk = 1; kk < arrayAllocLimit; kk++) {
-        if (objects[kk].addr == addr)
-            return objects[kk].handle;
+    // [IKM] 2013-01-01: search in reverse order, as suggested by rofl0r:
+    // it appears that, statistically, the given address is more often
+    // located closer to the end of the managed array.
+    for (size_t i = numObjects - 1; i >= 1; --i)
+    {
+        if (objects[i].addr == addr)
+        {
+            return objects[i].handle;
+        }
     }
     return 0;
 }
 
-const char* ManagedObjectPool::HandleToAddress(long handle) {
+const char* ManagedObjectPool::HandleToAddress(int32_t handle) {
     // this function is called often (whenever a pointer is used)
     if ((handle < 1) || (handle >= arrayAllocLimit))
         return NULL;
@@ -131,8 +139,21 @@ const char* ManagedObjectPool::HandleToAddress(long handle) {
     return objects[handle].addr;
 }
 
+ScriptValueType ManagedObjectPool::HandleToAddressAndManager(int32_t handle, void *&object, ICCDynamicObject *&manager) {
+    object = NULL;
+    manager = NULL;
+    // this function is called often (whenever a pointer is used)
+    if ((handle < 1) || (handle >= arrayAllocLimit))
+        return kScValUndefined;
+    if (objects[handle].handle == 0)
+        return kScValUndefined;
+    object = (void*)objects[handle].addr;
+    manager = objects[handle].callback;
+    return objects[handle].obj_type;
+}
+
 int ManagedObjectPool::RemoveObject(const char *address) {
-    long handl = AddressToHandle(address);
+    int32_t handl = AddressToHandle(address);
     if (handl == 0)
         return 0;
 
@@ -162,7 +183,7 @@ void ManagedObjectPool::RunGarbageCollection()
     }
 }
 
-int ManagedObjectPool::AddObject(const char *address, ICCDynamicObject *callback, int useSlot) {
+int ManagedObjectPool::AddObject(const char *address, ICCDynamicObject *callback, bool plugin_object, int useSlot) {
     if (useSlot == -1)
         useSlot = numObjects;
 
@@ -170,7 +191,7 @@ int ManagedObjectPool::AddObject(const char *address, ICCDynamicObject *callback
 
     if (useSlot < arrayAllocLimit) {
         // still space in the array, so use it
-        objects[useSlot].init(useSlot, address, callback);
+        objects[useSlot].init(useSlot, address, callback, plugin_object ? kScValPluginObject : kScValDynamicObject);
         if (useSlot == numObjects)
             numObjects++;
         return useSlot;
@@ -183,7 +204,7 @@ int ManagedObjectPool::AddObject(const char *address, ICCDynamicObject *callback
             // long
             for (int i = arrayAllocLimit - 1; i >= 1; i--) {
                 if (objects[i].handle == 0) {
-                    objects[i].init(i, address, callback);
+                    objects[i].init(i, address, callback, plugin_object ? kScValPluginObject : kScValDynamicObject);
                     return i;
                 }
             }
@@ -194,14 +215,14 @@ int ManagedObjectPool::AddObject(const char *address, ICCDynamicObject *callback
 
         objects = (ManagedObject*)realloc(objects, sizeof(ManagedObject) * arrayAllocLimit);
         memset(&objects[useSlot], 0, sizeof(ManagedObject) * ARRAY_INCREMENT_SIZE);
-        objects[useSlot].init(useSlot, address, callback);
+        objects[useSlot].init(useSlot, address, callback, plugin_object ? kScValPluginObject : kScValDynamicObject);
         if (useSlot == numObjects)
             numObjects++;
         return useSlot;
     }
 }
 
-void ManagedObjectPool::WriteToDisk(DataStream *out) {
+void ManagedObjectPool::WriteToDisk(Stream *out) {
     int serializeBufferSize = SERIALIZE_BUFFER_SIZE;
     char *serializeBuffer = (char*)malloc(serializeBufferSize);
 
@@ -238,7 +259,7 @@ void ManagedObjectPool::WriteToDisk(DataStream *out) {
     free(serializeBuffer);
 }
 
-int ManagedObjectPool::ReadFromDisk(DataStream *in, ICCObjectReader *reader) {
+int ManagedObjectPool::ReadFromDisk(Stream *in, ICCObjectReader *reader) {
     int serializeBufferSize = SERIALIZE_BUFFER_SIZE;
     char *serializeBuffer = (char*)malloc(serializeBufferSize);
     char typeNameBuffer[200];

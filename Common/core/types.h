@@ -28,6 +28,7 @@
 #define NULL 0
 #endif
 
+#include <stddef.h>
 #if !defined (WINDOWS_VERSION)
 #include <stdint.h>
 #include <cstdlib> // for size_t
@@ -61,5 +62,9 @@
 #define _UINTPTR_T_DEFINED
 
 #endif // WINDOWS_VERSION
+
+
+#define fixed_t int32_t // fixed point type
+#define color_t int32_t
 
 #endif // __AGS_CN_CORE__TYPES_H

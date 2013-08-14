@@ -16,7 +16,6 @@
 // Quit game procedure
 //
 
-#include "util/wgt2allg.h"
 #include "gfx/ali3d.h"
 #include "ac/cdaudio.h"
 #include "ac/gamesetup.h"
@@ -27,6 +26,8 @@
 #include "debug/agseditordebugger.h"
 #include "debug/debug_log.h"
 #include "debug/debugger.h"
+#include "debug/out.h"
+#include "font/fonts.h"
 #include "main/main.h"
 #include "main/mainheader.h"
 #include "main/quit.h"
@@ -37,6 +38,7 @@
 
 using AGS::Common::Bitmap;
 namespace BitmapHelper = AGS::Common::BitmapHelper;
+namespace Out = AGS::Common::Out;
 
 extern GameSetupStruct game;
 extern int spritewidth[MAX_SPRITES],spriteheight[MAX_SPRITES];
@@ -144,9 +146,9 @@ void quit_check_for_error_state(char *&qmsg, char *alertis)
             qmsg++;
         }
         else
-            strcpy(alertis,"An error has occurred. Please contact the game author for support, as this "
+            sprintf(alertis,"An error has occurred. Please contact the game author for support, as this "
             "is likely to be a scripting error and not a bug in AGS.\n"
-            "(ACI version " ACI_VERSION_TEXT ")\n\n");
+            "(ACI version %s)\n\n", EngineVersion.LongString.GetCStr());
 
         strcat (alertis, get_cur_script(5) );
 
@@ -160,12 +162,12 @@ void quit_check_for_error_state(char *&qmsg, char *alertis)
 
         sprintf(alertis, "A warning has been generated. This is not normally fatal, but you have selected "
             "to treat warnings as errors.\n"
-            "(ACI version " ACI_VERSION_TEXT ")\n\n%s\n", get_cur_script(5));
+            "(ACI version %s)\n\n%s\n", EngineVersion.LongString.GetCStr(), get_cur_script(5));
     }
-    else strcpy(alertis,"An internal error has occurred. Please note down the following information.\n"
+    else sprintf(alertis,"An internal error has occurred. Please note down the following information.\n"
         "If the problem persists, post the details on the AGS Technical Forum.\n"
-        "(ACI version " ACI_VERSION_TEXT ")\n"
-        "\nError: ");
+        "(ACI version %s)\n"
+        "\nError: ", EngineVersion.LongString.GetCStr());
 }
 
 void quit_destroy_subscreen()
@@ -238,9 +240,7 @@ void quit_delete_temp_files()
 }
 
 // TODO: move to test unit
-#include "gfx/allegrobitmap.h"
-using AGS::Common::AllegroBitmap;
-extern AllegroBitmap *test_allegro_bitmap;
+extern Bitmap *test_allegro_bitmap;
 extern IDriverDependantBitmap *test_allegro_ddb;
 void allegro_bitmap_test_release()
 {
@@ -258,7 +258,7 @@ char return_to_room[150] = "\0";
 // message. If it begins with anything else, it is treated as an internal
 // error.
 // "!|" is a special code used to mean that the player has aborted (Alt+X)
-void quit(char*quitmsg) {
+void quit(const char *quitmsg) {
 
     // Need to copy it in case it's from a plugin (since we're
     // about to free plugins)
@@ -328,7 +328,7 @@ void quit(char*quitmsg) {
 
     proper_exit=1;
 
-    write_log_debug("***** ENGINE HAS SHUTDOWN");
+    Out::FPrint("***** ENGINE HAS SHUTDOWN");
 
     shutdown_debug_system();
 

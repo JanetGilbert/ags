@@ -12,11 +12,10 @@
 //
 //=============================================================================
 
-#include "util/wgt2allg.h"
-#include "gfx/ali3d.h"
-#include "ac/game.h"
+#if !defined (WINDOWS_VERSION)
+#include <sys/stat.h>                      //mkdir
+#endif
 #include "ac/common.h"
-#include "ac/roomstruct.h"
 #include "ac/view.h"
 #include "ac/audiochannel.h"
 #include "ac/character.h"
@@ -26,6 +25,8 @@
 #include "ac/draw.h"
 #include "ac/dynamicsprite.h"
 #include "ac/event.h"
+#include "ac/file.h"
+#include "ac/game.h"
 #include "ac/gamesetup.h"
 #include "ac/gamesetupstruct.h"
 #include "ac/gamestate.h"
@@ -49,36 +50,41 @@
 #include "ac/room.h"
 #include "ac/roomobject.h"
 #include "ac/roomstatus.h"
+#include "ac/roomstruct.h"
 #include "ac/runtime_defines.h"
 #include "ac/screenoverlay.h"
+#include "ac/spritecache.h"
 #include "ac/string.h"
 #include "ac/system.h"
 #include "ac/timer.h"
 #include "ac/translation.h"
 #include "ac/dynobj/all_dynamicclasses.h"
 #include "ac/dynobj/all_scriptclasses.h"
-#include "script/cc_error.h"
-#include "util/string_utils.h"
 #include "debug/debug_log.h"
+#include "debug/out.h"
+#include "font/fonts.h"
+#include "gfx/ali3d.h"
 #include "gui/animatingguibutton.h"
+#include "gfx/graphicsdriver.h"
 #include "gui/guidialog.h"
+#include "main/game_file.h"
 #include "main/main.h"
 #include "media/audio/audio.h"
+#include "media/audio/soundclip.h"
 #include "plugin/agsplugin.h"
+#include "script/cc_error.h"
+#include "script/runtimescriptvalue.h"
 #include "script/script.h"
 #include "script/script_runtime.h"
-#include "ac/spritecache.h"
+#include "util/alignedstream.h"
 #include "util/filestream.h"
-#include "gfx/graphicsdriver.h"
-#include "gfx/bitmap.h"
+#include "util/string_utils.h"
 
-using AGS::Common::DataStream;
+using AGS::Common::AlignedStream;
+using AGS::Common::String;
+using AGS::Common::Stream;
 using AGS::Common::Bitmap;
 namespace BitmapHelper = AGS::Common::BitmapHelper;
-
-#if !defined (WINDOWS_VERSION)
-#include <sys/stat.h>                      //mkdir
-#endif
 
 extern ScriptAudioChannel scrAudioChannel[MAX_SOUND_CHANNELS + 1];
 extern int time_between_timers;
@@ -141,7 +147,7 @@ roomstruct thisroom;
 
 volatile int switching_away_from_game = 0;
 volatile char want_exit = 0, abort_engine = 0;
-int loaded_game_file_version = 0;
+GameDataVersion loaded_game_file_version = kGameVersion_Undefined;
 int frames_per_second=40;
 int displayed_room=-10,starting_room = -1;
 int in_new_room=0, new_room_was = 0;  // 1 in new room, 2 first time in new room, 3 loading saved game
@@ -190,8 +196,6 @@ const char* sgnametemplate = "agssave.%03d";
 char saveGameSuffix[MAX_SG_EXT_LENGTH + 1];
 
 int game_paused=0;
-
-int engineNeedsAsInt = 100;
 char pexbuf[STD_BUFFER_SIZE];
 
 unsigned int load_new_game = 0;
@@ -254,7 +258,7 @@ int Game_IsAudioPlaying(int audioType)
     return 0;
 }
 
-void Game_SetAudioTypeSpeechVolumeDrop(int audioType, int volumeDrop) 
+void Game_SetAudioTypeSpeechVolumeDrop(int audioType, int volumeDrop)
 {
     if ((audioType < 0) || (audioType >= game.audioClipTypeCount))
         quit("!Game.SetAudioTypeVolume: invalid audio type");
@@ -322,7 +326,7 @@ int oldmouse;
 void setup_for_dialog() {
     cbuttfont = play.normal_font;
     acdialog_font = play.normal_font;
-    wsetscreen(virtual_screen);
+    SetVirtualScreen(virtual_screen);
     if (!play.mouse_cursor_hidden)
         domouse(1);
     oldmouse=cur_cursor; set_mouse_cursor(CURS_ARROW);
@@ -336,10 +340,13 @@ void restore_after_dialog() {
 
 
 
-void get_save_game_path(int slotNum, char *buffer) {
-    strcpy(buffer, saveGameDirectory);
-    sprintf(&buffer[strlen(buffer)], sgnametemplate, slotNum);
-    strcat(buffer, saveGameSuffix);
+String get_save_game_path(int slotNum) {
+    String filename;
+    filename.Format(sgnametemplate, slotNum);
+    String path = saveGameDirectory;
+    path.Append(filename);
+    path.Append(saveGameSuffix);
+    return path;
 }
 
 
@@ -359,7 +366,7 @@ int Game_SetSaveGameDirectory(const char *newFolder) {
 #if defined (WINDOWS_VERSION)
     mkdir(newSaveGameDir);
 #else
-    mkdir(newSaveGameDir, 0);
+    mkdir(newSaveGameDir, 0755);
 #endif
 
     put_backslash(newSaveGameDir);
@@ -375,7 +382,7 @@ int Game_SetSaveGameDirectory(const char *newFolder) {
     // copy the Restart Game file, if applicable
     char restartGamePath[260];
     sprintf(restartGamePath, "%s""agssave.%d%s", saveGameDirectory, RESTART_POINT_SAVE_GAME_NUMBER, saveGameSuffix);
-    DataStream *restartGameFile = Common::File::OpenFileRead(restartGamePath);
+    Stream *restartGameFile = Common::File::OpenFileRead(restartGamePath);
     if (restartGameFile != NULL) {
         long fileSize = restartGameFile->GetLength();
         char *mbuffer = (char*)malloc(fileSize);
@@ -396,9 +403,11 @@ int Game_SetSaveGameDirectory(const char *newFolder) {
 
 
 const char* Game_GetSaveSlotDescription(int slnum) {
-    char buffer[STD_BUFFER_SIZE];
-    if (load_game(slnum, buffer, NULL) == 0)
-        return CreateNewScriptString(buffer);
+    String description;
+    if (read_savedgame_description(get_save_game_path(slnum), description) == 0)
+    {
+        return CreateNewScriptString(description);
+    }
     return NULL;
 }
 
@@ -406,7 +415,7 @@ const char* Game_GetSaveSlotDescription(int slnum) {
 
 
 int load_game_and_print_error(int toload) {
-    int ecret = load_game(toload, NULL, NULL);
+    int ecret = load_game(toload);
     if (ecret < 0) {
         // disable speech in case there are dynamic graphics that
         // have been freed
@@ -535,35 +544,35 @@ void unload_game_file() {
 
     if ((gameinst != NULL) && (gameinst->pc != 0))
         quit("Error: unload_game called while script still running");
-    //ccAbortAndDestroyInstance (gameinst);
+    //->AbortAndDestroy (gameinst);
     else {
-        ccFreeInstance(gameinstFork);
-        ccFreeInstance(gameinst);
+        delete gameinstFork;
+        delete gameinst;
         gameinstFork = NULL;
         gameinst = NULL;
     }
 
-    ccFreeScript (gamescript);
+    delete gamescript;
     gamescript = NULL;
 
     if ((dialogScriptsInst != NULL) && (dialogScriptsInst->pc != 0))
         quit("Error: unload_game called while dialog script still running");
     else if (dialogScriptsInst != NULL)
     {
-        ccFreeInstance(dialogScriptsInst);
+        delete dialogScriptsInst;
         dialogScriptsInst = NULL;
     }
 
     if (dialogScriptsScript != NULL)
     {
-        ccFreeScript(dialogScriptsScript);
+        delete dialogScriptsScript;
         dialogScriptsScript = NULL;
     }
 
     for (ee = 0; ee < numScriptModules; ee++) {
-        ccFreeInstance(moduleInstFork[ee]);
-        ccFreeInstance(moduleInst[ee]);
-        ccFreeScript(scriptModules[ee]);
+        delete moduleInstFork[ee];
+        delete moduleInst[ee];
+        delete scriptModules[ee];
     }
     numScriptModules = 0;
 
@@ -761,7 +770,7 @@ ScriptViewFrame* Game_GetViewFrame(int viewNumber, int loopNumber, int frame) {
     return sdt;
 }
 
-int Game_DoOnceOnly(const char *token) 
+int Game_DoOnceOnly(const char *token)
 {
     if (strlen(token) > 199)
         quit("!Game.DoOnceOnly: token length cannot be more than 200 chars");
@@ -927,13 +936,29 @@ int Game_ChangeTranslation(const char *newFilename)
 char*sgsig="Adventure Game Studio saved game";
 int sgsiglen=32;
 
-void serialize_bitmap(Common::Bitmap *thispic, DataStream *out) {
+void serialize_bitmap(Common::Bitmap *thispic, Stream *out) {
     if (thispic != NULL) {
         out->WriteInt32(thispic->GetWidth());
         out->WriteInt32(thispic->GetHeight());
         out->WriteInt32(thispic->GetColorDepth());
         for (int cc=0;cc<thispic->GetHeight();cc++)
-            out->WriteArray(&thispic->GetScanLine(cc)[0],thispic->GetWidth(),thispic->GetColorDepth()/8);
+        {
+          switch (thispic->GetColorDepth())
+          {
+          case 8:
+          // CHECKME: originally, AGS does not use real BPP here, but simply divides color depth by 8;
+          // therefore 15-bit bitmaps are saved only partially? is this a bug? or?
+          case 15:
+            out->WriteArray(&thispic->GetScanLine(cc)[0], thispic->GetWidth(), 1);
+            break;
+          case 16:
+            out->WriteArrayOfInt16((const int16_t*)&thispic->GetScanLine(cc)[0], thispic->GetWidth());
+            break;
+          case 32:
+            out->WriteArrayOfInt32((const int32_t*)&thispic->GetScanLine(cc)[0], thispic->GetWidth());
+            break;
+          }
+        }
     }
 }
 
@@ -977,7 +1002,7 @@ void convert_guid_from_text_to_binary(const char *guidText, unsigned char *buffe
     temp = buffer[6]; buffer[6] = buffer[7]; buffer[7] = temp;
 }
 
-Bitmap *read_serialized_bitmap(DataStream *in) {
+Bitmap *read_serialized_bitmap(Stream *in) {
     Bitmap *thispic;
     int picwid = in->ReadInt32();
     int pichit = in->ReadInt32();
@@ -986,20 +1011,33 @@ Bitmap *read_serialized_bitmap(DataStream *in) {
     if (thispic == NULL)
         return NULL;
     for (int vv=0; vv < pichit; vv++)
-        in->ReadArray(&thispic->GetScanLineForWriting(vv)[0], picwid, piccoldep/8);
+    {
+      switch (piccoldep)
+      {
+      case 8:
+      // CHECKME: originally, AGS does not use real BPP here, but simply divides color depth by 8
+      case 15:
+        in->ReadArray(thispic->GetScanLineForWriting(vv), picwid, 1);
+        break;
+      case 16:
+        in->ReadArrayOfInt16((int16_t*)thispic->GetScanLineForWriting(vv), picwid);
+        break;
+      case 32:
+        in->ReadArrayOfInt32((int32_t*)thispic->GetScanLineForWriting(vv), picwid);
+        break;
+      }
+    }
+
     return thispic;
 }
 
-
-
-
-long write_screen_shot_for_vista(DataStream *out, Bitmap *screenshot) 
+long write_screen_shot_for_vista(Stream *out, Bitmap *screenshot) 
 {
     long fileSize = 0;
     char tempFileName[MAX_PATH];
     sprintf(tempFileName, "%s""_tmpscht.bmp", saveGameDirectory);
 
-	BitmapHelper::SaveToFile(screenshot, tempFileName, palette);
+	screenshot->SaveToFile(tempFileName, palette);
 
     update_polled_stuff_if_runtime();
 
@@ -1008,7 +1046,7 @@ long write_screen_shot_for_vista(DataStream *out, Bitmap *screenshot)
         fileSize = file_size(tempFileName);
         char *buffer = (char*)malloc(fileSize);
 
-        DataStream *temp_in = Common::File::OpenFileRead(tempFileName);
+        Stream *temp_in = Common::File::OpenFileRead(tempFileName);
         temp_in->Read(buffer, fileSize);
         delete temp_in;
         unlink(tempFileName);
@@ -1020,7 +1058,7 @@ long write_screen_shot_for_vista(DataStream *out, Bitmap *screenshot)
 }
 
 
-void save_game_screenshot(DataStream *out, Bitmap *screenshot)
+void save_game_screenshot(Stream *out, Bitmap *screenshot)
 {
     // store the screenshot at the start to make it easily accesible
     out->WriteInt32((screenshot == NULL) ? 0 : 1);
@@ -1029,13 +1067,22 @@ void save_game_screenshot(DataStream *out, Bitmap *screenshot)
         serialize_bitmap(screenshot, out);
 }
 
-void save_game_header(DataStream *out)
+void save_game_header(Stream *out)
 {
-    fputstring(ACI_VERSION_TEXT, out);
+    // Write lowest forward-compatible version string, so that
+    // earlier versions could load savedgames made by current engine
+    if (SavedgameLowestForwardCompatVersion <= Version::LastOldFormatVersion)
+    {
+        fputstring(SavedgameLowestForwardCompatVersion.BackwardCompatibleString, out);
+    }
+    else
+    {
+        fputstring(SavedgameLowestForwardCompatVersion.LongString, out);
+    }
     fputstring(usetup.main_data_filename, out);
 }
 
-void save_game_head_dynamic_values(DataStream *out)
+void save_game_head_dynamic_values(Stream *out)
 {
     out->WriteInt32(scrnhit);
     out->WriteInt32(final_col_dep);
@@ -1046,7 +1093,7 @@ void save_game_head_dynamic_values(DataStream *out)
     out->WriteInt32(loopcounter);
 }
 
-void save_game_spriteset(DataStream *out)
+void save_game_spriteset(Stream *out)
 {
     out->WriteInt32(spriteset.elements);
     for (int bb = 1; bb < spriteset.elements; bb++) {
@@ -1060,29 +1107,31 @@ void save_game_spriteset(DataStream *out)
     out->WriteInt32(0);
 }
 
-void save_game_scripts(DataStream *out)
+void save_game_scripts(Stream *out)
 {
     // write the data segment of the global script
     int gdatasize=gameinst->globaldatasize;
     out->WriteInt32(gdatasize);
-    ccFlattenGlobalData (gameinst);
     // MACPORT FIX: just in case gdatasize is 2 or 4, don't want to swap endian
     out->Write(&gameinst->globaldata[0], gdatasize);
-    ccUnFlattenGlobalData (gameinst);
     // write the script modules data segments
     out->WriteInt32(numScriptModules);
     for (int bb = 0; bb < numScriptModules; bb++) {
         int glsize = moduleInst[bb]->globaldatasize;
         out->WriteInt32(glsize);
         if (glsize > 0) {
-            ccFlattenGlobalData(moduleInst[bb]);
             out->Write(&moduleInst[bb]->globaldata[0], glsize);
-            ccUnFlattenGlobalData(moduleInst[bb]);
         }
     }
 }
 
-void save_game_room_state(DataStream *out)
+void WriteRoomStatus_Aligned(RoomStatus *roomstat, Stream *out)
+{
+    AlignedStream align_s(out, Common::kAligned_Write);
+    roomstat->WriteToFile_v321(&align_s);
+}
+
+void save_game_room_state(Stream *out)
 {
     out->WriteInt32(displayed_room);
     if (displayed_room >= 0) {
@@ -1103,19 +1152,19 @@ void save_game_room_state(DataStream *out)
             roomstat = getRoomStatus(bb);
             if (roomstat->beenhere) {
                 out->WriteInt8 (1);
-                roomstat->WriteToFile(out);
+                WriteRoomStatus_Aligned(roomstat, out);
                 if (roomstat->tsdatasize>0)
                     out->Write(&roomstat->tsdata[0], roomstat->tsdatasize);
             }
             else
-                out->WriteInt8 (0); // <--- [IKM] added by me, CHECKME if needed / works correctly
+                out->WriteInt8(0);
         }
         else
-            out->WriteInt8 (0);
+            out->WriteInt8(0);
     }
 }
 
-void save_game_play_ex_data(DataStream *out)
+void save_game_play_ex_data(Stream *out)
 {
     for (int bb = 0; bb < play.num_do_once_tokens; bb++)
     {
@@ -1124,37 +1173,39 @@ void save_game_play_ex_data(DataStream *out)
     out->WriteArrayOfInt32(&play.gui_draw_order[0], game.numgui);
 }
 
-void save_game_movelist(DataStream *out)
+void WriteMoveList_Aligned(Stream *out)
 {
+    AlignedStream align_s(out, Common::kAligned_Write);
     for (int i = 0; i < game.numcharacters + MAX_INIT_SPR + 1; ++i)
     {
-        mls[i].WriteToFile(out);
+        mls[i].WriteToFile(&align_s);
+        align_s.Reset();
     }
-    //out->WriteArray(&mls[0],sizeof(MoveList), game.numcharacters + MAX_INIT_SPR + 1);
 }
 
-void save_game_charextras(DataStream *out)
+void WriteCharacterExtras_Aligned(Stream *out)
 {
+    AlignedStream align_s(out, Common::kAligned_Write);
     for (int i = 0; i < game.numcharacters; ++i)
     {
-        charextra[i].WriteToFile(out);
+        charextra[i].WriteToFile(&align_s);
+        align_s.Reset();
     }
-    //out->WriteArray(&charextra[0],sizeof(CharacterExtras),game.numcharacters);
 }
 
-void save_game_palette(DataStream *out)
+void save_game_palette(Stream *out)
 {
     out->WriteArray(&palette[0],sizeof(color),256);
 }
 
-void save_game_dialogs(DataStream *out)
+void save_game_dialogs(Stream *out)
 {
     for (int bb=0;bb<game.numdialog;bb++)
         out->WriteArrayOfInt32(&dialog[bb].optionflags[0],MAXTOPICOPTIONS);
 }
 
 // [IKM] yea, okay this is just plain silly name :)
-void save_game_more_dynamic_values(DataStream *out)
+void save_game_more_dynamic_values(Stream *out)
 {
     out->WriteInt32(mouse_on_iface);
     out->WriteInt32(mouse_on_iface_button);
@@ -1164,28 +1215,33 @@ void save_game_more_dynamic_values(DataStream *out)
     //out->WriteInt32(mi.trk);
 }
 
-void save_game_gui(DataStream *out)
+void WriteAnimatedButtons_Aligned(Stream *out)
 {
-    write_gui(out,guis,&game);
-    out->WriteInt32(numAnimButs);
+    AlignedStream align_s(out, Common::kAligned_Write);
     for (int i = 0; i < numAnimButs; ++i)
     {
-        animbuts[i].WriteToFile(out);
+        animbuts[i].WriteToFile(&align_s);
+        align_s.Reset();
     }
-    //out->WriteArray(&animbuts[0], sizeof(AnimatingGUIButton), numAnimButs);
 }
 
-void save_game_audiocliptypes(DataStream *out)
+void save_game_gui(Stream *out)
+{
+    write_gui(out,guis,&game,true);
+    out->WriteInt32(numAnimButs);
+    WriteAnimatedButtons_Aligned(out);
+}
+
+void save_game_audiocliptypes(Stream *out)
 {
     out->WriteInt32(game.audioClipTypeCount);
     for (int i = 0; i < game.audioClipTypeCount; ++i)
     {
         game.audioClipTypes[i].WriteToFile(out);
     }
-    //out->WriteArray(&game.audioClipTypes[0], sizeof(AudioClipType), game.audioClipTypeCount);
 }
 
-void save_game_thisroom(DataStream *out)
+void save_game_thisroom(Stream *out)
 {
     out->WriteArrayOfInt16(&thisroom.regionLightLevel[0],MAX_REGIONS);
     out->WriteArrayOfInt32(&thisroom.regionTintLevel[0],MAX_REGIONS);
@@ -1193,7 +1249,7 @@ void save_game_thisroom(DataStream *out)
     out->WriteArrayOfInt16(&thisroom.walk_area_zoom2[0],MAX_WALK_AREAS + 1);
 }
 
-void save_game_ambientsounds(DataStream *out)
+void save_game_ambientsounds(Stream *out)
 {
     for (int i = 0; i < MAX_SOUND_CHANNELS; ++i)
     {
@@ -1202,20 +1258,26 @@ void save_game_ambientsounds(DataStream *out)
     //out->WriteArray (&ambient[0], sizeof(AmbientSound), MAX_SOUND_CHANNELS);
 }
 
-void save_game_overlays(DataStream *out)
+void WriteOverlays_Aligned(Stream *out)
 {
-    out->WriteInt32(numscreenover);
+    AlignedStream align_s(out, Common::kAligned_Write);
     for (int i = 0; i < numscreenover; ++i)
     {
-        screenover[i].WriteToFile(out);
+        screenover[i].WriteToFile(&align_s);
+        align_s.Reset();
     }
-    //out->WriteArray(&screenover[0],sizeof(ScreenOverlay),numscreenover);
+}
+
+void save_game_overlays(Stream *out)
+{
+    out->WriteInt32(numscreenover);
+    WriteOverlays_Aligned(out);
     for (int bb=0;bb<numscreenover;bb++) {
         serialize_bitmap (screenover[bb].pic, out);
     }
 }
 
-void save_game_dynamic_surfaces(DataStream *out)
+void save_game_dynamic_surfaces(Stream *out)
 {
     for (int bb = 0; bb < MAX_DYNAMIC_SURFACES; bb++)
     {
@@ -1231,7 +1293,7 @@ void save_game_dynamic_surfaces(DataStream *out)
     }
 }
 
-void save_game_displayed_room_status(DataStream *out)
+void save_game_displayed_room_status(Stream *out)
 {
     if (displayed_room >= 0) {
 
@@ -1245,15 +1307,14 @@ void save_game_displayed_room_status(DataStream *out)
             serialize_bitmap (raw_saved_screen, out);
 
         // save the current troom, in case they save in room 600 or whatever
-        troom.WriteToFile(out);
-        //out->WriteArray(&troom,sizeof(RoomStatus),1);
+        WriteRoomStatus_Aligned(&troom, out);
         if (troom.tsdatasize>0)
             out->Write(&troom.tsdata[0],troom.tsdatasize);
 
     }
 }
 
-void save_game_globalvars(DataStream *out)
+void save_game_globalvars(Stream *out)
 {
     out->WriteInt32 (numGlobalVars);
     for (int i = 0; i < numGlobalVars; ++i)
@@ -1263,7 +1324,7 @@ void save_game_globalvars(DataStream *out)
     //out->WriteArray (&globalvars[0], sizeof(InteractionVariable), numGlobalVars);
 }
 
-void save_game_views(DataStream *out)
+void save_game_views(Stream *out)
 {
     out->WriteInt32 (game.numviews);
     for (int bb = 0; bb < game.numviews; bb++) {
@@ -1277,7 +1338,7 @@ void save_game_views(DataStream *out)
     }
 }
 
-void save_game_audioclips_and_crossfade(DataStream *out)
+void save_game_audioclips_and_crossfade(Stream *out)
 {
     out->WriteInt32(game.audioClipCount);
     for (int bb = 0; bb <= MAX_SOUND_CHANNELS; bb++)
@@ -1304,9 +1365,15 @@ void save_game_audioclips_and_crossfade(DataStream *out)
     out->WriteInt32(crossFadeVolumeAtStart);
 }
 
+void WriteGameState_Aligned(Stream *out)
+{
+    AlignedStream align_s(out, Common::kAligned_Write);
+    play.WriteToFile_v321(&align_s);
+}
+
 #define MAGICNUMBER 0xbeefcafe
 // Write the save game position to the file
-void save_game_data (DataStream *out, Bitmap *screenshot) {
+void save_game_data (Stream *out, Bitmap *screenshot) {
 
     platform->RunPluginHooks(AGSE_PRESAVEGAME, 0);
     out->WriteInt32(SGVERSION);
@@ -1326,37 +1393,19 @@ void save_game_data (DataStream *out, Bitmap *screenshot) {
     }
 
     //----------------------------------------------------------------
-    play.WriteToFile(out);
-    //out->WriteArray(&play,sizeof(GameState),1);
+    WriteGameState_Aligned(out);
 
     save_game_play_ex_data(out);
     //----------------------------------------------------------------
 
-    save_game_movelist(out);
+    WriteMoveList_Aligned(out);
 
-    ((GameSetupStructBase*)&game)->WriteToFile(out);
-    //out->WriteArray(&game,sizeof(GameSetupStructBase),1);
+    WriteGameSetupStructBase_Aligned(out);
 
     //----------------------------------------------------------------
-    game.WriteForSaveGame(out);
-    //out->WriteArray(&game.invinfo[0], sizeof(InventoryItemInfo), game.numinvitems);
-    //out->WriteArray(&game.mcurs[0], sizeof(MouseCursor), game.numcursors);
+    game.WriteForSaveGame_v321(out);
 
-    //if (game.invScripts == NULL)
-    //{
-    //  for (bb = 0; bb < game.numinvitems; bb++)
-    //    out->WriteArray (&game.intrInv[bb]->timesRun[0], sizeof (int), MAX_NEWINTERACTION_EVENTS);
-    //  for (bb = 0; bb < game.numcharacters; bb++)
-    //    out->WriteArray (&game.intrChar[bb]->timesRun[0], sizeof (int), MAX_NEWINTERACTION_EVENTS); 
-    //}
-
-    //out->WriteArray (&game.options[0], sizeof(int), OPT_HIGHESTOPTION+1);
-    //out->WriteInt8 (game.options[OPT_LIPSYNCTEXT]);
-
-    //out->WriteArray(&game.chars[0],sizeof(CharacterInfo),game.numcharacters);
-    //----------------------------------------------------------------
-
-    save_game_charextras(out);
+    WriteCharacterExtras_Aligned(out);
     save_game_palette(out);
     save_game_dialogs(out);
     save_game_more_dynamic_values(out);
@@ -1410,7 +1459,6 @@ void create_savegame_screenshot(Bitmap *&screenShot)
         if (gfxDriver->UsesMemoryBackBuffer())
         {
             screenShot = BitmapHelper::CreateBitmap(usewid, usehit, virtual_screen->GetColorDepth());
-
             screenShot->StretchBlt(virtual_screen,
 				RectWH(0, 0, virtual_screen->GetWidth(), virtual_screen->GetHeight()),
 				RectWH(0, 0, screenShot->GetWidth(), screenShot->GetHeight()));
@@ -1452,10 +1500,10 @@ void save_game(int slotn, const char*descript) {
     }
 
     VALIDATE_STRING(descript);
-    char nametouse[260];
-    get_save_game_path(slotn, nametouse);
+    String nametouse;
+    nametouse = get_save_game_path(slotn);
 
-    DataStream *out = Common::File::CreateFile(nametouse);
+    Stream *out = Common::File::CreateFile(nametouse);
     if (out == NULL)
         quit("save_game: unable to open savegame file for writing");
 
@@ -1478,7 +1526,7 @@ void save_game(int slotn, const char*descript) {
     // Started writing to the file here
 
     // Extended savegame info for Win Vista and higher
-    out->Write(&vistaHeader, sizeof(RICH_GAME_MEDIA_HEADER));
+    vistaHeader.WriteToFile(out);
 
     // Savegame signature
     out->Write(sgsig,sgsiglen);
@@ -1523,35 +1571,36 @@ void save_game(int slotn, const char*descript) {
 
 char rbuffer[200];
 
-void restore_game_screenshot(DataStream *in)
+Bitmap *restore_game_screenshot(Stream *in)
 {
     int isScreen = in->ReadInt32();
     if (isScreen) {
-        // skip the screenshot
-        delete read_serialized_bitmap(in); // [IKM] how very appropriate
+        return read_serialized_bitmap(in);
     }
+    return NULL;
 }
 
-int restore_game_header(DataStream *in)
+int restore_game_header(Stream *in)
 {
-    fgetstring_limit(rbuffer, in, 200);
-    int vercmp = strcmp(rbuffer, ACI_VERSION_TEXT);
-    if ((vercmp > 0) || (strcmp(rbuffer, LOWEST_SGVER_COMPAT) < 0) ||
-        (strlen(rbuffer) > strlen(LOWEST_SGVER_COMPAT))) {
-            delete in;
-            return -4;
+    String version_string = String::FromStream(in, 200);
+    AGS::Engine::Version requested_engine_version(version_string);
+    if (requested_engine_version > EngineVersion ||
+        requested_engine_version < SavedgameLowestBackwardCompatVersion)
+    {
+        // Version is either non-forward or non-backward compatible
+        // TODO: distinct error codes
+        return -4;
     }
     fgetstring_limit (rbuffer, in, 180);
     rbuffer[180] = 0;
     if (stricmp (rbuffer, usetup.main_data_filename)) {
-        delete in;
         return -5;
     }
 
     return 0;
 }
 
-int restore_game_head_dynamic_values(DataStream *in, int &sg_cur_mode, int &sg_cur_cursor)
+int restore_game_head_dynamic_values(Stream *in, int &sg_cur_mode, int &sg_cur_cursor)
 {
     int gamescrnhit = in->ReadInt32();
     // a 320x240 game, they saved in a 320x200 room but try to restore
@@ -1566,13 +1615,11 @@ int restore_game_head_dynamic_values(DataStream *in, int &sg_cur_mode, int &sg_c
     if (gamescrnhit != scrnhit) {
         Display("This game was saved with the interpreter running at a different "
             "resolution. It cannot be restored.");
-        delete in;
         return -6;
     }
 
     if (in->ReadInt32() != final_col_dep) {
         Display("This game was saved with the engine running at a different colour depth. It cannot be restored.");
-        delete in;
         return -7;
     }
 
@@ -1590,7 +1637,7 @@ int restore_game_head_dynamic_values(DataStream *in, int &sg_cur_mode, int &sg_c
     return 0;
 }
 
-void restore_game_spriteset(DataStream *in)
+void restore_game_spriteset(Stream *in)
 {
     for (int bb = 1; bb < spriteset.elements; bb++) {
         if (game.spriteflags[bb] & SPF_DYNAMICALLOC) {
@@ -1626,35 +1673,30 @@ void restore_game_clean_gfx()
 
 void restore_game_clean_scripts()
 {
-    ccFreeInstance(gameinstFork);
-    ccFreeInstance(gameinst);
+    delete gameinstFork;
+    delete gameinst;
     gameinstFork = NULL;
     gameinst = NULL;
     for (int vv = 0; vv < numScriptModules; vv++) {
-        ccFreeInstance(moduleInstFork[vv]);
-        ccFreeInstance(moduleInst[vv]);
+        delete moduleInstFork[vv];
+        delete moduleInst[vv];
         moduleInst[vv] = NULL;
     }
 
     if (dialogScriptsInst != NULL)
     {
-        ccFreeInstance(dialogScriptsInst);
+        delete dialogScriptsInst;
         dialogScriptsInst = NULL;
     }
 }
 
-void restore_game_scripts(DataStream *in, int &gdatasize, char **newglobaldatabuffer, 
+void restore_game_scripts(Stream *in, int &gdatasize, char **newglobaldatabuffer, 
                           char **scriptModuleDataBuffers, int *scriptModuleDataSize)
 {
     // read the global script data segment
     gdatasize = in->ReadInt32();
     *newglobaldatabuffer = (char*)malloc(gdatasize);
     in->Read(*newglobaldatabuffer, gdatasize);
-    //in->ReadArray(&gameinst->globaldata[0],gdatasize,1);
-    //ccUnFlattenGlobalData (gameinst);
-
-
-
     if (in->ReadInt32() != numScriptModules)
         quit("wrong script module count; cannot restore game");
     for (int vv = 0; vv < numScriptModules; vv++) {
@@ -1664,7 +1706,13 @@ void restore_game_scripts(DataStream *in, int &gdatasize, char **newglobaldatabu
     }
 }
 
-void restore_game_room_state(DataStream *in, const char *nametouse)
+void ReadRoomStatus_Aligned(RoomStatus *roomstat, Stream *in)
+{
+    AlignedStream align_s(in, Common::kAligned_Read);
+    roomstat->ReadFromFile_v321(&align_s);
+}
+
+void restore_game_room_state(Stream *in, const char *nametouse)
 {
     int vv;
 
@@ -1672,14 +1720,6 @@ void restore_game_room_state(DataStream *in, const char *nametouse)
 
     // now the rooms
     resetRoomStatuses();
-
-    // JJS: What was the point in closing and reopening the file?
-    /*
-    long gobackto = in->GetPosition();
-    delete in;
-    in = Common::File::OpenFileRead(nametouse);
-    in->Seek(Common::kSeekBegin, gobackto);
-    */
 
     // read the room state for all the rooms the player has been in
     RoomStatus* roomstat;
@@ -1698,7 +1738,7 @@ void restore_game_room_state(DataStream *in, const char *nametouse)
 
             if (roomstat->beenhere)
             {
-                roomstat->ReadFromFile(in);
+                ReadRoomStatus_Aligned(roomstat, in);
                 if (roomstat->tsdatasize > 0)
                 {
                     roomstat->tsdata=(char*)malloc(roomstat->tsdatasize + 8);  // JJS: Why allocate 8 additional bytes?
@@ -1709,7 +1749,13 @@ void restore_game_room_state(DataStream *in, const char *nametouse)
     }
 }
 
-void restore_game_play(DataStream *in)
+void ReadGameState_Aligned(Stream *in)
+{
+    AlignedStream align_s(in, Common::kAligned_Read);
+    play.ReadFromFile_v321(&align_s);
+}
+
+void restore_game_play(Stream *in)
 {
     int speech_was = play.want_speech, musicvox = play.seperate_music_lib;
     // preserve the replay settings
@@ -1722,11 +1768,7 @@ void restore_game_play(DataStream *in)
 
     free_do_once_tokens();
 
-    //in->ReadArray (&play, 76, 4);
-    //in->ReadArray (((char*)&play) + 78*4, sizeof(GameState) - 78*4, 1);
-
-    //in->ReadArray(&play,sizeof(GameState),1);
-    play.ReadFromFile(in);
+    ReadGameState_Aligned(in);
 
     // Preserve whether the music vox is available
     play.seperate_music_lib = musicvox;
@@ -1758,36 +1800,38 @@ void restore_game_play(DataStream *in)
     in->ReadArrayOfInt32(&play.gui_draw_order[0], game.numgui);
 }
 
-void restore_game_movelist(DataStream *in)
+void ReadMoveList_Aligned(Stream *in)
 {
+    AlignedStream align_s(in, Common::kAligned_Read);
     for (int i = 0; i < game.numcharacters + MAX_INIT_SPR + 1; ++i)
     {
-        mls[i].ReadFromFile(in);
+        mls[i].ReadFromFile(&align_s);
+        align_s.Reset();
     }
-    //in->ReadArray(&mls[0],sizeof(MoveList), game.numcharacters + MAX_INIT_SPR + 1);
 }
 
-void restore_game_charextras(DataStream *in)
+void ReadCharacterExtras_Aligned(Stream *in)
 {
+    AlignedStream align_s(in, Common::kAligned_Read);
     for (int i = 0; i < game.numcharacters; ++i)
     {
-        charextra[i].ReadFromFile(in);
+        charextra[i].ReadFromFile(&align_s);
+        align_s.Reset();
     }
-    //in->ReadArray(&charextra[0],sizeof(CharacterExtras),game.numcharacters);
 }
 
-void restore_game_palette(DataStream *in)
+void restore_game_palette(Stream *in)
 {
     in->ReadArray(&palette[0],sizeof(color),256);
 }
 
-void restore_game_dialogs(DataStream *in)
+void restore_game_dialogs(Stream *in)
 {
     for (int vv=0;vv<game.numdialog;vv++)
         in->ReadArrayOfInt32(&dialog[vv].optionflags[0],MAXTOPICOPTIONS);
 }
 
-void restore_game_more_dynamic_values(DataStream *in)
+void restore_game_more_dynamic_values(Stream *in)
 {
     mouse_on_iface=in->ReadInt32();
     mouse_on_iface_button=in->ReadInt32();
@@ -1796,7 +1840,17 @@ void restore_game_more_dynamic_values(DataStream *in)
     game_paused=in->ReadInt32();
 }
 
-void restore_game_gui(DataStream *in, int numGuisWas)
+void ReadAnimatedButtons_Aligned(Stream *in)
+{
+    AlignedStream align_s(in, Common::kAligned_Read);
+    for (int i = 0; i < numAnimButs; ++i)
+    {
+        animbuts[i].ReadFromFile(&align_s);
+        align_s.Reset();
+    }
+}
+
+void restore_game_gui(Stream *in, int numGuisWas)
 {
     int vv;
     for (vv = 0; vv < game.numgui; vv++)
@@ -1811,14 +1865,10 @@ void restore_game_gui(DataStream *in, int numGuisWas)
         export_gui_controls(vv);
 
     numAnimButs = in->ReadInt32();
-    for (int i = 0; i < numAnimButs; ++i)
-    {
-        animbuts[i].ReadFromFile(in);
-    }
-    //in->ReadArray(&animbuts[0], sizeof(AnimatingGUIButton), numAnimButs);
+    ReadAnimatedButtons_Aligned(in);
 }
 
-void restore_game_audiocliptypes(DataStream *in)
+void restore_game_audiocliptypes(Stream *in)
 {
     if (in->ReadInt32() != game.audioClipTypeCount)
         quit("!Restore_Game: game has changed (audio types), unable to restore");
@@ -1827,10 +1877,9 @@ void restore_game_audiocliptypes(DataStream *in)
     {
         game.audioClipTypes[i].ReadFromFile(in);
     }
-    //in->ReadArray(&game.audioClipTypes[0], sizeof(AudioClipType), game.audioClipTypeCount);
 }
 
-void restore_game_thisroom(DataStream *in, short *saved_light_levels, int *saved_tint_levels,
+void restore_game_thisroom(Stream *in, short *saved_light_levels, int *saved_tint_levels,
                            short *saved_zoom_levels1, short *saved_zoom_levels2)
 {
     in->ReadArrayOfInt16(&saved_light_levels[0],MAX_REGIONS);
@@ -1839,7 +1888,7 @@ void restore_game_thisroom(DataStream *in, short *saved_light_levels, int *saved
     in->ReadArrayOfInt16(&saved_zoom_levels2[0],MAX_WALK_AREAS + 1);
 }
 
-void restore_game_ambientsounds(DataStream *in, int crossfadeInChannelWas, int crossfadeOutChannelWas,
+void restore_game_ambientsounds(Stream *in, int crossfadeInChannelWas, int crossfadeOutChannelWas,
                                 int *doAmbient)
 {
     int bb;
@@ -1855,7 +1904,6 @@ void restore_game_ambientsounds(DataStream *in, int crossfadeInChannelWas, int c
     {
         ambient[i].ReadFromFile(in);
     }
-    //in->ReadArray(&ambient[0], sizeof(AmbientSound), MAX_SOUND_CHANNELS);
 
     for (bb = 1; bb < MAX_SOUND_CHANNELS; bb++) {
         if (ambient[bb].channel == 0)
@@ -1867,14 +1915,20 @@ void restore_game_ambientsounds(DataStream *in, int crossfadeInChannelWas, int c
     }
 }
 
-void restore_game_overlays(DataStream *in)
+void ReadOverlays_Aligned(Stream *in)
 {
-    numscreenover = in->ReadInt32();
+    AlignedStream align_s(in, Common::kAligned_Read);
     for (int i = 0; i < numscreenover; ++i)
     {
-        screenover[i].ReadFromFile(in);
+        screenover[i].ReadFromFile(&align_s);
+        align_s.Reset();
     }
-    //in->ReadArray(&screenover[0],sizeof(ScreenOverlay),numscreenover);
+}
+
+void restore_game_overlays(Stream *in)
+{
+    numscreenover = in->ReadInt32();
+    ReadOverlays_Aligned(in);
     for (int bb=0;bb<numscreenover;bb++) {
         if (screenover[bb].hasSerializedBitmap)
         {
@@ -1884,7 +1938,7 @@ void restore_game_overlays(DataStream *in)
     }
 }
 
-void restore_game_dynamic_surfaces(DataStream *in, Bitmap **dynamicallyCreatedSurfacesFromSaveGame)
+void restore_game_dynamic_surfaces(Stream *in, Bitmap **dynamicallyCreatedSurfacesFromSaveGame)
 {
     // load into a temp array since ccUnserialiseObjects will destroy
     // it otherwise
@@ -1901,7 +1955,7 @@ void restore_game_dynamic_surfaces(DataStream *in, Bitmap **dynamicallyCreatedSu
     }
 }
 
-void restore_game_displayed_room_status(DataStream *in, Bitmap **newbscene)
+void restore_game_displayed_room_status(Stream *in, Bitmap **newbscene)
 {
     int bb;
     for (bb = 0; bb < MAX_BSCENE; bb++)
@@ -1925,20 +1979,20 @@ void restore_game_displayed_room_status(DataStream *in, Bitmap **newbscene)
 
         if (troom.tsdata != NULL)
             free (troom.tsdata);
+        
         // get the current troom, in case they save in room 600 or whatever
-        troom.ReadFromFile(in);
-        //in->ReadArray(&troom,sizeof(RoomStatus),1);
+        ReadRoomStatus_Aligned(&troom, in);
+        
         if (troom.tsdatasize > 0) {
             troom.tsdata=(char*)malloc(troom.tsdatasize+5);
             in->Read(&troom.tsdata[0],troom.tsdatasize);
         }
         else
             troom.tsdata = NULL;
-
     }
 }
 
-void restore_game_globalvars(DataStream *in)
+void restore_game_globalvars(Stream *in)
 {
     if (in->ReadInt32() != numGlobalVars) 
         quit("!Game has been modified since save; unable to restore game (GM01)");
@@ -1949,7 +2003,7 @@ void restore_game_globalvars(DataStream *in)
     }
 }
 
-void restore_game_views(DataStream *in)
+void restore_game_views(Stream *in)
 {
     if (in->ReadInt32() != game.numviews)
         quit("!Game has been modified since save; unable to restore (GV02)");
@@ -1965,7 +2019,7 @@ void restore_game_views(DataStream *in)
     }
 }
 
-void restore_game_audioclips_and_crossfade(DataStream *in, int crossfadeInChannelWas, int crossfadeOutChannelWas)
+void restore_game_audioclips_and_crossfade(Stream *in, int crossfadeInChannelWas, int crossfadeOutChannelWas)
 {
     int bb;
 
@@ -2022,24 +2076,12 @@ void restore_game_audioclips_and_crossfade(DataStream *in, int crossfadeInChanne
     crossFadeVolumeAtStart = in->ReadInt32();
 }
 
-int restore_game_data (DataStream *in, const char *nametouse) {
+int restore_game_data (Stream *in, const char *nametouse) {
 
     int bb, vv;
 
-    if (in->ReadInt32()!=SGVERSION) {
-        delete in;
-        return -3;
-    }
-
-    restore_game_screenshot(in);
-
-    int res = restore_game_header(in);
-    if (res != 0) {
-        return res;
-    }
-
     int sg_cur_mode = 0, sg_cur_cursor = 0;
-    res = restore_game_head_dynamic_values(in, /*out*/ sg_cur_mode, sg_cur_cursor);
+    int res = restore_game_head_dynamic_values(in, /*out*/ sg_cur_mode, sg_cur_cursor);
     if (res != 0) {
         return res;
     }
@@ -2064,7 +2106,7 @@ int restore_game_data (DataStream *in, const char *nametouse) {
 
     restore_game_play(in);
 
-    restore_game_movelist(in);
+    ReadMoveList_Aligned(in);
 
     // save pointer members before reading
     char* gswas=game.globalscript;
@@ -2074,13 +2116,12 @@ int restore_game_data (DataStream *in, const char *nametouse) {
     char* mesbk[MAXGLOBALMES];
     int numchwas = game.numcharacters;
     for (vv=0;vv<MAXGLOBALMES;vv++) mesbk[vv]=game.messages[vv];
-    int numdiwas = game.numdialog, numinvwas = game.numinvitems;
+    int numdiwas = game.numdialog;
+    int numinvwas = game.numinvitems;
     int numviewswas = game.numviews;
     int numGuisWas = game.numgui;
 
-    //in->ReadArray(&game,sizeof(GameSetupStructBase),1);
-    GameSetupStructBase *gameBase = (GameSetupStructBase *) &game;
-    gameBase->ReadFromFile(in);
+    ReadGameSetupStructBase_Aligned(in);
 
     if (game.numdialog!=numdiwas)
         quit("!Restore_Game: Game has changed (dlg), unable to restore");
@@ -2089,7 +2130,7 @@ int restore_game_data (DataStream *in, const char *nametouse) {
     if (game.numviews != numviewswas)
         quit("!Restore_Game: Game has changed (views), unable to restore position");
 
-    game.ReadFromSaveGame(in, gswas, compsc, chwas, olddict, mesbk); 
+    game.ReadFromSaveGame_v321(in, gswas, compsc, chwas, olddict, mesbk); 
     //
     //in->ReadArray(&game.invinfo[0], sizeof(InventoryItemInfo), game.numinvitems);
     //in->ReadArray(&game.mcurs[0], sizeof(MouseCursor), game.numcursors);
@@ -2115,10 +2156,10 @@ int restore_game_data (DataStream *in, const char *nametouse) {
     //in->ReadArray(&game.chars[0],sizeof(CharacterInfo),game.numcharacters);
     //
 
-    restore_game_charextras(in);
+    ReadCharacterExtras_Aligned(in);
     if (roominst!=NULL) {  // so it doesn't overwrite the tsdata
-        ccFreeInstance(roominstFork);
-        ccFreeInstance(roominst); 
+        delete roominstFork;
+        delete roominst; 
         roominstFork = NULL;
         roominst=NULL;
     }
@@ -2174,8 +2215,6 @@ int restore_game_data (DataStream *in, const char *nametouse) {
     // preserve legacy music type setting
     current_music_type = in->ReadInt32();
 
-    delete in;
-
     // restore these to the ones retrieved from the save game
     for (bb = 0; bb < MAX_DYNAMIC_SURFACES; bb++)
     {
@@ -2191,7 +2230,6 @@ int restore_game_data (DataStream *in, const char *nametouse) {
     // read the global data into the newly created script
     memcpy(&gameinst->globaldata[0], newglobaldatabuffer, gdatasize);
     free(newglobaldatabuffer);
-    ccUnFlattenGlobalData(gameinst);
 
     // restore the script module data
     for (bb = 0; bb < numScriptModules; bb++) {
@@ -2199,7 +2237,6 @@ int restore_game_data (DataStream *in, const char *nametouse) {
             quit("!Restore Game: script module global data changed, unable to restore");
         memcpy(&moduleInst[bb]->globaldata[0], scriptModuleDataBuffers[bb], scriptModuleDataSize[bb]);
         free(scriptModuleDataBuffers[bb]);
-        ccUnFlattenGlobalData(moduleInst[bb]);
     }
 
 
@@ -2291,7 +2328,7 @@ int restore_game_data (DataStream *in, const char *nametouse) {
 
     if (musicpos > 0) {
     // For some reason, in Prodigal after this Seek line is called
-    // it can cause the next update_polled_stuff to crash;
+    // it can cause the next update_polled_mp3 to crash;
     // must be some sort of bug in AllegroMP3
     if ((crossFading > 0) && (channels[crossFading] != NULL))
     channels[crossFading]->seek(musicpos);
@@ -2341,102 +2378,169 @@ int restore_game_data (DataStream *in, const char *nametouse) {
 }
 
 int gameHasBeenRestored = 0;
+int oldeip;
 
-int do_game_load(const char *nametouse, int slotNumber, char *descrp, int *wantShot)
+void ReadRichMediaHeader_Aligned(RICH_GAME_MEDIA_HEADER &rich_media_header, Stream *in)
 {
-    gameHasBeenRestored++;
+    AlignedStream align_s(in, Common::kAligned_Read);
+    rich_media_header.ReadFromFile(&align_s);
+}
 
-    DataStream *in = Common::File::OpenFileRead(nametouse);
-    if (in==NULL)
-        return -1;
+Stream *open_savedgame(const char *savedgame, int &error_code)
+{
+    error_code = 0;
+    Stream *in = Common::File::OpenFileRead(savedgame);
+    if (!in)
+    {
+        error_code = -1;
+        return in;
+    }
 
     // skip Vista header
-    in->Seek(Common::kSeekBegin, sizeof(RICH_GAME_MEDIA_HEADER));
+    RICH_GAME_MEDIA_HEADER rich_media_header;
+    ReadRichMediaHeader_Aligned(rich_media_header, in);
 
-    in->Read(rbuffer,sgsiglen);
-    rbuffer[sgsiglen]=0;
-    if (strcmp(rbuffer,sgsig)!=0) {
+    // check saved game signature
+    in->Read(rbuffer, sgsiglen);
+    rbuffer[sgsiglen] = 0;
+    if (strcmp(rbuffer, sgsig) != 0) {
         // not a save game
         delete in;
-        return -2; 
+        error_code = -2;
+        return NULL;
     }
+
     int oldeip = our_eip;
     our_eip = 2050;
 
-    fgetstring_limit(rbuffer,in, 180);
+    // read description
+    fgetstring_limit(rbuffer, in, 180);
     rbuffer[180] = 0;
     safeguard_string ((unsigned char*)rbuffer);
 
-    if (descrp!=NULL) {
-        // just want slot description, so return
-        strcpy(descrp,rbuffer);
+    // check saved game format version
+    if (in->ReadInt32() != SGVERSION) {
         delete in;
-        our_eip = oldeip;
-        return 0;
+        error_code = -3;
+        return NULL;
     }
 
-    if (wantShot != NULL) {
-        // just want the screenshot
-        if (in->ReadInt32()!=SGVERSION) {
-            delete in;
-            return -3;
-        }
-        int isScreen = in->ReadInt32();
-        *wantShot = 0;
+    return in;
+}
 
-        if (isScreen) {
-            int gotSlot = spriteset.findFreeSlot();
-            // load the screenshot
-            Bitmap *redin = read_serialized_bitmap(in);
-            if (gotSlot > 0) {
-                // add it into the sprite set
-                add_dynamic_sprite(gotSlot, gfxDriver->ConvertBitmapToSupportedColourDepth(redin));
-
-                *wantShot = gotSlot;
-            }
-            else
-            {
-                delete redin;
-            }
-        }
-        delete in;
+int read_savedgame_description(const String &savedgame, String &description)
+{
+    int error_code;
+    // yeah, I know what you think... this will be remade someday
+    delete open_savedgame(savedgame, error_code);
+    if (error_code == 0)
+    {
+        description = rbuffer;
         our_eip = oldeip;
-        return 0;
+    }
+    return error_code;
+}
+
+int read_savedgame_screenshot(const String &savedgame, int &want_shot)
+{
+    want_shot = 0;
+
+    int error_code;
+    Stream *in = open_savedgame(savedgame, error_code);
+    if (!in)
+    {
+        return error_code;
+    }
+
+    Bitmap *screenshot = restore_game_screenshot(in);
+    if (screenshot)
+    {
+        int slot = spriteset.findFreeSlot();
+        if (slot > 0)
+        {
+            // add it into the sprite set
+            add_dynamic_sprite(slot, gfxDriver->ConvertBitmapToSupportedColourDepth(screenshot));
+            want_shot = slot;
+        }
+        else
+        {
+            delete screenshot;
+        }
+    }
+
+    delete in;
+    our_eip = oldeip;
+    return 0;
+}
+
+int load_game(int slotNumber)
+{
+    return load_game(get_save_game_path(slotNumber), slotNumber);
+}
+
+int load_game(const Common::String &path, int slotNumber)
+{
+    gameHasBeenRestored++;
+
+    int error_code;
+    Stream *in = open_savedgame(path, error_code);
+    if (!in)
+    {
+        return error_code;
     }
 
     our_eip = 2051;
 
-    // do the actual restore
-    int ress = restore_game_data(in, nametouse);
+    delete restore_game_screenshot(in);  // [IKM] how very appropriate
 
-    our_eip = oldeip;
+    error_code = restore_game_header(in);
 
-    if (ress == -5) {
-        // saved in different game
-        RunAGSGame (rbuffer, 0, 0);
-        load_new_game_restore = slotNumber;
-        return 0;
+    // saved in different game
+    if (error_code == -5) {
+        // [IKM] 2012-11-26: this is a workaround, indeed.
+        // Try to find wanted game's executable; if it does not exist,
+        // continue loading savedgame in current game, and pray for the best
+        get_current_dir_path(gamefilenamebuf, rbuffer);
+        if (Common::File::TestReadFile(gamefilenamebuf))
+        {
+            delete in;
+            RunAGSGame (rbuffer, 0, 0);
+            load_new_game_restore = slotNumber;
+            return 0;
+        }
+        Common::Out::FPrint("WARNING: the saved game '%s' references game file '%s', but it cannot be found in the current directory.", path.GetCStr(), gamefilenamebuf);
+        Common::Out::FPrint("Trying to restore in the running game instead.");
+    }
+    else if (error_code != 0) {
+        delete in;
+        return error_code;
     }
 
-    if (ress)
-        return ress;
+    // do the actual restore
+    error_code = restore_game_data(in, path);
+    delete in;
+    our_eip = oldeip;
 
-    run_on_event (GE_RESTORE_GAME, slotNumber);
+    if (error_code)
+    {
+        return error_code;
+    }
+
+    run_on_event (GE_RESTORE_GAME, RuntimeScriptValue().SetInt32(slotNumber));
 
     // ensure keyboard buffer is clean
     // use the raw versions rather than the rec_ versions so we don't
     // interfere with the replay sync
     while (keypressed()) readkey();
-
     return 0;
 }
-
+/* //j removed
 int load_game(int slotn, char*descrp, int *wantShot) {
     char nametouse[260];
     get_save_game_path(slotn, nametouse);
 
     return do_game_load(nametouse, slotn, descrp, wantShot);
-}
+}*/
 
 void prepare_cutscene_skip(){
     if (play.in_cutscene == 0 || play.fast_forward){
@@ -2737,4 +2841,400 @@ InteractionVariable *FindGraphicalVariable(const char *varName) {
             return &thisroom.localvars[ii];
     }
     return NULL;
+}
+
+//=============================================================================
+//
+// Script API Functions
+//
+//=============================================================================
+
+#include "debug/out.h"
+#include "script/script_api.h"
+#include "script/script_runtime.h"
+
+// int  (int audioType);
+RuntimeScriptValue Sc_Game_IsAudioPlaying(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT_PINT(Game_IsAudioPlaying);
+}
+
+// void (int audioType, int volumeDrop)
+RuntimeScriptValue Sc_Game_SetAudioTypeSpeechVolumeDrop(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID_PINT2(Game_SetAudioTypeSpeechVolumeDrop);
+}
+
+// void (int audioType, int volume, int changeType)
+RuntimeScriptValue Sc_Game_SetAudioTypeVolume(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID_PINT3(Game_SetAudioTypeVolume);
+}
+
+// void (int audioType)
+RuntimeScriptValue Sc_Game_StopAudio(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID_PINT(Game_StopAudio);
+}
+
+// int (const char *newFilename)
+RuntimeScriptValue Sc_Game_ChangeTranslation(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT_POBJ(Game_ChangeTranslation, const char);
+}
+
+// int (const char *token)
+RuntimeScriptValue Sc_Game_DoOnceOnly(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT_POBJ(Game_DoOnceOnly, const char);
+}
+
+// int (int red, int grn, int blu)
+RuntimeScriptValue Sc_Game_GetColorFromRGB(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT_PINT3(Game_GetColorFromRGB);
+}
+
+// int (int viewNumber, int loopNumber)
+RuntimeScriptValue Sc_Game_GetFrameCountForLoop(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT_PINT2(Game_GetFrameCountForLoop);
+}
+
+// const char* (int x, int y)
+RuntimeScriptValue Sc_Game_GetLocationName(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_OBJ_PINT2(const char, myScriptStringImpl, Game_GetLocationName);
+}
+
+// int (int viewNumber)
+RuntimeScriptValue Sc_Game_GetLoopCountForView(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT_PINT(Game_GetLoopCountForView);
+}
+
+// int ()
+RuntimeScriptValue Sc_Game_GetMODPattern(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Game_GetMODPattern);
+}
+
+// int (int viewNumber, int loopNumber)
+RuntimeScriptValue Sc_Game_GetRunNextSettingForLoop(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT_PINT2(Game_GetRunNextSettingForLoop);
+}
+
+// const char* (int slnum)
+RuntimeScriptValue Sc_Game_GetSaveSlotDescription(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_OBJ_PINT(const char, myScriptStringImpl, Game_GetSaveSlotDescription);
+}
+
+// ScriptViewFrame* (int viewNumber, int loopNumber, int frame)
+RuntimeScriptValue Sc_Game_GetViewFrame(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_OBJAUTO_PINT3(ScriptViewFrame, Game_GetViewFrame);
+}
+
+// const char* (const char *msg)
+RuntimeScriptValue Sc_Game_InputBox(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_OBJ_POBJ(const char, myScriptStringImpl, Game_InputBox, const char);
+}
+
+// int (const char *newFolder)
+RuntimeScriptValue Sc_Game_SetSaveGameDirectory(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT_POBJ(Game_SetSaveGameDirectory, const char);
+}
+
+// void (int evenAmbient);
+RuntimeScriptValue Sc_StopAllSounds(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID_PINT(StopAllSounds);
+}
+
+// int ()
+RuntimeScriptValue Sc_Game_GetCharacterCount(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Game_GetCharacterCount);
+}
+
+// int ()
+RuntimeScriptValue Sc_Game_GetDialogCount(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Game_GetDialogCount);
+}
+
+// const char *()
+RuntimeScriptValue Sc_Game_GetFileName(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_OBJ(const char, myScriptStringImpl, Game_GetFileName);
+}
+
+// int ()
+RuntimeScriptValue Sc_Game_GetFontCount(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Game_GetFontCount);
+}
+
+// const char* (int index)
+RuntimeScriptValue Sc_Game_GetGlobalMessages(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_OBJ_PINT(const char, myScriptStringImpl, Game_GetGlobalMessages);
+}
+
+// const char* (int index)
+RuntimeScriptValue Sc_Game_GetGlobalStrings(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_OBJ_PINT(const char, myScriptStringImpl, Game_GetGlobalStrings);
+}
+
+// void  (int index, char *newval);
+RuntimeScriptValue Sc_SetGlobalString(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID_PINT_POBJ(SetGlobalString, const char);
+}
+
+// int ()
+RuntimeScriptValue Sc_Game_GetGUICount(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Game_GetGUICount);
+}
+
+// int ()
+RuntimeScriptValue Sc_Game_GetIgnoreUserInputAfterTextTimeoutMs(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Game_GetIgnoreUserInputAfterTextTimeoutMs);
+}
+
+// void (int newValueMs)
+RuntimeScriptValue Sc_Game_SetIgnoreUserInputAfterTextTimeoutMs(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID_PINT(Game_SetIgnoreUserInputAfterTextTimeoutMs);
+}
+
+// int ()
+RuntimeScriptValue Sc_Game_GetInSkippableCutscene(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Game_GetInSkippableCutscene);
+}
+
+// int ()
+RuntimeScriptValue Sc_Game_GetInventoryItemCount(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Game_GetInventoryItemCount);
+}
+
+// int ()
+RuntimeScriptValue Sc_Game_GetMinimumTextDisplayTimeMs(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Game_GetMinimumTextDisplayTimeMs);
+}
+
+// void (int newTextMinTime)
+RuntimeScriptValue Sc_Game_SetMinimumTextDisplayTimeMs(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID_PINT(Game_SetMinimumTextDisplayTimeMs);
+}
+
+// int ()
+RuntimeScriptValue Sc_Game_GetMouseCursorCount(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Game_GetMouseCursorCount);
+}
+
+// const char *()
+RuntimeScriptValue Sc_Game_GetName(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_OBJ(const char, myScriptStringImpl, Game_GetName);
+}
+
+// void (const char *newName)
+RuntimeScriptValue Sc_Game_SetName(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID_POBJ(Game_SetName, const char);
+}
+
+// int ()
+RuntimeScriptValue Sc_Game_GetNormalFont(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Game_GetNormalFont);
+}
+
+// void  (int fontnum);
+RuntimeScriptValue Sc_SetNormalFont(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID_PINT(SetNormalFont);
+}
+
+// int ()
+RuntimeScriptValue Sc_Game_GetSkippingCutscene(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Game_GetSkippingCutscene);
+}
+
+// int ()
+RuntimeScriptValue Sc_Game_GetSpeechFont(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Game_GetSpeechFont);
+}
+
+// void  (int fontnum);
+RuntimeScriptValue Sc_SetSpeechFont(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID_PINT(SetSpeechFont);
+}
+
+// int (int spriteNum)
+RuntimeScriptValue Sc_Game_GetSpriteWidth(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT_PINT(Game_GetSpriteWidth);
+}
+
+// int (int spriteNum)
+RuntimeScriptValue Sc_Game_GetSpriteHeight(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT_PINT(Game_GetSpriteHeight);
+}
+
+// int ()
+RuntimeScriptValue Sc_Game_GetTextReadingSpeed(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Game_GetTextReadingSpeed);
+}
+
+// void (int newTextSpeed)
+RuntimeScriptValue Sc_Game_SetTextReadingSpeed(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID_PINT(Game_SetTextReadingSpeed);
+}
+
+// const char* ()
+RuntimeScriptValue Sc_Game_GetTranslationFilename(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_OBJ(const char, myScriptStringImpl, Game_GetTranslationFilename);
+}
+
+// int ()
+RuntimeScriptValue Sc_Game_GetUseNativeCoordinates(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Game_GetUseNativeCoordinates);
+}
+
+// int ()
+RuntimeScriptValue Sc_Game_GetViewCount(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_INT(Game_GetViewCount);
+}
+
+
+void RegisterGameAPI()
+{
+    ccAddExternalStaticFunction("Game::IsAudioPlaying^1",                       Sc_Game_IsAudioPlaying);
+    ccAddExternalStaticFunction("Game::SetAudioTypeSpeechVolumeDrop^2",         Sc_Game_SetAudioTypeSpeechVolumeDrop);
+    ccAddExternalStaticFunction("Game::SetAudioTypeVolume^3",                   Sc_Game_SetAudioTypeVolume);
+    ccAddExternalStaticFunction("Game::StopAudio^1",                            Sc_Game_StopAudio);
+    ccAddExternalStaticFunction("Game::ChangeTranslation^1",                    Sc_Game_ChangeTranslation);
+    ccAddExternalStaticFunction("Game::DoOnceOnly^1",                           Sc_Game_DoOnceOnly);
+    ccAddExternalStaticFunction("Game::GetColorFromRGB^3",                      Sc_Game_GetColorFromRGB);
+    ccAddExternalStaticFunction("Game::GetFrameCountForLoop^2",                 Sc_Game_GetFrameCountForLoop);
+    ccAddExternalStaticFunction("Game::GetLocationName^2",                      Sc_Game_GetLocationName);
+    ccAddExternalStaticFunction("Game::GetLoopCountForView^1",                  Sc_Game_GetLoopCountForView);
+    ccAddExternalStaticFunction("Game::GetMODPattern^0",                        Sc_Game_GetMODPattern);
+    ccAddExternalStaticFunction("Game::GetRunNextSettingForLoop^2",             Sc_Game_GetRunNextSettingForLoop);
+    ccAddExternalStaticFunction("Game::GetSaveSlotDescription^1",               Sc_Game_GetSaveSlotDescription);
+    ccAddExternalStaticFunction("Game::GetViewFrame^3",                         Sc_Game_GetViewFrame);
+    ccAddExternalStaticFunction("Game::InputBox^1",                             Sc_Game_InputBox);
+    ccAddExternalStaticFunction("Game::SetSaveGameDirectory^1",                 Sc_Game_SetSaveGameDirectory);
+    ccAddExternalStaticFunction("Game::StopSound^1",                            Sc_StopAllSounds);
+    ccAddExternalStaticFunction("Game::get_CharacterCount",                     Sc_Game_GetCharacterCount);
+    ccAddExternalStaticFunction("Game::get_DialogCount",                        Sc_Game_GetDialogCount);
+    ccAddExternalStaticFunction("Game::get_FileName",                           Sc_Game_GetFileName);
+    ccAddExternalStaticFunction("Game::get_FontCount",                          Sc_Game_GetFontCount);
+    ccAddExternalStaticFunction("Game::geti_GlobalMessages",                    Sc_Game_GetGlobalMessages);
+    ccAddExternalStaticFunction("Game::geti_GlobalStrings",                     Sc_Game_GetGlobalStrings);
+    ccAddExternalStaticFunction("Game::seti_GlobalStrings",                     Sc_SetGlobalString);
+    ccAddExternalStaticFunction("Game::get_GUICount",                           Sc_Game_GetGUICount);
+    ccAddExternalStaticFunction("Game::get_IgnoreUserInputAfterTextTimeoutMs",  Sc_Game_GetIgnoreUserInputAfterTextTimeoutMs);
+    ccAddExternalStaticFunction("Game::set_IgnoreUserInputAfterTextTimeoutMs",  Sc_Game_SetIgnoreUserInputAfterTextTimeoutMs);
+    ccAddExternalStaticFunction("Game::get_InSkippableCutscene",                Sc_Game_GetInSkippableCutscene);
+    ccAddExternalStaticFunction("Game::get_InventoryItemCount",                 Sc_Game_GetInventoryItemCount);
+    ccAddExternalStaticFunction("Game::get_MinimumTextDisplayTimeMs",           Sc_Game_GetMinimumTextDisplayTimeMs);
+    ccAddExternalStaticFunction("Game::set_MinimumTextDisplayTimeMs",           Sc_Game_SetMinimumTextDisplayTimeMs);
+    ccAddExternalStaticFunction("Game::get_MouseCursorCount",                   Sc_Game_GetMouseCursorCount);
+    ccAddExternalStaticFunction("Game::get_Name",                               Sc_Game_GetName);
+    ccAddExternalStaticFunction("Game::set_Name",                               Sc_Game_SetName);
+    ccAddExternalStaticFunction("Game::get_NormalFont",                         Sc_Game_GetNormalFont);
+    ccAddExternalStaticFunction("Game::set_NormalFont",                         Sc_SetNormalFont);
+    ccAddExternalStaticFunction("Game::get_SkippingCutscene",                   Sc_Game_GetSkippingCutscene);
+    ccAddExternalStaticFunction("Game::get_SpeechFont",                         Sc_Game_GetSpeechFont);
+    ccAddExternalStaticFunction("Game::set_SpeechFont",                         Sc_SetSpeechFont);
+    ccAddExternalStaticFunction("Game::geti_SpriteWidth",                       Sc_Game_GetSpriteWidth);
+    ccAddExternalStaticFunction("Game::geti_SpriteHeight",                      Sc_Game_GetSpriteHeight);
+    ccAddExternalStaticFunction("Game::get_TextReadingSpeed",                   Sc_Game_GetTextReadingSpeed);
+    ccAddExternalStaticFunction("Game::set_TextReadingSpeed",                   Sc_Game_SetTextReadingSpeed);
+    ccAddExternalStaticFunction("Game::get_TranslationFilename",                Sc_Game_GetTranslationFilename);
+    ccAddExternalStaticFunction("Game::get_UseNativeCoordinates",               Sc_Game_GetUseNativeCoordinates);
+    ccAddExternalStaticFunction("Game::get_ViewCount",                          Sc_Game_GetViewCount);
+
+    /* ----------------------- Registering unsafe exports for plugins -----------------------*/
+
+    ccAddExternalFunctionForPlugin("Game::IsAudioPlaying^1",                       (void*)Game_IsAudioPlaying);
+    ccAddExternalFunctionForPlugin("Game::SetAudioTypeSpeechVolumeDrop^2",         (void*)Game_SetAudioTypeSpeechVolumeDrop);
+    ccAddExternalFunctionForPlugin("Game::SetAudioTypeVolume^3",                   (void*)Game_SetAudioTypeVolume);
+    ccAddExternalFunctionForPlugin("Game::StopAudio^1",                            (void*)Game_StopAudio);
+    ccAddExternalFunctionForPlugin("Game::ChangeTranslation^1",                    (void*)Game_ChangeTranslation);
+    ccAddExternalFunctionForPlugin("Game::DoOnceOnly^1",                           (void*)Game_DoOnceOnly);
+    ccAddExternalFunctionForPlugin("Game::GetColorFromRGB^3",                      (void*)Game_GetColorFromRGB);
+    ccAddExternalFunctionForPlugin("Game::GetFrameCountForLoop^2",                 (void*)Game_GetFrameCountForLoop);
+    ccAddExternalFunctionForPlugin("Game::GetLocationName^2",                      (void*)Game_GetLocationName);
+    ccAddExternalFunctionForPlugin("Game::GetLoopCountForView^1",                  (void*)Game_GetLoopCountForView);
+    ccAddExternalFunctionForPlugin("Game::GetMODPattern^0",                        (void*)Game_GetMODPattern);
+    ccAddExternalFunctionForPlugin("Game::GetRunNextSettingForLoop^2",             (void*)Game_GetRunNextSettingForLoop);
+    ccAddExternalFunctionForPlugin("Game::GetSaveSlotDescription^1",               (void*)Game_GetSaveSlotDescription);
+    ccAddExternalFunctionForPlugin("Game::GetViewFrame^3",                         (void*)Game_GetViewFrame);
+    ccAddExternalFunctionForPlugin("Game::InputBox^1",                             (void*)Game_InputBox);
+    ccAddExternalFunctionForPlugin("Game::SetSaveGameDirectory^1",                 (void*)Game_SetSaveGameDirectory);
+    ccAddExternalFunctionForPlugin("Game::StopSound^1",                            (void*)StopAllSounds);
+    ccAddExternalFunctionForPlugin("Game::get_CharacterCount",                     (void*)Game_GetCharacterCount);
+    ccAddExternalFunctionForPlugin("Game::get_DialogCount",                        (void*)Game_GetDialogCount);
+    ccAddExternalFunctionForPlugin("Game::get_FileName",                           (void*)Game_GetFileName);
+    ccAddExternalFunctionForPlugin("Game::get_FontCount",                          (void*)Game_GetFontCount);
+    ccAddExternalFunctionForPlugin("Game::geti_GlobalMessages",                    (void*)Game_GetGlobalMessages);
+    ccAddExternalFunctionForPlugin("Game::geti_GlobalStrings",                     (void*)Game_GetGlobalStrings);
+    ccAddExternalFunctionForPlugin("Game::seti_GlobalStrings",                     (void*)SetGlobalString);
+    ccAddExternalFunctionForPlugin("Game::get_GUICount",                           (void*)Game_GetGUICount);
+    ccAddExternalFunctionForPlugin("Game::get_IgnoreUserInputAfterTextTimeoutMs",  (void*)Game_GetIgnoreUserInputAfterTextTimeoutMs);
+    ccAddExternalFunctionForPlugin("Game::set_IgnoreUserInputAfterTextTimeoutMs",  (void*)Game_SetIgnoreUserInputAfterTextTimeoutMs);
+    ccAddExternalFunctionForPlugin("Game::get_InSkippableCutscene",                (void*)Game_GetInSkippableCutscene);
+    ccAddExternalFunctionForPlugin("Game::get_InventoryItemCount",                 (void*)Game_GetInventoryItemCount);
+    ccAddExternalFunctionForPlugin("Game::get_MinimumTextDisplayTimeMs",           (void*)Game_GetMinimumTextDisplayTimeMs);
+    ccAddExternalFunctionForPlugin("Game::set_MinimumTextDisplayTimeMs",           (void*)Game_SetMinimumTextDisplayTimeMs);
+    ccAddExternalFunctionForPlugin("Game::get_MouseCursorCount",                   (void*)Game_GetMouseCursorCount);
+    ccAddExternalFunctionForPlugin("Game::get_Name",                               (void*)Game_GetName);
+    ccAddExternalFunctionForPlugin("Game::set_Name",                               (void*)Game_SetName);
+    ccAddExternalFunctionForPlugin("Game::get_NormalFont",                         (void*)Game_GetNormalFont);
+    ccAddExternalFunctionForPlugin("Game::set_NormalFont",                         (void*)SetNormalFont);
+    ccAddExternalFunctionForPlugin("Game::get_SkippingCutscene",                   (void*)Game_GetSkippingCutscene);
+    ccAddExternalFunctionForPlugin("Game::get_SpeechFont",                         (void*)Game_GetSpeechFont);
+    ccAddExternalFunctionForPlugin("Game::set_SpeechFont",                         (void*)SetSpeechFont);
+    ccAddExternalFunctionForPlugin("Game::geti_SpriteWidth",                       (void*)Game_GetSpriteWidth);
+    ccAddExternalFunctionForPlugin("Game::geti_SpriteHeight",                      (void*)Game_GetSpriteHeight);
+    ccAddExternalFunctionForPlugin("Game::get_TextReadingSpeed",                   (void*)Game_GetTextReadingSpeed);
+    ccAddExternalFunctionForPlugin("Game::set_TextReadingSpeed",                   (void*)Game_SetTextReadingSpeed);
+    ccAddExternalFunctionForPlugin("Game::get_TranslationFilename",                (void*)Game_GetTranslationFilename);
+    ccAddExternalFunctionForPlugin("Game::get_UseNativeCoordinates",               (void*)Game_GetUseNativeCoordinates);
+    ccAddExternalFunctionForPlugin("Game::get_ViewCount",                          (void*)Game_GetViewCount);
+}
+
+void RegisterStaticObjects()
+{
+    ccAddExternalStaticObject("game",&play, &GlobalStaticManager);
+	ccAddExternalStaticObject("gs_globals",&play.globalvars[0], &GlobalStaticManager);
+	ccAddExternalStaticObject("mouse",&scmouse, &GlobalStaticManager);
+	ccAddExternalStaticObject("palette",&palette[0], &GlobalStaticManager);
+	ccAddExternalStaticObject("system",&scsystem, &GlobalStaticManager);
+	ccAddExternalStaticObject("savegameindex",&play.filenumbers[0], &GlobalStaticManager);
 }

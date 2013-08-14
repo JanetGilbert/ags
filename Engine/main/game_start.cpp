@@ -16,7 +16,6 @@
 // Game initialization
 //
 
-#include "util/wgt2allg.h"
 #include "ac/common.h"
 #include "ac/characterinfo.h"
 #include "ac/game.h"
@@ -29,10 +28,13 @@
 #include "ac/screen.h"
 #include "debug/debug_log.h"
 #include "debug/debugger.h"
+#include "debug/out.h"
 #include "main/mainheader.h"
 #include "main/game_run.h"
 #include "main/game_start.h"
 #include "script/script.h"
+
+namespace Out = AGS::Common::Out;
 
 extern int our_eip, displayed_room;
 extern const char *load_game_errors[9];
@@ -50,7 +52,7 @@ extern int convert_16bit_bgr;
 
 void start_game_check_replay()
 {
-    write_log_debug("Checking replay status");
+    Out::FPrint("Checking replay status");
 
     if (play.recording) {
         start_recording();
@@ -90,7 +92,7 @@ void start_game_load_savegame_on_startup()
             sscanf(sgName, "agssave.%03d", &saveGameNumber);
         }
         current_fade_out_effect();
-        int loadGameErrorCode = do_game_load(loadSaveGameOnStartup, saveGameNumber, NULL, NULL);
+        int loadGameErrorCode = load_game(loadSaveGameOnStartup, saveGameNumber);
         if (loadGameErrorCode)
         {
             quitprintf("Unable to resume the save game. Try starting the game over. (Error: %s)", load_game_errors[-loadGameErrorCode]);
@@ -106,9 +108,9 @@ void start_game() {
     our_eip = -42;
 
     for (int kk = 0; kk < numScriptModules; kk++)
-        run_text_script(moduleInst[kk], "game_start");
+        moduleInst[kk]->RunTextScript("game_start");
 
-    run_text_script(gameinst,"game_start");
+    gameinst->RunTextScript("game_start");
 
     our_eip = -43;
 
@@ -168,8 +170,8 @@ void initialize_start_and_play_game(int override_start_room, const char *loadSav
 
         start_game_check_replay();
 
-        write_log_debug("Engine initialization complete");
-        write_log_debug("Starting game");
+        Out::FPrint("Engine initialization complete");
+        Out::FPrint("Starting game");
 
         start_game_init_editor_debugging();
 

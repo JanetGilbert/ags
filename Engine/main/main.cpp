@@ -22,12 +22,12 @@
 // What about other platforms?
 //
 
-#include "util/wgt2allg.h"
 #include "ac/common.h"
 #include "ac/gamesetup.h"
 #include "ac/gamestate.h"
 #include "debug/agseditordebugger.h"
 #include "debug/debug_log.h"
+#include "debug/out.h"
 #include "main/engine.h"
 #include "main/mainheader.h"
 #include "main/main.h"
@@ -38,6 +38,8 @@
 #ifdef _DEBUG
 #include "test/test_all.h"
 #endif
+
+namespace Out = Common::Out;
 
 char appDirectory[512]; // Needed for library loading
 
@@ -77,12 +79,12 @@ extern char editor_debugger_instance_token[100];
 
 
 // Startup flags, set from parameters to engine
+char force_gfxfilter[50];
 int datafile_argv=0, change_to_game_dir = 0, force_window = 0;
 int override_start_room = 0, force_16bit = 0;
 bool justRegisterGame = false;
 bool justUnRegisterGame = false;
 const char *loadSaveGameOnStartup = NULL;
-
 
 #if !defined(IOS_VERSION) && !defined(PSP_VERSION) && !defined(ANDROID_VERSION)
 int psp_video_framedrop = 1;
@@ -113,8 +115,46 @@ void main_create_platform_driver()
     platform = AGSPlatformDriver::GetDriver();
 }
 
+// Version and build numbers
+#define ACI_VERSION_MAJOR               3
+#define ACI_VERSION_MINOR               3
+#define ACI_VERSION_RELEASE             0
+#define ACI_VERSION_REVISION            1140
+#ifdef NO_MP3_PLAYER
+#define SPECIAL_VERSION "NMP"
+#else
+#define SPECIAL_VERSION ""
+#endif
+
+// this needs to be updated if the "play" struct changes
+#define SVG_VERSION_BWCOMPAT_MAJOR      3
+#define SVG_VERSION_BWCOMPAT_MINOR      2
+#define SVG_VERSION_BWCOMPAT_RELEASE    0
+#define SVG_VERSION_BWCOMPAT_REVISION   1103
+// CHECKME: we may lower this down, if we find that earlier versions may still
+// load new savedgames
+#define SVG_VERSION_FWCOMPAT_MAJOR      3
+#define SVG_VERSION_FWCOMPAT_MINOR      2
+#define SVG_VERSION_FWCOMPAT_RELEASE    1
+#define SVG_VERSION_FWCOMPAT_REVISION   1111
+
+// Current engine version
+AGS::Engine::Version EngineVersion;
+// Lowest savedgame version, accepted by this engine
+AGS::Engine::Version SavedgameLowestBackwardCompatVersion;
+// Lowest engine version, which would accept current savedgames
+AGS::Engine::Version SavedgameLowestForwardCompatVersion;
+
 void main_init()
 {
+#if defined (BUILD_STR)
+    EngineVersion = Version(ACI_VERSION_MAJOR, ACI_VERSION_MINOR, ACI_VERSION_RELEASE, ACI_VERSION_REVISION, SPECIAL_VERSION, BUILD_STR);
+#else
+    EngineVersion = Version(ACI_VERSION_MAJOR, ACI_VERSION_MINOR, ACI_VERSION_RELEASE, ACI_VERSION_REVISION, SPECIAL_VERSION);
+#endif
+    SavedgameLowestBackwardCompatVersion = Version(SVG_VERSION_BWCOMPAT_MAJOR, SVG_VERSION_BWCOMPAT_MINOR, SVG_VERSION_BWCOMPAT_RELEASE, SVG_VERSION_BWCOMPAT_REVISION);
+    SavedgameLowestForwardCompatVersion = Version(SVG_VERSION_FWCOMPAT_MAJOR, SVG_VERSION_FWCOMPAT_MINOR, SVG_VERSION_FWCOMPAT_RELEASE, SVG_VERSION_FWCOMPAT_REVISION);
+
     Common::AssetManager::CreateInstance();
     main_pre_init();
     main_create_platform_driver();
@@ -138,10 +178,26 @@ int main_preprocess_cmdline(int argc,char*argv[])
 extern char return_to_roomedit[30];
 extern char return_to_room[150];
 
+void main_print_help() {
+    printf("\nUsage: ags [<options>] [<gamefile or directory>]\n\n"
+           "Options:\n"
+           "-windowed            Set display mode to windowed\n"
+           "-fullscreen          Set display mode to fullscreen\n"
+           "-hicolor             Enable 16bit colors\n"
+           "-letterbox           Enable letterbox mode\n"
+           "-gfxfilter <filter>  Enable graphics filter, where <filter> can be\n"
+           "                     StdScale2, StdScale3, StdScale4, Hq2x or Hq3x\n"
+           "--help               Print this help message\n");
+}
+
 int main_process_cmdline(int argc,char*argv[])
 {
+    force_gfxfilter[0] = '\0';
+
     for (int ee=1;ee<argc;ee++) {
-        if (argv[ee][1]=='?') return 0;
+        if (stricmp(argv[ee],"--help") == 0 || argv[ee][1]=='?') {
+            return 0;
+        }
         if (stricmp(argv[ee],"-shelllaunch") == 0)
             change_to_game_dir = 1;
         else if (stricmp(argv[ee],"-updatereg") == 0)
@@ -158,6 +214,11 @@ int main_process_cmdline(int argc,char*argv[])
             play.recording = 1;
         else if (stricmp(argv[ee],"-playback") == 0)
             play.playback = 1;
+        else if ((stricmp(argv[ee],"-gfxfilter") == 0) && (argc > ee + 1))
+        {
+            strncpy(force_gfxfilter, argv[ee + 1], 49);
+            ee++;
+        }
 #ifdef _DEBUG
         else if ((stricmp(argv[ee],"--startr") == 0) && (ee < argc-1)) {
             override_start_room = atoi(argv[ee+1]);
@@ -312,14 +373,23 @@ int main(int argc,char*argv[]) {
         return res;
     }
 
-    printf("Adventure Creator v%sInterpreter\n"
-      "Copyright (c) 1999-2001 Chris Jones\n" "ACI version %s\n", AC_VERSION_TEXT, ACI_VERSION_TEXT);
-
-    if ((argc>1) && (argv[1][1]=='?'))
-        return 0;
-
     initialize_debug_system();
-    write_log_debug("***** ENGINE STARTUP");
+
+    Out::FPrint("Adventure Game Studio v%s Interpreter\n"
+           "Copyright (c) 1999-2011 Chris Jones and 2011-20xx others\n"
+#ifdef BUILD_STR
+           "ACI version %s (Build: %s)\n",
+           EngineVersion.ShortString.GetCStr(), EngineVersion.LongString.GetCStr(), EngineVersion.BuildInfo.GetCStr());
+#else
+           "ACI version %s\n", EngineVersion.ShortString.GetCStr(), EngineVersion.LongString.GetCStr());
+#endif
+
+    if ((argc>1) && (stricmp(argv[1],"--help") == 0 || argv[1][1]=='?')) {
+        main_print_help();
+        return 0;
+    }
+
+    Out::FPrint("***** ENGINE STARTUP");
 
 #if defined(WINDOWS_VERSION)
     _set_new_handler(malloc_fail_handler);

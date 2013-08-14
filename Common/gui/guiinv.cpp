@@ -15,16 +15,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "ac/common.h"
 #include "gui/guiinv.h"
 #include "gui/guimain.h"
-#include "util/datastream.h"
+#include "util/stream.h"
 
-using AGS::Common::DataStream;
+using AGS::Common::Stream;
 
 DynamicArray<GUIInv> guiinv;
 int numguiinv = 0;
 
-void GUIInv::WriteToFile(DataStream *out)
+void GUIInv::WriteToFile(Stream *out)
 {
 	GUIObject::WriteToFile(out);
 	out->WriteInt32(charId);
@@ -33,10 +34,10 @@ void GUIInv::WriteToFile(DataStream *out)
 	out->WriteInt32(topIndex);
 }
 
-void GUIInv::ReadFromFile(DataStream *in, int version)
+void GUIInv::ReadFromFile(Stream *in, GuiVersion gui_version)
 {
-	GUIObject::ReadFromFile(in, version);
-	if (version >= 109) {
+	GUIObject::ReadFromFile(in, gui_version);
+	if (gui_version >= kGuiVersion_unkn_109) {
 	  charId = in->ReadInt32();
 	  itemWidth = in->ReadInt32();
 	  itemHeight = in->ReadInt32();
@@ -49,7 +50,7 @@ void GUIInv::ReadFromFile(DataStream *in, int version)
 	  topIndex = 0;
 	}
 
-	if (loaded_game_file_version >= 31) // 2.70
+	if (loaded_game_file_version >= kGameVersion_270)
 	{
 	  // ensure that some items are visible
 	  if (itemWidth > wid)
@@ -62,7 +63,7 @@ void GUIInv::ReadFromFile(DataStream *in, int version)
 }
 
 void GUIInv::CalculateNumCells() {
-  if (loaded_game_file_version >= 31) // 2.70
+  if (loaded_game_file_version >= kGameVersion_270)
   {
     itemsPerLine = wid / multiply_up_coordinate(itemWidth);
     numLines = hit / multiply_up_coordinate(itemHeight);

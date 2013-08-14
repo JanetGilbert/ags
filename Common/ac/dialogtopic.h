@@ -18,9 +18,7 @@
 #ifndef __AGS_CN_AC__DIALOGTOPIC_H
 #define __AGS_CN_AC__DIALOGTOPIC_H
 
-#include "util/file.h"
-
-namespace AGS { namespace Common { class DataStream; } }
+namespace AGS { namespace Common { class Stream; } }
 using namespace AGS; // FIXME later
 
 // [IKM] This is *conversation* dialog, not *gui* dialog, mind you!
@@ -60,7 +58,7 @@ struct DialogTopic {
     int           numoptions;
     int           topicFlags;
 
-    void ReadFromFile(Common::DataStream *in);
+    void ReadFromFile(Common::Stream *in);
 };
 
 

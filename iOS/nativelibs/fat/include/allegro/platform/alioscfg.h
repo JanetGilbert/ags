@@ -51,7 +51,6 @@
 /* Describe this platform */
 #define ALLEGRO_PLATFORM_STR  "iOS"
 #define ALLEGRO_USE_CONSTRUCTOR
-
 #define ALLEGRO_MULTITHREADED
 #define ALLEGRO_LITTLE_ENDIAN
 

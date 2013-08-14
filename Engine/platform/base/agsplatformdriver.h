@@ -20,10 +20,9 @@
 #define __AGS_EE_PLATFORM__AGSPLATFORMDRIVER_H
 
 #include "ac/datetime.h"
-#include "util/file.h"
 #include "debug/outputtarget.h"
 
-namespace AGS { namespace Common { class DataStream; } }
+namespace AGS { namespace Common { class Stream; } }
 using namespace AGS; // FIXME later
 
 #ifdef DJGPP
@@ -70,7 +69,7 @@ struct AGSPlatformDriver
     virtual int  CDPlayerCommand(int cmdd, int datt) = 0;
     virtual void ShutdownCDPlayer() = 0;
 
-    virtual void ReadPluginsFromDisk(Common::DataStream *in);
+    virtual void ReadPluginsFromDisk(Common::Stream *in);
     virtual void StartPlugins();
     virtual int  RunPluginHooks(int event, long data);
     virtual void RunPluginInitGfxHooks(const char *driverName, void *data);

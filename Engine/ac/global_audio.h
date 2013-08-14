@@ -42,12 +42,13 @@ void    SetChannelVolume(int chan, int newvol);
 void    SetDigitalMasterVolume (int newvol);
 int     GetCurrentMusic();
 void    SetMusicRepeat(int loopflag);
-void    PlayMP3File (char *filename);
+void    PlayMP3File (const char *filename);
 void    PlaySilentMIDI (int mnum);
 
 void    SetSpeechVolume(int newvol);
 void    __scr_play_speech(int who, int which);
 void    SetVoiceMode (int newmod);
+int     GetVoiceMode ();
 int     IsVoxAvailable();
 int     IsMusicVoxAvailable ();
 

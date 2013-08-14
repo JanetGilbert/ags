@@ -17,7 +17,7 @@
 
 #include "ac/dynobj/cc_dynamicobject.h"   // ICCDynamicObject
 
-namespace AGS { namespace Common { class DataStream; }}
+namespace AGS { namespace Common { class Stream; }}
 using namespace AGS; // FIXME later
 
 #define OBJECT_CACHE_MAGIC_NUMBER 0xa30b
@@ -27,12 +27,14 @@ const int GARBAGE_COLLECTION_INTERVAL = 100;
 
 struct ManagedObjectPool {
     struct ManagedObject {
-        long handle;
+        ScriptValueType obj_type;
+        int32_t handle;
         const char *addr;
         ICCDynamicObject * callback;
         int  refCount;
 
-        void init(long theHandle, const char *theAddress, ICCDynamicObject *theCallback);
+        void init(int32_t theHandle, const char *theAddress,
+            ICCDynamicObject *theCallback, ScriptValueType objType);
         int remove(bool force);
         int AddRef();
         int CheckDispose();
@@ -48,17 +50,18 @@ private:
 
 public:
 
-    long AddRef(long handle);
-    int CheckDispose(long handle);
-    long SubRef(long handle);
-    long AddressToHandle(const char *addr);
-    const char* HandleToAddress(long handle);
+    int32_t AddRef(int32_t handle);
+    int CheckDispose(int32_t handle);
+    int32_t SubRef(int32_t handle);
+    int32_t AddressToHandle(const char *addr);
+    const char* HandleToAddress(int32_t handle);
+    ScriptValueType HandleToAddressAndManager(int32_t handle, void *&object, ICCDynamicObject *&manager);
     int RemoveObject(const char *address);
     void RunGarbageCollectionIfAppropriate();
     void RunGarbageCollection();
-    int AddObject(const char *address, ICCDynamicObject *callback, int useSlot = -1);
-    void WriteToDisk(Common::DataStream *out);
-    int ReadFromDisk(Common::DataStream *in, ICCObjectReader *reader);
+    int AddObject(const char *address, ICCDynamicObject *callback, bool plugin_object, int useSlot = -1);
+    void WriteToDisk(Common::Stream *out);
+    int ReadFromDisk(Common::Stream *in, ICCObjectReader *reader);
     void reset();
     ManagedObjectPool();
 

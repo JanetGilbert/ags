@@ -12,8 +12,8 @@
 //
 //=============================================================================
 
+#include <stdio.h>
 #include "ac/global_region.h"
-#include "util/wgt2allg.h"
 #include "ac/common.h"
 #include "ac/draw.h"
 #include "ac/region.h"
@@ -37,14 +37,17 @@ int GetRegionAt (int xxx, int yyy) {
     xxx = convert_to_low_res(xxx);
     yyy = convert_to_low_res(yyy);
 
-    if (xxx >= thisroom.regions->GetWidth())
-        xxx = thisroom.regions->GetWidth() - 1;
-    if (yyy >= thisroom.regions->GetHeight())
-        yyy = thisroom.regions->GetHeight() - 1;
-    if (xxx < 0)
-        xxx = 0;
-    if (yyy < 0)
-        yyy = 0;
+    if (loaded_game_file_version >= kGameVersion_262) // Version 2.6.2+
+    {
+        if (xxx >= thisroom.regions->GetWidth())
+            xxx = thisroom.regions->GetWidth() - 1;
+        if (yyy >= thisroom.regions->GetHeight())
+            yyy = thisroom.regions->GetHeight() - 1;
+        if (xxx < 0)
+            xxx = 0;
+        if (yyy < 0)
+            yyy = 0;
+    }
 
     int hsthere = thisroom.regions->GetPixel (xxx, yyy);
     if (hsthere < 0)

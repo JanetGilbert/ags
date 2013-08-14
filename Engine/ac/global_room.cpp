@@ -13,7 +13,6 @@
 //=============================================================================
 
 #include "ac/global_room.h"
-#include "util/wgt2allg.h"
 #include "ac/common.h"
 #include "ac/character.h"
 #include "ac/characterinfo.h"
@@ -167,7 +166,8 @@ void CallRoomScript (int value) {
         quit("!CallRoomScript: not inside a script???");
 
     play.roomscript_finished = 0;
-    curscript->run_another("$on_call", value, 0);
+    RuntimeScriptValue rval_null;
+    curscript->run_another("$on_call", RuntimeScriptValue().SetInt32(value), rval_null /*0*/);
 }
 
 int HasBeenToRoom (int roomnum) {

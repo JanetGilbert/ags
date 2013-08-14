@@ -30,22 +30,16 @@
 // AlignedStream does not support seek, hence moving stream pointer to random
 // position will break padding count logic.
 //
-// A Close() method must be called either explicitly by user or implicitly by
-// stream destructor in order to read/write remaining padding bytes.
-//
 //=============================================================================
 #ifndef __AGS_CN_UTIL__ALIGNEDSTREAM_H
 #define __AGS_CN_UTIL__ALIGNEDSTREAM_H
 
-#include "util/stream.h"
-#include "util/string.h"
+#include "util/proxystream.h"
 
 namespace AGS
 {
 namespace Common
 {
-
-class DataStream;
 
 enum AlignedStreamMode
 {
@@ -53,94 +47,56 @@ enum AlignedStreamMode
     kAligned_Write
 };
 
-class AlignedStream : public Stream
+class AlignedStream : public ProxyStream
 {
 public:
-    // TODO: use shared ptr
-    AlignedStream(DataStream *stream, AlignedStreamMode mode, size_t alignment = sizeof(int32_t));
+    AlignedStream(Stream *stream, AlignedStreamMode mode,
+                  ObjectOwnershipPolicy stream_ownership_policy = kReleaseAfterUse,
+                  size_t base_alignment = sizeof(int16_t));
     virtual ~AlignedStream();
 
-    // Is stream valid (underlying data initialized properly)
-    virtual bool    IsValid() const;
-    // Is end of stream
-    virtual bool    EOS() const;
-    // Total length of stream (if known)
-    virtual int     GetLength() const;
-    // Current position (if known)
-    virtual int     GetPosition() const;
+    // Read/Write cumulated padding and reset block counter
+    void            Reset();
+
+    virtual void    Close();
+
     virtual bool    CanRead() const;
     virtual bool    CanWrite() const;
     virtual bool    CanSeek() const;
 
-    // Free the underlying stream (to prevent automatic dispose on close)
-    // TODO: use shared ptr instead
-    void            ReleaseStream();
-    // Close() MUST be called at the end of aligned stream work so that the
-    // stream could read/write the necessary padding at the end of data chunk;
-    // Close() will be called automatically from stream's destructor, but is
-    // exposed in case user would like to explicitly end aligned read/write at
-    // certain point.
-    virtual void    Close();
-
-    virtual int     ReadByte();
-    inline  int8_t  ReadInt8()
-    {
-        return ReadByte();
-    }
+    virtual size_t  Read(void *buffer, size_t size);
+    virtual int32_t ReadByte();
     virtual int16_t ReadInt16();
     virtual int32_t ReadInt32();
     virtual int64_t ReadInt64();
-    virtual int     Read(void *buffer, int size);
-    virtual int     ReadArray(void *buffer, int elem_size, int count);
-    virtual String ReadString(int max_chars = 5000000);
+    virtual size_t  ReadArray(void *buffer, size_t elem_size, size_t count);
+    virtual size_t  ReadArrayOfInt16(int16_t *buffer, size_t count);
+    virtual size_t  ReadArrayOfInt32(int32_t *buffer, size_t count);
+    virtual size_t  ReadArrayOfInt64(int64_t *buffer, size_t count);
 
-    virtual int     WriteByte(uint8_t b);
-    inline  void    WriteInt8(int8_t val)
-    {
-        WriteByte(val);
-    }
-    virtual void    WriteInt16(int16_t val);
-    virtual void    WriteInt32(int32_t val);
-    virtual void    WriteInt64(int64_t val);
-    virtual int     Write(const void *buffer, int size);
-    virtual int     WriteArray(const void *buffer, int elem_size, int count);
-    virtual void    WriteString(const String &str);
+    virtual size_t  Write(const void *buffer, size_t size);
+    virtual int32_t WriteByte(uint8_t b);
+    virtual size_t  WriteInt16(int16_t val);
+    virtual size_t  WriteInt32(int32_t val);
+    virtual size_t  WriteInt64(int64_t val);
+    virtual size_t  WriteArray(const void *buffer, size_t elem_size, size_t count);
+    virtual size_t  WriteArrayOfInt16(const int16_t *buffer, size_t count);
+    virtual size_t  WriteArrayOfInt32(const int32_t *buffer, size_t count);
+    virtual size_t  WriteArrayOfInt64(const int64_t *buffer, size_t count);
 
-    virtual int     Seek(StreamSeek seek, int pos);
-
-    inline int ReadArrayOfInt16(int16_t *buffer, int count)
-    {
-        return ReadArray(buffer, sizeof(int16_t), count);
-    }
-    inline int ReadArrayOfInt32(int32_t *buffer, int count)
-    {
-        return ReadArray(buffer, sizeof(int32_t), count);
-    }
-    inline int ReadArrayOfInt64(int64_t *buffer, int count)
-    {
-        return ReadArray(buffer, sizeof(int64_t), count);
-    }
-    inline int WriteArrayOfInt16(const int16_t *buffer, int count)
-    {
-        return WriteArray(buffer, sizeof(int16_t), count);
-    }
-    inline int WriteArrayOfInt32(const int32_t *buffer, int count)
-    {
-        return WriteArray(buffer, sizeof(int32_t), count);
-    }
-    inline int WriteArrayOfInt64(const int64_t *buffer, int count)
-    {
-        return WriteArray(buffer, sizeof(int64_t), count);
-    }
+    virtual size_t  Seek(StreamSeek seek, int pos);
 
 protected:
     void            ReadPadding(size_t next_type);
     void            WritePadding(size_t next_type);
+    void            FinalizeBlock();
 
 private:
-    DataStream         *_stream;
+    static const size_t LargestPossibleType = sizeof(int64_t);
+
     AlignedStreamMode   _mode;
-    size_t              _alignment;
+    size_t              _baseAlignment;
+    size_t              _maxAlignment;
     int64_t             _block;
     int8_t              _paddingBuffer[sizeof(int64_t)];
 };

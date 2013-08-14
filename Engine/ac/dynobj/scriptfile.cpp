@@ -38,18 +38,63 @@ int sc_File::Serialize(const char *address, char *buffer, int bufsize) {
 
 int sc_File::OpenFile(const char *filename, int mode) {
   handle = FileOpen(filename, fopenModes[mode], fworkModes[mode]);
-  if (handle == NULL)
-    return 0;
+  if (handle <= 0)
+      return 0;
   return 1;
 }
 
 void sc_File::Close() {
-  if (handle) {
+  if (handle > 0) {
     FileClose(handle);
-    handle = NULL;
+    handle = 0;
   }
 }
 
 sc_File::sc_File() {
-    handle = NULL;
+    handle = 0;
+}
+
+
+void sc_File::Read(const char *address, intptr_t offset, void *dest, int size)
+{
+}
+
+uint8_t sc_File::ReadInt8(const char *address, intptr_t offset)
+{
+    return 0;
+}
+
+int16_t sc_File::ReadInt16(const char *address, intptr_t offset)
+{
+    return 0;
+}
+
+int32_t sc_File::ReadInt32(const char *address, intptr_t offset)
+{
+    return 0;
+}
+
+float sc_File::ReadFloat(const char *address, intptr_t offset)
+{
+    return 0.0;
+}
+
+void sc_File::Write(const char *address, intptr_t offset, void *src, int size)
+{
+}
+
+void sc_File::WriteInt8(const char *address, intptr_t offset, uint8_t val)
+{
+}
+
+void sc_File::WriteInt16(const char *address, intptr_t offset, int16_t val)
+{
+}
+
+void sc_File::WriteInt32(const char *address, intptr_t offset, int32_t val)
+{
+}
+
+void sc_File::WriteFloat(const char *address, intptr_t offset, float val)
+{
 }
