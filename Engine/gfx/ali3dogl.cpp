@@ -88,7 +88,7 @@ using namespace AGS; // FIXME later
 #define GL_CLAMP GL_CLAMP_TO_EDGE
 
 // Defined in Allegro
-extern "C" 
+extern "C"
 {
   void android_swap_buffers();
   void android_create_screen(int width, int height, int color_depth);
@@ -151,12 +151,12 @@ using namespace AGS; // FIXME later
 
 #include <OpenGLES/ES1/glext.h>
 
-extern "C" 
+extern "C"
 {
   void ios_swap_buffers();
   void ios_select_buffer();
   void ios_create_screen();
-  void ios_mouse_setup(int left, int right, int top, int bottom, float scaling_x, float scaling_y);  
+  void ios_mouse_setup(int left, int right, int top, int bottom, float scaling_x, float scaling_y);
 }
 
 #define HDC void*
@@ -221,7 +221,7 @@ GLfloat backbuffer_texture_coordinates[] =
    320.0f / 512.0f, 0,
    0, 200.0f / 256.0f,
    320.0f / 512.0f, 200.0f / 256.0f
-};   
+};
 
 
 
@@ -263,7 +263,7 @@ GFX_DRIVER gfx_opengl =
    "OpenGL",
    NULL,    // init
    NULL,   // exit
-   NULL,                        // AL_METHOD(int, scroll, (int x, int y)); 
+   NULL,                        // AL_METHOD(int, scroll, (int x, int y));
    ogl_dummy_vsync,   // vsync
    NULL,  // setpalette
    NULL,                        // AL_METHOD(int, request_scroll, (int x, int y));
@@ -308,7 +308,7 @@ public:
   // 0=not transparent, 255=invisible, 1..254 barely visible .. mostly visible
   virtual void SetTransparency(int transparency) { _transparency = transparency; }
   virtual void SetFlippedLeftRight(bool isFlipped) { _flipped = isFlipped; }
-  virtual void SetStretch(int width, int height) 
+  virtual void SetStretch(int width, int height)
   {
     _stretchToWidth = width;
     _stretchToHeight = height;
@@ -317,7 +317,7 @@ public:
   virtual int GetHeight() { return _height; }
   virtual int GetColorDepth() { return _colDepth; }
   virtual void SetLightLevel(int lightLevel)  { _lightLevel = lightLevel; }
-  virtual void SetTint(int red, int green, int blue, int tintSaturation) 
+  virtual void SetTint(int red, int green, int blue, int tintSaturation)
   {
     _red = red;
     _green = green;
@@ -515,7 +515,7 @@ IGraphicsDriver* GetOGLGraphicsDriver(GFXFilter *filter)
   return _ogl_driver;
 }
 
-OGLGraphicsDriver::OGLGraphicsDriver(D3DGFXFilter *filter) 
+OGLGraphicsDriver::OGLGraphicsDriver(D3DGFXFilter *filter)
 {
   numToDraw = 0;
   numToDrawLastTime = 0;
@@ -567,7 +567,7 @@ void OGLGraphicsDriver::set_up_default_vertices()
 }
 
 
-void OGLGraphicsDriver::Vsync() 
+void OGLGraphicsDriver::Vsync()
 {
   // do nothing on D3D
 }
@@ -582,7 +582,7 @@ int OGLGraphicsDriver::FindSupportedResolutionWidth(int idealWidth, int height, 
   return idealWidth;
 }
 
-bool OGLGraphicsDriver::SupportsGammaControl() 
+bool OGLGraphicsDriver::SupportsGammaControl()
 {
   return false;
 }
@@ -600,7 +600,7 @@ void OGLGraphicsDriver::SetRenderOffset(int x, int y)
   _global_y_offset = y;
 }
 
-void OGLGraphicsDriver::SetTintMethod(TintMethod method) 
+void OGLGraphicsDriver::SetTintMethod(TintMethod method)
 {
   _legacyPixelShader = (method == TintReColourise);
 }
@@ -623,11 +623,11 @@ void OGLGraphicsDriver::create_backbuffer_arrays()
 
 #if defined(ANDROID_VERSION) || defined(IOS_VERSION)
       device_mouse_setup(
-        0, 
-        device_screen_physical_width - 1, 
-        (device_screen_physical_height - backbuffer_vertices[5]) / 2, 
-        device_screen_physical_height - ((device_screen_physical_height - backbuffer_vertices[5]) / 2), 
-        (float)_newmode_width / (float)device_screen_physical_width, 
+        0,
+        device_screen_physical_width - 1,
+        (device_screen_physical_height - backbuffer_vertices[5]) / 2,
+        device_screen_physical_height - ((device_screen_physical_height - backbuffer_vertices[5]) / 2),
+        (float)_newmode_width / (float)device_screen_physical_width,
         (float)_newmode_height / backbuffer_vertices[5]);
 #endif
     }
@@ -642,7 +642,7 @@ void OGLGraphicsDriver::create_backbuffer_arrays()
         device_screen_physical_width - ((device_screen_physical_width - backbuffer_vertices[2]) / 2),
         0,
         device_screen_physical_height - 1,
-        (float)_newmode_width / backbuffer_vertices[2], 
+        (float)_newmode_width / backbuffer_vertices[2],
         (float)_newmode_height / (float)device_screen_physical_height);
 #endif
     }
@@ -655,11 +655,11 @@ void OGLGraphicsDriver::create_backbuffer_arrays()
 
 #if defined(ANDROID_VERSION) || defined(IOS_VERSION)
     device_mouse_setup(
-      0, 
-      device_screen_physical_width - 1, 
-      0, 
-      device_screen_physical_width - 1, 
-      (float)_newmode_width / (float)device_screen_physical_width, 
+      0,
+      device_screen_physical_width - 1,
+      0,
+      device_screen_physical_width - 1,
+      (float)_newmode_width / (float)device_screen_physical_width,
       (float)_newmode_height / (float)device_screen_physical_height);
 #endif
   }
@@ -675,8 +675,8 @@ void OGLGraphicsDriver::create_backbuffer_arrays()
     device_mouse_setup(
       (device_screen_physical_width - _newmode_width) / 2,
       device_screen_physical_width - ((device_screen_physical_width - _newmode_width) / 2),
-      (device_screen_physical_height - _newmode_height) / 2, 
-      device_screen_physical_height - ((device_screen_physical_height - _newmode_height) / 2), 
+      (device_screen_physical_height - _newmode_height) / 2,
+      device_screen_physical_height - ((device_screen_physical_height - _newmode_height) / 2),
       1.0f,
       1.0f);
 #endif
@@ -790,7 +790,7 @@ void OGLGraphicsDriver::InitOpenGl()
 
     glGenTextures(1, &_backbuffer);
     glBindTexture(GL_TEXTURE_2D, _backbuffer);
-    
+
     if (psp_gfx_smoothing)
     {
       glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -822,7 +822,7 @@ void OGLGraphicsDriver::InitOpenGl()
   create_backbuffer_arrays();
 }
 
-bool OGLGraphicsDriver::Init(int width, int height, int colourDepth, bool windowed, volatile int *loopTimer) 
+bool OGLGraphicsDriver::Init(int width, int height, int colourDepth, bool windowed, volatile int *loopTimer)
 {
   return this->Init(width, height, width, height, colourDepth, windowed, loopTimer);
 }
@@ -884,7 +884,7 @@ bool OGLGraphicsDriver::Init(int virtualWidth, int virtualHeight, int realWidth,
 #if defined(WINDOWS_VERSION)
     if (_newmode_windowed)
     {
-      if (adjust_window(device_screen_physical_width, device_screen_physical_height) != 0) 
+      if (adjust_window(device_screen_physical_width, device_screen_physical_height) != 0)
       {
         ustrzcpy(allegro_error, ALLEGRO_ERROR_SIZE, get_config_text("Window size not supported"));
         return -1;
@@ -949,9 +949,9 @@ bool OGLGraphicsDriver::Init(int virtualWidth, int virtualHeight, int realWidth,
   return true;
 }
 
-void OGLGraphicsDriver::UnInit() 
+void OGLGraphicsDriver::UnInit()
 {
-  if (_screenTintLayerDDB != NULL) 
+  if (_screenTintLayerDDB != NULL)
   {
     this->DestroyDDB(_screenTintLayerDDB);
     _screenTintLayerDDB = NULL;
@@ -992,7 +992,7 @@ void OGLGraphicsDriver::GetCopyOfScreenIntoBitmap(Bitmap *destination)
     unsigned char* surfaceData = buffer;
     unsigned char* sourcePtr;
     unsigned char* destPtr;
-    
+
 	Bitmap* retrieveInto = BitmapHelper::CreateBitmap(retrieve_width, retrieve_height, 32);
 
     if (retrieveInto)
@@ -1078,7 +1078,7 @@ void OGLGraphicsDriver::_renderSprite(SpriteDrawListEntry *drawListEntry, bool g
     {
       thisX = (_newmode_width - thisX) - width;
     }
-    if (globalTopBottomFlip) 
+    if (globalTopBottomFlip)
     {
       thisY = (_newmode_height - thisY) - height;
     }
@@ -1098,7 +1098,7 @@ void OGLGraphicsDriver::_renderSprite(SpriteDrawListEntry *drawListEntry, bool g
       // and now shift it over to make it 0..w again
       thisX += width;
     }
-    if (globalTopBottomFlip) 
+    if (globalTopBottomFlip)
     {
       heightToScale = -heightToScale;
       thisY -= height;
@@ -1129,7 +1129,7 @@ void OGLGraphicsDriver::_renderSprite(SpriteDrawListEntry *drawListEntry, bool g
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     }
-    else 
+    else
     {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -1140,12 +1140,12 @@ void OGLGraphicsDriver::_renderSprite(SpriteDrawListEntry *drawListEntry, bool g
     if (bmpToDraw->_vertex != NULL)
     {
       glTexCoordPointer(2, GL_FLOAT, sizeof(OGLCUSTOMVERTEX), &(bmpToDraw->_vertex[ti * 4].tu));
-      glVertexPointer(2, GL_FLOAT, sizeof(OGLCUSTOMVERTEX), &(bmpToDraw->_vertex[ti * 4].position));  
+      glVertexPointer(2, GL_FLOAT, sizeof(OGLCUSTOMVERTEX), &(bmpToDraw->_vertex[ti * 4].position));
     }
     else
     {
       glTexCoordPointer(2, GL_FLOAT, sizeof(OGLCUSTOMVERTEX), &defaultVertices[0].tu);
-      glVertexPointer(2, GL_FLOAT, sizeof(OGLCUSTOMVERTEX), &defaultVertices[0].position);  
+      glVertexPointer(2, GL_FLOAT, sizeof(OGLCUSTOMVERTEX), &defaultVertices[0].position);
     }
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -1246,7 +1246,7 @@ void OGLGraphicsDriver::_render(GlobalFlipType flip, bool clearDrawListAfterward
     glBindTexture(GL_TEXTURE_2D, _backbuffer);
 
     glTexCoordPointer(2, GL_FLOAT, 0, backbuffer_texture_coordinates);
-    glVertexPointer(2, GL_FLOAT, 0, backbuffer_vertices);  
+    glVertexPointer(2, GL_FLOAT, 0, backbuffer_vertices);
     glClear(GL_COLOR_BUFFER_BIT);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -1365,13 +1365,13 @@ void OGLGraphicsDriver::UpdateTextureRegion(TextureTile *tile, Bitmap *bitmap, O
       {
         unsigned short* memPtrShort = (unsigned short*)memPtr;
         unsigned short* srcData = (unsigned short*)&bitmap->GetScanLine[y + tile->y][(x + tile->x) * 2];
-        if (*srcData == MASK_COLOR_15) 
+        if (*srcData == MASK_COLOR_15)
         {
           if (target->_opaque)  // set to black if opaque
             memPtrShort[x] = 0x8000;
           else if (!usingLinearFiltering)
             memPtrShort[x] = 0;
-          // set to transparent, but use the colour from the neighbouring 
+          // set to transparent, but use the colour from the neighbouring
           // pixel to stop the linear filter doing black outlines
           else
           {
@@ -1421,7 +1421,7 @@ void OGLGraphicsDriver::UpdateTextureRegion(TextureTile *tile, Bitmap *bitmap, O
             memPtrLong[x] = 0xFF000000;
           else if (!usingLinearFiltering)
             memPtrLong[x] = 0;
-          // set to transparent, but use the colour from the neighbouring 
+          // set to transparent, but use the colour from the neighbouring
           // pixel to stop the linear filter doing black outlines
           else
           {
@@ -1636,13 +1636,13 @@ IDriverDependantBitmap* OGLGraphicsDriver::CreateDDBFromBitmap(Bitmap *bitmap, b
       thisTile->y = y * tileHeight;
       thisTile->width = tileWidth;
       thisTile->height = tileHeight;
-      if (x == tilesAcross - 1) 
+      if (x == tilesAcross - 1)
       {
         thisTile->width += lastTileExtraWidth;
         thisAllocatedWidth = thisTile->width;
         AdjustSizeToNearestSupportedByCard(&thisAllocatedWidth, &thisAllocatedHeight);
       }
-      if (y == tilesDown - 1) 
+      if (y == tilesDown - 1)
       {
         thisTile->height += lastTileExtraHeight;
         thisAllocatedHeight = thisTile->height;
@@ -1694,7 +1694,7 @@ void OGLGraphicsDriver::do_fade(bool fadingOut, int speed, int targetColourRed, 
   }
   else if (_drawScreenCallback != NULL)
     _drawScreenCallback();
-  
+
   Bitmap *blackSquare = BitmapHelper::CreateBitmap(16, 16, 32);
   blackSquare->Clear(makecol32(targetColourRed, targetColourGreen, targetColourBlue));
   IDriverDependantBitmap *d3db = this->CreateDDBFromBitmap(blackSquare, false, false);
@@ -1731,12 +1731,12 @@ void OGLGraphicsDriver::do_fade(bool fadingOut, int speed, int targetColourRed, 
   this->ClearDrawList();
 }
 
-void OGLGraphicsDriver::FadeOut(int speed, int targetColourRed, int targetColourGreen, int targetColourBlue) 
+void OGLGraphicsDriver::FadeOut(int speed, int targetColourRed, int targetColourGreen, int targetColourBlue)
 {
   do_fade(true, speed, targetColourRed, targetColourGreen, targetColourBlue);
 }
 
-void OGLGraphicsDriver::FadeIn(int speed, PALLETE p, int targetColourRed, int targetColourGreen, int targetColourBlue) 
+void OGLGraphicsDriver::FadeIn(int speed, PALLETE p, int targetColourRed, int targetColourGreen, int targetColourBlue)
 {
   do_fade(false, speed, targetColourRed, targetColourGreen, targetColourBlue);
 }
@@ -1749,7 +1749,7 @@ void OGLGraphicsDriver::BoxOutEffect(bool blackingOut, int speed, int delay)
   }
   else if (_drawScreenCallback != NULL)
     _drawScreenCallback();
-  
+
   Bitmap *blackSquare = BitmapHelper::CreateBitmap(16, 16, 32);
   blackSquare->Clear();
   IDriverDependantBitmap *d3db = this->CreateDDBFromBitmap(blackSquare, false, false);
@@ -1788,7 +1788,7 @@ void OGLGraphicsDriver::BoxOutEffect(bool blackingOut, int speed, int delay)
       this->drawList[this->numToDraw - 1].y = _newmode_height / 2 + boxHeight / 2;
       d3db->SetStretch(_newmode_width, _newmode_height);
     }
-    
+
     this->_render(flipTypeLastTime, false);
 
     if (_pollingCallback)
@@ -1805,7 +1805,7 @@ bool OGLGraphicsDriver::PlayVideo(const char *filename, bool useAVISound, VideoS
  return true;
 }
 
-void OGLGraphicsDriver::create_screen_tint_bitmap() 
+void OGLGraphicsDriver::create_screen_tint_bitmap()
 {
 	_screenTintLayer = BitmapHelper::CreateBitmap(16, 16, this->_newmode_depth);
   _screenTintLayer = this->ConvertBitmapToSupportedColourDepth(_screenTintLayer);
@@ -1814,11 +1814,11 @@ void OGLGraphicsDriver::create_screen_tint_bitmap()
 }
 
 void OGLGraphicsDriver::SetScreenTint(int red, int green, int blue)
-{ 
+{
   if ((red != _tint_red) || (green != _tint_green) || (blue != _tint_blue))
   {
-    _tint_red = red; 
-    _tint_green = green; 
+    _tint_red = red;
+    _tint_green = green;
     _tint_blue = blue;
 
     _screenTintLayer->Clear(makecol_depth(_screenTintLayer->GetColorDepth(), red, green, blue));

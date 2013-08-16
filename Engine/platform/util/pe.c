@@ -105,7 +105,7 @@ typedef struct {
   unsigned int dwFileSubtype;
   unsigned int dwFileDateMS;
   unsigned int dwFileDateLS;
-} VS_FIXEDFILEINFO; 
+} VS_FIXEDFILEINFO;
 
 typedef struct {
   unsigned short wLength;
@@ -132,7 +132,7 @@ void fillBufferFromWidechar(unsigned short* inputBuffer, char* outputText)
 {
   unsigned short* input = inputBuffer;
   char* output = outputText;
-  
+
   while (*input)
     *output++ = *input++;
 
@@ -147,13 +147,13 @@ int getVersionString(char* version_data, unsigned int size, char* buffer, char* 
   char* last = version_data + size;
 
   char temp[200];
-  
+
   // Skip header
   current += 0x28;
-  
+
   // Skip VS_FIXEDFILEINFO
   current += sizeof(VS_FIXEDFILEINFO);
-  
+
   // Now comes either "StringFileInfo" or "VarFileInfo"
   STRINGFILEINFO_HEADER* stringfileinfo_header = (STRINGFILEINFO_HEADER*)current;
   current += sizeof(STRINGFILEINFO_HEADER);
@@ -168,22 +168,22 @@ int getVersionString(char* version_data, unsigned int size, char* buffer, char* 
   }
   else
     current += (0x3C - sizeof(STRINGFILEINFO_HEADER));
-  
+
   while (current < last)
   {
     STRINGFILEINFO_HEADER* header = (STRINGFILEINFO_HEADER*)current;
     current += sizeof(STRINGFILEINFO_HEADER);
-  
+
     // Read name
     fillBufferFromWidechar((unsigned short*)current, temp);
-  
+
     if (strcmp(temp, name) == 0)
     {
       current += (2 + 2 * strlen(temp));
-  
+
       // Next value is 32 bit aligned
       current = (char*)((unsigned int)(current + 3) & (~3));
-    
+
       // Read value
       fillBufferFromWidechar((unsigned short*)current, buffer);
 
@@ -191,7 +191,7 @@ int getVersionString(char* version_data, unsigned int size, char* buffer, char* 
     }
     else
       current += (header->wLength - sizeof(STRINGFILEINFO_HEADER));
-  
+
     // Next value is 32 bit aligned
     current = (char*)((unsigned int)(current + 3) & (~3));
   }
@@ -204,7 +204,7 @@ int getVersionString(char* version_data, unsigned int size, char* buffer, char* 
 int seekToResource(FILE* pe, int id)
 {
   int i;
-  
+
   // Read in resource directory
   fread(&resource_directory, sizeof(IMAGE_RESOURCE_DIRECTORY), 1, pe);
 
@@ -221,16 +221,16 @@ int seekToResource(FILE* pe, int id)
       return 1;
     }
   }
-  
+
   return 0;
 }
 
 
 
-int getVersionInformation(char* filename, version_info_t* version_info)
+int getVersionInformation(const char* filename, version_info_t* version_info)
 {
   FILE* pe = fopen(filename, "rb");
-  
+
   if (!pe)
     return 0;
 
@@ -250,7 +250,7 @@ int getVersionInformation(char* filename, version_info_t* version_info)
     if (strcmp(".rsrc", (char*)section_header.Name) == 0)
       break;
   }
-  
+
   if (i == nt_headers.FileHeader.NumberOfSections)
     goto error_exit;
 
@@ -285,12 +285,12 @@ int getVersionInformation(char* filename, version_info_t* version_info)
 
   // Finally we got a virtual address of the resource, now seek to it
   fseek(pe, resource_start + resource_data_entry.OffsetToData - resource_virtual_address, SEEK_SET);
-  
+
   // Read version resource
   char* version_data = (char*)malloc(resource_data_entry.Size);
   fread(version_data, resource_data_entry.Size, 1, pe);
-  
-  memset(version_info, 0, sizeof(version_info_t));  
+
+  memset(version_info, 0, sizeof(version_info_t));
   getVersionString(version_data, resource_data_entry.Size, version_info->version, "FileVersion");
   getVersionString(version_data, resource_data_entry.Size, version_info->description, "FileDescription");
   getVersionString(version_data, resource_data_entry.Size, version_info->internal_name, "InternalName");
@@ -299,7 +299,7 @@ int getVersionInformation(char* filename, version_info_t* version_info)
   fclose(pe);
 
   return 1;
-  
+
 error_exit:
   fclose(pe);
   return 0;

@@ -12,8 +12,8 @@ void android_debug_printf(char* format, ...)
   va_start(ap, format);
   vsprintf(buffer, format, ap);
   va_end(ap);
-
-  __android_log_print(ANDROID_LOG_DEBUG, "Allegro", buffer);
+  __android_log_print(ANDROID_LOG_DEBUG, "Allegro", "%s", buffer); //J changed so it would compile, hope it works!
+ // __android_log_print(ANDROID_LOG_DEBUG, "Allegro", buffer);
 }
 
 int IsDataFile(version_info_t* version_info)
@@ -27,14 +27,14 @@ int IsCompatibleOldDatafile(version_info_t* version_info)
   int minor = 0;
   int rev = 0;
   int build = 0;
-  
+
   sscanf(version_info->version, "%d.%d.%d.%d", &major, &minor, &rev, &build);
-  
+
   return ((major == 3) || ((major == 2) && (minor >= 50)));
 }
 
 
-JNIEXPORT jboolean JNICALL 
+JNIEXPORT jboolean JNICALL
   Java_com_bigbluecup_android_PEHelper_isAgsDatafile(JNIEnv* env, jobject object, jclass stringclass, jstring filename)
 {
   version_info_t info;
@@ -43,6 +43,6 @@ JNIEXPORT jboolean JNICALL
   getVersionInformation(filename_char, &info);
 
   (*env)->ReleaseStringUTFChars(env, filename, filename_char);
-  
+
   return IsDataFile(&info) && IsCompatibleOldDatafile(&info);
 }

@@ -1,6 +1,7 @@
 *.o
 *.so
 Android/library/libs
+*.o.d
 
 .pc
 *.ncb

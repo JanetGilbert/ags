@@ -280,7 +280,9 @@ void SetMousePosition (int newx, int newy) {
 
     multiply_up_coordinates(&newx, &newy);
     filter->SetMousePosition(newx, newy);
+    #if defined(IOS_VERSION)
     ios_set_mouse(newx, newy); // J Need to reset the raw coordinates for this to take effect
+    #endif
     RefreshMouse();
 }
 
@@ -332,7 +334,7 @@ void update_inv_cursor(int invnum) {
     }
 }
 
-void update_cached_mouse_cursor() 
+void update_cached_mouse_cursor()
 {
     if (mouseCursor != NULL)
         gfxDriver->DestroyDDB(mouseCursor);
@@ -367,7 +369,7 @@ int find_next_enabled_cursor(int startwith) {
     do {
         if ((game.mcurs[testing].flags & MCF_DISABLED)==0) {
             // inventory cursor, and they have an active item
-            if (testing == MODE_USE) 
+            if (testing == MODE_USE)
             {
                 if (playerchar->activeinv > 0)
                     break;

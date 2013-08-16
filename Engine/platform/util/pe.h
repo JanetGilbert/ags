@@ -25,7 +25,7 @@ typedef struct {
   char internal_name[100];
 } version_info_t;
 
-int getVersionInformation(char* filename, version_info_t* version_info);
+int getVersionInformation(const char* filename, version_info_t* version_info);
 
 #ifdef __cplusplus
 }
