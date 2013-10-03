@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		11147CAF16D3DB4E00667733 /* Icon-72@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 11147CAE16D3DB4E00667733 /* Icon-72@2x.png */; };
 		11188409163AFC98009CE41A /* agswadjetutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11188407163AFC98009CE41A /* agswadjetutil.cpp */; };
+		11392AD717FB1FD000F1567C /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 11392AD617FB1FD000F1567C /* GameKit.framework */; };
+		11392ADC17FB21CB00F1567C /* GameCenterManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 11392ADB17FB21CB00F1567C /* GameCenterManager.m */; };
 		116DA9D217764E5600CBD3FC /* agsAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 116DA9CD17764E5600CBD3FC /* agsAppDelegate.mm */; };
 		116DA9D317764E5600CBD3FC /* agsViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 116DA9CF17764E5600CBD3FC /* agsViewController.mm */; };
 		116DA9D417764E5600CBD3FC /* EAGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 116DA9D117764E5600CBD3FC /* EAGLView.m */; };
@@ -361,10 +363,6 @@
 		60CA3EA4160713FF00CFB3BD /* test_all.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3D27160713FF00CFB3BD /* test_all.cpp */; };
 		60CA3EA5160713FF00CFB3BD /* test_file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3D29160713FF00CFB3BD /* test_file.cpp */; };
 		60CA3EA6160713FF00CFB3BD /* test_string.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3D2B160713FF00CFB3BD /* test_string.cpp */; };
-		60CA834015BA1FCC0010D3B4 /* (null) in Resources */ = {isa = PBXBuildFile; };
-		60CA834115BA1FCC0010D3B4 /* (null) in Resources */ = {isa = PBXBuildFile; };
-		60CA834215BA1FCC0010D3B4 /* (null) in Resources */ = {isa = PBXBuildFile; };
-		60CA834315BA1FCC0010D3B4 /* (null) in Resources */ = {isa = PBXBuildFile; };
 		60CE9D9C155272CD00A52D5A /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CE9D9B155272CD00A52D5A /* libfreetype.a */; };
 		60F49A4A155131E500A07887 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60F49A49155131E500A07887 /* AudioToolbox.framework */; };
 /* End PBXBuildFile section */
@@ -373,6 +371,10 @@
 		11147CAE16D3DB4E00667733 /* Icon-72@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-72@2x.png"; sourceTree = "<group>"; };
 		11188407163AFC98009CE41A /* agswadjetutil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = agswadjetutil.cpp; sourceTree = "<group>"; };
 		11188408163AFC98009CE41A /* agswadjetutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = agswadjetutil.h; sourceTree = "<group>"; };
+		11392AD617FB1FD000F1567C /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
+		11392AD917FB21C100F1567C /* AppSpecificValues.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppSpecificValues.h; sourceTree = "<group>"; };
+		11392ADA17FB21CB00F1567C /* GameCenterManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameCenterManager.h; sourceTree = "<group>"; };
+		11392ADB17FB21CB00F1567C /* GameCenterManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameCenterManager.m; sourceTree = "<group>"; };
 		116DA9CC17764E5600CBD3FC /* agsAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = agsAppDelegate.h; sourceTree = "<group>"; };
 		116DA9CD17764E5600CBD3FC /* agsAppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = agsAppDelegate.mm; sourceTree = "<group>"; };
 		116DA9CE17764E5600CBD3FC /* agsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = agsViewController.h; sourceTree = "<group>"; };
@@ -1094,6 +1096,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				11392AD717FB1FD000F1567C /* GameKit.framework in Frameworks */,
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
 				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
 				28FD15000DC6FC520079059D /* OpenGLES.framework in Frameworks */,
@@ -1118,6 +1121,7 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				11392AD817FB21AB00F1567C /* GameCenter */,
 				116DA9CC17764E5600CBD3FC /* agsAppDelegate.h */,
 				116DA9CD17764E5600CBD3FC /* agsAppDelegate.mm */,
 				116DA9CE17764E5600CBD3FC /* agsViewController.h */,
@@ -1135,6 +1139,16 @@
 				11188408163AFC98009CE41A /* agswadjetutil.h */,
 			);
 			path = agswadjetutil;
+			sourceTree = "<group>";
+		};
+		11392AD817FB21AB00F1567C /* GameCenter */ = {
+			isa = PBXGroup;
+			children = (
+				11392ADA17FB21CB00F1567C /* GameCenterManager.h */,
+				11392ADB17FB21CB00F1567C /* GameCenterManager.m */,
+				11392AD917FB21C100F1567C /* AppSpecificValues.h */,
+			);
+			name = GameCenter;
 			sourceTree = "<group>";
 		};
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
@@ -1196,6 +1210,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				11392AD617FB1FD000F1567C /* GameKit.framework */,
 				11C2066F17BAC4A3003BEC6B /* Crashlytics.framework */,
 				11B1EBAC16920D470038348A /* liballeg.a */,
 				6041A85D1552E60600596310 /* libaldmb.a */,
@@ -2383,6 +2398,9 @@
 /* Begin PBXProject section */
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0500;
+			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Shivah" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
@@ -2797,6 +2815,7 @@
 				6080428E1614DE8F00D33732 /* assetmanager.cpp in Sources */,
 				11188409163AFC98009CE41A /* agswadjetutil.cpp in Sources */,
 				608B4E57163BF27B00547FAA /* libc.c in Sources */,
+				11392ADC17FB21CB00F1567C /* GameCenterManager.m in Sources */,
 				116DA9D217764E5600CBD3FC /* agsAppDelegate.mm in Sources */,
 				116DA9D317764E5600CBD3FC /* agsViewController.mm in Sources */,
 				116DA9D417764E5600CBD3FC /* EAGLView.m in Sources */,
@@ -2810,7 +2829,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = armv7;
 				CODE_SIGN_IDENTITY = "iPhone Developer: David Gilbert (V72VMZY53F)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: David Gilbert (V72VMZY53F)";
 				COPY_PHASE_STRIP = NO;
@@ -2857,7 +2875,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = armv7;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: David Gilbert";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: David Gilbert";
 				COPY_PHASE_STRIP = YES;
@@ -2893,7 +2910,6 @@
 		C01FCF4F08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = armv7;
 				CODE_SIGN_IDENTITY = "iPhone Developer: David Gilbert (V72VMZY53F)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: David Gilbert (V72VMZY53F)";
 				COPY_PHASE_STRIP = NO;
@@ -2920,6 +2936,7 @@
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				LIBRARY_SEARCH_PATHS = "${SOURCE_ROOT}/../../nativelibs/fat/lib";
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CODE_SIGN_FLAGS = "-gta";
 				PREBINDING = NO;
 				SDKROOT = iphoneos;
@@ -2930,7 +2947,6 @@
 		C01FCF5008A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = armv7;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: David Gilbert";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: David Gilbert";
 				COPY_PHASE_STRIP = YES;

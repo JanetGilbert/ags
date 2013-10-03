@@ -24,7 +24,7 @@ extern void check_skip_cutscene_drag(int startx, int starty, int endx, int endy)
 
 @implementation agsViewController
 
-@synthesize context, inputAccessoryView, isInPortraitOrientation, isKeyboardActive, isIPad;
+@synthesize context, inputAccessoryView, isInPortraitOrientation, isKeyboardActive, isIPad, gameCenterManager;
 
 
 agsViewController* agsviewcontroller;
@@ -506,6 +506,31 @@ extern "C" void ios_create_screen()
 	[self createGestureRecognizers];
 	agsviewcontroller = self;
 	self.isIPad = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad);
+    
+    if ([GameCenterManager isGameCenterAvailable]) {
+        self.gameCenterManager = [[[GameCenterManager alloc] init] autorelease];
+        [self.gameCenterManager setDelegate:self];
+        [self.gameCenterManager authenticateLocalUser];
+    } else {
+        // The current device does not support Game Center.
+    }
+}
+
+- (IBAction) showAchievements
+{
+    GKAchievementViewController *achievements = [[GKAchievementViewController alloc] init];
+    if (achievements != NULL)
+    {
+        achievements.achievementDelegate = self;
+        achievements.modalPresentationStyle = UIModalPresentationCurrentContext;
+        [self presentModalViewController: achievements animated: YES];
+        //[self presentViewController:achievements animated:YES completion:nil];
+    }
+}
+- (void)achievementViewControllerDidFinish:(GKAchievementViewController *)viewController;
+{
+    [self dismissModalViewControllerAnimated: YES];
+    [viewController release];
 }
 
 
@@ -646,6 +671,7 @@ void ios_show_message_box(char* buffer)
 	if ([EAGLContext currentContext] == context)
 		[EAGLContext setCurrentContext:nil];
 	
+    [gameCenterManager release];
 	[context release];
 	
 	[super dealloc];
@@ -668,7 +694,10 @@ void ios_show_message_box(char* buffer)
 	// Tear down context.
 	if ([EAGLContext currentContext] == context)
 		[EAGLContext setCurrentContext:nil];
-	self.context = nil;
+	
+    self.gameCenterManager = nil;
+    self.context = nil;
+    
 }
 
 - (void)didReceiveMemoryWarning
@@ -678,6 +707,95 @@ void ios_show_message_box(char* buffer)
 	
 	// Release any cached data, images, etc. that aren't in use.
 }
+
+// ---------------------------------------------------------------------------------------------------
+// Achievements
+// ---------------------------------------------------------------------------------------------------
+
+- (void) completeAchievement:(NSString*)identifier value:(double)value
+{
+    if(identifier!= NULL)
+    {
+        [self.gameCenterManager submitAchievement: identifier percentComplete: value];
+    }
+}
+
+- (double) isAchieved:(NSString*)identifier
+{
+    if(identifier!= NULL)
+    {
+       return [self.gameCenterManager checkAchievement: identifier];
+    }
+    
+    return 0.0;
+}
+
+- (void) resetAchievements
+{
+    [self.gameCenterManager resetAchievements];
+}
+
+// Interface
+/*
+extern "C" void SetAchievement(char * name)
+{
+    NSString *s = [NSString stringWithUTF8String:name];
+    
+    [agsviewcontroller completeAchievement:s value:100.0];
+    
+    [s release];
+}
+
+extern "C" double IsAchievedYet(char * name)
+{
+    NSString *s = [NSString stringWithUTF8String:name];
+    
+    return [agsviewcontroller isAchieved:s];
+    
+    [s release];
+}*/
+
+extern "C" int GetAchievementValue(char * name)
+{
+    if (name == NULL)
+    {
+        return 0;
+    }
+    
+    NSString *s = [NSString stringWithUTF8String:name];
+    
+    return (int)[agsviewcontroller isAchieved:s];
+    
+    [s release];
+}
+
+extern "C" void SetAchievementValue(char * name, int value)
+{
+    if (name == NULL)
+    {
+        return;
+    }
+    
+    NSString *s = [NSString stringWithUTF8String:name];
+    
+    [agsviewcontroller resetAchievements]; // todo remove
+    
+    [agsviewcontroller completeAchievement:s value:(double)value];
+    
+    [s release];
+}
+
+extern "C" void ShowAchievements()
+{
+    [agsviewcontroller showAchievements];
+}
+
+extern "C" void ResetAchievements()
+{
+    [agsviewcontroller resetAchievements];
+}
+
+
 
 
 @end

@@ -3,6 +3,10 @@
 Utility functions for Wadjet eye games
 
 */
+//#include <string>
+
+//using namespace std;
+
 
 #ifdef WIN32
 #define WINDOWS_VERSION
@@ -29,7 +33,16 @@ IAGSEngine* engine;
 extern "C"
 {
   void fakekey(int keypress);
-    bool isPhone();
+  bool isPhone();
+
+  //void SetAchievement(char * name);
+  //bool IsAchievedYet(char * name);
+  int GetAchievementValue(char * name);
+  void SetAchievementValue(char * name, int value);
+  void ShowAchievements();
+  void ResetAchievements();
+
+
 }
 
 #endif
@@ -56,6 +69,52 @@ void FakeKeypress(int keypress)
   fakekey(keypress);
 #endif
 }
+/*
+void IosSetAchievement(char * name)
+{
+#if defined(IOS_VERSION)
+  SetAchievement(name);
+#endif
+}
+
+
+bool IosIsAchievedYet(char * name)
+{
+#if defined(IOS_VERSION)
+  return IsAchievedYet(name);
+#endif
+  return false;
+}*/
+
+void IosSetAchievementValue(char * name, int value)
+{
+#if defined(IOS_VERSION)
+  SetAchievementValue(name, value);
+#endif
+}
+
+
+int IosGetAchievementValue(char * name)
+{
+#if defined(IOS_VERSION)
+  return GetAchievementValue(name);
+#endif
+  return -1;
+}
+
+void IosShowAchievements()
+{
+#if defined(IOS_VERSION)
+  ShowAchievements();
+#endif
+}
+
+void IosResetAchievements()
+{
+#if defined(IOS_VERSION)
+    ResetAchievements();
+#endif
+}
 
 void AGS_EngineStartup(IAGSEngine *lpEngine)
 {
@@ -63,6 +122,12 @@ void AGS_EngineStartup(IAGSEngine *lpEngine)
 
   engine->RegisterScriptFunction("FakeKeypress", (void*)&FakeKeypress);
   engine->RegisterScriptFunction("IsOnPhone", (void*)&IsOnPhone);
+  //engine->RegisterScriptFunction("IosSetAchievement", (void*)&IosSetAchievement);
+  //engine->RegisterScriptFunction("IosIsAchievedYet", (bool*)&IosIsAchievedYet);
+  engine->RegisterScriptFunction("IosGetAchievementValue", (int*)&IosGetAchievementValue);
+  engine->RegisterScriptFunction("IosSetAchievementValue", (void*)&IosSetAchievementValue);
+  engine->RegisterScriptFunction("IosShowAchievements", (void*)&IosShowAchievements);
+  engine->RegisterScriptFunction("IosResetAchievements", (void*)&IosResetAchievements);
 }
 
 void AGS_EngineShutdown()
@@ -91,10 +156,17 @@ void AGS_EngineInitGfx(const char *driverID, void *data)
 // ********************************************
 // ***********  Editor Interface  *************
 // ********************************************
-
+  //  "import bool IosSetAchievement(String);\r\n"
+  //  "import bool IosIsAchievedYet(String);\r\n"
+    
+    
 const char* scriptHeader =
   "import void FakeKeypress(int);\r\n"
   "import bool IsOnPhone();\r\n"
+  "import int IosGetAchievementValue(String);\r\n"
+  "import bool IosSetAchievementValue(String, int);\r\n"
+  "import void IosShowAchievements();\r\n"
+  "import void IosResetAchievements();\r\n"
   ;
 
 

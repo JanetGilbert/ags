@@ -8,16 +8,32 @@
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
 
-@interface agsViewController : UIViewController <UIAlertViewDelegate, UIKeyInput, UITextInputTraits>
+#import <GameKit/GameKit.h>
+#import "GameCenterManager.h"
+
+@class GameCenterManager;
+
+@interface agsViewController : UIViewController <UIAlertViewDelegate, UIKeyInput, UITextInputTraits, UIActionSheetDelegate, GKAchievementViewControllerDelegate, GameCenterManagerDelegate>
 {
 	EAGLContext *context;
 	BOOL isInPortraitOrientation;
 	BOOL isKeyboardActive;
 	BOOL isIPad;
+    
+    GameCenterManager *gameCenterManager;
+    
 }
+
+@property (nonatomic, retain) GameCenterManager *gameCenterManager;
 
 - (void)createGestureRecognizers;
 - (void)createKeyboardButtonBar:(int)openedKeylist;
 - (void)moveViewAnimated:(BOOL)upwards duration:(float)duration;
+
+- (IBAction) reset;
+- (IBAction) showAchievements;
+- (void) completeAchievement:(NSString*)identifier value:(double)value;
+- (double) isAchieved:(NSString*)identifier;
+- (void) resetAchievements;
 
 @end
