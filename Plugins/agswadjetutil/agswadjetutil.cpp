@@ -35,8 +35,6 @@ extern "C"
   void fakekey(int keypress);
   bool isPhone();
 
-  //void SetAchievement(char * name);
-  //bool IsAchievedYet(char * name);
   int GetAchievementValue(char * name);
   void SetAchievementValue(char * name, int value);
   void ShowAchievements();
@@ -69,22 +67,6 @@ void FakeKeypress(int keypress)
   fakekey(keypress);
 #endif
 }
-/*
-void IosSetAchievement(char * name)
-{
-#if defined(IOS_VERSION)
-  SetAchievement(name);
-#endif
-}
-
-
-bool IosIsAchievedYet(char * name)
-{
-#if defined(IOS_VERSION)
-  return IsAchievedYet(name);
-#endif
-  return false;
-}*/
 
 void IosSetAchievementValue(char * name, int value)
 {
@@ -105,7 +87,7 @@ int IosGetAchievementValue(char * name)
 void IosShowAchievements()
 {
 #if defined(IOS_VERSION)
-  ShowAchievements();
+  //ShowAchievements(); doesn't work
 #endif
 }
 
@@ -122,8 +104,6 @@ void AGS_EngineStartup(IAGSEngine *lpEngine)
 
   engine->RegisterScriptFunction("FakeKeypress", (void*)&FakeKeypress);
   engine->RegisterScriptFunction("IsOnPhone", (void*)&IsOnPhone);
-  //engine->RegisterScriptFunction("IosSetAchievement", (void*)&IosSetAchievement);
-  //engine->RegisterScriptFunction("IosIsAchievedYet", (bool*)&IosIsAchievedYet);
   engine->RegisterScriptFunction("IosGetAchievementValue", (int*)&IosGetAchievementValue);
   engine->RegisterScriptFunction("IosSetAchievementValue", (void*)&IosSetAchievementValue);
   engine->RegisterScriptFunction("IosShowAchievements", (void*)&IosShowAchievements);
@@ -156,8 +136,6 @@ void AGS_EngineInitGfx(const char *driverID, void *data)
 // ********************************************
 // ***********  Editor Interface  *************
 // ********************************************
-  //  "import bool IosSetAchievement(String);\r\n"
-  //  "import bool IosIsAchievedYet(String);\r\n"
     
     
 const char* scriptHeader =

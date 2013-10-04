@@ -5,6 +5,9 @@
 #import "keycode.h"
 #import <Crashlytics/Crashlytics.h>
 
+#import "AppSpecificValues.h"
+#import "GameCenterManager.h"
+
 // From the engine
 extern void startEngine(char* filename, char* directory, int loadLastSave);
 extern int psp_rotation;
@@ -499,9 +502,10 @@ extern "C" void ios_create_screen()
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad
 {
-	[self showActivityIndicator];
+	
     
 	[super viewDidLoad];
+    [self showActivityIndicator];
 	[self.view setMultipleTouchEnabled:YES];
 	[self createGestureRecognizers];
 	agsviewcontroller = self;
@@ -511,27 +515,32 @@ extern "C" void ios_create_screen()
         self.gameCenterManager = [[[GameCenterManager alloc] init] autorelease];
         [self.gameCenterManager setDelegate:self];
         [self.gameCenterManager authenticateLocalUser];
+        
     } else {
+        int dummy=0;
         // The current device does not support Game Center.
     }
 }
-
+/*
 - (IBAction) showAchievements
 {
-    GKAchievementViewController *achievements = [[GKAchievementViewController alloc] init];
+   GKAchievementViewController *achievements = [[GKAchievementViewController alloc] init];
     if (achievements != NULL)
     {
         achievements.achievementDelegate = self;
-        achievements.modalPresentationStyle = UIModalPresentationCurrentContext;
         [self presentModalViewController: achievements animated: YES];
-        //[self presentViewController:achievements animated:YES completion:nil];
+        
     }
+
+  
+
 }
 - (void)achievementViewControllerDidFinish:(GKAchievementViewController *)viewController;
 {
     [self dismissModalViewControllerAnimated: YES];
     [viewController release];
-}
+
+}*/
 
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -668,10 +677,12 @@ void ios_show_message_box(char* buffer)
 
 - (void)dealloc
 {
+    [gameCenterManager release];
+    
 	if ([EAGLContext currentContext] == context)
 		[EAGLContext setCurrentContext:nil];
 	
-    [gameCenterManager release];
+    
 	[context release];
 	
 	[super dealloc];
@@ -691,11 +702,13 @@ void ios_show_message_box(char* buffer)
 {
 	[super viewDidUnload];
     
+    self.gameCenterManager = nil;
+    
 	// Tear down context.
 	if ([EAGLContext currentContext] == context)
 		[EAGLContext setCurrentContext:nil];
 	
-    self.gameCenterManager = nil;
+
     self.context = nil;
     
 }
@@ -727,6 +740,8 @@ void ios_show_message_box(char* buffer)
        return [self.gameCenterManager checkAchievement: identifier];
     }
     
+    
+    
     return 0.0;
 }
 
@@ -736,24 +751,7 @@ void ios_show_message_box(char* buffer)
 }
 
 // Interface
-/*
-extern "C" void SetAchievement(char * name)
-{
-    NSString *s = [NSString stringWithUTF8String:name];
-    
-    [agsviewcontroller completeAchievement:s value:100.0];
-    
-    [s release];
-}
 
-extern "C" double IsAchievedYet(char * name)
-{
-    NSString *s = [NSString stringWithUTF8String:name];
-    
-    return [agsviewcontroller isAchieved:s];
-    
-    [s release];
-}*/
 
 extern "C" int GetAchievementValue(char * name)
 {
@@ -764,9 +762,11 @@ extern "C" int GetAchievementValue(char * name)
     
     NSString *s = [NSString stringWithUTF8String:name];
     
-    return (int)[agsviewcontroller isAchieved:s];
+    int res = (int)[agsviewcontroller isAchieved:s];
     
     [s release];
+    
+    return res;
 }
 
 extern "C" void SetAchievementValue(char * name, int value)
@@ -787,7 +787,7 @@ extern "C" void SetAchievementValue(char * name, int value)
 
 extern "C" void ShowAchievements()
 {
-    [agsviewcontroller showAchievements];
+    //[agsviewcontroller showAchievements]; doesn't work
 }
 
 extern "C" void ResetAchievements()

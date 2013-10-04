@@ -143,6 +143,7 @@
 		[[GKLocalPlayer localPlayer] authenticateWithCompletionHandler:^(NSError *error) 
 		{
 			[self callDelegateOnMainThread: @selector(processGameCenterAuth:) withArg: NULL error: error];
+            [self cacheAchievements];
 		}];
 	}
 }
@@ -230,17 +231,9 @@
 	}
 }
 
-// negative = error, otherwise returns percent complete
-- (double) checkAchievement: (NSString*) identifier
+
+- (void) cacheAchievements
 {
-	//GameCenter check for duplicate achievements when the achievement is submitted, but if you only want to report
-	// new achievements to the user, then you need to check if it's been earned
-	// before you submit.  Otherwise you'll end up with a race condition between loadAchievementsWithCompletionHandler
-	// and reportAchievementWithCompletionHandler.  To avoid this, we fetch the current achievement list once,
-	// then cache it and keep it updated with any new achievements.
-    
-    __block double achievementfound = 0.0;
-    
 	if(self.earnedAchievementCache == NULL)
 	{
 		[GKAchievement loadAchievementsWithCompletionHandler: ^(NSArray *scores, NSError *error)
@@ -253,28 +246,34 @@
                      [tempCache setObject: score forKey: score.identifier];
                  }
                  self.earnedAchievementCache= tempCache;
+                 
              }
              else
              {
                  //Something broke loading the achievement list.
-                 achievementfound = -1.0;
              }
              
          }];
 	}
-	
-    if (achievementfound != -1)
-	{
-        //Search the list for the ID we're using...
-		GKAchievement* achievement= [self.earnedAchievementCache objectForKey: identifier];
+}
 
-		if(achievement!= NULL)
-		{
-            achievementfound = achievement.percentComplete;
-		}
-	}
+
+// negative = error, otherwise returns percent complete
+- (double) checkAchievement: (NSString*) identifier
+{
+    if (self.earnedAchievementCache != NULL)
+    {
+        GKAchievement* achievement= [self.earnedAchievementCache objectForKey: identifier];
+        if(achievement != NULL)
+        {
+            if(achievement.percentComplete >= 100.0)
+            {
+                return true;
+            }
+        }
+    }
     
-    return achievementfound;
+    return false;
 }
 
 

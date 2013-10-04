@@ -84,6 +84,7 @@
 - (void) submitAchievement: (NSString*) identifier percentComplete: (double) percentComplete;
 - (double) checkAchievement: (NSString*) identifier;
 - (void) resetAchievements;
+- (void) cacheAchievements;
 
 - (void) mapPlayerIDtoPlayer: (NSString*) playerID;
 @end

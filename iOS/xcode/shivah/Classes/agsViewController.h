@@ -13,12 +13,16 @@
 
 @class GameCenterManager;
 
-@interface agsViewController : UIViewController <UIAlertViewDelegate, UIKeyInput, UITextInputTraits, UIActionSheetDelegate, GKAchievementViewControllerDelegate, GameCenterManagerDelegate>
+//@interface Game_CenterViewController : UIViewController <UIActionSheetDelegate, GKLeaderboardViewControllerDelegate, GKAchievementViewControllerDelegate, GameCenterManagerDelegate> {
+
+
+@interface agsViewController : UIViewController <UIAlertViewDelegate, UIKeyInput, UITextInputTraits, UIActionSheetDelegate,  GKAchievementViewControllerDelegate, GameCenterManagerDelegate>
 {
 	EAGLContext *context;
 	BOOL isInPortraitOrientation;
 	BOOL isKeyboardActive;
 	BOOL isIPad;
+    
     
     GameCenterManager *gameCenterManager;
     
@@ -30,7 +34,7 @@
 - (void)createKeyboardButtonBar:(int)openedKeylist;
 - (void)moveViewAnimated:(BOOL)upwards duration:(float)duration;
 
-- (IBAction) reset;
+//- (IBAction) reset;
 - (IBAction) showAchievements;
 - (void) completeAchievement:(NSString*)identifier value:(double)value;
 - (double) isAchieved:(NSString*)identifier;
