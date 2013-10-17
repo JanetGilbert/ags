@@ -70,32 +70,32 @@ void FakeKeypress(int keypress)
 
 void IosSetAchievementValue(char * name, int value)
 {
-#if defined(IOS_VERSION)
+/*#if defined(IOS_VERSION)
   SetAchievementValue(name, value);
-#endif
+#endif*/
 }
 
 
 int IosGetAchievementValue(char * name)
 {
-#if defined(IOS_VERSION)
+/*#if defined(IOS_VERSION)
   return GetAchievementValue(name);
-#endif
+#endif*/
   return -1;
 }
 
 void IosShowAchievements()
 {
-#if defined(IOS_VERSION)
+/*#if defined(IOS_VERSION)
   //ShowAchievements(); doesn't work
-#endif
+#endif*/
 }
 
 void IosResetAchievements()
 {
-#if defined(IOS_VERSION)
+/*#if defined(IOS_VERSION)
     ResetAchievements();
-#endif
+#endif*/
 }
 
 void AGS_EngineStartup(IAGSEngine *lpEngine)

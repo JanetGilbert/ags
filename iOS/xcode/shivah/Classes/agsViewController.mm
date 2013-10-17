@@ -511,7 +511,8 @@ extern "C" void ios_create_screen()
 	agsviewcontroller = self;
 	self.isIPad = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad);
     
-    if ([GameCenterManager isGameCenterAvailable]) {
+    //j put back in if you want gamecenter
+    /*if ([GameCenterManager isGameCenterAvailable]) {
         self.gameCenterManager = [[[GameCenterManager alloc] init] autorelease];
         [self.gameCenterManager setDelegate:self];
         [self.gameCenterManager authenticateLocalUser];
@@ -519,7 +520,7 @@ extern "C" void ios_create_screen()
     } else {
         int dummy=0;
         // The current device does not support Game Center.
-    }
+    }*/
 }
 /*
 - (IBAction) showAchievements
