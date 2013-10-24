@@ -469,7 +469,10 @@ extern "C" int ios_is_keyboard_visible()
     [swipeGesture release];*/
 }
 
-
+- (BOOL) prefersStatusBarHidden
+{
+    return YES;
+}
 
 
 
