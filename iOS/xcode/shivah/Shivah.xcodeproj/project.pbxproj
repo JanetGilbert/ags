@@ -2867,6 +2867,7 @@
 					"\"$(SRCROOT)/../../../Plugins/agskey/vc2008/Debug\"",
 					"\"$(SRCROOT)/../../../Plugins/agswadjetutil/vc2008/Release\"",
 				);
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				"OTHER_CODE_SIGN_FLAGS[sdk=*]" = "";
 				PRODUCT_NAME = Shivah;
@@ -2907,7 +2908,7 @@
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_NAME = Shivah;
 				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "A38CF578-8B89-42BA-9940-6A4BD5D62660";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "84ED3C50-899E-47BD-A6FB-CD8CA7FB8534";
 				SDKROOT = iphoneos;
 				STRIPFLAGS = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
