@@ -371,10 +371,19 @@
 		11147CAE16D3DB4E00667733 /* Icon-72@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-72@2x.png"; sourceTree = "<group>"; };
 		11188407163AFC98009CE41A /* agswadjetutil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = agswadjetutil.cpp; sourceTree = "<group>"; };
 		11188408163AFC98009CE41A /* agswadjetutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = agswadjetutil.h; sourceTree = "<group>"; };
+		112EC93A1825460000A8ABC5 /* Default@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x~ipad.png"; sourceTree = "<group>"; };
 		11392AD617FB1FD000F1567C /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		11392AD917FB21C100F1567C /* AppSpecificValues.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppSpecificValues.h; sourceTree = "<group>"; };
 		11392ADA17FB21CB00F1567C /* GameCenterManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameCenterManager.h; sourceTree = "<group>"; };
 		11392ADB17FB21CB00F1567C /* GameCenterManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameCenterManager.m; sourceTree = "<group>"; };
+		1143DB1D1821A0D600CEDF7A /* icon_76x76.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_76x76.png; sourceTree = "<group>"; };
+		1143DB1E1821A10300CEDF7A /* icon_152x152.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_152x152.png; sourceTree = "<group>"; };
+		1143DB1F1821A12500CEDF7A /* Shivah.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Shivah.xcodeproj; sourceTree = "<group>"; };
+		1143DB221821A13500CEDF7A /* Default~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default~ipad.png"; sourceTree = "<group>"; };
+		1143DB231821A14B00CEDF7A /* Default-Portrait@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Portrait@2x.png"; sourceTree = "<group>"; };
+		1143DB241821A16E00CEDF7A /* Default-Landscape.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape.png"; sourceTree = "<group>"; };
+		1143DB251821A18300CEDF7A /* Default-Landscape@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape@2x.png"; sourceTree = "<group>"; };
+		1143DB261821A1F000CEDF7A /* icon_120x120.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_120x120.png; sourceTree = "<group>"; };
 		116DA9CC17764E5600CBD3FC /* agsAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = agsAppDelegate.h; sourceTree = "<group>"; };
 		116DA9CD17764E5600CBD3FC /* agsAppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = agsAppDelegate.mm; sourceTree = "<group>"; };
 		116DA9CE17764E5600CBD3FC /* agsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = agsViewController.h; sourceTree = "<group>"; };
@@ -1151,6 +1160,11 @@
 			name = GameCenter;
 			sourceTree = "<group>";
 		};
+		1143DB201821A12500CEDF7A /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -1162,6 +1176,15 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				112EC93A1825460000A8ABC5 /* Default@2x~ipad.png */,
+				1143DB261821A1F000CEDF7A /* icon_120x120.png */,
+				1143DB251821A18300CEDF7A /* Default-Landscape@2x.png */,
+				1143DB241821A16E00CEDF7A /* Default-Landscape.png */,
+				1143DB231821A14B00CEDF7A /* Default-Portrait@2x.png */,
+				1143DB221821A13500CEDF7A /* Default~ipad.png */,
+				1143DB1F1821A12500CEDF7A /* Shivah.xcodeproj */,
+				1143DB1E1821A10300CEDF7A /* icon_152x152.png */,
+				1143DB1D1821A0D600CEDF7A /* icon_76x76.png */,
 				60898C2B160779D9009E152F /* Plugins */,
 				60CA3AA7160713FD00CFB3BD /* Engine */,
 				60CA39A8160713D200CFB3BD /* Common */,
@@ -2418,6 +2441,12 @@
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* CustomTemplate */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 1143DB201821A12500CEDF7A /* Products */;
+					ProjectRef = 1143DB1F1821A12500CEDF7A /* Shivah.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				1D6058900D05DD3D006BFB54 /* Shivah */,
