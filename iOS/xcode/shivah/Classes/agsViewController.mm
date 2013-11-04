@@ -6,7 +6,7 @@
 #import <Crashlytics/Crashlytics.h>
 
 #import "AppSpecificValues.h"
-#import "GameCenterManager.h"
+//#import "GameCenterManager.h"
 
 // From the engine
 extern void startEngine(char* filename, char* directory, int loadLastSave);
@@ -27,7 +27,7 @@ extern void check_skip_cutscene_drag(int startx, int starty, int endx, int endy)
 
 @implementation agsViewController
 
-@synthesize context, inputAccessoryView, isInPortraitOrientation, isKeyboardActive, isIPad, gameCenterManager;
+@synthesize context, inputAccessoryView, isInPortraitOrientation, isKeyboardActive, isIPad;//, gameCenterManager;
 
 
 agsViewController* agsviewcontroller;
@@ -681,7 +681,7 @@ void ios_show_message_box(char* buffer)
 
 - (void)dealloc
 {
-    [gameCenterManager release];
+ //   [gameCenterManager release];
     
 	if ([EAGLContext currentContext] == context)
 		[EAGLContext setCurrentContext:nil];
@@ -706,7 +706,7 @@ void ios_show_message_box(char* buffer)
 {
 	[super viewDidUnload];
     
-    self.gameCenterManager = nil;
+    //self.gameCenterManager = nil;
     
 	// Tear down context.
 	if ([EAGLContext currentContext] == context)
@@ -733,7 +733,7 @@ void ios_show_message_box(char* buffer)
 {
     if(identifier!= NULL)
     {
-        [self.gameCenterManager submitAchievement: identifier percentComplete: value];
+    //    [self.gameCenterManager submitAchievement: identifier percentComplete: value];
     }
 }
 
@@ -741,7 +741,7 @@ void ios_show_message_box(char* buffer)
 {
     if(identifier!= NULL)
     {
-       return [self.gameCenterManager checkAchievement: identifier];
+     //  return [self.gameCenterManager checkAchievement: identifier];
     }
     
     
@@ -751,7 +751,7 @@ void ios_show_message_box(char* buffer)
 
 - (void) resetAchievements
 {
-    [self.gameCenterManager resetAchievements];
+   // [self.gameCenterManager resetAchievements];
 }
 
 // Interface
@@ -759,7 +759,7 @@ void ios_show_message_box(char* buffer)
 
 extern "C" int GetAchievementValue(char * name)
 {
-    if (name == NULL)
+    /*if (name == NULL)
     {
         return 0;
     }
@@ -770,12 +770,13 @@ extern "C" int GetAchievementValue(char * name)
     
     [s release];
     
-    return res;
+    return res;*/
+    return 0;
 }
 
 extern "C" void SetAchievementValue(char * name, int value)
 {
-    if (name == NULL)
+    /*if (name == NULL)
     {
         return;
     }
@@ -786,7 +787,7 @@ extern "C" void SetAchievementValue(char * name, int value)
     
     [agsviewcontroller completeAchievement:s value:(double)value];
     
-    [s release];
+    [s release];*/
 }
 
 extern "C" void ShowAchievements()

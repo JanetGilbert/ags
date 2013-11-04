@@ -9,26 +9,25 @@
 #import <OpenGLES/ES2/glext.h>
 
 #import <GameKit/GameKit.h>
-#import "GameCenterManager.h"
+//#import "GameCenterManager.h"
 
-@class GameCenterManager;
+//@class GameCenterManager;
 
 //@interface Game_CenterViewController : UIViewController <UIActionSheetDelegate, GKLeaderboardViewControllerDelegate, GKAchievementViewControllerDelegate, GameCenterManagerDelegate> {
 
 
-@interface agsViewController : UIViewController <UIAlertViewDelegate, UIKeyInput, UITextInputTraits, UIActionSheetDelegate,  GKAchievementViewControllerDelegate, GameCenterManagerDelegate>
-{
+@interface agsViewController : UIViewController <UIAlertViewDelegate, UIKeyInput, UITextInputTraits, UIActionSheetDelegate>{
 	EAGLContext *context;
 	BOOL isInPortraitOrientation;
 	BOOL isKeyboardActive;
 	BOOL isIPad;
     
     
-    GameCenterManager *gameCenterManager;
+   // GameCenterManager *gameCenterManager;
     
 }
 
-@property (nonatomic, retain) GameCenterManager *gameCenterManager;
+//@property (nonatomic, retain) GameCenterManager *gameCenterManager;
 
 - (void)createGestureRecognizers;
 - (void)createKeyboardButtonBar:(int)openedKeylist;
