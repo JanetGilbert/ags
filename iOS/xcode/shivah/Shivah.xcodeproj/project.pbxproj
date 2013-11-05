@@ -2848,8 +2848,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: WADJET EYE GAMES, LLC (69P49K3LPW)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: WADJET EYE GAMES, LLC (69P49K3LPW)";
 				"CODE_SIGN_RESOURCE_RULES_PATH[sdk=*]" = "";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2898,8 +2898,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: WADJET EYE GAMES, LLC (69P49K3LPW)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: David Gilbert (V72VMZY53F)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2922,7 +2922,7 @@
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_NAME = Shivah;
 				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "84ED3C50-899E-47BD-A6FB-CD8CA7FB8534";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "60452925-92EC-41E3-8BC7-43FB68F1425F";
 				SDKROOT = iphoneos;
 				STRIPFLAGS = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -2963,6 +2963,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CODE_SIGN_FLAGS = "-gta";
 				PREBINDING = NO;
+				PROVISIONING_PROFILE = "60452925-92EC-41E3-8BC7-43FB68F1425F";
 				SDKROOT = iphoneos;
 				USER_HEADER_SEARCH_PATHS = "${SOURCE_ROOT}/../../../Plugins ${SOURCE_ROOT}/../../../Common ${SOURCE_ROOT}/../../../Common/libinclude ${SOURCE_ROOT}/../../../Engine ${SOURCE_ROOT}/../../../iOS/nativelibs/fat/include ${SOURCE_ROOT}/../../nativelibs/fat/include/freetype2";
 				VALID_ARCHS = armv7;
@@ -2998,6 +2999,7 @@
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				"OTHER_CODE_SIGN_FLAGS[sdk=*]" = "";
 				PREBINDING = NO;
+				PROVISIONING_PROFILE = "60452925-92EC-41E3-8BC7-43FB68F1425F";
 				SDKROOT = iphoneos;
 				USER_HEADER_SEARCH_PATHS = "${SOURCE_ROOT}/../../../Common ${SOURCE_ROOT}/../../../Common/libinclude ${SOURCE_ROOT}/../../../Engine ${SOURCE_ROOT}/../../../iOS/nativelibs/fat/include ${SOURCE_ROOT}/../../nativelibs/fat/include/freetype2";
 				VALID_ARCHS = armv7;
