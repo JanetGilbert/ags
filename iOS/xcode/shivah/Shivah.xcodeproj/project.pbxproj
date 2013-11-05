@@ -2890,7 +2890,7 @@
 				STRIPFLAGS = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				"USER_HEADER_SEARCH_PATHS[arch=*]" = "${SOURCE_ROOT}/../../../Plugins ${SOURCE_ROOT}/../../../Common ${SOURCE_ROOT}/../../../Common/libinclude ${SOURCE_ROOT}/../../../Engine ${SOURCE_ROOT}/../../../iOS/nativelibs/fat/include ${SOURCE_ROOT}/../../nativelibs/fat/include/freetype2";
-				VALID_ARCHS = "arm64 armv7";
+				VALID_ARCHS = armv7;
 			};
 			name = Debug;
 		};
@@ -2927,7 +2927,7 @@
 				STRIPFLAGS = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
-				VALID_ARCHS = "arm64 armv7";
+				VALID_ARCHS = armv7;
 			};
 			name = Release;
 		};
@@ -2965,6 +2965,7 @@
 				PREBINDING = NO;
 				SDKROOT = iphoneos;
 				USER_HEADER_SEARCH_PATHS = "${SOURCE_ROOT}/../../../Plugins ${SOURCE_ROOT}/../../../Common ${SOURCE_ROOT}/../../../Common/libinclude ${SOURCE_ROOT}/../../../Engine ${SOURCE_ROOT}/../../../iOS/nativelibs/fat/include ${SOURCE_ROOT}/../../nativelibs/fat/include/freetype2";
+				VALID_ARCHS = armv7;
 			};
 			name = Debug;
 		};
@@ -2999,6 +3000,7 @@
 				PREBINDING = NO;
 				SDKROOT = iphoneos;
 				USER_HEADER_SEARCH_PATHS = "${SOURCE_ROOT}/../../../Common ${SOURCE_ROOT}/../../../Common/libinclude ${SOURCE_ROOT}/../../../Engine ${SOURCE_ROOT}/../../../iOS/nativelibs/fat/include ${SOURCE_ROOT}/../../nativelibs/fat/include/freetype2";
+				VALID_ARCHS = armv7;
 			};
 			name = Release;
 		};
