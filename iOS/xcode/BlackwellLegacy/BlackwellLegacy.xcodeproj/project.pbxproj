@@ -381,7 +381,6 @@
 		112EC93A1825460000A8ABC5 /* Default@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x~ipad.png"; sourceTree = "<group>"; };
 		1143DB1D1821A0D600CEDF7A /* icon_76x76.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_76x76.png; sourceTree = "<group>"; };
 		1143DB1E1821A10300CEDF7A /* icon_152x152.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_152x152.png; sourceTree = "<group>"; };
-		1143DB1F1821A12500CEDF7A /* Shivah.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Shivah.xcodeproj; sourceTree = "<group>"; };
 		1143DB221821A13500CEDF7A /* Default~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default~ipad.png"; sourceTree = "<group>"; };
 		1143DB231821A14B00CEDF7A /* Default-Portrait@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Portrait@2x.png"; sourceTree = "<group>"; };
 		1143DB241821A16E00CEDF7A /* Default-Landscape.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape.png"; sourceTree = "<group>"; };
@@ -402,7 +401,7 @@
 		1194B047182890FC00D2C3CA /* Icon-48.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-48.png"; sourceTree = "<group>"; };
 		11B1EBAC16920D470038348A /* liballeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liballeg.a; path = ../../nativelibs/fat/lib/liballeg.a; sourceTree = "<group>"; };
 		11C2066F17BAC4A3003BEC6B /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
-		11D7F71C177636EC00C3567E /* Shivah-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Shivah-Info.plist"; sourceTree = "<group>"; };
+		11D7F71C177636EC00C3567E /* BlackwellLegacy-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "BlackwellLegacy-Info.plist"; sourceTree = "<group>"; };
 		11E10A5D16CF015200349298 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		11EF2BB717BABA100005FE0A /* ac2game.dat */ = {isa = PBXFileReference; lastKnownFileType = file; name = ac2game.dat; path = game/ac2game.dat; sourceTree = SOURCE_ROOT; };
 		11EF2BB817BABA100005FE0A /* audio.vox */ = {isa = PBXFileReference; lastKnownFileType = file; name = audio.vox; path = game/audio.vox; sourceTree = SOURCE_ROOT; };
@@ -410,14 +409,14 @@
 		11EF2BBA17BABA100005FE0A /* ios_iphone.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios_iphone.cfg; path = game/ios_iphone.cfg; sourceTree = SOURCE_ROOT; };
 		11EF2BBB17BABA100005FE0A /* speech.vox */ = {isa = PBXFileReference; lastKnownFileType = file; name = speech.vox; path = game/speech.vox; sourceTree = SOURCE_ROOT; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		1D6058910D05DD3D006BFB54 /* Shivah.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Shivah.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D6058910D05DD3D006BFB54 /* BlackwellLegacy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BlackwellLegacy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		28AD733E0D9D9553002E5188 /* MainWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainWindow.xib; sourceTree = "<group>"; };
 		28EC4C5811D54ECE0027AA9F /* agsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = agsViewController.xib; sourceTree = "<group>"; };
 		28FD14FF0DC6FC520079059D /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		28FD15070DC6FC5B0079059D /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		29B97316FDCFA39411CA2CEA /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
-		32CA4F630368D1EE00C91783 /* Shivah_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Shivah_Prefix.pch; sourceTree = "<group>"; };
+		32CA4F630368D1EE00C91783 /* BlackwellLegacy_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlackwellLegacy_Prefix.pch; sourceTree = "<group>"; };
 		6041A85D1552E60600596310 /* libaldmb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libaldmb.a; path = ../../nativelibs/fat/lib/libaldmb.a; sourceTree = SOURCE_ROOT; };
 		6041A85F1552E60600596310 /* libdumb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdumb.a; path = ../../nativelibs/fat/lib/libdumb.a; sourceTree = SOURCE_ROOT; };
 		6041A8601552E60600596310 /* libogg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libogg.a; path = ../../nativelibs/fat/lib/libogg.a; sourceTree = SOURCE_ROOT; };
@@ -1152,15 +1151,10 @@
 			path = agswadjetutil;
 			sourceTree = "<group>";
 		};
-		1143DB201821A12500CEDF7A /* Products */ = {
-			isa = PBXGroup;
-			name = Products;
-			sourceTree = "<group>";
-		};
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1D6058910D05DD3D006BFB54 /* Shivah.app */,
+				1D6058910D05DD3D006BFB54 /* BlackwellLegacy.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1168,7 +1162,6 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
-				1143DB1F1821A12500CEDF7A /* Shivah.xcodeproj */,
 				60898C2B160779D9009E152F /* Plugins */,
 				60CA3AA7160713FD00CFB3BD /* Engine */,
 				60CA39A8160713D200CFB3BD /* Common */,
@@ -1185,7 +1178,7 @@
 		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
-				32CA4F630368D1EE00C91783 /* Shivah_Prefix.pch */,
+				32CA4F630368D1EE00C91783 /* BlackwellLegacy_Prefix.pch */,
 				29B97316FDCFA39411CA2CEA /* main.mm */,
 			);
 			name = "Other Sources";
@@ -1215,7 +1208,7 @@
 				60BC89A7155E969700807358 /* iTunesArtwork */,
 				608498E7155CDF7000121EFE /* Icon@2x.png */,
 				608498E5155CDF6400121EFE /* Icon-72.png */,
-				11D7F71C177636EC00C3567E /* Shivah-Info.plist */,
+				11D7F71C177636EC00C3567E /* BlackwellLegacy-Info.plist */,
 				6041A8691552E63B00596310 /* Icon.png */,
 				28EC4C5811D54ECE0027AA9F /* agsViewController.xib */,
 				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
@@ -2388,9 +2381,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		1D6058900D05DD3D006BFB54 /* Shivah */ = {
+		1D6058900D05DD3D006BFB54 /* BlackwellLegacy */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "Shivah" */;
+			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "BlackwellLegacy" */;
 			buildPhases = (
 				1D60588D0D05DD3D006BFB54 /* Resources */,
 				1D60588E0D05DD3D006BFB54 /* Sources */,
@@ -2403,9 +2396,9 @@
 			);
 			dependencies = (
 			);
-			name = Shivah;
+			name = BlackwellLegacy;
 			productName = Shivah;
-			productReference = 1D6058910D05DD3D006BFB54 /* Shivah.app */;
+			productReference = 1D6058910D05DD3D006BFB54 /* BlackwellLegacy.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -2426,7 +2419,7 @@
 					};
 				};
 			};
-			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Shivah" */;
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "BlackwellLegacy" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
@@ -2438,15 +2431,9 @@
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* CustomTemplate */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 1143DB201821A12500CEDF7A /* Products */;
-					ProjectRef = 1143DB1F1821A12500CEDF7A /* Shivah.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
-				1D6058900D05DD3D006BFB54 /* Shivah */,
+				1D6058900D05DD3D006BFB54 /* BlackwellLegacy */,
 			);
 		};
 /* End PBXProject section */
@@ -2879,9 +2866,9 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = Shivah_Prefix.pch;
+				GCC_PREFIX_HEADER = BlackwellLegacy_Prefix.pch;
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
-				INFOPLIST_FILE = "Shivah-Info.plist";
+				INFOPLIST_FILE = "BlackwellLegacy-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				"IPHONEOS_DEPLOYMENT_TARGET[arch=*]" = 4.3;
 				LIBRARY_SEARCH_PATHS = (
@@ -2904,7 +2891,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				"OTHER_CODE_SIGN_FLAGS[sdk=*]" = "";
-				PRODUCT_NAME = Shivah;
+				PRODUCT_NAME = BlackwellLegacy;
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				STRIPFLAGS = "";
@@ -2925,9 +2912,9 @@
 					"\"$(SRCROOT)\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = Shivah_Prefix.pch;
+				GCC_PREFIX_HEADER = BlackwellLegacy_Prefix.pch;
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
-				INFOPLIST_FILE = "Shivah-Info.plist";
+				INFOPLIST_FILE = "BlackwellLegacy-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2939,7 +2926,7 @@
 					"\"$(SRCROOT)\"",
 				);
 				OTHER_CODE_SIGN_FLAGS = "";
-				PRODUCT_NAME = Shivah;
+				PRODUCT_NAME = BlackwellLegacy;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "FF35F53D-50B3-4266-86E0-A8FA5B789747";
 				SDKROOT = iphoneos;
@@ -3028,7 +3015,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "Shivah" */ = {
+		1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "BlackwellLegacy" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1D6058940D05DD3E006BFB54 /* Debug */,
@@ -3037,7 +3024,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Shivah" */ = {
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "BlackwellLegacy" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C01FCF4F08A954540054247B /* Debug */,
