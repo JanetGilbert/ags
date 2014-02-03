@@ -34,7 +34,7 @@ extern "C" void ios_resume_sound();
     [TestFlight takeOff:@"8897920d3d667b72496a97c996cc98c0_MTYyMzU0MjAxMi0xMi0wNCAxNjo1MDozOS4wMzM4MjY"];
 #endif*/
     [Crashlytics startWithAPIKey:@"632ccb316e88010c5d7b793d4bf069e57fbf624e"];
-	return YES;
+	return YES; 
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
