@@ -2855,8 +2855,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: David Gilbert (V72VMZY53F)";
 				"CODE_SIGN_RESOURCE_RULES_PATH[sdk=*]" = "";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2905,8 +2904,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: WADJET EYE GAMES, LLC (69P49K3LPW)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2928,8 +2926,8 @@
 				);
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_NAME = BlackwellLegacy;
-				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "87ADA516-BEDC-4022-A68F-4E8B99F49EBC";
+				PROVISIONING_PROFILE = "3793C245-4935-4B9D-881F-B3093EDA2BA6";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "3793C245-4935-4B9D-881F-B3093EDA2BA6";
 				SDKROOT = iphoneos;
 				STRIPFLAGS = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
