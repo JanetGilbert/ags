@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>40EF17CD-F576-4434-912E-95394E327B0D</string>
+	<key>IDESourceControlProjectName</key>
+	<string>BlackwellUnbound</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>EDF70E71-2A1C-4698-8639-AF9A16D04705</key>
+		<string>ssh://github.com/JanetGilbert/ags.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>iOS/xcode/BlackwellUnbound/BlackwellUnbound.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>EDF70E71-2A1C-4698-8639-AF9A16D04705</key>
+		<string>../../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>ssh://github.com/JanetGilbert/ags.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>EDF70E71-2A1C-4698-8639-AF9A16D04705</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>EDF70E71-2A1C-4698-8639-AF9A16D04705</string>
+			<key>IDESourceControlWCCName</key>
+			<string>ags</string>
+		</dict>
+	</array>
+</dict>
+</plist>

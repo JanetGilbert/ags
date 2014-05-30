@@ -28,7 +28,6 @@
 		1194B04F1828931C00D2C3CA /* Default-Portrait@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1143DB231821A14B00CEDF7A /* Default-Portrait@2x.png */; };
 		1194B0501828931E00D2C3CA /* Default~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 1143DB221821A13500CEDF7A /* Default~ipad.png */; };
 		11B1EBAD16920D470038348A /* liballeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 11B1EBAC16920D470038348A /* liballeg.a */; };
-		11C2067017BAC4A3003BEC6B /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 11C2066F17BAC4A3003BEC6B /* Crashlytics.framework */; };
 		11E10A5E16CF015200349298 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 11E10A5D16CF015200349298 /* Default-568h@2x.png */; };
 		11EF2BBC17BABA100005FE0A /* ac2game.dat in Resources */ = {isa = PBXBuildFile; fileRef = 11EF2BB717BABA100005FE0A /* ac2game.dat */; };
 		11EF2BBD17BABA100005FE0A /* audio.vox in Resources */ = {isa = PBXBuildFile; fileRef = 11EF2BB817BABA100005FE0A /* audio.vox */; };
@@ -400,7 +399,6 @@
 		118957BA16D3F0BA007F44A2 /* Default-Portrait@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Portrait@2x~ipad.png"; sourceTree = "<group>"; };
 		1194B047182890FC00D2C3CA /* Icon-48.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-48.png"; sourceTree = "<group>"; };
 		11B1EBAC16920D470038348A /* liballeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liballeg.a; path = ../../nativelibs/fat/lib/liballeg.a; sourceTree = "<group>"; };
-		11C2066F17BAC4A3003BEC6B /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		11D7F71C177636EC00C3567E /* BlackwellUnbound-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "BlackwellUnbound-Info.plist"; sourceTree = "<group>"; };
 		11E10A5D16CF015200349298 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		11EF2BB717BABA100005FE0A /* ac2game.dat */ = {isa = PBXFileReference; lastKnownFileType = file; name = ac2game.dat; path = game/ac2game.dat; sourceTree = SOURCE_ROOT; };
@@ -1122,7 +1120,6 @@
 				6041A8881552E89E00596310 /* libz.dylib in Frameworks */,
 				6041A8981552E8C400596310 /* libbz2.dylib in Frameworks */,
 				11B1EBAD16920D470038348A /* liballeg.a in Frameworks */,
-				11C2067017BAC4A3003BEC6B /* Crashlytics.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1219,7 +1216,6 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				11C2066F17BAC4A3003BEC6B /* Crashlytics.framework */,
 				11B1EBAC16920D470038348A /* liballeg.a */,
 				6041A85D1552E60600596310 /* libaldmb.a */,
 				6041A8971552E8C400596310 /* libbz2.dylib */,
