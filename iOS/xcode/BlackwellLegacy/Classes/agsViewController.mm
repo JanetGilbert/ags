@@ -3,7 +3,7 @@
 #import "agsViewController.h"
 #import "EAGLView.h"
 #import "keycode.h"
-#import <Crashlytics/Crashlytics.h>
+//#import <Crashlytics/Crashlytics.h>
 
 #import "AppSpecificValues.h"
 //#import "GameCenterManager.h"
@@ -134,7 +134,7 @@ extern "C" int ios_is_keyboard_visible()
 
 - (void)showKeyboard
 {
-    //[[Crashlytics sharedInstance] crash]; // j ono a bug
+
     //int *x = NULL; *x = 42; // j ono a bug
     //[NSObject doesNotRecognizeSelector]; // j ono an exception
 	if (!self.isKeyboardActive)
