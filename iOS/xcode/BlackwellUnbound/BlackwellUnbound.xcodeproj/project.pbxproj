@@ -2851,7 +2851,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer: David Gilbert (V72VMZY53F)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				"CODE_SIGN_RESOURCE_RULES_PATH[sdk=*]" = "";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2900,7 +2901,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: WADJET EYE GAMES, LLC (69P49K3LPW)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2922,8 +2924,8 @@
 				);
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_NAME = BlackwellUnbound;
-				PROVISIONING_PROFILE = "3793C245-4935-4B9D-881F-B3093EDA2BA6";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "3793C245-4935-4B9D-881F-B3093EDA2BA6";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "DC3E6BEF-37E4-4E56-9F9D-815888A9C35B";
 				SDKROOT = iphoneos;
 				STRIPFLAGS = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
