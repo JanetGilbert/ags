@@ -12,6 +12,7 @@
 		116DA9D217764E5600CBD3FC /* agsAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 116DA9CD17764E5600CBD3FC /* agsAppDelegate.mm */; };
 		116DA9D317764E5600CBD3FC /* agsViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 116DA9CF17764E5600CBD3FC /* agsViewController.mm */; };
 		116DA9D417764E5600CBD3FC /* EAGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 116DA9D117764E5600CBD3FC /* EAGLView.m */; };
+		11851668194AA84A00C63B06 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 11851667194AA84A00C63B06 /* Default-568h@2x.png */; };
 		118957B116D3ECA9007F44A2 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 118957B016D3ECA9007F44A2 /* Default.png */; };
 		118957B316D3ECBD007F44A2 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 118957B216D3ECBD007F44A2 /* Default@2x.png */; };
 		118957B516D3EFA5007F44A2 /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 118957B416D3EFA5007F44A2 /* Default-Landscape~ipad.png */; };
@@ -381,13 +382,14 @@
 		1143DB241821A16E00CEDF7A /* Default-Landscape.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape.png"; sourceTree = "<group>"; };
 		1143DB251821A18300CEDF7A /* Default-Landscape@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape@2x.png"; sourceTree = "<group>"; };
 		1143DB261821A1F000CEDF7A /* icon_120x120.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_120x120.png; sourceTree = "<group>"; };
-		115073F71949D9E900D4F9E1 /* Default~iphone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default~iphone.png"; sourceTree = "<group>"; };
+		115073F71949D9E900D4F9E1 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		116DA9CC17764E5600CBD3FC /* agsAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = agsAppDelegate.h; sourceTree = "<group>"; };
 		116DA9CD17764E5600CBD3FC /* agsAppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = agsAppDelegate.mm; sourceTree = "<group>"; };
 		116DA9CE17764E5600CBD3FC /* agsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = agsViewController.h; sourceTree = "<group>"; };
 		116DA9CF17764E5600CBD3FC /* agsViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = agsViewController.mm; sourceTree = "<group>"; };
 		116DA9D017764E5600CBD3FC /* EAGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EAGLView.h; sourceTree = "<group>"; };
 		116DA9D117764E5600CBD3FC /* EAGLView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EAGLView.m; sourceTree = "<group>"; };
+		11851667194AA84A00C63B06 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		118957B016D3ECA9007F44A2 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		118957B216D3ECBD007F44A2 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		118957B416D3EFA5007F44A2 /* Default-Landscape~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape~ipad.png"; sourceTree = "<group>"; };
@@ -1152,6 +1154,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				11851667194AA84A00C63B06 /* Default-568h@2x.png */,
 				60898C2B160779D9009E152F /* Plugins */,
 				60CA3AA7160713FD00CFB3BD /* Engine */,
 				60CA39A8160713D200CFB3BD /* Common */,
@@ -1177,7 +1180,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				115073F71949D9E900D4F9E1 /* Default~iphone.png */,
+				115073F71949D9E900D4F9E1 /* Default-568h@2x.png */,
 				1194B047182890FC00D2C3CA /* Icon-48.png */,
 				1143DB1E1821A10300CEDF7A /* icon_152x152.png */,
 				1143DB1D1821A0D600CEDF7A /* icon_76x76.png */,
@@ -2438,6 +2441,7 @@
 				608498E8155CDF7000121EFE /* Icon@2x.png in Resources */,
 				1194B04F1828931C00D2C3CA /* Default-Portrait@2x.png in Resources */,
 				60BC89A8155E969700807358 /* iTunesArtwork in Resources */,
+				11851668194AA84A00C63B06 /* Default-568h@2x.png in Resources */,
 				1194B04D1828931300D2C3CA /* Default-Landscape@2x.png in Resources */,
 				60844EAD1573943400003ED0 /* MainWindow-iPad.xib in Resources */,
 				1194B04B1828930E00D2C3CA /* Default@2x~ipad.png in Resources */,
@@ -2837,8 +2841,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: David Gilbert (V72VMZY53F)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: David Gilbert (V72VMZY53F)";
 				"CODE_SIGN_RESOURCE_RULES_PATH[sdk=*]" = "";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2887,8 +2891,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: WADJET EYE GAMES, LLC (69P49K3LPW)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: WADJET EYE GAMES, LLC (69P49K3LPW)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2911,7 +2915,7 @@
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_NAME = BlackwellUnbound;
 				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "DC3E6BEF-37E4-4E56-9F9D-815888A9C35B";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "E6420EE3-5726-4994-8065-02E9A56B90DE";
 				SDKROOT = iphoneos;
 				STRIPFLAGS = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
