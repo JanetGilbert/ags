@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>96E46ADA-B3B1-4DD1-9966-DAF3C8068B84</string>
+	<key>IDESourceControlProjectName</key>
+	<string>Legacy</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>BA4AFBB1-05B9-4619-88BD-221A52D323E9</key>
+		<string>ssh://github.com/JanetGilbert/ags.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>OSX/xcode/legacy/Legacy.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>BA4AFBB1-05B9-4619-88BD-221A52D323E9</key>
+		<string>../../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>ssh://github.com/JanetGilbert/ags.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>BA4AFBB1-05B9-4619-88BD-221A52D323E9</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>BA4AFBB1-05B9-4619-88BD-221A52D323E9</string>
+			<key>IDESourceControlWCCName</key>
+			<string>ags</string>
+		</dict>
+	</array>
+</dict>
+</plist>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>42DB9F00-C5CE-497B-8B80-740ED4D13384</string>
+	<key>IDESourceControlProjectName</key>
+	<string>Shivah</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>3696291C-62A0-46F4-A4B7-0684C58E7A25</key>
+		<string>ssh://github.com/JanetGilbert/ags.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>OSX/xcode/shivah/Shivah.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>3696291C-62A0-46F4-A4B7-0684C58E7A25</key>
+		<string>../../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>ssh://github.com/JanetGilbert/ags.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>3696291C-62A0-46F4-A4B7-0684C58E7A25</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>3696291C-62A0-46F4-A4B7-0684C58E7A25</string>
+			<key>IDESourceControlWCCName</key>
+			<string>ags</string>
+		</dict>
+	</array>
+</dict>
+</plist>
