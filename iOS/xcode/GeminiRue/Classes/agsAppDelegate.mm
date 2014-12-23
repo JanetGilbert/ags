@@ -2,14 +2,14 @@
 #import "agsAppDelegate.h"
 #import "agsViewController.h"
 
-/*#define TESTFLIGHT 1
+#define TESTFLIGHT 1
 
 #ifdef TESTFLIGHT
 #import "TestFlight.h"
-#endif*/
+#endif
 
 
-#import <Crashlytics/Crashlytics.h>
+//#import <Crashlytics/Crashlytics.h>
 
 
 @implementation agsAppDelegate
@@ -33,7 +33,8 @@ extern "C" void ios_resume_sound();
     [TestFlight setDeviceIdentifier:[[UIDevice currentDevice] uniqueIdentifier]]; //j must NOT be in release build
     [TestFlight takeOff:@"8897920d3d667b72496a97c996cc98c0_MTYyMzU0MjAxMi0xMi0wNCAxNjo1MDozOS4wMzM4MjY"];
 #endif*/
-    [Crashlytics startWithAPIKey:@"632ccb316e88010c5d7b793d4bf069e57fbf624e"];
+   // [Crashlytics startWithAPIKey:@"632ccb316e88010c5d7b793d4bf069e57fbf624e"];
+    [TestFlight takeOff:@"c9137613-fef6-4da8-9457-a32574950e4f"];
 	return YES;
 }
 

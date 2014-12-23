@@ -3,7 +3,7 @@
 #import "agsViewController.h"
 #import "EAGLView.h"
 #import "keycode.h"
-#import <Crashlytics/Crashlytics.h>
+//#import <Crashlytics/Crashlytics.h>
 
 #import "AppSpecificValues.h"
 //#import "GameCenterManager.h"
