@@ -33,7 +33,7 @@ public:
 
   inline ~PThreadMutex()
   {
-    Unlock();
+    //j Unlock();
     pthread_mutex_destroy(&_mutex);
   }
 

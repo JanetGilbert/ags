@@ -410,6 +410,21 @@
 		11AD4AD61A48A0FF0049012D /* TestFlight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestFlight.h; sourceTree = "<group>"; };
 		11B1EBAC16920D470038348A /* liballeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liballeg.a; path = ../../nativelibs/fat/lib/liballeg.a; sourceTree = "<group>"; };
 		11E10A5D16CF015200349298 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		11E6E1C01A49B5550088F249 /* library_dummy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = library_dummy.h; path = util/library_dummy.h; sourceTree = "<group>"; };
+		11E6E1C11A49B5550088F249 /* library_posix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = library_posix.h; path = util/library_posix.h; sourceTree = "<group>"; };
+		11E6E1C21A49B5550088F249 /* library_psp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = library_psp.h; path = util/library_psp.h; sourceTree = "<group>"; };
+		11E6E1C31A49B5550088F249 /* library_windows.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = library_windows.h; path = util/library_windows.h; sourceTree = "<group>"; };
+		11E6E1C41A49B5550088F249 /* library.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = library.h; path = util/library.h; sourceTree = "<group>"; };
+		11E6E1C51A49B5550088F249 /* mutex_base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mutex_base.h; path = util/mutex_base.h; sourceTree = "<group>"; };
+		11E6E1C61A49B5550088F249 /* mutex_psp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mutex_psp.h; path = util/mutex_psp.h; sourceTree = "<group>"; };
+		11E6E1C71A49B5550088F249 /* mutex_pthread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mutex_pthread.h; path = util/mutex_pthread.h; sourceTree = "<group>"; };
+		11E6E1C81A49B5550088F249 /* mutex_wii.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mutex_wii.h; path = util/mutex_wii.h; sourceTree = "<group>"; };
+		11E6E1C91A49B5550088F249 /* mutex_windows.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mutex_windows.h; path = util/mutex_windows.h; sourceTree = "<group>"; };
+		11E6E1CA1A49B5550088F249 /* mutex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mutex.h; path = util/mutex.h; sourceTree = "<group>"; };
+		11E6E1CB1A49B5550088F249 /* thread_psp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = thread_psp.h; path = util/thread_psp.h; sourceTree = "<group>"; };
+		11E6E1CC1A49B5550088F249 /* thread_pthread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = thread_pthread.h; path = util/thread_pthread.h; sourceTree = "<group>"; };
+		11E6E1CD1A49B5550088F249 /* thread_windows.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = thread_windows.h; path = util/thread_windows.h; sourceTree = "<group>"; };
+		11E6E1CE1A49B5550088F249 /* thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = thread.h; path = util/thread.h; sourceTree = "<group>"; };
 		11EF2BB717BABA100005FE0A /* ac2game.dat */ = {isa = PBXFileReference; lastKnownFileType = file; name = ac2game.dat; path = game/ac2game.dat; sourceTree = SOURCE_ROOT; };
 		11EF2BB917BABA100005FE0A /* ios_ipad.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios_ipad.cfg; path = game/ios_ipad.cfg; sourceTree = SOURCE_ROOT; };
 		11EF2BBA17BABA100005FE0A /* ios_iphone.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios_iphone.cfg; path = game/ios_iphone.cfg; sourceTree = SOURCE_ROOT; };
@@ -1172,6 +1187,28 @@
 			path = TestFlightSDK3.0.2;
 			sourceTree = "<group>";
 		};
+		11E6E1BF1A49B5350088F249 /* util */ = {
+			isa = PBXGroup;
+			children = (
+				11E6E1C01A49B5550088F249 /* library_dummy.h */,
+				11E6E1C11A49B5550088F249 /* library_posix.h */,
+				11E6E1C21A49B5550088F249 /* library_psp.h */,
+				11E6E1C31A49B5550088F249 /* library_windows.h */,
+				11E6E1C41A49B5550088F249 /* library.h */,
+				11E6E1C51A49B5550088F249 /* mutex_base.h */,
+				11E6E1C61A49B5550088F249 /* mutex_psp.h */,
+				11E6E1C71A49B5550088F249 /* mutex_pthread.h */,
+				11E6E1C81A49B5550088F249 /* mutex_wii.h */,
+				11E6E1C91A49B5550088F249 /* mutex_windows.h */,
+				11E6E1CA1A49B5550088F249 /* mutex.h */,
+				11E6E1CB1A49B5550088F249 /* thread_psp.h */,
+				11E6E1CC1A49B5550088F249 /* thread_pthread.h */,
+				11E6E1CD1A49B5550088F249 /* thread_windows.h */,
+				11E6E1CE1A49B5550088F249 /* thread.h */,
+			);
+			name = util;
+			sourceTree = "<group>";
+		};
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -1680,6 +1717,7 @@
 		60CA3AA7160713FD00CFB3BD /* Engine */ = {
 			isa = PBXGroup;
 			children = (
+				11E6E1BF1A49B5350088F249 /* util */,
 				60CA3AA8160713FD00CFB3BD /* ac */,
 				60CA3BAB160713FE00CFB3BD /* debug */,
 				60CA3BB7160713FE00CFB3BD /* device */,

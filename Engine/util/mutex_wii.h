@@ -33,7 +33,7 @@ public:
 
   inline ~Mutex()
   {
-    Unlock();
+    //j Unlock();
     LWP_MutexDestroy(_mutex);
   }
 

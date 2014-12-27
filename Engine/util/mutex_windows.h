@@ -41,7 +41,7 @@ public:
 
   ~WindowsMutex()
   {
-    Unlock();
+    //j Unlock();
 
     _ASSERT(_mutex != NULL);
 

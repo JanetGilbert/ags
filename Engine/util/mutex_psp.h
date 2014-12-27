@@ -35,7 +35,7 @@ public:
 
   ~PSPMutex()
   {
-    Unlock();
+    //j Unlock();
     sceKernelDeleteSema(_mutex);
   }
 
