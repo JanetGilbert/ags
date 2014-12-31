@@ -14,7 +14,7 @@ cd $FILENAME
 patch -p0 < ../../../patches/liballegro-4.4.2.patch
 patch -p0 < ../../../patches/armv7/liballegro-4.4.2.patch
 
-cmake -G "Unix Makefiles" -DWANT_TESTS=off -DWANT_EXAMPLES=off -DWANT_TOOLS=off -DWANT_LOGG=off -DWANT_ALLEGROGL=off -DSHARED=off -DCMAKE_CXX_FLAGS="-fno-rtti -fno-exceptions" -DCMAKE_TOOLCHAIN_FILE=cmake/Toolchain-ios-gcc.cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/../../../nativelibs/armv7 .
+cmake -G "Unix Makefiles" -DWANT_TESTS=off -DWANT_EXAMPLES=off -DWANT_TOOLS=off -DWANT_LOGG=off -DWANT_ALLEGROGL=off -DSHARED=off -DCMAKE_CXX_FLAGS="-fno-rtti -fno-exceptions" -DCMAKE_TOOLCHAIN_FILE=cmake/Toolchain-ios-gcc.cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/../../nativelibs/fat .
 
 make
 make install
