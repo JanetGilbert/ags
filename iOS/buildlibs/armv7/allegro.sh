@@ -5,7 +5,7 @@ source ./setenv.sh
 FILENAME=allegro-4.4.2
 EXTENSION=tar.gz
 
-wget -c http://downloads.sourceforge.net/project/alleg/allegro/4.4.2/$FILENAME.$EXTENSION -O ../$FILENAME.$EXTENSION
+wget -c http://sourceforge.net/projects/alleg/files/allegro/4.4.2/$FILENAME.$EXTENSION -O ../$FILENAME.$EXTENSION
 
 tar -zxf ../$FILENAME.$EXTENSION
 
