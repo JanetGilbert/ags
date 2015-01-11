@@ -4,8 +4,8 @@ unset DEVROOT SDKROOT CFLAGS CC LD CPP CXX AR AS NM CXXCPP RANLIB LDFLAGS CPPFLA
 
 export IOS_BASE_SDK="8.1"
 export IOS_DEPLOY_TGT="4.3"
-export DEVROOT=Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer
-export SDKROOT=$DEVROOT/SDKs/iPhoneOS$IOS_BASE_SDK.sdk
+export DEVROOT=/Applications/Xcode.app/Contents/Developer
+export SDKROOT=$DEVROOT/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS$IOS_BASE_SDK.sdk
 export IOS_ADDITIONAL_LIBRARY_PATH=$(pwd)/../../nativelibs/fat
 export IOS_HOST_NAME=arm-apple-darwin10
 
