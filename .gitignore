@@ -45,3 +45,10 @@ Android/library/obj/
 Android/library/default.properties
 Android/library/project.properties
 Android/library/.classpath
+iOS/xcode/GeminiRue/game/ac2game.dat
+
+*.vox
+
+iOS/xcode/GeminiRue/game/audio.vox
+
+iOS/xcode/GeminiRue/game/speech.vox
