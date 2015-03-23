@@ -18,11 +18,12 @@
 
 #include <string.h>
 
+//j moved to alfont
 // Only a dummy. It is used in a function of alfont, but never called in AGS.
-size_t malloc_usable_size(const void* allocation)
+/*  size_t malloc_usable_size(const void* allocation)
 {
   return 0;
-}
+}*/
 
 
 #if defined (LINUX_VERSION) || defined (ANDROID_VERSION) || defined (IOS_VERSION)

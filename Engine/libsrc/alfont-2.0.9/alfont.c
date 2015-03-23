@@ -30,7 +30,7 @@
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
 
-#define _msize malloc_usable_size
+//j moved dummy function below #define _msize malloc_usable_size
 
 /* structs */
 
@@ -79,11 +79,13 @@ static FT_Library ft_library;
 static int alfont_textmode = 0;
 static int alfont_inited = 0;
 
-//j copy/pasted from libc.c 
-size_t malloc_usable_size(const void* allocation)
+
+//j dummy function, was malloc_usable_size
+size_t _msize(const void* allocation)
 {
     return 0;
 }
+
 
 char* alfont_get_name(ALFONT_FONT *f)
 {
