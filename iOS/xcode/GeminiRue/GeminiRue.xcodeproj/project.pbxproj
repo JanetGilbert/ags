@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		113288CC1AC1B1AE00E4A99E /* libtheora.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6041A8611552E60600596310 /* libtheora.a */; };
 		113B32AF1AB9FC5600A4234D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 113B32AE1AB9FC5600A4234D /* Images.xcassets */; };
 		119769CE1AB3589800048EE1 /* ac2game.dat in Resources */ = {isa = PBXBuildFile; fileRef = 119769C91AB3589800048EE1 /* ac2game.dat */; };
 		119769CF1AB3589800048EE1 /* audio.vox in Resources */ = {isa = PBXBuildFile; fileRef = 119769CA1AB3589800048EE1 /* audio.vox */; };
@@ -32,7 +33,6 @@
 		6041A8641552E60600596310 /* liballeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6041A85E1552E60600596310 /* liballeg.a */; };
 		6041A8651552E60600596310 /* libdumb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6041A85F1552E60600596310 /* libdumb.a */; };
 		6041A8661552E60600596310 /* libogg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6041A8601552E60600596310 /* libogg.a */; };
-		6041A8671552E60600596310 /* libtheora.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6041A8611552E60600596310 /* libtheora.a */; };
 		6041A8681552E60600596310 /* libvorbisidec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6041A8621552E60600596310 /* libvorbisidec.a */; };
 		6041A8881552E89E00596310 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6041A8871552E89E00596310 /* libz.dylib */; };
 		6041A8981552E8C400596310 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6041A8971552E8C400596310 /* libbz2.dylib */; };
@@ -1047,11 +1047,11 @@
 				28FD15080DC6FC5B0079059D /* QuartzCore.framework in Frameworks */,
 				60F49A4A155131E500A07887 /* AudioToolbox.framework in Frameworks */,
 				60CE9D9C155272CD00A52D5A /* libfreetype.a in Frameworks */,
+				113288CC1AC1B1AE00E4A99E /* libtheora.a in Frameworks */,
 				6041A8631552E60600596310 /* libaldmb.a in Frameworks */,
 				6041A8641552E60600596310 /* liballeg.a in Frameworks */,
 				6041A8651552E60600596310 /* libdumb.a in Frameworks */,
 				6041A8661552E60600596310 /* libogg.a in Frameworks */,
-				6041A8671552E60600596310 /* libtheora.a in Frameworks */,
 				6041A8681552E60600596310 /* libvorbisidec.a in Frameworks */,
 				6041A8881552E89E00596310 /* libz.dylib in Frameworks */,
 				6041A8981552E8C400596310 /* libbz2.dylib in Frameworks */,
@@ -2339,7 +2339,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export CODESIGN_ALLOCATE=/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/codesign_allocate\nif [ \"${PLATFORM_NAME}\" == \"iphoneos\" ]; then\n/Developer/iphoneentitlements401/gen_entitlements.py \"my.company.${PROJECT_NAME}\" \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/${PROJECT_NAME}.xcent\";\ncodesign -f -s \"iPhone Developer\" --entitlements \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/${PROJECT_NAME}.xcent\" \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/\"\nfi";
+			shellScript = "";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2680,7 +2680,10 @@
 					"\"$(SRCROOT)/../../nativelibs/fat/lib\"",
 					"\"$(SRCROOT)/../../../Engine\"",
 					"\"$(SRCROOT)/../../../Plugins/agslua/agslua/zlib\"",
+					/Users/janetcampbell68/Documents/ags/iOS/nativelibs/fat/lib,
 				);
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_NAME = GeminiRue;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -2707,7 +2710,9 @@
 					"\"$(SRCROOT)/../../nativelibs/fat/lib\"",
 					"\"$(SRCROOT)/../../../Engine\"",
 					"\"$(SRCROOT)/../../../Plugins/agslua/agslua/zlib\"",
+					/Users/janetcampbell68/Documents/ags/iOS/nativelibs/fat/lib,
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = GeminiRue;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -2744,7 +2749,8 @@
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1.1;
 				LIBRARY_SEARCH_PATHS = "${SOURCE_ROOT}/../../nativelibs/fat/lib";
-				OTHER_CODE_SIGN_FLAGS = "-gta";
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CODE_SIGN_FLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PREBINDING = NO;
 				PROVISIONING_PROFILE = "a1019c06-aad7-42c0-ba7e-bd6493a3d8c4";
@@ -2780,6 +2786,7 @@
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1.1;
 				LIBRARY_SEARCH_PATHS = "${SOURCE_ROOT}/../../nativelibs/fat/lib";
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PREBINDING = NO;
