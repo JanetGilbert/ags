@@ -572,6 +572,8 @@ void AGSIOS::WriteConsole(const char *text, ...) {
 void startEngine(char* filename, char* directory, int loadLastSave)
 {
   strcpy(psp_game_file_name, filename);
+    
+  sprintf(saveGameDirectory, "%s/", directory); //JG
 
   // Get the base directory (usually "/sdcard/ags").
   chdir(directory);

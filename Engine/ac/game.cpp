@@ -188,7 +188,11 @@ MoveList *mls = NULL;
 
 //=============================================================================
 
+#if defined(IOS_VERSION)
+char saveGameDirectory[260] = "/"; //JG
+#else
 char saveGameDirectory[260] = "./";
+#endif
 int want_quit = 0;
 
 const char* sgnametemplate = "agssave.%03d";
