@@ -40,7 +40,7 @@ extern "C"
 	int ios_poll_mouse_buttons()
 	{
 		int temp_button = mouse_button;
-		mouse_button = 0;
+		// mouse_button = 0; //JG - Drag'n'Drop
 		return temp_button;
 	}
 
@@ -258,7 +258,8 @@ extern "C" int ios_is_keyboard_visible()
 
 // Touching
 
-
+//JG - Drag'n'Drop
+/*
 - (IBAction)handleSingleFingerTap:(UIGestureRecognizer *)sender
 {
 	mouse_button = 1;
@@ -267,7 +268,7 @@ extern "C" int ios_is_keyboard_visible()
 - (IBAction)handleTwoFingerTap:(UIGestureRecognizer *)sender
 {
 	mouse_button = 2;
-}
+}*/
 
 
 - (void)moveViewAnimated:(BOOL)upwards duration:(float)duration
@@ -288,6 +289,8 @@ extern "C" int ios_is_keyboard_visible()
 	[UIView commitAnimations];
 }
 
+//JG - Drag'n'Drop
+/*
 - (IBAction)handleLongPress:(UIGestureRecognizer *)sender
 {
 	if (sender.state != UIGestureRecognizerStateBegan)
@@ -309,7 +312,7 @@ extern "C" int ios_is_keyboard_visible()
 	  return;
 
 	mouse_button = 10;
-}
+}*/
 
 - (void)touchesMoved:(NSSet*)touches withEvent:(UIEvent*)event
 {
@@ -317,6 +320,7 @@ extern "C" int ios_is_keyboard_visible()
 	CGPoint touchPoint = [touch locationInView:self.view];	
 	mouse_position_x = touchPoint.x;
 	mouse_position_y = touchPoint.y;
+    mouse_button=1; //JG - Drag'n'Drop
 }
 
 -(void)touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event
@@ -325,11 +329,23 @@ extern "C" int ios_is_keyboard_visible()
 	CGPoint touchPoint = [touch locationInView:self.view];	
 	mouse_position_x = touchPoint.x;
 	mouse_position_y = touchPoint.y;
+    mouse_button=1; //JG - Drag'n'Drop
+}
+
+//JG - Drag'n'Drop
+-(void)touchesEnded:(NSSet*)touches withEvent:(UIEvent*)event
+{
+    UITouch* touch = [touches anyObject];
+    CGPoint touchPoint = [touch locationInView:self.view];
+    mouse_position_x = touchPoint.x;
+    mouse_position_y = touchPoint.y;
+    mouse_button=0;
 }
 
 - (void)createGestureRecognizers
 {
-	UITapGestureRecognizer* singleFingerTap = [[UITapGestureRecognizer alloc]
+    //JG - Drag'n'Drop
+	/*UITapGestureRecognizer* singleFingerTap = [[UITapGestureRecognizer alloc]
 	initWithTarget:self action:@selector(handleSingleFingerTap:)];
 	singleFingerTap.numberOfTapsRequired = 1;
 	singleFingerTap.numberOfTouchesRequired = 1;
@@ -354,7 +370,7 @@ extern "C" int ios_is_keyboard_visible()
 	shortLongPressGesture.minimumPressDuration = 0.7;
 	[shortLongPressGesture requireGestureRecognizerToFail:longPressGesture];
 	[self.view addGestureRecognizer:shortLongPressGesture];
-	[shortLongPressGesture release];
+	[shortLongPressGesture release];*/
 }
 
 

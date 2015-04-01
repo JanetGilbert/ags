@@ -533,6 +533,7 @@ void game_loop_check_controls(bool checkControls)
     // don't let the player do anything before the screen fades in
     if ((in_new_room == 0) && (checkControls)) {
         int inRoom = displayed_room;
+        mgetgraphpos(); //JG - Drag'n'Drop
         check_controls();
         // If an inventory interaction changed the room
         if (inRoom != displayed_room)

@@ -426,6 +426,8 @@ void GUIMain::poll()
 
 void GUIMain::mouse_but_down()
 {
+  poll(); //JG - Drag'n'Drop
+    
   if (mouseover < 0)
     return;
 

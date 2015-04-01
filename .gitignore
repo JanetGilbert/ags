@@ -52,3 +52,5 @@ iOS/xcode/GeminiRue/game/ac2game.dat
 iOS/xcode/GeminiRue/game/audio.vox
 
 iOS/xcode/GeminiRue/game/speech.vox
+
+*.xcuserstate
