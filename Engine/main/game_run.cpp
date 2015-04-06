@@ -248,6 +248,13 @@ void check_controls() {
         }
     }
     else if ((wasbutdown>0) && (!misbuttondown(wasbutdown-1))) {
+        
+        //JG - click past dialogues on mouse up
+        if (is_text_overlay > 0) {
+            if (play.cant_skip_speech & SKIP_MOUSECLICK)
+                remove_screen_overlay(OVER_TEXTMSG);
+        }
+        
         guis[wasongui].mouse_but_up();
         int whichbut=wasbutdown;
         wasbutdown=0;
@@ -301,9 +308,12 @@ void check_controls() {
         if (play.fast_forward) { }
         else if ((play.wait_counter > 0) && (play.key_skip_wait > 1))
             play.wait_counter = -1;
-        else if (is_text_overlay > 0) {
+        /*else if (is_text_overlay > 0) { //JG - removed
             if (play.cant_skip_speech & SKIP_MOUSECLICK)
                 remove_screen_overlay(OVER_TEXTMSG);
+        }*/
+        else if (is_text_overlay > 0) { //JG - ensure that clicking past dialogues fires on mouse up.
+            wasbutdown=aa+1;
         }
         else if (!IsInterfaceEnabled()) ;  // blocking cutscene, ignore mouse
         else if (platform->RunPluginHooks(AGSE_MOUSECLICK, aa+1)) {

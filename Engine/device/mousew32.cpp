@@ -261,6 +261,21 @@ int misbuttondown(int buno)
   return FALSE;
 }
 
+// JG - Test whether button has been released this frame.
+int misbuttonreleased(int buno)
+{
+    int toret = FALSE;
+    
+    poll_mouse();
+    
+    if (mouse_b & MB_ARRAY[buno])
+        toret = FALSE;
+    else if (butwas & MB_ARRAY[buno])
+        toret = TRUE;
+    
+    return toret;
+}
+
 void msetgraphpos(int xa, int ya)
 { 
   position_mouse(xa, ya); // xa -= hotx; ya -= hoty;

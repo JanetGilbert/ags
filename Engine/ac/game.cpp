@@ -2564,6 +2564,12 @@ int load_game(const Common::String &path, int slotNumber)
 }
 
 void start_skipping_cutscene () {
+    
+    //JG Eensure that we can't freeze up the game by skipping a cutscene when not in a cutscene.
+    if (play.in_cutscene == 0){
+        return;
+    }
+    
     play.fast_forward = 1;
     // if a drop-down icon bar is up, remove it as it will pause the game
     if (ifacepopped>=0)
