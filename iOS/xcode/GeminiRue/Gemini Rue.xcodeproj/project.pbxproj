@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		113288CC1AC1B1AE00E4A99E /* libtheora.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6041A8611552E60600596310 /* libtheora.a */; };
 		113B32AF1AB9FC5600A4234D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 113B32AE1AB9FC5600A4234D /* Images.xcassets */; };
+		11558C6F1AD2FFC30044CACD /* agswadjetutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11558C6D1AD2FFC30044CACD /* agswadjetutil.cpp */; };
 		119769CE1AB3589800048EE1 /* ac2game.dat in Resources */ = {isa = PBXBuildFile; fileRef = 119769C91AB3589800048EE1 /* ac2game.dat */; };
 		119769CF1AB3589800048EE1 /* audio.vox in Resources */ = {isa = PBXBuildFile; fileRef = 119769CA1AB3589800048EE1 /* audio.vox */; };
 		119769D01AB3589800048EE1 /* ios_ipad.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 119769CB1AB3589800048EE1 /* ios_ipad.cfg */; };
@@ -339,6 +340,8 @@
 
 /* Begin PBXFileReference section */
 		113B32AE1AB9FC5600A4234D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = GeminiRue/Images.xcassets; sourceTree = "<group>"; };
+		11558C6D1AD2FFC30044CACD /* agswadjetutil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = agswadjetutil.cpp; path = agswadjetutil/agswadjetutil.cpp; sourceTree = "<group>"; };
+		11558C6E1AD2FFC30044CACD /* agswadjetutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = agswadjetutil.h; path = agswadjetutil/agswadjetutil.h; sourceTree = "<group>"; };
 		119769C91AB3589800048EE1 /* ac2game.dat */ = {isa = PBXFileReference; lastKnownFileType = file; name = ac2game.dat; path = game/ac2game.dat; sourceTree = "<group>"; };
 		119769CA1AB3589800048EE1 /* audio.vox */ = {isa = PBXFileReference; lastKnownFileType = file; name = audio.vox; path = game/audio.vox; sourceTree = "<group>"; };
 		119769CB1AB3589800048EE1 /* ios_ipad.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios_ipad.cfg; path = game/ios_ipad.cfg; sourceTree = "<group>"; };
@@ -1074,6 +1077,15 @@
 			path = Classes;
 			sourceTree = "<group>";
 		};
+		11558C6C1AD2FEAE0044CACD /* AGSWadjetUtil */ = {
+			isa = PBXGroup;
+			children = (
+				11558C6D1AD2FFC30044CACD /* agswadjetutil.cpp */,
+				11558C6E1AD2FFC30044CACD /* agswadjetutil.h */,
+			);
+			name = AGSWadjetUtil;
+			sourceTree = "<group>";
+		};
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -1164,6 +1176,7 @@
 		60898C2B160779D9009E152F /* Plugins */ = {
 			isa = PBXGroup;
 			children = (
+				11558C6C1AD2FEAE0044CACD /* AGSWadjetUtil */,
 				608778461699CE3000015533 /* ags_parallax */,
 				60898C2C160779D9009E152F /* agsblend */,
 				60898C39160779D9009E152F /* AGSflashlight */,
@@ -2430,6 +2443,7 @@
 				60CA3D48160713FF00CFB3BD /* cc_object.cpp in Sources */,
 				60CA3D49160713FF00CFB3BD /* cc_region.cpp in Sources */,
 				60CA3D4A160713FF00CFB3BD /* cc_serializer.cpp in Sources */,
+				11558C6F1AD2FFC30044CACD /* agswadjetutil.cpp in Sources */,
 				60CA3D4B160713FF00CFB3BD /* managedobjectpool.cpp in Sources */,
 				60CA3D4C160713FF00CFB3BD /* scriptdatetime.cpp in Sources */,
 				60CA3D4D160713FF00CFB3BD /* scriptdialogoptionsrendering.cpp in Sources */,
