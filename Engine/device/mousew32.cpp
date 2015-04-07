@@ -232,7 +232,13 @@ void mloadwcursor(char *namm)
 }
 
 int butwas = 0;
-int mgetbutton()
+
+void mupdatebuttonrelease() //JG
+{
+    butwas = mouse_b;
+}
+
+int mgetbutton(bool checkrelease=true)
 {
   int toret = NONE;
   poll_mouse();
@@ -248,7 +254,10 @@ int mgetbutton()
   else if (butis & 4)
     toret = MIDDLE;
 
-  butwas = butis;
+  if (checkrelease){ //JG
+      butwas = mouse_b;
+  }
+    
   return toret;
 }
 

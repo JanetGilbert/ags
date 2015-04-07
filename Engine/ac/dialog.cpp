@@ -66,7 +66,9 @@ extern AGSPlatformDriver *platform;
 extern int cur_mode,cur_cursor;
 extern Bitmap *virtual_screen;
 extern IGraphicsDriver *gfxDriver;
+
 extern int  misbuttonreleased(int);  //JG
+extern void mupdatebuttonrelease(); //JG
 
 DialogTopic *dialog;
 ScriptDialogOptionsRendering ccDialogOptionsRendering;
@@ -877,10 +879,11 @@ int show_dialog_options(int dlgnum, int sayChosenOption, bool runGameLoopsInBack
 
       //JG, we need the conversation to fire on mouse up (not mouse down) for iOS.
       int mouseButtonPressed=NONE;
+      mgetbutton(false);
       if (misbuttonreleased(0)){
           mouseButtonPressed=LEFT;
       }
-      mgetbutton();
+      mupdatebuttonrelease();
 
       if (mouseButtonPressed != NONE) {
         if (mouseison < 0) 

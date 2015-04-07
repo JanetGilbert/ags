@@ -341,7 +341,7 @@ void IAGSEngine::BlitSpriteRotated(int32 x, int32 y, BITMAP *bmp, int32 angle) {
 }
 
 extern void domouse(int);
-extern int  mgetbutton();
+extern int  mgetbutton(bool checkrelease);
 
 void IAGSEngine::PollSystem () {
 

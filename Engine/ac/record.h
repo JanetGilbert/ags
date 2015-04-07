@@ -46,7 +46,7 @@ int  rec_kbhit ();
 int  rec_iskeypressed (int keycode);
 int  rec_isSpeechFinished ();
 int  rec_misbuttondown (int but);
-int  rec_mgetbutton();
+int  rec_mgetbutton(bool checkrelease=true);
 void rec_domouse (int what);
 int  check_mouse_wheel ();
 void start_recording();
