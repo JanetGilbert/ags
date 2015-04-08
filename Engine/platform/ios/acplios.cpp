@@ -456,20 +456,25 @@ int ReadInteger(int* variable, char* section, char* name, int minimum, int maxim
 
 int ReadString(char* variable, char* section, char* name, char* default_value)
 {
-  if (reset_configuration)
-  {
-    strcpy(variable, default_value);
-    return 0;
-  }
-
-  char* temp = INIreaditem(section, name);
-
-  if (temp == NULL)
-    temp = default_value;
-
-  strcpy(variable, temp);
-
-  return 1;
+    if (reset_configuration)
+    {
+        strcpy(variable, default_value);
+        return 0;
+    }
+    
+    char* temp = INIreaditem(section, name);
+    char* to_copy=temp; //JG
+    
+    if (to_copy == NULL)
+        to_copy = default_value;
+    
+    strcpy(variable, to_copy);
+    
+    if (temp != NULL){
+        free(temp); // JG - fix memory leak.
+    }
+    
+    return 1;
 }
 
 
