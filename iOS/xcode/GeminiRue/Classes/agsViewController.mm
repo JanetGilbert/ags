@@ -588,5 +588,9 @@ void ios_show_message_box(char* buffer)
 	// Release any cached data, images, etc. that aren't in use.
 }
 
+- (BOOL) prefersStatusBarHidden
+{
+    return YES;
+}
 
 @end

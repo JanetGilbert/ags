@@ -19,5 +19,6 @@
 - (void)createGestureRecognizers;
 - (void)createKeyboardButtonBar:(int)openedKeylist;
 - (void)moveViewAnimated:(BOOL)upwards duration:(float)duration;
+- (BOOL) prefersStatusBarHidden; //JG
 
 @end
