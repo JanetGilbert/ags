@@ -108,6 +108,13 @@ int rec_getch () {
     return result;  
 }
 
+void call_simulate_keypress(int keycode)
+{
+    #ifdef ALLEGRO_KEYBOARD_HANDLER
+        simulate_keypress(keycode);
+    #endif
+}
+
 int rec_kbhit () {
     if ((play.playback) && (recordbuffer != NULL)) {
         // check for real keypresses to abort the replay

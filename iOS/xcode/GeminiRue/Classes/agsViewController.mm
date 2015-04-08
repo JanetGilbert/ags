@@ -2,10 +2,13 @@
 
 #import "agsViewController.h"
 #import "EAGLView.h"
+#import "keycode.h"
 
 // From the engine
 extern void startEngine(char* filename, char* directory, int loadLastSave);
 extern int psp_rotation;
+extern void start_skipping_cutscene(); //JG
+extern void call_simulate_keypress(int keycode); //JG
 extern void check_skip_cutscene_drag(int startx, int starty, int endx, int endy); //JG
 
 
@@ -81,6 +84,17 @@ extern "C"
 {
 	return YES;
 }
+
+//JG - Allows script to fake a keypress.
+extern "C" void fakekey(int keypress)
+{
+    if (keypress == AGS_KEYCODE_DELETE) {
+        keypress = 8;
+    }
+    
+    call_simulate_keypress(keypress);
+}
+
 
 int lastChar;
 
