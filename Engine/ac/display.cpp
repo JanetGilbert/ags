@@ -63,6 +63,9 @@ extern int spritewidth[MAX_SPRITES],spriteheight[MAX_SPRITES];
 extern SpriteCache spriteset;
 extern DynamicArray<GUIButton> guibuts;
 
+extern int misbuttonreleased(int buno); //JG
+extern void mupdatebuttonrelease(); //JG
+
 int display_message_aschar=0;
 char *heightTestString = "ZHwypgfjqhkilIK";
 
@@ -265,7 +268,16 @@ int _display_main(int xx,int yy,int wii,char*todis,int blocking,int usingfont,in
             render_graphics();
 
             update_polled_audio_and_crossfade();
-            if (mgetbutton()>NONE) {
+            //JG Skipping "Display()" boxes should trigger on mouse up, not mouse down.
+            int mouseButtonPressed=NONE;
+            mgetbutton(false);
+            if (misbuttonreleased(0)){
+                mouseButtonPressed=LEFT;
+            }
+           
+            mupdatebuttonrelease();
+            
+            if (mouseButtonPressed != NONE) {
                 // If we're allowed, skip with mouse
                 if (skip_setting & SKIP_MOUSECLICK)
                     break;
