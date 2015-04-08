@@ -37,6 +37,9 @@ int mouse_relative_position_y = 0;
 int mouse_start_position_x = 0; //JG
 int mouse_start_position_y = 0;
 
+extern "C" float ios_mouse_scaling_x; //JG
+extern "C" float ios_mouse_scaling_y;
+
 extern "C"
 {
 	int ios_poll_mouse_buttons()
@@ -58,6 +61,15 @@ extern "C"
 		*x = mouse_position_x;
 		*y = mouse_position_y;
 	}
+    
+    // JG - Set the game co-ordinates scaled to screen co-ordinates on iOS
+    void ios_set_mouse(int x, int y)
+    {
+        x = (float)x / ios_mouse_scaling_x;
+        y = (float)y / ios_mouse_scaling_y;
+        mouse_position_x=x;
+        mouse_position_y=y;
+    }
 }
 
 
