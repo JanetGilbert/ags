@@ -154,6 +154,8 @@ int in_new_room=0, new_room_was = 0;  // 1 in new room, 2 first time in new room
 int new_room_pos=0;
 int new_room_x = SCR_NO_VALUE, new_room_y = SCR_NO_VALUE;
 
+volatile bool set_cutscene_to_skip=false; //JG
+
 //Bitmap *spriteset[MAX_SPRITES+1];
 //SpriteCache spriteset (MAX_SPRITES+1);
 // initially size 1, this will be increased by the initFile function
@@ -2563,13 +2565,22 @@ int load_game(const Common::String &path, int slotNumber)
     return 0;
 }
 
+// JG
+void prepare_cutscene_skip(){
+    if (play.in_cutscene == 0 || play.fast_forward){
+        return;
+    }
+    set_cutscene_to_skip=true;
+}
+
 void start_skipping_cutscene () {
     
     //JG Eensure that we can't freeze up the game by skipping a cutscene when not in a cutscene.
-    if (play.in_cutscene == 0){
+    if (play.in_cutscene == 0 || play.fast_forward || !set_cutscene_to_skip){
         return;
     }
     
+    set_cutscene_to_skip = false;
     play.fast_forward = 1;
     // if a drop-down icon bar is up, remove it as it will pause the game
     if (ifacepopped>=0)
@@ -2581,13 +2592,29 @@ void start_skipping_cutscene () {
 
 }
 
+// JG - detect player dragging from left to right at the top of the screen, in order to skip a cutscene.
+void check_skip_cutscene_drag(int startx, int starty, int endx, int endy)
+{
+    if (play.in_cutscene==1  && play.fast_forward==0){
+        int scrw = System_GetScreenWidth();
+        int scrh = System_GetScreenHeight();
+        int scr_limit_x = scrw/4;
+        int scr_limit_y = (scrh/8)*3;
+        int distx=abs(startx-endx);
+        
+        if (distx>scr_limit_x && starty<scr_limit_y && endy<scr_limit_y){
+            prepare_cutscene_skip();
+        }
+    }
+}
+
 void check_skip_cutscene_keypress (int kgn) {
 
     if ((play.in_cutscene > 0) && (play.in_cutscene != 3)) {
         if ((kgn != 27) && ((play.in_cutscene == 1) || (play.in_cutscene == 5)))
             ;
         else
-            start_skipping_cutscene();
+            prepare_cutscene_skip(); //JG
     }
 
 }

@@ -6,7 +6,7 @@
 // From the engine
 extern void startEngine(char* filename, char* directory, int loadLastSave);
 extern int psp_rotation;
-
+extern void check_skip_cutscene_drag(int startx, int starty, int endx, int endy); //JG
 
 
 @interface agsViewController ()
@@ -34,6 +34,8 @@ int mouse_position_x = 0;
 int mouse_position_y = 0;
 int mouse_relative_position_x = 0;
 int mouse_relative_position_y = 0;
+int mouse_start_position_x = 0; //JG
+int mouse_start_position_y = 0;
 
 extern "C"
 {
@@ -331,6 +333,8 @@ extern "C" int ios_is_keyboard_visible()
 	CGPoint touchPoint = [touch locationInView:self.view];	
 	mouse_position_x = touchPoint.x;
 	mouse_position_y = touchPoint.y;
+    mouse_start_position_x = touchPoint.x; //JG
+    mouse_start_position_y = touchPoint.y;
     mouse_button=1; //JG - Drag'n'Drop
 }
 
@@ -342,6 +346,8 @@ extern "C" int ios_is_keyboard_visible()
     mouse_position_x = touchPoint.x;
     mouse_position_y = touchPoint.y;
     mouse_button=0;
+    
+    check_skip_cutscene_drag(mouse_start_position_x, mouse_start_position_y, mouse_position_x, mouse_position_y); //JG
 }
 
 - (void)createGestureRecognizers
