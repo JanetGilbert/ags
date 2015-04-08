@@ -139,7 +139,8 @@ int PlaySoundEx(int val1, int channel) {
         return -1;
 
     // that sound is already in memory, play it
-    if (!psp_audio_multithreaded)
+    //JG Caused crash in Gemini Rue Juice fight, due to large numbers of sounds playing.
+    /*if (!psp_audio_multithreaded)
     {
         if ((last_sound_played[channel] == val1) && (channels[channel] != NULL)) {
             DEBUG_CONSOLE("Playing sound %d on channel %d; cached", val1, channel);
@@ -147,7 +148,7 @@ int PlaySoundEx(int val1, int channel) {
             channels[channel]->set_volume (play.sound_volume);
             return channel;
         }
-    }
+    }*/
 
     // free the old sound
     stop_and_destroy_channel (channel);
