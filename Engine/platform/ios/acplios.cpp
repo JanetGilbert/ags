@@ -28,7 +28,8 @@
 #include "plugin/agsplugin.h"
 #include "util/string_utils.h"
 
-#define IOS_CONFIG_FILENAME "ios.cfg"
+#define IOS_IPHONE_CONFIG_FILENAME "ios_iphone.cfg"
+#define IOS_IPAD_CONFIG_FILENAME "ios_ipad.cfg"
 
 extern char* ios_document_directory;
 
@@ -78,6 +79,11 @@ extern int want_exit;
 extern void PauseGame();
 extern void UnPauseGame();
 extern int main(int argc,char*argv[]);
+
+extern "C"
+{
+    bool isPhone();
+}
 
 char psp_game_file_name[256];
 char* psp_game_file_name_pointer = psp_game_file_name;
@@ -133,6 +139,15 @@ struct AGSIOS : AGSPlatformDriver {
 };
 
 
+//JG - Allow game script to know whether we are running on iPhone or iPad.
+char * chooseConfigFilename()
+{
+    if (isPhone()){
+        return IOS_IPHONE_CONFIG_FILENAME;
+    }
+
+    return IOS_IPAD_CONFIG_FILENAME;
+}
 
 bool readConfigFile(char* directory)
 {
@@ -140,13 +155,13 @@ bool readConfigFile(char* directory)
 
   ResetConfiguration();
 
-  return ReadConfiguration(IOS_CONFIG_FILENAME, true);
+  return ReadConfiguration(chooseConfigFilename(), true);
 }
 
 
 bool writeConfigFile()
 {
-  FILE* config = fopen(IOS_CONFIG_FILENAME, "wb");
+  FILE* config = fopen(chooseConfigFilename(), "wb");
   if (config)
   {
     fprintf(config, "[misc]\n");
@@ -483,7 +498,7 @@ void ResetConfiguration()
 {
   reset_configuration = true;
 
-  ReadConfiguration(IOS_CONFIG_FILENAME, true);
+  ReadConfiguration(chooseConfigFilename(), true);
 
   reset_configuration = false;
 }
@@ -587,7 +602,7 @@ void startEngine(char* filename, char* directory, int loadLastSave)
   ResetConfiguration();
 
   // Read general configuration.
-  ReadConfiguration(IOS_CONFIG_FILENAME, true);
+  ReadConfiguration(chooseConfigFilename(), true);
 
   // Get the games path.
   char path[256];
@@ -603,7 +618,7 @@ void startEngine(char* filename, char* directory, int loadLastSave)
   setenv("ULTRADIR", "..", 1);
 
   // Read game specific configuration.
-  ReadConfiguration(IOS_CONFIG_FILENAME, false);
+  ReadConfiguration(chooseConfigFilename(), false);
 
   psp_load_latest_savegame = loadLastSave;
 

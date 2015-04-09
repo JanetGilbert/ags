@@ -28,7 +28,13 @@ char* ios_document_directory;
 
 agsViewController* agsviewcontroller;
 
+//JG Is this an iPhone or iPad?
+extern "C" bool isPhone()
+{
+    UIUserInterfaceIdiom idiom = UI_USER_INTERFACE_IDIOM();
 
+    return (idiom==UIUserInterfaceIdiomPhone);
+}
 
 // Mouse
 

@@ -68,6 +68,7 @@ namespace BitmapHelper = AGS::Common::BitmapHelper;
 #include "../Plugins/ags_parallax/ags_parallax.h"
 #if defined(IOS_VERSION)
 #include "../Plugins/agstouch/agstouch.h"
+#include "../Plugins/agswadjetutil/agswadjetutil.h"
 #endif // IOS_VERSION
 #endif // BUILTIN_PLUGINS
 
@@ -920,6 +921,19 @@ bool pl_use_builtin_plugin(EnginePlugin* apl)
         return true;
     }
 #endif // IOS_VERSION
+#if defined(IOS_VERSION)
+    //JG
+    else if (strncmp(apl->filename, "agswadjetutil", strlen("agswadjetutil")) == 0)
+    {
+        apl->engineStartup = agswadjetutil::AGS_EngineStartup;
+        apl->engineShutdown = agswadjetutil::AGS_EngineShutdown;
+        apl->onEvent = agswadjetutil::AGS_EngineOnEvent;
+        apl->debugHook = agswadjetutil::AGS_EngineDebugHook;
+        apl->initGfxHook = agswadjetutil::AGS_EngineInitGfx;
+        apl->builtin = true;
+        return true;
+    }
+#endif
 #endif // BUILTIN_PLUGINS
 
     AGS::Common::Out::FPrint("No built-in plugin found. Plugin loading failed!");
