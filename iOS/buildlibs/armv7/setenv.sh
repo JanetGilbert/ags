@@ -2,8 +2,8 @@
 
 unset DEVROOT SDKROOT CFLAGS CC LD CPP CXX AR AS NM CXXCPP RANLIB LDFLAGS CPPFLAGS CXXFLAGS
 
-export IOS_BASE_SDK="4.3"
-export IOS_DEPLOY_TGT="3.2"
+export IOS_BASE_SDK="8.3"
+export IOS_DEPLOY_TGT="5.1.1"
 
 export DEVROOT=/Developer/Platforms/iPhoneOS.platform/Developer
 export SDKROOT=$DEVROOT/SDKs/iPhoneOS$IOS_BASE_SDK.sdk
