@@ -56,3 +56,5 @@ iOS/xcode/GeminiRue/game/speech.vox
 *.xcuserstate
 
 iOS/xcode/GeminiRue/Gemini Rue.xcodeproj/project.xcworkspace/xcuserdata/janetcampbell68.xcuserdatad/UserInterfaceState.xcuserstate
+
+*.xcworkspacedata
