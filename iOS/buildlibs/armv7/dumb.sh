@@ -13,5 +13,5 @@ cd $FILENAME
 
 patch -p0 < ../../../patches/armv7/libdumb-0.9.3.patch
 
-make
-make install
+#make
+#make install
