@@ -20,20 +20,6 @@
                ReferencedContainer = "container:dumb.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "11472E381ADECAC200CFD5F2"
-               BuildableName = "dumbTests.xctest"
-               BlueprintName = "dumbTests"
-               ReferencedContainer = "container:dumb.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -42,26 +28,7 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Debug">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "11472E381ADECAC200CFD5F2"
-               BuildableName = "dumbTests.xctest"
-               BlueprintName = "dumbTests"
-               ReferencedContainer = "container:dumb.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "11472E2D1ADECAC200CFD5F2"
-            BuildableName = "libdumb.a"
-            BlueprintName = "dumb"
-            ReferencedContainer = "container:dumb.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </TestAction>
    <LaunchAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
