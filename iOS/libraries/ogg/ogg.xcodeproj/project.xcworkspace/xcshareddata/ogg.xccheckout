@@ -7,14 +7,14 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>3ED1316B-5AFA-435F-933C-5A3B654B521B</string>
 	<key>IDESourceControlProjectName</key>
-	<string>project</string>
+	<string>ogg</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>E31D27B7F1D5D506361FD284CB63F171E9FBC197</key>
 		<string>github.com:JanetGilbert/ags.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>iOS/libraries/ogg/ogg.xcodeproj/project.xcworkspace</string>
+	<string>iOS/libraries/ogg/ogg.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>E31D27B7F1D5D506361FD284CB63F171E9FBC197</key>
