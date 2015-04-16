@@ -1,0 +1,377 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		110DB3851AE05D7A00AD8976 /* ogg.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 110DB3841AE05D7A00AD8976 /* ogg.h */; };
+		110DB3871AE05D7A00AD8976 /* ogg.m in Sources */ = {isa = PBXBuildFile; fileRef = 110DB3861AE05D7A00AD8976 /* ogg.m */; };
+		110DB38D1AE05D7A00AD8976 /* libogg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 110DB3811AE05D7A00AD8976 /* libogg.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		110DB38E1AE05D7A00AD8976 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 110DB3791AE05D7A00AD8976 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 110DB3801AE05D7A00AD8976;
+			remoteInfo = ogg;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		110DB37F1AE05D7A00AD8976 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+				110DB3851AE05D7A00AD8976 /* ogg.h in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		110DB3811AE05D7A00AD8976 /* libogg.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libogg.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		110DB3841AE05D7A00AD8976 /* ogg.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ogg.h; sourceTree = "<group>"; };
+		110DB3861AE05D7A00AD8976 /* ogg.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ogg.m; sourceTree = "<group>"; };
+		110DB38C1AE05D7A00AD8976 /* oggTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = oggTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		110DB3921AE05D7A00AD8976 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		110DB37E1AE05D7A00AD8976 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		110DB3891AE05D7A00AD8976 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				110DB38D1AE05D7A00AD8976 /* libogg.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		110DB3781AE05D7A00AD8976 = {
+			isa = PBXGroup;
+			children = (
+				110DB3831AE05D7A00AD8976 /* ogg */,
+				110DB3901AE05D7A00AD8976 /* oggTests */,
+				110DB3821AE05D7A00AD8976 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		110DB3821AE05D7A00AD8976 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				110DB3811AE05D7A00AD8976 /* libogg.a */,
+				110DB38C1AE05D7A00AD8976 /* oggTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		110DB3831AE05D7A00AD8976 /* ogg */ = {
+			isa = PBXGroup;
+			children = (
+				110DB3841AE05D7A00AD8976 /* ogg.h */,
+				110DB3861AE05D7A00AD8976 /* ogg.m */,
+			);
+			path = ogg;
+			sourceTree = "<group>";
+		};
+		110DB3901AE05D7A00AD8976 /* oggTests */ = {
+			isa = PBXGroup;
+			children = (
+				110DB3911AE05D7A00AD8976 /* Supporting Files */,
+			);
+			path = oggTests;
+			sourceTree = "<group>";
+		};
+		110DB3911AE05D7A00AD8976 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				110DB3921AE05D7A00AD8976 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		110DB3801AE05D7A00AD8976 /* ogg */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 110DB3951AE05D7A00AD8976 /* Build configuration list for PBXNativeTarget "ogg" */;
+			buildPhases = (
+				110DB37D1AE05D7A00AD8976 /* Sources */,
+				110DB37E1AE05D7A00AD8976 /* Frameworks */,
+				110DB37F1AE05D7A00AD8976 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ogg;
+			productName = ogg;
+			productReference = 110DB3811AE05D7A00AD8976 /* libogg.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		110DB38B1AE05D7A00AD8976 /* oggTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 110DB3981AE05D7A00AD8976 /* Build configuration list for PBXNativeTarget "oggTests" */;
+			buildPhases = (
+				110DB3881AE05D7A00AD8976 /* Sources */,
+				110DB3891AE05D7A00AD8976 /* Frameworks */,
+				110DB38A1AE05D7A00AD8976 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				110DB38F1AE05D7A00AD8976 /* PBXTargetDependency */,
+			);
+			name = oggTests;
+			productName = oggTests;
+			productReference = 110DB38C1AE05D7A00AD8976 /* oggTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		110DB3791AE05D7A00AD8976 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0630;
+				ORGANIZATIONNAME = WadjetEyeGames;
+				TargetAttributes = {
+					110DB3801AE05D7A00AD8976 = {
+						CreatedOnToolsVersion = 6.3;
+					};
+					110DB38B1AE05D7A00AD8976 = {
+						CreatedOnToolsVersion = 6.3;
+					};
+				};
+			};
+			buildConfigurationList = 110DB37C1AE05D7A00AD8976 /* Build configuration list for PBXProject "ogg" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 110DB3781AE05D7A00AD8976;
+			productRefGroup = 110DB3821AE05D7A00AD8976 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				110DB3801AE05D7A00AD8976 /* ogg */,
+				110DB38B1AE05D7A00AD8976 /* oggTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		110DB38A1AE05D7A00AD8976 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		110DB37D1AE05D7A00AD8976 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				110DB3871AE05D7A00AD8976 /* ogg.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		110DB3881AE05D7A00AD8976 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		110DB38F1AE05D7A00AD8976 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 110DB3801AE05D7A00AD8976 /* ogg */;
+			targetProxy = 110DB38E1AE05D7A00AD8976 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		110DB3931AE05D7A00AD8976 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		110DB3941AE05D7A00AD8976 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		110DB3961AE05D7A00AD8976 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		110DB3971AE05D7A00AD8976 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		110DB3991AE05D7A00AD8976 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = oggTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		110DB39A1AE05D7A00AD8976 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = oggTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		110DB37C1AE05D7A00AD8976 /* Build configuration list for PBXProject "ogg" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				110DB3931AE05D7A00AD8976 /* Debug */,
+				110DB3941AE05D7A00AD8976 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		110DB3951AE05D7A00AD8976 /* Build configuration list for PBXNativeTarget "ogg" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				110DB3961AE05D7A00AD8976 /* Debug */,
+				110DB3971AE05D7A00AD8976 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		110DB3981AE05D7A00AD8976 /* Build configuration list for PBXNativeTarget "oggTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				110DB3991AE05D7A00AD8976 /* Debug */,
+				110DB39A1AE05D7A00AD8976 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 110DB3791AE05D7A00AD8976 /* Project object */;
+}
