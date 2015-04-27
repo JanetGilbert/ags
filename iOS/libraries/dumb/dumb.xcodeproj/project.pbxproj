@@ -7,18 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		11472E8A1ADECB0D00CFD5F2 /* alplay.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E511ADECB0D00CFD5F2 /* alplay.c */; };
-		11472E8C1ADECB0D00CFD5F2 /* datduh.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E521ADECB0D00CFD5F2 /* datduh.c */; };
-		11472E8E1ADECB0D00CFD5F2 /* datit.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E531ADECB0D00CFD5F2 /* datit.c */; };
-		11472E901ADECB0D00CFD5F2 /* datitq.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E541ADECB0D00CFD5F2 /* datitq.c */; };
-		11472E921ADECB0D00CFD5F2 /* datmod.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E551ADECB0D00CFD5F2 /* datmod.c */; };
-		11472E941ADECB0D00CFD5F2 /* datmodq.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E561ADECB0D00CFD5F2 /* datmodq.c */; };
-		11472E961ADECB0D00CFD5F2 /* dats3m.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E571ADECB0D00CFD5F2 /* dats3m.c */; };
-		11472E981ADECB0D00CFD5F2 /* dats3mq.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E581ADECB0D00CFD5F2 /* dats3mq.c */; };
-		11472E9A1ADECB0D00CFD5F2 /* datunld.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E591ADECB0D00CFD5F2 /* datunld.c */; };
-		11472E9C1ADECB0D00CFD5F2 /* datxm.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E5A1ADECB0D00CFD5F2 /* datxm.c */; };
-		11472E9E1ADECB0D00CFD5F2 /* datxmq.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E5B1ADECB0D00CFD5F2 /* datxmq.c */; };
-		11472EA01ADECB0D00CFD5F2 /* packfile.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E5C1ADECB0D00CFD5F2 /* packfile.c */; };
 		11472EA21ADECB0D00CFD5F2 /* atexit.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E5E1ADECB0D00CFD5F2 /* atexit.c */; };
 		11472EA41ADECB0D00CFD5F2 /* duhlen.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E5F1ADECB0D00CFD5F2 /* duhlen.c */; };
 		11472EA61ADECB0D00CFD5F2 /* duhtag.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E601ADECB0D00CFD5F2 /* duhtag.c */; };
@@ -61,6 +49,20 @@
 		11472EFA1ADED30E00CFD5F2 /* resample.inc in Sources */ = {isa = PBXBuildFile; fileRef = 11472EF91ADED30E00CFD5F2 /* resample.inc */; };
 		11472EFC1ADED33300CFD5F2 /* resamp2.inc in Sources */ = {isa = PBXBuildFile; fileRef = 11472EFB1ADED33300CFD5F2 /* resamp2.inc */; };
 		11472EFE1ADED34F00CFD5F2 /* resamp3.inc in Sources */ = {isa = PBXBuildFile; fileRef = 11472EFD1ADED34F00CFD5F2 /* resamp3.inc */; };
+		11F0ED391AEE9E1E00043642 /* aldmb.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 11F0ED381AEE9E1E00043642 /* aldmb.h */; };
+		11F0ED3B1AEE9E1E00043642 /* aldmb.m in Sources */ = {isa = PBXBuildFile; fileRef = 11F0ED3A1AEE9E1E00043642 /* aldmb.m */; };
+		11F0ED4D1AEE9E3800043642 /* alplay.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E511ADECB0D00CFD5F2 /* alplay.c */; };
+		11F0ED4E1AEE9E3800043642 /* datduh.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E521ADECB0D00CFD5F2 /* datduh.c */; };
+		11F0ED4F1AEE9E3800043642 /* datit.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E531ADECB0D00CFD5F2 /* datit.c */; };
+		11F0ED501AEE9E3800043642 /* datitq.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E541ADECB0D00CFD5F2 /* datitq.c */; };
+		11F0ED511AEE9E3800043642 /* datmod.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E551ADECB0D00CFD5F2 /* datmod.c */; };
+		11F0ED521AEE9E3800043642 /* datmodq.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E561ADECB0D00CFD5F2 /* datmodq.c */; };
+		11F0ED531AEE9E3800043642 /* dats3m.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E571ADECB0D00CFD5F2 /* dats3m.c */; };
+		11F0ED541AEE9E3800043642 /* dats3mq.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E581ADECB0D00CFD5F2 /* dats3mq.c */; };
+		11F0ED551AEE9E3800043642 /* datunld.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E591ADECB0D00CFD5F2 /* datunld.c */; };
+		11F0ED561AEE9E3800043642 /* datxm.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E5A1ADECB0D00CFD5F2 /* datxm.c */; };
+		11F0ED571AEE9E3800043642 /* datxmq.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E5B1ADECB0D00CFD5F2 /* datxmq.c */; };
+		11F0ED581AEE9E3800043642 /* packfile.c in Sources */ = {isa = PBXBuildFile; fileRef = 11472E5C1ADECB0D00CFD5F2 /* packfile.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -70,6 +72,16 @@
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		11F0ED341AEE9E1E00043642 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+				11F0ED391AEE9E1E00043642 /* aldmb.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -136,10 +148,20 @@
 		11472EF91ADED30E00CFD5F2 /* resample.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = resample.inc; sourceTree = "<group>"; };
 		11472EFB1ADED33300CFD5F2 /* resamp2.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = resamp2.inc; sourceTree = "<group>"; };
 		11472EFD1ADED34F00CFD5F2 /* resamp3.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = resamp3.inc; sourceTree = "<group>"; };
+		11F0ED361AEE9E1E00043642 /* libaldmb.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libaldmb.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		11F0ED381AEE9E1E00043642 /* aldmb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = aldmb.h; sourceTree = "<group>"; };
+		11F0ED3A1AEE9E1E00043642 /* aldmb.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = aldmb.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		11472E2B1ADECAC200CFD5F2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		11F0ED331AEE9E1E00043642 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -153,6 +175,7 @@
 			isa = PBXGroup;
 			children = (
 				11472E301ADECAC200CFD5F2 /* dumb */,
+				11F0ED371AEE9E1E00043642 /* aldmb */,
 				11472E2F1ADECAC200CFD5F2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -161,6 +184,7 @@
 			isa = PBXGroup;
 			children = (
 				11472E2E1ADECAC200CFD5F2 /* libdumb.a */,
+				11F0ED361AEE9E1E00043642 /* libaldmb.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -287,6 +311,15 @@
 			path = it;
 			sourceTree = "<group>";
 		};
+		11F0ED371AEE9E1E00043642 /* aldmb */ = {
+			isa = PBXGroup;
+			children = (
+				11F0ED381AEE9E1E00043642 /* aldmb.h */,
+				11F0ED3A1AEE9E1E00043642 /* aldmb.m */,
+			);
+			path = aldmb;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -307,6 +340,23 @@
 			productReference = 11472E2E1ADECAC200CFD5F2 /* libdumb.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		11F0ED351AEE9E1E00043642 /* aldmb */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 11F0ED4B1AEE9E1F00043642 /* Build configuration list for PBXNativeTarget "aldmb" */;
+			buildPhases = (
+				11F0ED321AEE9E1E00043642 /* Sources */,
+				11F0ED331AEE9E1E00043642 /* Frameworks */,
+				11F0ED341AEE9E1E00043642 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = aldmb;
+			productName = aldmb;
+			productReference = 11F0ED361AEE9E1E00043642 /* libaldmb.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -318,6 +368,9 @@
 				TargetAttributes = {
 					11472E2D1ADECAC200CFD5F2 = {
 						CreatedOnToolsVersion = 6.3;
+					};
+					11F0ED351AEE9E1E00043642 = {
+						CreatedOnToolsVersion = 6.3.1;
 					};
 				};
 			};
@@ -334,6 +387,7 @@
 			projectRoot = "";
 			targets = (
 				11472E2D1ADECAC200CFD5F2 /* dumb */,
+				11F0ED351AEE9E1E00043642 /* aldmb */,
 			);
 		};
 /* End PBXProject section */
@@ -347,20 +401,15 @@
 				11472EF21ADECB0D00CFD5F2 /* readxm2.c in Sources */,
 				11472EE61ADECB0D00CFD5F2 /* loadxm2.c in Sources */,
 				11472EDA1ADECB0D00CFD5F2 /* itunload.c in Sources */,
-				11472E9A1ADECB0D00CFD5F2 /* datunld.c in Sources */,
 				11472EE01ADECB0D00CFD5F2 /* loads3m.c in Sources */,
 				11472EAC1ADECB0D00CFD5F2 /* makeduh.c in Sources */,
 				11472EDE1ADECB0D00CFD5F2 /* loadmod2.c in Sources */,
-				11472E901ADECB0D00CFD5F2 /* datitq.c in Sources */,
 				11472ED01ADECB0D00CFD5F2 /* itmisc.c in Sources */,
-				11472E8C1ADECB0D00CFD5F2 /* datduh.c in Sources */,
-				11472E8A1ADECB0D00CFD5F2 /* alplay.c in Sources */,
 				11472EE21ADECB0D00CFD5F2 /* loads3m2.c in Sources */,
 				11472EC61ADECB0D00CFD5F2 /* sampbuf.c in Sources */,
 				11472EA81ADECB0D00CFD5F2 /* dumbfile.c in Sources */,
 				11472EEE1ADECB0D00CFD5F2 /* reads3m2.c in Sources */,
 				11472EA21ADECB0D00CFD5F2 /* atexit.c in Sources */,
-				11472E9E1ADECB0D00CFD5F2 /* datxmq.c in Sources */,
 				11472ED61ADECB0D00CFD5F2 /* itread2.c in Sources */,
 				11472ED81ADECB0D00CFD5F2 /* itrender.c in Sources */,
 				11472ED21ADECB0D00CFD5F2 /* itorder.c in Sources */,
@@ -371,17 +420,12 @@
 				11472EEC1ADECB0D00CFD5F2 /* reads3m.c in Sources */,
 				11472EA61ADECB0D00CFD5F2 /* duhtag.c in Sources */,
 				11472EF41ADECB0D00CFD5F2 /* xmeffect.c in Sources */,
-				11472EA01ADECB0D00CFD5F2 /* packfile.c in Sources */,
-				11472E9C1ADECB0D00CFD5F2 /* datxm.c in Sources */,
-				11472E941ADECB0D00CFD5F2 /* datmodq.c in Sources */,
 				11472EC21ADECB0D00CFD5F2 /* resample.c in Sources */,
 				11472ECE1ADECB0D00CFD5F2 /* itload2.c in Sources */,
 				11472EB21ADECB0D00CFD5F2 /* register.c in Sources */,
-				11472E8E1ADECB0D00CFD5F2 /* datit.c in Sources */,
 				11472EB01ADECB0D00CFD5F2 /* readduh.c in Sources */,
 				11472EB41ADECB0D00CFD5F2 /* rendduh.c in Sources */,
 				11472EC81ADECB0D00CFD5F2 /* silence.c in Sources */,
-				11472E961ADECB0D00CFD5F2 /* dats3m.c in Sources */,
 				11472EEA1ADECB0D00CFD5F2 /* readmod2.c in Sources */,
 				11472EB81ADECB0D00CFD5F2 /* unload.c in Sources */,
 				11472EE81ADECB0D00CFD5F2 /* readmod.c in Sources */,
@@ -393,10 +437,28 @@
 				11472EA41ADECB0D00CFD5F2 /* duhlen.c in Sources */,
 				11472EBA1ADECB0D00CFD5F2 /* clickrem.c in Sources */,
 				11472ECA1ADECB0D00CFD5F2 /* stdfile.c in Sources */,
-				11472E921ADECB0D00CFD5F2 /* datmod.c in Sources */,
 				11472EE41ADECB0D00CFD5F2 /* loadxm.c in Sources */,
-				11472E981ADECB0D00CFD5F2 /* dats3mq.c in Sources */,
 				11472EB61ADECB0D00CFD5F2 /* rendsig.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		11F0ED321AEE9E1E00043642 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				11F0ED551AEE9E3800043642 /* datunld.c in Sources */,
+				11F0ED501AEE9E3800043642 /* datitq.c in Sources */,
+				11F0ED4E1AEE9E3800043642 /* datduh.c in Sources */,
+				11F0ED4D1AEE9E3800043642 /* alplay.c in Sources */,
+				11F0ED571AEE9E3800043642 /* datxmq.c in Sources */,
+				11F0ED581AEE9E3800043642 /* packfile.c in Sources */,
+				11F0ED561AEE9E3800043642 /* datxm.c in Sources */,
+				11F0ED521AEE9E3800043642 /* datmodq.c in Sources */,
+				11F0ED4F1AEE9E3800043642 /* datit.c in Sources */,
+				11F0ED531AEE9E3800043642 /* dats3m.c in Sources */,
+				11F0ED511AEE9E3800043642 /* datmod.c in Sources */,
+				11F0ED541AEE9E3800043642 /* dats3mq.c in Sources */,
+				11F0ED3B1AEE9E1E00043642 /* aldmb.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -503,6 +565,31 @@
 			};
 			name = Release;
 		};
+		11F0ED471AEE9E1E00043642 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		11F0ED481AEE9E1E00043642 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -520,6 +607,15 @@
 			buildConfigurations = (
 				11472E431ADECAC200CFD5F2 /* Debug */,
 				11472E441ADECAC200CFD5F2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		11F0ED4B1AEE9E1F00043642 /* Build configuration list for PBXNativeTarget "aldmb" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				11F0ED471AEE9E1E00043642 /* Debug */,
+				11F0ED481AEE9E1E00043642 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 		};
