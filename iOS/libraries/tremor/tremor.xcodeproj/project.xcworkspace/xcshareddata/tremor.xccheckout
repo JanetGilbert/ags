@@ -14,11 +14,11 @@
 		<string>github.com:JanetGilbert/ags.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>iOS/libraries/tremor/tremor/tremor.xcodeproj/project.xcworkspace</string>
+	<string>iOS/libraries/tremor/tremor.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>E31D27B7F1D5D506361FD284CB63F171E9FBC197</key>
-		<string>../../../../../..</string>
+		<string>../../../../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>github.com:JanetGilbert/ags.git</string>
