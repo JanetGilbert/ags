@@ -345,7 +345,7 @@
 		11558C6E1AD2FFC30044CACD /* agswadjetutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = agswadjetutil.h; path = agswadjetutil/agswadjetutil.h; sourceTree = "<group>"; };
 		119398591AD6D0AE00F4E6E9 /* agsAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = agsAppDelegate.h; sourceTree = "<group>"; };
 		1193985A1AD6D0AE00F4E6E9 /* agsAppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = agsAppDelegate.mm; sourceTree = "<group>"; };
-		1193985B1AD6D0AE00F4E6E9 /* agsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = agsViewController.h; path = /Users/janetcampbell68/Documents/ags/iOS/Classes/agsViewController.h; sourceTree = "<absolute>"; };
+		1193985B1AD6D0AE00F4E6E9 /* agsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = agsViewController.h; sourceTree = "<group>"; };
 		1193985C1AD6D0AF00F4E6E9 /* agsViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = agsViewController.mm; sourceTree = "<group>"; };
 		1193985D1AD6D0AF00F4E6E9 /* EAGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EAGLView.h; sourceTree = "<group>"; };
 		1193985E1AD6D0AF00F4E6E9 /* EAGLView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EAGLView.m; sourceTree = "<group>"; };
@@ -1075,8 +1075,8 @@
 				1193985E1AD6D0AF00F4E6E9 /* EAGLView.m */,
 			);
 			name = Classes;
-			path = /Users/janetcampbell68/Documents/ags/iOS/Classes;
-			sourceTree = "<absolute>";
+			path = ../../Classes;
+			sourceTree = "<group>";
 		};
 		11558C6C1AD2FEAE0044CACD /* AGSWadjetUtil */ = {
 			isa = PBXGroup;
@@ -2696,7 +2696,7 @@
 					"\"$(SRCROOT)/../../nativelibs/fat/lib\"",
 					"\"$(SRCROOT)/../../../Engine\"",
 					"\"$(SRCROOT)/../../../Plugins/agslua/agslua/zlib\"",
-					/Users/janetcampbell68/Documents/ags/iOS/nativelibs/fat/lib,
+					"\"$(SRCROOT)/../../../iOS/nativelibs/fat/lib\"",
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
@@ -2728,7 +2728,7 @@
 					"\"$(SRCROOT)/../../nativelibs/fat/lib\"",
 					"\"$(SRCROOT)/../../../Engine\"",
 					"\"$(SRCROOT)/../../../Plugins/agslua/agslua/zlib\"",
-					/Users/janetcampbell68/Documents/ags/iOS/nativelibs/fat/lib,
+					"\"$(SRCROOT)/../../../iOS/nativelibs/fat/lib\"",
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "Gemini Rue";
