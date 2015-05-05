@@ -564,7 +564,7 @@ DLLEXPORT int    AGS_EditorSaveGame (char *, int);
 DLLEXPORT void   AGS_EditorLoadGame (char *, int);
 DLLEXPORT void   AGS_EngineStartup (IAGSEngine *);
 DLLEXPORT void   AGS_EngineShutdown (void);
-DLLEXPORT int    AGS_EngineOnEvent (int, int);
+DLLEXPORT int    AGS_EngineOnEvent (int, long);
 DLLEXPORT int    AGS_EngineDebugHook(const char *, int, int);
 DLLEXPORT void   AGS_EngineInitGfx(const char* driverID, void *data); 
 // We export this to verify that we are an AGS Plugin

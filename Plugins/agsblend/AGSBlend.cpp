@@ -1002,7 +1002,7 @@ void AGS_EngineShutdown()
 
 //------------------------------------------------------------------------------
 
-int AGS_EngineOnEvent(int event, int data)                    //*** optional ***
+int AGS_EngineOnEvent(int event, long data)                    //*** optional ***
 {
 	switch (event)
 	{

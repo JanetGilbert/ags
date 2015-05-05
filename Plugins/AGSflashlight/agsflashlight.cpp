@@ -811,7 +811,7 @@ void AGS_EngineShutdown()
 
 }
 
-int AGS_EngineOnEvent(int event, int data)
+int AGS_EngineOnEvent(int event, long data)
 {
   if (event == AGSE_PREGUIDRAW)
   {

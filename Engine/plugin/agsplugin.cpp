@@ -140,7 +140,7 @@ struct EnginePlugin {
     int         invalidatedRegion;
     void      (*engineStartup) (IAGSEngine *);
     void      (*engineShutdown) ();
-    int       (*onEvent) (int, int);
+    int       (*onEvent) (int, long);
     void      (*initGfxHook) (const char *driverName, void *data);
     int       (*debugHook) (const char * whichscript, int lineNumber, int reserved);
     IAGSEngine  eiface;
@@ -991,7 +991,7 @@ void pl_read_plugins_from_disk (Stream *in) {
               sprintf(buffer, "Plugin '%s' is not a valid AGS plugin (no engine startup entry point)", apl->filename);
               quit(buffer);
           }
-          apl->onEvent = (int(*)(int,int))apl->library.GetFunctionAddress("AGS_EngineOnEvent");
+          apl->onEvent = (int(*)(int,long))apl->library.GetFunctionAddress("AGS_EngineOnEvent");
           apl->debugHook = (int(*)(const char*,int,int))apl->library.GetFunctionAddress("AGS_EngineDebugHook");
           apl->initGfxHook = (void(*)(const char*, void*))apl->library.GetFunctionAddress("AGS_EngineInitGfx");
         }
