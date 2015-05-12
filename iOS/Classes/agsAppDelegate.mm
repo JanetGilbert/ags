@@ -11,6 +11,7 @@ volatile int is_in_foreground = 1;
 volatile int drawing_in_progress = 0;
 
 extern "C" void ios_resume_sound();
+extern "C" volatile int ios_audio_must_restart;//jg
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -33,6 +34,7 @@ extern "C" void ios_resume_sound();
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
 	is_in_foreground = 1;
+    ios_audio_must_restart = 1;//jg
 	ios_resume_sound();
 }
 
