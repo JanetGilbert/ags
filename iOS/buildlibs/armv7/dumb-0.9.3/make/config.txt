@@ -1,0 +1,3 @@
+include make/ios.inc
+ALL_TARGETS := core core-headers
+ALL_TARGETS += allegro allegro-headers

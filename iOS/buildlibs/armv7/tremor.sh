@@ -24,5 +24,5 @@ wget http://git.savannah.gnu.org/cgit/config.git/plain/config.guess -O config.gu
 export LDFLAGS="-Wl,-L$SDKROOT/usr/lib,-L$IOS_ADDITIONAL_LIBRARY_PATH/lib"
 export CFLAGS="-std=c99 -arch armv7 -marm -pipe -no-cpp-precomp -isysroot $SDKROOT -miphoneos-version-min=$IOS_DEPLOY_TGT -I$IOS_ADDITIONAL_LIBRARY_PATH/include -DLITTLE_ENDIAN -DBYTE_ORDER=LITTLE_ENDIAN -Dasm=__asm__"
 ./configure --host=$IOS_HOST_NAME --prefix=$IOS_ADDITIONAL_LIBRARY_PATH
-make
-make install
+#make
+#make install

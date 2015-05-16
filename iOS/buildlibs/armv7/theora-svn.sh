@@ -26,11 +26,11 @@ chmod +x lib/arm/gas-preprocessor.pl
 
 patch -p0 < ../../../patches/armv7/libtheora-svn.patch
 
-export CCAS="perl ./arm/gas-preprocessor.pl $DEVROOT/usr/bin/arm-apple-darwin10-gcc-4.2.1"
+#export CCAS="perl ./arm/gas-preprocessor.pl $DEVROOT/usr/bin/arm-apple-darwin10-gcc-4.2.1"
 
-export OGG_LIBS="-L$IOS_ADDITIONAL_LIBRARY_PATH/lib -logg"
-export VORBIS_LIBS="-L$IOS_ADDITIONAL_LIBRARY_PATH/lib -lm -lvorbis -logg"
-export LDFLAGS="-Wl,-L$SDKROOT/usr/lib,-L$IOS_ADDITIONAL_LIBRARY_PATH/lib"
-export CFLAGS="-std=c99 -arch armv7 -mcpu=cortex-a8 -pipe -no-cpp-precomp -isysroot $SDKROOT -miphoneos-version-min=$IOS_DEPLOY_TGT -I$IOS_ADDITIONAL_LIBRARY_PATH/include -DIOS_ARMV7"
-./configure --host=$IOS_HOST_NAME --prefix=$IOS_ADDITIONAL_LIBRARY_PATH --disable-examples
-make install
+#export OGG_LIBS="-L$IOS_ADDITIONAL_LIBRARY_PATH/lib -logg"
+#export VORBIS_LIBS="-L$IOS_ADDITIONAL_LIBRARY_PATH/lib -lm -lvorbis -logg"
+#export LDFLAGS="-Wl,-L$SDKROOT/usr/lib,-L$IOS_ADDITIONAL_LIBRARY_PATH/lib"
+#export CFLAGS="-std=c99 -arch armv7 -mcpu=cortex-a8 -pipe -no-cpp-precomp -isysroot $SDKROOT -miphoneos-version-min=$IOS_DEPLOY_TGT -I$IOS_ADDITIONAL_LIBRARY_PATH/include -DIOS_ARMV7"
+#./configure --host=$IOS_HOST_NAME --prefix=$IOS_ADDITIONAL_LIBRARY_PATH --disable-examples
+#make install
