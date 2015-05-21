@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		113288CC1AC1B1AE00E4A99E /* libtheora.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6041A8611552E60600596310 /* libtheora.a */; };
-		113B32AF1AB9FC5600A4234D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 113B32AE1AB9FC5600A4234D /* Images.xcassets */; };
 		114D6E621ADEC259003145B4 /* liballeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 114D6E611ADEC259003145B4 /* liballeg.a */; };
 		11558C6F1AD2FFC30044CACD /* agswadjetutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11558C6D1AD2FFC30044CACD /* agswadjetutil.cpp */; };
 		1193985F1AD6D0AF00F4E6E9 /* agsAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1193985A1AD6D0AE00F4E6E9 /* agsAppDelegate.mm */; };
@@ -19,6 +18,7 @@
 		119769D01AB3589800048EE1 /* ios_ipad.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 119769CB1AB3589800048EE1 /* ios_ipad.cfg */; };
 		119769D11AB3589800048EE1 /* ios_iphone.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 119769CC1AB3589800048EE1 /* ios_iphone.cfg */; };
 		119769D21AB3589800048EE1 /* speech.vox in Resources */ = {isa = PBXBuildFile; fileRef = 119769CD1AB3589800048EE1 /* speech.vox */; };
+		14FFC0531B0E17B000E719A4 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14FFC0521B0E17B000E719A4 /* Images.xcassets */; };
 		1D60589B0D05DD56006BFB54 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.mm */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
@@ -339,7 +339,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		113B32AE1AB9FC5600A4234D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = GeminiRue/Images.xcassets; sourceTree = "<group>"; };
 		114D6E611ADEC259003145B4 /* liballeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liballeg.a; path = ../../nativelibs/fat/lib/liballeg.a; sourceTree = "<group>"; };
 		11558C6D1AD2FFC30044CACD /* agswadjetutil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = agswadjetutil.cpp; path = agswadjetutil/agswadjetutil.cpp; sourceTree = "<group>"; };
 		11558C6E1AD2FFC30044CACD /* agswadjetutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = agswadjetutil.h; path = agswadjetutil/agswadjetutil.h; sourceTree = "<group>"; };
@@ -354,6 +353,7 @@
 		119769CB1AB3589800048EE1 /* ios_ipad.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios_ipad.cfg; path = game/ios_ipad.cfg; sourceTree = "<group>"; };
 		119769CC1AB3589800048EE1 /* ios_iphone.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios_iphone.cfg; path = game/ios_iphone.cfg; sourceTree = "<group>"; };
 		119769CD1AB3589800048EE1 /* speech.vox */ = {isa = PBXFileReference; lastKnownFileType = file; name = speech.vox; path = game/speech.vox; sourceTree = "<group>"; };
+		14FFC0521B0E17B000E719A4 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = IconResources/Images.xcassets; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D6058910D05DD3D006BFB54 /* Shivah.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Shivah.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -1123,7 +1123,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				113B32AE1AB9FC5600A4234D /* Images.xcassets */,
+				14FFC0521B0E17B000E719A4 /* Images.xcassets */,
 				119769C91AB3589800048EE1 /* ac2game.dat */,
 				119769CA1AB3589800048EE1 /* audio.vox */,
 				119769CB1AB3589800048EE1 /* ios_ipad.cfg */,
@@ -2327,10 +2327,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14FFC0531B0E17B000E719A4 /* Images.xcassets in Resources */,
 				28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */,
 				28EC4C5A11D54ECE0027AA9F /* agsViewController.xib in Resources */,
 				119769CE1AB3589800048EE1 /* ac2game.dat in Resources */,
-				113B32AF1AB9FC5600A4234D /* Images.xcassets in Resources */,
 				119769D01AB3589800048EE1 /* ios_ipad.cfg in Resources */,
 				119769D21AB3589800048EE1 /* speech.vox in Resources */,
 				119769CF1AB3589800048EE1 /* audio.vox in Resources */,
