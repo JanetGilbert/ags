@@ -106,3 +106,5 @@ iOS/xcode/BlackwellLegacy/game/ac2gamenew.dat
 iOS/xcode/BlackwellDeception/BlackwellDeception.xcodeproj/xcuserdata/janetcampbell68.xcuserdatad/xcschemes/xcschememanagement.plist
 
 iOS/xcode/BlackwellDeception/BlackwellDeception.xcodeproj/xcuserdata/janetgilbert.xcuserdatad/xcschemes/xcschememanagement.plist
+
+*.exe
