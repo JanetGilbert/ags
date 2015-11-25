@@ -28,25 +28,25 @@
     {
       "size" : "57x57",
       "idiom" : "iphone",
-      "filename" : "57x57.png",
+      "filename" : "Icon.png",
       "scale" : "1x"
     },
     {
       "size" : "57x57",
       "idiom" : "iphone",
-      "filename" : "114x114.png",
+      "filename" : "Icon@2x.png",
       "scale" : "2x"
     },
     {
       "size" : "60x60",
       "idiom" : "iphone",
-      "filename" : "120x120.png",
+      "filename" : "icon_120x120.png",
       "scale" : "2x"
     },
     {
       "size" : "60x60",
       "idiom" : "iphone",
-      "filename" : "180x180.png",
+      "filename" : "icon_180x180.png",
       "scale" : "3x"
     },
     {
@@ -82,31 +82,26 @@
     {
       "size" : "72x72",
       "idiom" : "ipad",
-      "filename" : "72x72.png",
+      "filename" : "Icon-72.png",
       "scale" : "1x"
     },
     {
       "size" : "72x72",
       "idiom" : "ipad",
-      "filename" : "144x144.png",
+      "filename" : "Icon-72@2x.png",
       "scale" : "2x"
     },
     {
       "size" : "76x76",
       "idiom" : "ipad",
-      "filename" : "76x76.png",
+      "filename" : "icon_76x76.png",
       "scale" : "1x"
     },
     {
       "size" : "76x76",
       "idiom" : "ipad",
-      "filename" : "152x152.png",
+      "filename" : "icon_152x152.png",
       "scale" : "2x"
-    },
-    {
-      "idiom" : "car",
-      "size" : "120x120",
-      "scale" : "1x"
     },
     {
       "size" : "24x24",
@@ -161,6 +156,11 @@
       "scale" : "2x",
       "role" : "quickLook",
       "subtype" : "42mm"
+    },
+    {
+      "idiom" : "car",
+      "size" : "120x120",
+      "scale" : "1x"
     }
   ],
   "info" : {
