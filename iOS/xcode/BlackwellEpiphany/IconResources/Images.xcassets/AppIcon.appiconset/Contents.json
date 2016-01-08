@@ -104,6 +104,12 @@
       "scale" : "2x"
     },
     {
+      "size" : "83.5x83.5",
+      "idiom" : "ipad",
+      "filename" : "icon_167x167.png",
+      "scale" : "2x"
+    },
+    {
       "size" : "24x24",
       "idiom" : "watch",
       "scale" : "2x",
@@ -156,11 +162,6 @@
       "scale" : "2x",
       "role" : "quickLook",
       "subtype" : "42mm"
-    },
-    {
-      "idiom" : "car",
-      "size" : "120x120",
-      "scale" : "1x"
     }
   ],
   "info" : {
