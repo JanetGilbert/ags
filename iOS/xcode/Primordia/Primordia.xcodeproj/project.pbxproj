@@ -2699,7 +2699,7 @@
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.wadjeteyegames.Blackwell-Epiphany";
+				PRODUCT_BUNDLE_IDENTIFIER = com.wadjeteyegames.primordia;
 				PRODUCT_NAME = Primordia;
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
@@ -2730,7 +2730,7 @@
 					"\"$(SRCROOT)/../../../iOS/nativelibs/fat/lib\"",
 				);
 				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.wadjeteyegames.Blackwell-Epiphany";
+				PRODUCT_BUNDLE_IDENTIFIER = com.wadjeteyegames.primordia;
 				PRODUCT_NAME = Primordia;
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
@@ -2810,8 +2810,8 @@
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PREBINDING = NO;
-				PROVISIONING_PROFILE = "10052f1a-97cf-47ee-9d2a-08a1a34ff4ac";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "10052f1a-97cf-47ee-9d2a-08a1a34ff4ac";
+				PROVISIONING_PROFILE = "eefb654c-ed18-4d0e-8f8b-19908b13d600";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "eefb654c-ed18-4d0e-8f8b-19908b13d600";
 				SDKROOT = iphoneos;
 				USER_HEADER_SEARCH_PATHS = "${SOURCE_ROOT}/../../../Common ${SOURCE_ROOT}/../../../Common/libinclude ${SOURCE_ROOT}/../../../Engine ${SOURCE_ROOT}/../../../iOS/nativelibs/fat/include ${SOURCE_ROOT}/../../nativelibs/fat/include/freetype2";
 				VALID_ARCHS = "arm64 armv7";
