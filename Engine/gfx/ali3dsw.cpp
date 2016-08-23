@@ -260,7 +260,7 @@ private:
 
 bool ALSoftwareGraphicsDriver::IsModeSupported(int driver, int width, int height, int colDepth)
 {
-#if defined(ANDROID_VERSION) || defined(PSP_VERSION) || defined(IOS_VERSION) || defined(ALLEGRO_SDL2)
+#if defined(ANDROID_VERSION) || defined(PSP_VERSION) || defined(IOS_VERSION) || defined(ALLEGRO_SDL2) || defined(MAC_VERSION)
   // Everything is drawn to a virtual screen, so all resolutions are supported.
   return true;
 #endif
@@ -375,10 +375,6 @@ bool ALSoftwareGraphicsDriver::Init(int virtualWidth, int virtualHeight, int rea
     // therefore we should not delete it right away, but only at driver shutdown.
 
     virtualScreen = BitmapHelper::GetScreenBitmap();
-
-    // [ER] 2014-03-13
-    // Hide the system cursor via allegro
-    show_os_cursor(MOUSE_CURSOR_NONE);
 
 #ifdef _WIN32
     if (!windowed)

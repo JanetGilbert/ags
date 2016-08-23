@@ -543,11 +543,11 @@ int my_readkey() {
     else
     {
       gott = gott & 0x00ff;
-      
-      if (scancode==KEY_BACKSPACE)
-      {
+#if defined(MAC_VERSION)
+      if (scancode==KEY_BACKSPACE) {
         gott = 8; //j backspace on mac
       }
+#endif
     }
 
     // Alt+X, abort (but only once game is loaded)

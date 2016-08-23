@@ -23,22 +23,41 @@
 #include <xalleg.h>
 #include "gfx/ali3d.h"
 #include "ac/runtime_defines.h"
-#include "debug/out.h"
 #include "platform/base/agsplatformdriver.h"
 #include "plugin/agsplugin.h"
+#include "media/audio/audio.h"
 #include "util/string.h"
 #include <libcda.h>
 
 #include <pwd.h>
 #include <sys/stat.h>
 
-using namespace AGS::Common;
+#include "binreloc.h"
+#include "main/config.h"
+
+using AGS::Common::String;
 
 
 // Replace the default Allegro icon. The original defintion is in the
 // Allegro 4.4 source under "src/x/xwin.c".
+extern "C" {
 #include "icon.xpm"
+}
 void* allegro_icon = icon_xpm;
+
+// PSP variables
+int psp_video_framedrop = 1;
+int psp_audio_enabled = 1;
+int psp_midi_enabled = 1;
+int psp_ignore_acsetup_cfg_file = 0;
+int psp_clear_cache_on_room_change = 0;
+
+int psp_midi_preload_patches = 0;
+int psp_audio_cachesize = 10;
+char psp_game_file_name[256];
+int psp_gfx_smooth_sprites = 1;
+char psp_translation[100];
+
 String LinuxOutputDirectory;
 
 struct AGSLinux : AGSPlatformDriver {
@@ -51,11 +70,11 @@ struct AGSLinux : AGSPlatformDriver {
   virtual const char *GetAppOutputDirectory();
   virtual unsigned long GetDiskFreeSpaceMB();
   virtual const char* GetNoMouseErrorString();
+  virtual bool IsMouseControlSupported(bool windowed);
   virtual const char* GetAllegroFailUserHint();
   virtual eScriptSystemOSID GetSystemOSID();
   virtual int  InitializeCDPlayer();
   virtual void PlayVideo(const char* name, int skip, int flags);
-  virtual void PostAllegroInit(bool windowed);
   virtual void PostAllegroExit();
   virtual void SetGameWindowIcon();
   virtual void ShutdownCDPlayer();
@@ -150,7 +169,7 @@ void AGSLinux::Delay(int millis) {
     usleep(5);
     millis -= 5;
 
-    update_polled_stuff(false);
+    update_polled_stuff_if_runtime();
   }
   if (millis > 0)
     usleep(millis);
@@ -165,7 +184,10 @@ const char* AGSLinux::GetNoMouseErrorString() {
   return "This game requires a mouse. You need to configure and setup your mouse to play this game.\n";
 }
 
-// extern int INIreadint (const char *sectn, const char *item, int errornosect = 1);
+bool AGSLinux::IsMouseControlSupported(bool windowed)
+{
+  return true; // supported for both fullscreen and windowed modes
+}
 
 const char* AGSLinux::GetAllegroFailUserHint()
 {
@@ -173,12 +195,7 @@ const char* AGSLinux::GetAllegroFailUserHint()
 }
 
 eScriptSystemOSID AGSLinux::GetSystemOSID() {
-  // int fake_win =  INIreadint("misc", "fake_os", 0);
-  // if (fake_win > 0) {
-  //   return (eScriptSystemOSID)fake_win;
-  // } else {
-  //   return eOS_Linux;
-  // }
+  // override performed if `override.os` is set in config.
   return eOS_Linux;
 }
 
@@ -188,36 +205,6 @@ int AGSLinux::InitializeCDPlayer() {
 
 void AGSLinux::PlayVideo(const char *name, int skip, int flags) {
   // do nothing
-}
-
-//
-// Quoting Benoit Pierre:
-// When using a high polling rate mouse on Linux with X11, the mouse cursor
-// lags. This is due to the fact that Allegro will only process up-to 5
-// X11 events at a time, and so mouse motion events will pile up and the
-// mouse cursor will lag. It's possible to fix it without patching Allegro
-// by setting a custom Allegro X11 input handler that will make sure all
-// currently queued X11 events are processed.
-//
-// NOTE: this refers specifically to Allegro 4.
-// TODO: if AGS ever uses patched Allegro version, this custom handler may
-// be removed.
-//
-static void XWinInputHandler(void)
-{
-  if (!_xwin.display)
-    return;
-
-  // Repeat the call to Allegro's internal input handler until all the event
-  // queue was processed
-  while (XQLength(_xwin.display) > 0)
-    _xwin_private_handle_input();
-}
-
-void AGSLinux::PostAllegroInit(bool windowed)
-{
-  _xwin_input_handler = XWinInputHandler;
-  Out::FPrint("Set up the custom XWin input handler");
 }
 
 void AGSLinux::PostAllegroExit() {
@@ -238,6 +225,7 @@ AGSPlatformDriver* AGSPlatformDriver::GetDriver() {
   return instance;
 }
 
+#if 0
 void AGSLinux::ReplaceSpecialPaths(const char *sourcePath, char *destPath) {
   // MYDOCS is what is used in acplwin.cpp
   if(strncasecmp(sourcePath, "$MYDOCS$", 8) == 0) {
@@ -272,6 +260,7 @@ void AGSLinux::ReplaceSpecialPaths(const char *sourcePath, char *destPath) {
     strcpy(destPath, sourcePath);
   }
 }
+#endif
 
 bool AGSLinux::LockMouseToWindow()
 {

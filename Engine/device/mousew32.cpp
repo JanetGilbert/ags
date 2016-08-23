@@ -37,15 +37,19 @@
 #endif
 
 #include "ac/system.h"
+#include "debug/out.h"
 #include "device/mousew32.h"
 #include "gfx/bitmap.h"
 #include "gfx/gfx_util.h"
 #include "main/graphics_mode.h"
 #include "platform/base/agsplatformdriver.h"
 #include "util/math.h"
-#include "ac/global_game.h" //j
+#if defined(MAC_VERSION)
+#include "ac/global_game.h" // j for IsKeyPressed
+#endif
 
 using namespace AGS::Common;
+
 
 extern char lib_file_name[13];
 
@@ -59,11 +63,7 @@ int mousex = 0, mousey = 0, numcurso = -1, hotx = 0, hoty = 0;
 int real_mouse_x = 0, real_mouse_y = 0;
 int boundx1 = 0, boundx2 = 99999, boundy1 = 0, boundy2 = 99999;
 int disable_mgetgraphpos = 0;
-#if defined(MAC_VERSION)
 char ignore_bounds = 0;
-#else
-char ignore_bounds = 1;
-#endif
 extern char alpha_blend_cursor ;
 Bitmap *savebk = NULL, *mousecurs[MAXCURSORS];
 extern int vesa_xres, vesa_yres;
@@ -101,7 +101,10 @@ void mgraphconfine(int x1, int y1, int x2, int y2)
 {
   Mouse::ControlRect = Rect(x1 + game_frame_x_offset, y1 + game_frame_y_offset,
       x2 + game_frame_x_offset, y2 + game_frame_y_offset);
-  set_mouse_range(x1, y1, x2, y2);
+  set_mouse_range(Mouse::ControlRect.Left, Mouse::ControlRect.Top, Mouse::ControlRect.Right, Mouse::ControlRect.Bottom);
+  Out::FPrint("Mouse confined: (%d,%d)-(%d,%d) (%dx%d)",
+      Mouse::ControlRect.Left, Mouse::ControlRect.Top, Mouse::ControlRect.Right, Mouse::ControlRect.Bottom,
+      Mouse::ControlRect.GetWidth(), Mouse::ControlRect.GetHeight());
 }
 
 void mgetgraphpos()
@@ -127,7 +130,7 @@ void mgetgraphpos()
         // and applying them to saved mouse coordinates.
         int mickey_x, mickey_y;
         get_mouse_mickeys(&mickey_x, &mickey_y);
-
+        
         // Apply mouse speed
         int dx = Mouse::Speed * mickey_x;
         int dy = Mouse::Speed * mickey_y;
@@ -171,10 +174,11 @@ void mgetgraphpos()
         real_mouse_y = mouse_y;
     }
 
-    // Set game cursor position, and apply real->virtual coordinate translation
+    // Set new in-game cursor position
     mousex = real_mouse_x;
     mousey = real_mouse_y;
 
+    // Convert to zero-based coordinates by subtracting left-top corner of the control frame
     mousex -= Mouse::ControlRect.Left;
     mousey -= Mouse::ControlRect.Top;
 
@@ -186,14 +190,13 @@ void mgetgraphpos()
         msetgraphpos(mousex, mousey);
     }
 
+    // Convert to virtual coordinates
     if (callback)
         callback->AdjustPosition(&mousex, &mousey);
 }
 
 void msetcursorlimit(int x1, int y1, int x2, int y2)
 {
-  // like graphconfine, but don't actually pass it to the driver
-  // - stops the Windows cursor showing when out of the area
   boundx1 = x1;
   boundy1 = y1;
   boundx2 = x2;
@@ -290,7 +293,7 @@ void mloadwcursor(char *namm)
 {
   color dummypal[256];
   if (wloadsprites(&dummypal[0], namm, mousecurs, 0, MAXCURSORS)) {
-    //printf("C_Load_wCursor: Error reading mouse cursor file\n");
+    //printf("C_Load_wCursor: Error reading mouse cursor file\n"); 
     exit(1);
   }
 }
@@ -308,24 +311,20 @@ int mgetbutton()
   if (butis & 1)
   {
     toret = LEFT;
+#if defined(MAC_VERSION)
     // j Ctrl-left click should be right-click
     if (IsKeyPressed(405) || IsKeyPressed(406))
     {
       toret = RIGHT;
     }
+#endif
   }
   else if (butis & 2)
-  {
     toret = RIGHT;
-  }
   else if (butis & 4)
-  {
     toret = MIDDLE;
-  }
 
   butwas = butis;
-
-
   return toret;
 }
 

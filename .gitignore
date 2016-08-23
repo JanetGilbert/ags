@@ -33,7 +33,7 @@ Engine/resource/version.aps
 *.o
 *.d
 common.a
-ags
+Engine/ags
 Android/launcher_list/.classpath
 Android/launcher_list/.settings/
 Android/launcher_list/bin/
@@ -69,52 +69,38 @@ iOS/nativelibs/i386
 iOS/nativelibs/x86_64
 Solutions/Engine.App/test.ini
 
+OSX/xcode/agsteam
+OSX/xcode/steamworks_sdk
 
-OSX/xcode/legacy/game_files/ac2game.001
-OSX/xcode/legacy/game_files/ac2game.002
-OSX/xcode/legacy/game_files/ac2game.dat
-OSX/xcode/legacy/game_files/audio.vox
-OSX/xcode/legacy/game_files/speech.vox
-iOS/xcode/BlackwellLegacy/game/ac2game.dat
-iOS/xcode/BlackwellLegacy/game/audio.vox
-iOS/xcode/BlackwellLegacy/game/speech.vox
-OSX/xcode/shivah/game_files/ac2game.dat
-OSX/xcode/shivah/game_files/audio.vox
-OSX/xcode/shivah/game_files/speech.vox
-xcuserdata
-OSX/xcode/shivah/Shivah.xcodeproj/project.xcworkspace/xcuserdata/janetcampbell68.xcuserdatad/UserInterfaceState.xcuserstate
-iOS/xcode/BlackwellConvergence/game/ac2game.dat
-iOS/xcode/BlackwellConvergence/game/audio.vox
-iOS/xcode/BlackwellConvergence/game/speech.vox
-iOS/xcode/BlackwellUnbound/game/ac2game.dat
-iOS/xcode/BlackwellUnbound/game/audio.vox
-iOS/xcode/BlackwellUnbound/game/speech.vox
-iOS/xcode/ags/Gemini Rue.xcodeproj/project.xcworkspace/contents.xcworkspacedata
-OSX/xcode/legacy/Legacy.xcodeproj/project.xcworkspace/xcuserdata/janetcampbell68.xcuserdatad/UserInterfaceState.xcuserstate
+libsrc/*.tar*
+libsrc/*.zip
+
+ac2game.dat
+audio.vox
+speech.vox
+
+OSX/buildlibs/opt/
+OSX/buildlibs/build/
+OSX/include/
+OSX/lib/
+
+## Xcode Build generated
+build/
+DerivedData/
+
+## Xcode Various settings
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+
+## Xcode Other
+*.moved-aside
 *.xcuserstate
-*.xcscheme
-OSX/xcode/legacy/Legacy.xcodeproj/xcuserdata/janetcampbell68.xcuserdatad/xcschemes/xcschememanagement.plist
-*.xcuserstate
-OSX/xcode/shivah/Shivah.xcodeproj/project.xcworkspace/xcuserdata/janetcampbell68.xcuserdatad/UserInterfaceState.xcuserstate
-OSX/xcode/legacy/game_files/music.vox
-OSX/xcode/legacy/Legacy.xcodeproj/xcuserdata/janetcampbell68.xcuserdatad/xcschemes/Legacy.xcscheme
-OSX/xcode/legacy/Legacy.xcodeproj/project.xcworkspace/xcuserdata/janetcampbell68.xcuserdatad/UserInterfaceState.xcuserstate
-OSX/xcode/legacy/Legacy.xcodeproj/xcuserdata/janetcampbell68.xcuserdatad/xcschemes/Legacy.xcscheme
-OSX/xcode/legacy/Legacy.xcodeproj/xcuserdata/janetcampbell68.xcuserdatad/xcschemes/xcschememanagement.plist
-OSX/xcode/shivah/Shivah.xcodeproj/project.xcworkspace/xcuserdata/janetcampbell68.xcuserdatad/UserInterfaceState.xcuserstate
-OSX/xcode/legacy/Legacy.xcodeproj/project.xcworkspace/xcuserdata/janetcampbell68.xcuserdatad/UserInterfaceState.xcuserstate
-*.xcuserstate
-OSX/xcode/shivah/Shivah.xcodeproj/project.xcworkspace/xcuserdata/janetcampbell68.xcuserdatad/UserInterfaceState.xcuserstate
-*.dat
-*.vox
-*.xcworkspacedata
 *.xccheckout
-OSX/xcode/legacy/Legacy.xcodeproj/project.xcworkspace/xcuserdata/janetcampbell68.xcuserdatad/UserInterfaceState.xcuserstate
-OSX/xcode/legacy/Legacy.xcodeproj/project.xcworkspace/xcuserdata/janetcampbell68.xcuserdatad/UserInterfaceState.xcuserstate
-OSX/xcode/golden_wake/game_files no steam.zip
-OSX/xcode/golden_wake/game_files/steam/ac2game.dat.old
-OSX/xcode/golden_wakegame_files no steam.zip
-OSX/xcode/legacy/Legacy.xcodeproj/xcuserdata/janetcampbell68.xcuserdatad/xcschemes/xcschememanagement.plist
-OSX/xcode/legacy/Legacy.xcodeproj/xcuserdata/janetcampbell68.xcuserdatad/xcschemes/Legacy.xcscheme
-
-*.exe
+*.xcscmblueprint

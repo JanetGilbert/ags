@@ -95,18 +95,18 @@ void adjust_pixel_sizes_for_loaded_data(int *x, int *y, int filever)
 void adjust_sizes_for_resolution(int filever)
 {
     int ee;
-    for (ee = 0; ee < game.numcursors; ee++)
+    for (ee = 0; ee < game.numcursors; ee++) 
     {
         game.mcurs[ee].hotx = adjust_pixel_size_for_loaded_data(game.mcurs[ee].hotx, filever);
         game.mcurs[ee].hoty = adjust_pixel_size_for_loaded_data(game.mcurs[ee].hoty, filever);
     }
 
-    for (ee = 0; ee < game.numinvitems; ee++)
+    for (ee = 0; ee < game.numinvitems; ee++) 
     {
         adjust_pixel_sizes_for_loaded_data(&game.invinfo[ee].hotx, &game.invinfo[ee].hoty, filever);
     }
 
-    for (ee = 0; ee < game.numgui; ee++)
+    for (ee = 0; ee < game.numgui; ee++) 
     {
         GUIMain*cgp=&guis[ee];
         adjust_pixel_sizes_for_loaded_data(&cgp->x, &cgp->y, filever);
@@ -122,7 +122,7 @@ void adjust_sizes_for_resolution(int filever)
 
         cgp->popupyp = adjust_pixel_size_for_loaded_data(cgp->popupyp, filever);
 
-        for (ff = 0; ff < cgp->numobjs; ff++)
+        for (ff = 0; ff < cgp->numobjs; ff++) 
         {
             adjust_pixel_sizes_for_loaded_data(&cgp->objs[ff]->x, &cgp->objs[ff]->y, filever);
             adjust_pixel_sizes_for_loaded_data(&cgp->objs[ff]->wid, &cgp->objs[ff]->hit, filever);
@@ -135,7 +135,7 @@ void adjust_sizes_for_resolution(int filever)
     {
         // New 3.1 format game file, but with Use Native Coordinates off
 
-        for (ee = 0; ee < game.numcharacters; ee++)
+        for (ee = 0; ee < game.numcharacters; ee++) 
         {
             game.chars[ee].x /= 2;
             game.chars[ee].y /= 2;
@@ -377,7 +377,7 @@ bool find_nearest_supported_mode(const Size &base_size, const int scaling_factor
     {
         wanted_ratio = (ratio_reference->Height << 10) / ratio_reference->Width;
     }
-
+    
     int nearest_width = 0;
     int nearest_height = 0;
     int nearest_width_diff = 0;
@@ -416,7 +416,7 @@ bool find_nearest_supported_mode(const Size &base_size, const int scaling_factor
         {
             continue;
         }
-
+      
         int diff_w = abs(wanted_size.Width - mode.Width);
         int diff_h = abs(wanted_size.Height - mode.Height);
         bool same_diff_w_higher = (diff_w == nearest_width_diff && nearest_width < mode.Width);
@@ -535,7 +535,7 @@ bool try_find_nearest_supported_mode(const Size &base_size, const int scaling_fa
     if (!prefer_sideborders)
     {
         // no sideborders
-        if (!prefer_letterbox)
+        if (!prefer_letterbox) 
             // no letterboxing, perfect match only
             found = find_nearest_supported_mode(base_size, scaling_factor, found_size, color_depth, NULL, true, true);
 
@@ -553,7 +553,7 @@ bool try_find_nearest_supported_mode(const Size &base_size, const int scaling_fa
     if (!found)
     {
         // with sideborders
-        if (!prefer_letterbox)
+        if (!prefer_letterbox) 
         {
             // no letterbox, sideborders only
             // try match desktop ratio
@@ -611,7 +611,7 @@ int try_find_max_supported_uniform_scaling(const Size &base_size, Size &found_si
     if (!prefer_sideborders)
     {
         // no sideborders
-        if (!prefer_letterbox)
+        if (!prefer_letterbox) 
             // no letterboxing, perfect match only
             multiplier = find_max_supported_uniform_scaling(base_size, found_size, color_depth, NULL, true, true);
 
@@ -629,7 +629,7 @@ int try_find_max_supported_uniform_scaling(const Size &base_size, Size &found_si
     if (!multiplier)
     {
         // with sideborders
-        if (!prefer_letterbox)
+        if (!prefer_letterbox) 
         {
             // no letterbox, sideborders only
             // try match desktop ratio
@@ -678,7 +678,7 @@ bool engine_init_gfx_filters(Size &game_size, Size &screen_size, const int color
             filter = NULL;
         }
     }
-
+    
     // If the filter was not set for any reason, try to choose standard scaling filter
     // of maximal possible scaling factor
     if (!filter)
@@ -707,7 +707,7 @@ bool engine_init_gfx_filters(Size &game_size, Size &screen_size, const int color
 
     // On success apply filter and define game frame
     Out::FPrint("Applying graphics filter: %s", filter->GetFilterID());
-    gfxDriver->SetGraphicsFilter(filter);
+    gfxDriver->SetGraphicsFilter(filter);    
     game_size.Width = screen_size.Width / filter->GetScalingFactor();
     game_size.Height = screen_size.Height / filter->GetScalingFactor();
     Out::FPrint("Chosen gfx resolution: %d x %d (%d bit), game frame: %d x %d",
@@ -771,7 +771,7 @@ bool init_gfx_mode(const Size &game_size, const Size &screen_size, int cdep)
     return false;
 }
 
-bool switch_to_graphics_mode(const Size &game_size, const Size &screen_size)
+bool switch_to_graphics_mode(const Size &game_size, const Size &screen_size) 
 {
     bool result = init_gfx_mode(game_size, screen_size, firstDepth);
     if (!result && firstDepth != secondDepth)
@@ -823,7 +823,7 @@ void engine_post_init_gfx_driver()
 {
 	_old_screen = BitmapHelper::GetScreenBitmap();
 
-    if (gfxDriver->HasAcceleratedStretchAndFlip())
+    if (gfxDriver->HasAcceleratedStretchAndFlip()) 
     {
         walkBehindMethod = DrawAsSeparateSprite;
 
@@ -989,10 +989,9 @@ int create_gfx_driver_and_init_mode(const String &gfx_driver_id, Size &game_size
     // Assign mouse control parameters.
     //
     // Whether mouse movement should be controlled by the engine - this is
-    // declared here for the sake of distinction; this definition may be
-    // replaced with e.g. config option if necessary. Currently it is assumed
-    // that mouse movement should be controlled only in fullscreen.
-    const bool should_control_mouse = !usetup.windowed;
+    // determined based on related config option.
+    const bool should_control_mouse = usetup.mouse_control == kMouseCtrl_Always ||
+        usetup.mouse_control == kMouseCtrl_Fullscreen && !usetup.windowed;
     // Whether mouse movement control is supported by the engine - this is
     // determined on per platform basis. Some builds may not have such
     // capability, e.g. because of how backend library implements mouse utils.

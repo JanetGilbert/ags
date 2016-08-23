@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:AGSKit/AGSKit.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:convergence/Convergence.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:golden_wake/GoldenWake.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:legacy/Legacy.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:primordia/Primordia.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:shivah/Shivah.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:unbound/Unbound.xcodeproj">
+   </FileRef>
+</Workspace>

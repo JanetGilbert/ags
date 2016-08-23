@@ -122,6 +122,11 @@ void INIwritestring(ConfigTree &cfg, const String &sectn, const String &item, co
     cfg[sectn][item] = value;
 }
 
+void INIwriteint(ConfigTree &cfg, const String &sectn, const String &item, int value)
+{
+    cfg[sectn][item] = String::FromFormat("%d", value);
+}
+
 void find_default_cfg_file(const char *alt_cfg_file)
 {
     // Try current directory for config first; else try exe dir
@@ -157,11 +162,30 @@ void find_user_cfg_file()
 
 void config_defaults()
 {
-    // set default dir if no config file
-    usetup.data_files_dir = ".";
 #ifdef WINDOWS_VERSION
     usetup.digicard = DIGI_DIRECTAMX(0);
 #endif
+}
+
+void read_game_data_location(const ConfigTree &cfg)
+{
+    usetup.data_files_dir = INIreadstring(cfg, "misc", "datadir", usetup.data_files_dir);
+    if (!usetup.data_files_dir.IsEmpty())
+    {
+        // strip any trailing slash
+        // TODO: move this to Path namespace later
+        AGS::Common::Path::FixupPath(usetup.data_files_dir);
+#if defined (WINDOWS_VERSION)
+        // if the path is just x:\ don't strip the slash
+        if (!(usetup.data_files_dir.GetLength() < 4 && usetup.data_files_dir[1] == ':'))
+        {
+            usetup.data_files_dir.TrimRight('/');
+        }
+#else
+        usetup.data_files_dir.TrimRight('/');
+#endif
+    }
+    usetup.main_data_filename = INIreadstring(cfg, "misc", "datafile", usetup.main_data_filename);
 }
 
 void read_config(const ConfigTree &cfg)
@@ -222,22 +246,6 @@ void read_config(const ConfigTree &cfg)
         // This option is backwards (usevox is 0 if no_speech_pack)
         usetup.no_speech_pack = INIreadint(cfg, "sound", "usespeech") == 0;
 
-        usetup.data_files_dir = INIreadstring(cfg, "misc","datadir");
-        if (usetup.data_files_dir.IsEmpty())
-            usetup.data_files_dir = ".";
-        // strip any trailing slash
-        // TODO: move this to Path namespace later
-        AGS::Common::Path::FixupPath(usetup.data_files_dir);
-#if defined (WINDOWS_VERSION)
-        // if the path is just x:\ don't strip the slash
-        if (!(usetup.data_files_dir.GetLength() < 4 && usetup.data_files_dir[1] == ':'))
-        {
-            usetup.data_files_dir.TrimRight('/');
-        }
-#else
-        usetup.data_files_dir.TrimRight('/');
-#endif
-        usetup.main_data_filename = INIreadstring(cfg, "misc", "datafile");
         usetup.user_data_dir = INIreadstring(cfg, "misc", "user_data_dir");
 
 #if defined(IOS_VERSION) || defined(PSP_VERSION) || defined(ANDROID_VERSION)
@@ -275,12 +283,25 @@ void read_config(const ConfigTree &cfg)
         usetup.mouse_speed = INIreadfloat(cfg, "mouse", "speed", 1.f);
         if (usetup.mouse_speed <= 0.f)
             usetup.mouse_speed = 1.f;
+        const char *mouse_ctrl_options[kNumMouseCtrlOptions] = { "never", "fullscreen", "always" };
+        String mouse_str = INIreadstring(cfg, "mouse", "control", "fullscreen");
+        for (int i = 0; i < kNumMouseCtrlOptions; ++i)
+        {
+            if (mouse_str.CompareNoCase(mouse_ctrl_options[i]) == 0)
+            {
+                usetup.mouse_control = (MouseControl)i;
+                break;
+            }
+        }
         const char *mouse_speed_options[kNumMouseSpeedDefs] = { "absolute", "current_display" };
-        String mouse_str = INIreadstring(cfg, "mouse", "speed_def", "current_display");
+        mouse_str = INIreadstring(cfg, "mouse", "speed_def", "current_display");
         for (int i = 0; i < kNumMouseSpeedDefs; ++i)
         {
             if (mouse_str.CompareNoCase(mouse_speed_options[i]) == 0)
+            {
                 usetup.mouse_speed_def = (MouseSpeedDef)i;
+                break;
+            }
         }
 
         usetup.override_multitasking = INIreadint(cfg, "override", "multitasking");

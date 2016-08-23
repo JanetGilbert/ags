@@ -1,7 +1,7 @@
 #ifndef AGS_WADJETUTIL_H
 #define AGS_WADJETUTIL_H
 
-#include "plugin/agsplugin.h"
+#include "agsplugin.h"
 
 namespace agswadjetutil
 {

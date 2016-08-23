@@ -28,12 +28,13 @@ extern String ac_config_file;
 void load_default_config_file(AGS::Common::ConfigTree &cfg, const char *alt_cfg_file);
 // Find and load user configuration file (located into writable user location)
 void load_user_config_file(AGS::Common::ConfigTree &cfg);
+// Read optional data file name and location from config
+void read_game_data_location(const AGS::Common::ConfigTree &cfg);
 // Setup game using final config tree
 void read_config(const AGS::Common::ConfigTree &cfg);
 // Fixup game setup parameters
 void post_config();
 
-void read_config_file(ConfigTree &cfg, const char *alt_cfg_file);
 void save_config_file();
 
 bool INIreaditem(const ConfigTree &cfg, const String &sectn, const String &item, String &value);
@@ -41,6 +42,7 @@ String INIreadstring(const ConfigTree &cfg, const String &sectn, const String &i
 int INIreadint(const ConfigTree &cfg, const String &sectn, const String &item);
 float INIreadfloat(const ConfigTree &cfg, const String &sectn, const String &item, float def_value = 0.f);
 void INIwritestring(ConfigTree &cfg, const String &sectn, const String &item, const String &value);
+void INIwriteint(ConfigTree &cfg, const String &sectn, const String &item, int value);
 
 
 #endif // __AGS_EE_MAIN__CONFIG_H

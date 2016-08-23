@@ -205,7 +205,7 @@ PACKFILE *pack_fopen(char *filnam1, char *modd1) {
     // ~ signals load from specific data file, not the main default one
     char gfname[80];
     int ii = 0;
-
+    
     filnam++;
     while (filnam[0]!='~') {
       gfname[ii] = filnam[0];
@@ -222,7 +222,7 @@ PACKFILE *pack_fopen(char *filnam1, char *modd1) {
     sprintf(useloc,"%s\\%s",usetup.data_files_dir,gfname);
 #endif
     Common::AssetManager::SetDataFile(useloc);*/
-
+    
     char *libname = ci_find_file(usetup.data_files_dir, gfname);
     if (Common::AssetManager::SetDataFile(libname) != Common::kAssetNoError)
     {
@@ -232,7 +232,7 @@ PACKFILE *pack_fopen(char *filnam1, char *modd1) {
       Common::AssetManager::SetDataFile(libname);
     }
     free(libname);
-
+    
     needsetback = 1;
   }
 
@@ -259,14 +259,14 @@ PACKFILE *pack_fopen(char *filnam1, char *modd1) {
   if ((Common::AssetManager::GetAssetOffset(filnam)<1) || (file_exists)) {
     if (needsetback) Common::AssetManager::SetDataFile(game_file_name);
     return __old_pack_fopen(filnam, modd);
-  }
+  } 
   else {
     _my_temppack=__old_pack_fopen(Common::AssetManager::GetLibraryForAsset(filnam), modd);
     if (_my_temppack == NULL)
       quitprintf("pack_fopen: unable to change datafile: not found: %s", Common::AssetManager::GetLibraryForAsset(filnam).GetCStr());
 
     pack_fseek(_my_temppack,Common::AssetManager::GetAssetOffset(filnam));
-
+    
 #if ALLEGRO_DATE < 20050101
     _my_temppack->todo=Common::AssetManager::GetAssetSize(filnam);
 #else
@@ -282,6 +282,7 @@ PACKFILE *pack_fopen(char *filnam1, char *modd1) {
 // end packfile functions
 
 
+const String GameInstallRootToken    = "$INSTALLDIR$";
 const String UserSavedgamesRootToken = "$MYDOCS$";
 const String GameSavedgamesDirToken  = "$SAVEGAMEDIR$";
 const String GameDataDirToken        = "$APPDATADIR$";
@@ -348,8 +349,19 @@ bool ResolveScriptPath(const String &sc_path, bool read_only, String &path, Stri
         path = sc_path;
         return true;
     }
-
-    if (sc_path.CompareLeft(GameSavedgamesDirToken, GameSavedgamesDirToken.GetLength()) == 0)
+    
+    if (sc_path.CompareLeft(GameInstallRootToken, GameInstallRootToken.GetLength()) == 0)
+    {
+        if (!read_only)
+        {
+            debug_log("Attempt to access file '%s' denied (cannot write to game installation directory)",
+                sc_path.GetCStr());
+            return false;
+        }
+        parent_dir = get_current_dir();
+        child_path = sc_path.Mid(GameInstallRootToken.GetLength());
+    }
+    else if (sc_path.CompareLeft(GameSavedgamesDirToken, GameSavedgamesDirToken.GetLength()) == 0)
     {
         parent_dir = saveGameDirectory;
         child_path = sc_path.Mid(GameSavedgamesDirToken.GetLength());
@@ -376,7 +388,7 @@ bool ResolveScriptPath(const String &sc_path, bool read_only, String &path, Stri
         parent_dir = MakeAppDataPath();
         // Set alternate non-remapped "unsafe" path for read-only operations
         if (read_only)
-            alt_path = sc_path;
+            alt_path = String::FromFormat("%s%s", get_current_dir().GetCStr(), sc_path.GetCStr());
 
         // For games made in the safe-path-aware versions of AGS, report a warning
         // if the unsafe path is used for write operation

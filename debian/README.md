@@ -47,7 +47,7 @@ Download the sources with git and change into the **ags** directory:
 Build the package and install it with gdebi:
 
     fakeroot debian/rules binary
-    sudo gdebi ../ags_3.30.0-1_*.deb
+    sudo gdebi ../ags_3~git-1_*.deb
 
 #Using the engine
 To start an AGS game, just run ags with the game directory or the game
@@ -76,7 +76,9 @@ A direct link is here:
 
 http://www.eglebbk.dds.nl/program/download/digmid.dat
 
-Rename that file to **patches.dat**. You can now place it:
+This 'digmid.dat' is, in fact, a **bzip2** archive, containing actual data file,
+which should be about 25 MB large. Extract that file and rename it to **patches.dat**.
+You can now place it:
 
 -   in the directory pointed to by the ALLEGRO environment variable; or
 -   if $ALLEGRO is not defined, in $HOME; or
@@ -165,4 +167,4 @@ Build the package with pbuilder and install it and its dependencies with gdebi:
 
     cd ags
     pdebuild
-    sudo gdebi /var/cache/pbuilder/result/ags_3.30.0-1_i386.deb
+    sudo gdebi /var/cache/pbuilder/result/ags_3~git-1_i386.deb

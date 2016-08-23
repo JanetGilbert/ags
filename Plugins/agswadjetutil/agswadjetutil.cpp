@@ -19,7 +19,7 @@ Utility functions for Wadjet eye games
 #define THIS_IS_THE_PLUGIN
 #endif
 
-#include "plugin/agsplugin.h"
+#include "agsplugin.h"
 
 #if defined(BUILTIN_PLUGINS)
 namespace agswadjetutil {

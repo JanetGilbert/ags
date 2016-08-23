@@ -378,30 +378,7 @@ String MakeSaveGameDir(const char *newFolder, bool allowAbsolute)
     return newSaveGameDir;
 }
 
-// TODO: Update to new save game dir system:
-// // evil evil evil kludge for autocloud on the steam build
-// // Makes sure the saves folder is the in "same" relative place on all 3 platforms
-// // OH and it must be lowercase because Steam lacks handling of MixedCase foldernames.
-// #if defined (MAC_VERSION)
-//   if (strcasecmp(newFolder, "Saves") == 0)
-//   {
-//     AGSMacGetBundleDir(newSaveGameDir);
-//     strcat(newSaveGameDir, "/saves");
-//   }
-// #elif defined(LINUX_VERSION)
-//   if (strcasecmp(newFolder, "Saves") == 0)
-//   {
-//     strcpy(newSaveGameDir, "saves");
-//   }
-// #endif
-//
-//
-// #if defined (WINDOWS_VERSION)
-//   mkdir(newSaveGameDir);
-// #else
-//   mkdir(newSaveGameDir, 0755);
-// #endif
-
+// set global variable 'saveGameDirectory'
 int SetSaveGameDirectoryPath(const char *newFolder, bool allowAbsolute)
 {
     String newSaveGameDir = MakeSaveGameDir(newFolder, allowAbsolute);
@@ -441,10 +418,6 @@ int SetSaveGameDirectoryPath(const char *newFolder, bool allowAbsolute)
     strcpy(saveGameDirectory, newSaveGameDir);
     return 1;
 }
-
-#if defined (MAC_VERSION)
-void AGSMacGetBundleDir(char gamepath[PATH_MAX]);
-#endif
 
 int Game_SetSaveGameDirectory(const char *newFolder)
 {
@@ -2554,7 +2527,7 @@ int load_game(const Common::String &path, int slotNumber)
     gameHasBeenRestored++;
 
     SavedGameVersion svg_version;
-    int error_code;
+    int error_code;    
     Stream *in = open_savedgame(path, error_code, &svg_version);
     if (!in)
     {
