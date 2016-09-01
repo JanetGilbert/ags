@@ -145,6 +145,135 @@
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
+		<Configuration
+			Name="Release_MD|Win32"
+			OutputDirectory="$(SolutionDir)\.lib\$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="4"
+			CharacterSet="2"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="2"
+				EnableIntrinsicFunctions="true"
+				AdditionalIncludeDirectories="..\..\Common;..\..\Compiler"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;WINDOWS_VERSION"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+				DisableSpecificWarnings="4996"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)\Compiler_md.lib"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Debug_MD|Win32"
+			OutputDirectory="$(SolutionDir)\.lib\$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="4"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="..\..\Common;..\..\Compiler"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;WINDOWS_VERSION"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="4"
+				DisableSpecificWarnings="4996"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)\Compiler_md_d.lib"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -194,6 +323,30 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="cs"
+				>
+				<File
+					RelativePath="..\..\Common\script\cc_error.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Common\script\cc_options.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Common\script\cc_script.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Common\script\cc_treemap.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Common\script\script_common.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -201,34 +354,30 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\Common\fmem.h"
+				RelativePath="..\..\Compiler\fmem.h"
 				>
 			</File>
 			<Filter
 				Name="cs"
 				>
 				<File
-					RelativePath="..\..\Common\cs\cc_error.h"
+					RelativePath="..\..\Common\script\cc_error.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\Common\cs\cc_instance.h"
+					RelativePath="..\..\Common\script\cc_options.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\Common\cs\cc_options.h"
+					RelativePath="..\..\Common\script\cc_script.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\Common\cs\cc_script.h"
+					RelativePath="..\..\Common\script\cc_treemap.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\Common\cs\cc_treemap.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Common\cs\cs_common.h"
+					RelativePath="..\..\Common\script\script_common.h"
 					>
 				</File>
 			</Filter>

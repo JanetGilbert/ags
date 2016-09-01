@@ -12,9 +12,6 @@
 //
 //=============================================================================
 
-#if !defined (WINDOWS_VERSION)
-#include <sys/stat.h>                      //mkdir
-#endif
 #include "ac/common.h"
 #include "ac/view.h"
 #include "ac/audiochannel.h"
@@ -62,6 +59,7 @@
 #include "ac/dynobj/all_scriptclasses.h"
 #include "debug/debug_log.h"
 #include "debug/out.h"
+#include "device/mousew32.h"
 #include "font/fonts.h"
 #include "gfx/ali3d.h"
 #include "gui/animatingguibutton.h"
@@ -77,21 +75,18 @@
 #include "script/script.h"
 #include "script/script_runtime.h"
 #include "util/alignedstream.h"
+#include "util/directory.h"
 #include "util/filestream.h"
 #include "util/string_utils.h"
 
-using AGS::Common::AlignedStream;
-using AGS::Common::String;
-using AGS::Common::Stream;
-using AGS::Common::Bitmap;
-namespace BitmapHelper = AGS::Common::BitmapHelper;
+using namespace AGS::Common;
 
 extern ScriptAudioChannel scrAudioChannel[MAX_SOUND_CHANNELS + 1];
 extern int time_between_timers;
 extern Bitmap *virtual_screen;
 extern int cur_mode,cur_cursor;
 extern SpeechLipSyncLine *splipsync;
-extern int numLipLines, curLipLine, curLipLinePhenome;
+extern int numLipLines, curLipLine, curLipLinePhoneme;
 
 extern CharacterExtras *charextra;
 extern DialogTopic *dialog;
@@ -146,6 +141,7 @@ RoomStatus*croom=NULL;
 roomstruct thisroom;
 
 volatile int switching_away_from_game = 0;
+volatile bool switched_away = false;
 volatile char want_exit = 0, abort_engine = 0;
 GameDataVersion loaded_game_file_version = kGameVersion_Undefined;
 int frames_per_second=40;
@@ -353,35 +349,52 @@ String get_save_game_path(int slotNum) {
     return path;
 }
 
-int SetSaveGameDirectoryPath(const char *newFolder, bool allowAbsolute)
+// Convert a path possibly containing path tags into acceptable save path
+String MakeSaveGameDir(const char *newFolder)
 {
+    // don't allow absolute paths
+    if (!is_relative_filename(newFolder))
+        return "";
 
-    // don't allow them to go to another folder
-    if ((!allowAbsolute) && ((newFolder[0] == '/') || (newFolder[0] == '\\') ||
-        (newFolder[0] == ' ') ||
-        ((newFolder[0] != 0) && (newFolder[1] == ':'))))
-        return 0;
+    String newSaveGameDir = newFolder;
+    if (newSaveGameDir.CompareLeft(UserSavedgamesRootToken, UserSavedgamesRootToken.GetLength()) == 0)
+    {
+        newSaveGameDir.ReplaceMid(0, UserSavedgamesRootToken.GetLength(),
+            PathOrCurDir(platform->GetUserSavedgamesDirectory()));
+    }
+    else if (newSaveGameDir.CompareLeft(GameDataDirToken, GameDataDirToken.GetLength()) == 0)
+    {
+        newSaveGameDir.ReplaceMid(0, GameDataDirToken.GetLength(),
+            PathOrCurDir(platform->GetAllUsersDataDirectory()));
+    }
+    else
+    {
+        newSaveGameDir.Format("%s/%s", PathOrCurDir(platform->GetUserSavedgamesDirectory()), newFolder);
+        // For games made in the safe-path-aware versions of AGS, report a warning
+        if (game.options[OPT_SAFEFILEPATHS])
+        {
+            debug_log("Attempt to explicitly set savegame location relative to the game installation directory ('%s') denied;\nPath will be remapped to the user documents directory: '%s'",
+                newFolder, newSaveGameDir.GetCStr());
+        }
+    }
+    return newSaveGameDir;
+}
 
-    char newSaveGameDir[260];
-    platform->ReplaceSpecialPaths(newFolder, newSaveGameDir, sizeof(newSaveGameDir));
-    fix_filename_slashes(newSaveGameDir);
+bool SetSaveGameDirectoryPath(const char *newFolder, bool explicit_path)
+{
+    String newSaveGameDir = explicit_path ? String(newFolder) : MakeSaveGameDir(newFolder);
+    if (newSaveGameDir.IsEmpty())
+        return false;
 
-#if defined (WINDOWS_VERSION)
-    mkdir(newSaveGameDir);
-#else
-    mkdir(newSaveGameDir, 0755);
-#endif
-
-    put_backslash(newSaveGameDir);
+    if (!Directory::CreateDirectory(newSaveGameDir))
+        return false;
+    newSaveGameDir.AppendChar('/');
 
     char newFolderTempFile[260];
     strcpy(newFolderTempFile, newSaveGameDir);
     strcat(newFolderTempFile, "agstmp.tmp");
-
     if (!Common::File::TestCreateFile(newFolderTempFile))
-	{
-        return 0;
-    }
+        return false;
 
     // copy the Restart Game file, if applicable
     char restartGamePath[260];
@@ -394,7 +407,7 @@ int SetSaveGameDirectoryPath(const char *newFolder, bool allowAbsolute)
         restartGameFile->Read(mbuffer, fileSize);
         delete restartGameFile;
 
-        sprintf(restartGamePath, "%s""agssave.%d%s", newSaveGameDir, RESTART_POINT_SAVE_GAME_NUMBER, saveGameSuffix);
+        sprintf(restartGamePath, "%s""agssave.%d%s", newSaveGameDir.GetCStr(), RESTART_POINT_SAVE_GAME_NUMBER, saveGameSuffix);
         restartGameFile = Common::File::CreateFile(restartGamePath);
         restartGameFile->Write(mbuffer, fileSize);
         delete restartGameFile;
@@ -402,15 +415,17 @@ int SetSaveGameDirectoryPath(const char *newFolder, bool allowAbsolute)
     }
 
     strcpy(saveGameDirectory, newSaveGameDir);
-    return 1;
+    return true;
 }
 
 int Game_SetSaveGameDirectory(const char *newFolder)
 {
-	return SetSaveGameDirectoryPath(newFolder, false);
+    // Had the user specified custom save path, it should
+    // override any paths set from game script
+    if (usetup.user_data_dir.IsEmpty())
+        return SetSaveGameDirectoryPath(newFolder, false) ? 1 : 0;
+    return 1;
 }
-
-
 
 const char* Game_GetSaveSlotDescription(int slnum) {
     String description;
@@ -1488,6 +1503,7 @@ void create_savegame_screenshot(Bitmap *&screenShot)
         }
         else
         {
+            // FIXME this weird stuff! (related to incomplete OpenGL renderer)
 #if defined(IOS_VERSION) || defined(ANDROID_VERSION) || defined(WINDOWS_VERSION)
             int color_depth = (psp_gfx_renderer > 0) ? 32 : final_col_dep;
 #else
@@ -2720,9 +2736,18 @@ int __GetLocationType(int xxx,int yyy, int allowHotspot0) {
     return winner;
 }
 
-void display_switch_out() {
+void display_switch_out()
+{
+    switched_away = true;
+    // Always unlock mouse when switching out from the game
+    Mouse::UnlockFromWindow();
+}
+
+void display_switch_out_suspend()
+{
     // this is only called if in SWITCH_PAUSE mode
     //debug_log("display_switch_out");
+    display_switch_out();
 
     switching_away_from_game++;
 
@@ -2747,7 +2772,18 @@ void display_switch_out() {
     switching_away_from_game--;
 }
 
-void display_switch_in() {
+void display_switch_in()
+{
+    switched_away = false;
+    // If auto lock option is set, lock mouse to the game window
+    if (usetup.mouse_auto_lock && usetup.windowed)
+        Mouse::TryLockToWindow();
+}
+
+void display_switch_in_resume()
+{
+    display_switch_in();
+
     for (int i = 0; i <= MAX_SOUND_CHANNELS; i++) {
         if ((channels[i] != NULL) && (channels[i]->done == 0)) {
             channels[i]->resume();

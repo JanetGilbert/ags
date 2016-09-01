@@ -12,7 +12,6 @@
 #define NEST_ELSESINGLE 6
 #define NEST_STRUCT     7
 #define MAX_FUNCTIONS 2000
-#define MAXSYMBOLS 10000
 #define MAX_FUNCTION_PARAMETERS 15
 // This is the maximum length of a "static string" in the script
 #define MAX_SYM_LEN 500
@@ -84,7 +83,6 @@
 #define SFLG_CONST     0x10000  // const variable
 #define SFLG_AUTOPTR   0x20000  // automatically convert definition to pointer
 #define SFLG_DYNAMICARRAY 0x40000  // array allocated at runtime
-#define PARAM_NO_DEFAULT_VALUE -32000
 #define TEMP_SYMLIST_LENGTH 100
 
 extern int is_whitespace(char cht);

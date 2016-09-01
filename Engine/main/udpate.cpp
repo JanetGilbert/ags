@@ -60,7 +60,7 @@ extern bool facetalk_qfg4_override_placement_x, facetalk_qfg4_override_placement
 extern volatile unsigned long globalTimerCounter;
 extern int time_between_timers;
 extern SpeechLipSyncLine *splipsync;
-extern int numLipLines, curLipLine, curLipLinePhenome;
+extern int numLipLines, curLipLine, curLipLinePhoneme;
 extern ScreenOverlay screenover[MAX_SCREEN_OVERLAYS];
 extern int numscreenover;
 extern int is_text_overlay;
@@ -331,19 +331,19 @@ void update_sierra_speech()
     if (curLipLine >= 0) {
       // check voice lip sync
       int spchOffs = channels[SCHAN_SPEECH]->get_pos_ms ();
-      if (curLipLinePhenome >= splipsync[curLipLine].numPhenomes) {
+      if (curLipLinePhoneme >= splipsync[curLipLine].numPhonemes) {
         // the lip-sync has finished, so just stay idle
       }
       else 
       {
-        while ((curLipLinePhenome < splipsync[curLipLine].numPhenomes) &&
-          ((curLipLinePhenome < 0) || (spchOffs >= splipsync[curLipLine].endtimeoffs[curLipLinePhenome])))
+        while ((curLipLinePhoneme < splipsync[curLipLine].numPhonemes) &&
+          ((curLipLinePhoneme < 0) || (spchOffs >= splipsync[curLipLine].endtimeoffs[curLipLinePhoneme])))
         {
-          curLipLinePhenome ++;
-          if (curLipLinePhenome >= splipsync[curLipLine].numPhenomes)
+          curLipLinePhoneme ++;
+          if (curLipLinePhoneme >= splipsync[curLipLine].numPhonemes)
             facetalkframe = game.default_lipsync_frame;
           else
-            facetalkframe = splipsync[curLipLine].frame[curLipLinePhenome];
+            facetalkframe = splipsync[curLipLine].frame[curLipLinePhoneme];
 
           if (facetalkframe >= views[facetalkview].loops[facetalkloop].numFrames)
             facetalkframe = 0;
@@ -435,19 +435,18 @@ void update_sierra_speech()
       }
 
       Bitmap *frame_pic = screenover[face_talking].pic;
-      const ViewFrame *vf = &views[facetalkview].loops[facetalkloop].frames[facetalkframe];
-      DrawViewFrame(frame_pic, vf, view_frame_x, view_frame_y);
+      const ViewFrame *face_vf = &views[facetalkview].loops[facetalkloop].frames[facetalkframe];
+      bool face_has_alpha = (game.spriteflags[face_vf->pic] & SPF_ALPHACHANNEL) != 0;
+      DrawViewFrame(frame_pic, face_vf, view_frame_x, view_frame_y);
 
       if ((facetalkchar->blinkview > 0) && (facetalkchar->blinktimer < 0)) {
+        ViewFrame *blink_vf = &views[facetalkchar->blinkview].loops[facetalkBlinkLoop].frames[facetalkchar->blinkframe];
+        face_has_alpha |= (game.spriteflags[blink_vf->pic] & SPF_ALPHACHANNEL) != 0;
         // draw the blinking sprite on top
-        vf = &views[facetalkchar->blinkview].loops[facetalkBlinkLoop].frames[facetalkchar->blinkframe];
-        DrawViewFrame(frame_pic,
-            vf,
-            view_frame_x, view_frame_y);
+        DrawViewFrame(frame_pic, blink_vf, view_frame_x, view_frame_y, face_has_alpha);
       }
-      const bool closeupface_has_alpha = (game.spriteflags[vf->pic] & SPF_ALPHACHANNEL) != 0;
 
-      gfxDriver->UpdateDDBFromBitmap(screenover[face_talking].bmp, screenover[face_talking].pic, closeupface_has_alpha);
+      gfxDriver->UpdateDDBFromBitmap(screenover[face_talking].bmp, screenover[face_talking].pic, face_has_alpha);
     }  // end if updatedFrame
   }
 }

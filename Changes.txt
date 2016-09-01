@@ -1,5 +1,155 @@
 REVISION HISTORY
 ================
+VERSION 3.3.5 - Patch 6, August 2016
+
+Editor:
+- Fixed properties buttons dissapearing from the Properties panel if the
+  object was selected while the panel was not visible.
+
+Engine:
+- Fixed Display script functions displaying different text if there is any
+  variadic text formatting function called in repeatedly_execute().
+- Fixed text formatting functions did not parse "%%" format properly.
+
+
+VERSION 3.3.5 - Patch 5, July 2016
+
+Engine:
+- Fixed user's allegro.cfg was ignored.
+
+
+VERSION 3.3.5 - Patch 4, July 2016
+
+Compiler:
+- Fixed crash occuring when there is an incomplete declaration in the end
+  of script.
+
+Engine:
+- Engine will fall back to using default system paths if it failed using
+  user-defined custom save path for any reason.
+- Fixed engine displaying same warning twice if the loaded game was compiled
+  for higher version of AGS.
+
+WinSetup:
+- Only let user choose actually existing folders for custom save paths.
+
+
+VERSION 3.3.5 - Patch 3, June 2016
+
+Engine:
+- Fixed "datafile" config option was ignored.
+- Fixed "datadir" config option was never used when searching for possible game location
+  (this was broken for several years!).
+- Fixed Game.FileName property return empty string.
+- Fixed built-in console making Direct3D9 graphics driver crash in 16-bit games.
+
+
+VERSION 3.3.5 - Patch 2, June 2016
+
+Engine:
+- Fixed compilation on big-endian systems.
+- Fixed compilation with GCC 6.
+
+
+VERSION 3.3.5 - Patch 1, April 2016
+
+Engine:
+- Added support for $INSTALLDIR$ location tag in the filepaths
+  used in the script.
+- Fixed game could not find files in the current directory when
+  run from the Editor.
+
+WinSetup:
+- Fixed error that could occur if choosed custom save path
+  contained "%" symbol.
+- Read correct game's resolution from game data instead of config file.
+- Do not write all default config contents to user config, save only options
+  that are set by setup program.
+
+
+VERSION 3.3.5, March 2016
+
+Editor Features:
+- Path to resource's (sprite, audio) source file is now saved as relative one if the file is
+  located inside game project's folder.
+- Removed arbitrary limit of the script imports (was 50000).
+- Script allows struct member qualifiers to be in any order.
+- Better detection of integer constants overflow in script.
+- Removed arbitrary limit of integer default value of +/-32000. Integer values are now limited
+  by correct 32-bit values (-2147483648 to 2147483647).
+- Support for negative constants in enums.
+- Better folding markers and indentation guides in script editor.
+
+Editor Bug Fixes:
+- Fixed compiler crash if unknown keyword used after "readonly".
+- Fixed compiler did not properly report incorrect type of dynamic array in function declaration.
+- Fixed compiler did not report proper type name in case of syntax error sometimes.
+- Fixed mouse cursor flicker above the script editor.
+
+Engine Features:
+- Removed unconfigurable mouse cursor's acceleration (Windows).
+- Support for mouse cursor speed control: may be defined in configuration and changed in script.
+- A config option for keeping consistent cursor speed relative to user's desktop resolution.
+- Support for locking mouse inside window: automatic lock is enabled in configuration, and user
+  may use Ctrl+Alt combination to lock/release mouse at any time.
+- Restricted writing game files to special system directories
+  (game is forbidden to write files into installation directiory or by absolute path).
+  Unsafe paths are either remapped (when possible) or rejected.
+- Support for player defined saves & game file directory.
+- -v/--version command line argument makes engine display its version and bail.
+
+Engine Bug Fixes:
+- Fixed crash if screenshot is taken while game window was minimized or moving.
+- Fixed alpha blend did not work properly for speech portrait if blinking frame did not have alpha channel.
+- Fixed Display and Say script commands were displaying text for minimal amount of time under certain conditions.
+- Fixed legacy audio functions did not start digital music playback if MIDI driver failed to initialize.
+- Fixed game was run in smallest possible window if graphics driver failed to initialize fullscreen mode.
+- Fixed "--help" command line argument not working all times depending on its order.
+- Fixed engine did not always properly closed application window when running debug build.
+
+Script API:
+- Supported late_repeatedly_execute_always() callback in script, called after game has updated, but
+  before it is drawn.
+- Added Mouse.ControlEnabled (readonly) and Mouse.Speed properties.
+- Added System.HasInputFocus property which tells if game currently has focus or runs at background.
+
+Cosmetics & convenience:
+- Clarified disabled MIDI option name in WinSetup.
+- Extended information displayed if graphics driver failed to initialize.
+- Clarified error messages for running unsupported games.
+
+
+VERSION 3.3.4, July 2015
+
+Features:
+- Removed 10,000 symbols limit in scripts.
+- Added Character.Thinking and Character.ThinkingFrame script properties.
+- Added Papagayo voice lip sync support.
+- Find/Replace dialog now remembers the state of "Case sensitive" checkbox.
+- Engine now scans all available files in search of game data, only giving standard names
+  a priority.
+
+Bug Fixes:
+- Fixed Editor crash in case of lip sync data parsing error.
+- Fixed Find/Replace dialog skipped the first word in the script being searched through.
+- Fixed an order of cycling through fields on Find/Replace dialog.
+- Restored letterboxed game's viewport behavior for larger (and scrolling) rooms.
+- Fixed Hq2x and Hq3x filter rendering when the display resolution requires side borders.
+- Fixed Hq2X and Hq3x filters leaving graphic artifacts on letterbox borders.
+- Fixed wrong screen settings could be applied in particular cases when requested gfx filter
+  could not be found or failed to initialize.
+- Gfx filter name supplied in command line is case-insensitive now.
+- Do not disable both digital sound and MIDI music if only one of these failed to initialize.
+- Fixed MIDI music refuses to start if digital sound is disabled.
+- Fixed division by zero in AlMP3 library code, that could cause crash when seeking in MP3
+  audio clip.
+- Removed an advise to contact Chris Jones displayed in case of error.
+
+Compatibility:
+- Permissive emulation of pre-AGS 3.1.1 "option-on/off" commands in dialog script, that do
+not stop game execution if a wrong option number is supplied.
+
+
 VERSION 3.3.3, December 2014
 
 Features:
@@ -16,6 +166,8 @@ Bug Fixes:
   will continue playing though.
 - Fixed character walking in hi-res games when the destination has negative Y coordinate.
 - Fixed black borders not drawn in screen corners by Direct3D renderer.
+
+Compatibility:
 - Corrected interpretation for games made with AGS 3.0 - 3.2 to let them assign empty loop
   in SetObjectFrame().
 

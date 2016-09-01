@@ -20,11 +20,11 @@
 using AGS::Common::Bitmap;
 namespace BitmapHelper = AGS::Common::BitmapHelper;
 
-const char* Hq3xGFXFilter::Initialize(int width, int height, int colDepth) {
+const char* Hq3xGFXFilter::Initialize(int colDepth) {
     if (colDepth < 32)
         return "Only supports 32-bit colour games";
 
-    return ScalingGFXFilter::Initialize(width, height, colDepth);
+    return ScalingGFXFilter::Initialize(colDepth);
 }
 
 
@@ -50,7 +50,8 @@ void Hq3xGFXFilter::RenderScreen(Bitmap *toRender, int x, int y) {
     hq3x_32(&toRender->GetScanLineForWriting(0)[0], &realScreenBuffer->GetScanLineForWriting(0)[0], toRender->GetWidth(), toRender->GetHeight(), realScreenBuffer->GetWidth() * BYTES_PER_PIXEL(realScreenBuffer->GetColorDepth()));
     realScreenBuffer->Release();
 
-    realScreen->Blit(realScreenBuffer, 0, 0, x * MULTIPLIER, y * MULTIPLIER, realScreen->GetWidth(), realScreen->GetHeight());
+    realScreen->Blit(realScreenBuffer, 0, 0, x * MULTIPLIER, y * MULTIPLIER,
+        toRender->GetWidth() * MULTIPLIER, toRender->GetHeight() * MULTIPLIER);
 
     lastBlitFrom = toRender;
 }

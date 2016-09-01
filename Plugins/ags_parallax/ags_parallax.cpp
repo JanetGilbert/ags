@@ -16,16 +16,16 @@ but a workalike plugin created by JJS for the AGS engine ports.
 #define THIS_IS_THE_PLUGIN
 #endif
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+
 #include "plugin/agsplugin.h"
 
 #if defined(BUILTIN_PLUGINS)
 namespace ags_parallax {
 #endif
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
 
 //#define DEBUG
 //#define ENABLE_SAVING // The original plugin does not save any data!
@@ -55,6 +55,13 @@ typedef struct
 #define MAX_SPRITES 100
 sprite_t sprites[MAX_SPRITES];
 
+// workaround to fix this error:
+//   psp-fixup-imports ags_parallax.elf
+//   Error, no .lib.stub section found
+void dummy()
+{
+  void *tmp = new int;
+}
 
 #if defined(ENABLE_SAVING)
 void RestoreGame(FILE* file)
@@ -336,5 +343,5 @@ void AGS_EditorLoadGame(char* buffer, int bufsize)
 
 
 #if defined(BUILTIN_PLUGINS)
-}
+} // namespace ags_parallax
 #endif

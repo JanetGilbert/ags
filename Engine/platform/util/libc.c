@@ -26,7 +26,7 @@
 }*/
 
 
-#if defined (LINUX_VERSION) || defined (ANDROID_VERSION) || defined (IOS_VERSION)
+#if defined (LINUX_VERSION) || defined (ANDROID_VERSION) || defined (IOS_VERSION) || defined (MAC_VERSION)
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -94,4 +94,4 @@ char* strlwr(char* s)
   return original;
 }
 
-#endif // defined (LINUX_VERSION) || defined (ANDROID_VERSION) || defined (IOS_VERSION)
+#endif // defined (LINUX_VERSION) || defined (ANDROID_VERSION) || defined (IOS_VERSION) || defined (MAC_VERSION)

@@ -68,6 +68,7 @@ extern int _places_r, _places_g, _places_b;
 const int MaxScalingFactor = 8; // we support up to x8 scaling now
 
 Size GameSize;
+Size LetterboxedGameSize;
 int firstDepth, secondDepth;
 String GfxFilterRequest;
 
@@ -241,7 +242,8 @@ void engine_init_screen_settings(Size &game_size, Size &screen_size)
     // include black horizontal borders of fixed height.
     // If the letterbox option is disabled, then the game frame size will be
     // equal to native game size.
-    game_size = ResolutionTypeToSize(game.default_resolution, game.options[OPT_LETTERBOX] != 0);
+    LetterboxedGameSize = ResolutionTypeToSize(game.default_resolution, game.options[OPT_LETTERBOX] != 0);
+    game_size = LetterboxedGameSize;
     screen_size = Size(0, 0);
 
     // Log out display information
@@ -253,13 +255,14 @@ void engine_init_screen_settings(Size &game_size, Size &screen_size)
 
     Out::FPrint("Game native resolution: %d x %d (%d bit)%s", scrnwid, scrnhit, firstDepth,
         game.options[OPT_LETTERBOX] == 0 ? "": " letterbox-by-design");
-    Out::FPrint("Game settings: letterbox %s, side borders %s",
+    Out::FPrint("Game settings: %s, letterbox %s, side borders %s",
+        usetup.windowed ? "windowed" : "fullscreen",
         usetup.prefer_letterbox ? "acceptable" : "undesirable", usetup.prefer_sideborders ? "acceptable" : "undesirable");
 
     adjust_sizes_for_resolution(loaded_game_file_version);
 }
 
-int initialize_graphics_filter(const char *filterID, int width, int height, int colDepth)
+bool initialize_graphics_filter(const char *filterID, int colDepth)
 {
     int idx = 0;
     GFXFilter **filterList;
@@ -273,33 +276,36 @@ int initialize_graphics_filter(const char *filterID, int width, int height, int 
         filterList = get_allegro_gfx_filter_list(false);
     }
 
-    // by default, select No Filter
-    filter = filterList[0];
-
+    filter = NULL;
     GFXFilter *thisFilter = filterList[idx];
-    while (thisFilter != NULL) {
-
+    while (thisFilter != NULL)
+    {
         if ((filterID != NULL) &&
-            (strcmp(thisFilter->GetFilterID(), filterID) == 0))
+            (stricmp(thisFilter->GetFilterID(), filterID) == 0))
             filter = thisFilter;
-        else if (idx > 0)
+        else
             delete thisFilter;
 
         idx++;
         thisFilter = filterList[idx];
     }
 
-    Out::FPrint("Applying scaling filter: %s", filter->GetFilterID());
-
-    const char *filterError = filter->Initialize(width, height, colDepth);
-    if (filterError != NULL) {
-        proper_exit = 1;
-        platform->DisplayAlert("Unable to initialize the graphics filter. It returned the following error:\n'%s'\n\nTry running Setup and selecting a different graphics filter.", filterError);
-        return -1;
+    if (!filter)
+    {
+        Out::FPrint("Could not find graphics filter %s", filterID);
+        return false;
     }
 
-    gfxDriver->SetGraphicsFilter(filter);
-    return 0;
+    const char *filterError = filter->Initialize(colDepth);
+    if (filterError != NULL)
+    {
+        platform->DisplayAlert("Unable to initialize the graphics filter '%s'. It returned the following error:\n'%s'"
+            "\n\nTry running Setup and selecting a different graphics filter.", filter->GetFilterID(), filterError);
+        delete filter;
+        filter = NULL;
+        return false;
+    }
+    return true;
 }
 
 bool pre_create_gfx_driver(const String &gfx_driver_id)
@@ -496,24 +502,6 @@ int find_max_supported_uniform_scaling(const Size &base_size, Size &found_size, 
     return least_supported_scaling;
 }
 
-int get_scaling_from_filter_name(const String &filter_id)
-{
-    int scaling = 0;
-    if (filter_id.CompareLeftNoCase("StdScale") == 0)
-    {
-        scaling = filter_id.Mid(8).ToInt();
-    }
-    else if (filter_id.CompareLeftNoCase("Hq") == 0)
-    {
-        scaling = filter_id.Mid(2).ToInt();
-    }
-    else if (filter_id.CompareLeftNoCase("AAx") == 0)
-    {
-        scaling = filter_id.Mid(3).ToInt();
-    }
-    return scaling > 0 ? scaling : 1;
-}
-
 // Finds any supported graphics mode that can fit requested game frame size;
 // returns true if found acceptable mode, sets found_size.
 bool try_find_nearest_supported_mode(const Size &base_size, const int scaling_factor, Size &found_size, const int color_depth,
@@ -668,7 +656,7 @@ int try_find_max_supported_uniform_scaling(const Size &base_size, Size &found_si
     return multiplier;
 }
 
-int engine_init_gfx_filters(Size &game_size, Size &screen_size, const int color_depth)
+bool engine_init_gfx_filters(Size &game_size, Size &screen_size, const int color_depth)
 {
     Out::FPrint("Initializing gfx filters");
     if (force_gfxfilter[0])
@@ -677,60 +665,59 @@ int engine_init_gfx_filters(Size &game_size, Size &screen_size, const int color_
         GfxFilterRequest = usetup.gfxFilterID;
     Out::FPrint("Requested gfx filter: %s", GfxFilterRequest.GetCStr());
 
-    String gfxfilter;
-    if (GfxFilterRequest.CompareNoCase("max") != 0)
-        gfxfilter = GfxFilterRequest;
-    
-    const Size base_size = game_size;
-
-    int scaling_factor = 0;
-    if (!gfxfilter.IsEmpty())
+    // Try to initialize gfx filter of requested name
+    if (GfxFilterRequest.CompareNoCase("max") != 0 &&
+        initialize_graphics_filter(GfxFilterRequest, color_depth))
     {
-        scaling_factor = get_scaling_from_filter_name(gfxfilter);
-        Size found_screen_size;
-        if (try_find_nearest_supported_mode(base_size, scaling_factor, found_screen_size, color_depth,
+        // Filter found, but we must also try if the engine will be able to set
+        // screen resolution
+        if (!try_find_nearest_supported_mode(game_size, filter->GetScalingFactor(), screen_size, color_depth,
                 usetup.windowed, usetup.prefer_sideborders, usetup.prefer_letterbox))
-            screen_size = found_screen_size;
-    }
-
-    if (screen_size.IsNull())
-    {
-#if defined (WINDOWS_VERSION) || defined (LINUX_VERSION)
-        Size found_screen_size;
-        scaling_factor = try_find_max_supported_uniform_scaling(base_size, found_screen_size, color_depth,
-                            usetup.windowed, usetup.prefer_sideborders, usetup.prefer_letterbox);
-        if (scaling_factor > 0)
         {
-            screen_size = found_screen_size;
+            delete filter;
+            filter = NULL;
         }
-        else
+    }
+    
+    // If the filter was not set for any reason, try to choose standard scaling filter
+    // of maximal possible scaling factor
+    if (!filter)
+    {
+        String filter_name;
+        int scaling_factor;
+#if (defined (WINDOWS_VERSION) || defined (LINUX_VERSION))
+        scaling_factor = try_find_max_supported_uniform_scaling(game_size, screen_size, color_depth,
+                            usetup.windowed, usetup.prefer_sideborders, usetup.prefer_letterbox);
+        if (scaling_factor == 0)
 #endif
         {
             screen_size = game_size;
             scaling_factor = 1;
         }
-        gfxfilter.Format(scaling_factor > 1 ? "StdScale%d" : "None", scaling_factor);
+        filter_name.Format(scaling_factor > 1 ? "StdScale%d" : "None", scaling_factor);
+        initialize_graphics_filter(filter_name, color_depth);
     }
 
-    if (gfxfilter.IsEmpty())
+    // If not suitable filter still found then return with error message
+    if (!filter)
     {
         set_allegro_error("Failed to find acceptable graphics filter");
-        return EXIT_NORMAL;
+        return false;
     }
-    game_size.Width = screen_size.Width / scaling_factor;
-    game_size.Height = screen_size.Height / scaling_factor;
+
+    // On success apply filter and define game frame
+    Out::FPrint("Applying graphics filter: %s", filter->GetFilterID());
+    gfxDriver->SetGraphicsFilter(filter);    
+    game_size.Width = screen_size.Width / filter->GetScalingFactor();
+    game_size.Height = screen_size.Height / filter->GetScalingFactor();
     Out::FPrint("Chosen gfx resolution: %d x %d (%d bit), game frame: %d x %d",
         screen_size.Width, screen_size.Height, color_depth, game_size.Width, game_size.Height);
-    if (initialize_graphics_filter(gfxfilter, base_size.Width, base_size.Height, color_depth))
-    {
-        return EXIT_NORMAL;
-    }
-    return RETURN_CONTINUE;
+    return true;
 }
 
 bool create_gfx_driver(const String &gfx_driver_id)
 {
-    Out::FPrint("Init gfx driver");
+    Out::FPrint("Init gfx driver: %s", gfx_driver_id.GetCStr());
     if (!pre_create_gfx_driver(gfx_driver_id))
         return false;
 
@@ -757,6 +744,7 @@ bool init_gfx_mode(const Size &game_size, const Size &screen_size, int cdep)
     final_scrn_wid = game_size.Width;
     final_scrn_hit = game_size.Height;
     final_col_dep = cdep;
+    game_frame_x_offset = (final_scrn_wid - scrnwid) / 2;
     game_frame_y_offset = (final_scrn_hit - scrnhit) / 2;
     usetup.want_letterbox = final_scrn_hit > scrnhit;
 
@@ -777,7 +765,9 @@ bool init_gfx_mode(const Size &game_size, const Size &screen_size, int cdep)
         return true;
     }
     else
-        Out::FPrint("Failed, resolution not supported");
+    {
+        Out::FPrint("Failed. %s", get_allegro_error());
+    }
     return false;
 }
 
@@ -786,25 +776,27 @@ bool switch_to_graphics_mode(const Size &game_size, const Size &screen_size)
     bool result = init_gfx_mode(game_size, screen_size, firstDepth);
     if (!result && firstDepth != secondDepth)
         result = init_gfx_mode(game_size, screen_size, secondDepth);
-    if (!result && editor_debugging_enabled == 0)
-    {
-        usetup.windowed = !usetup.windowed;
-        result = init_gfx_mode(game_size, screen_size, firstDepth);
-        if (!result && firstDepth != secondDepth)
-            result = init_gfx_mode(game_size, screen_size, secondDepth);
-    }
     return result;
 }
 
-int engine_init_graphics_mode(const Size &game_size, const Size &screen_size)
+bool create_gfx_filter_and_init_mode(Size &game_size, Size &screen_size)
 {
+    Size final_game_size = game_size;
+    Size final_screen_size = screen_size;
+
+    Out::FPrint("Trying to setup %s mode", usetup.windowed ? "windowed" : "fullscreen");
+
+    if (!engine_init_gfx_filters(final_game_size, final_screen_size, firstDepth))
+        return false;
+
     Out::FPrint("Switching to graphics mode");
 
-    if (!switch_to_graphics_mode(game_size, screen_size))
-    {
-        return EXIT_NORMAL;
-    }
-    return RETURN_CONTINUE;
+    if (!switch_to_graphics_mode(final_game_size, final_screen_size))
+        return false;
+
+    game_size = final_game_size;
+    screen_size = final_screen_size;
+    return true;
 }
 
 void CreateBlankImage()
@@ -873,8 +865,7 @@ void engine_prepare_screen()
     if (final_col_dep > 16) {
         // when we're using 32-bit colour, it converts hi-color images
         // the wrong way round - so fix that
-
-#if defined(IOS_VERSION) || defined(ANDROID_VERSION) || defined(PSP_VERSION)
+#if defined(IOS_VERSION) || defined(ANDROID_VERSION) || defined(PSP_VERSION) || defined(MAC_VERSION)
         _rgb_b_shift_16 = 0;
         _rgb_g_shift_16 = 5;
         _rgb_r_shift_16 = 11;
@@ -976,24 +967,50 @@ void log_out_driver_modes(const int color_depth)
 
 int create_gfx_driver_and_init_mode(const String &gfx_driver_id, Size &game_size, Size &screen_size)
 {
+    Size init_desktop;
+    get_desktop_resolution(&init_desktop.Width, &init_desktop.Height);
+
     if (!create_gfx_driver(gfx_driver_id))
         return EXIT_NORMAL;
     // Log out supported driver modes
     log_out_driver_modes(firstDepth);
     if (firstDepth != secondDepth)
         log_out_driver_modes(secondDepth);
-    
-    int res = engine_init_gfx_filters(game_size, screen_size, firstDepth);
-    if (res != RETURN_CONTINUE)
-    {
-        return res;
-    }
 
-    res = engine_init_graphics_mode(game_size, screen_size);
-    if (res != RETURN_CONTINUE)
+    bool result = create_gfx_filter_and_init_mode(game_size, screen_size);
+    if (!result && editor_debugging_enabled == 0)
     {
-        return res;
+        usetup.windowed = !usetup.windowed;
+        result = create_gfx_filter_and_init_mode(game_size, screen_size);
     }
+    if (!result)
+        return EXIT_NORMAL;
+
+    // Assign mouse control parameters.
+    //
+    // Whether mouse movement should be controlled by the engine - this is
+    // determined based on related config option.
+    const bool should_control_mouse = usetup.mouse_control == kMouseCtrl_Always ||
+        usetup.mouse_control == kMouseCtrl_Fullscreen && !usetup.windowed;
+    // Whether mouse movement control is supported by the engine - this is
+    // determined on per platform basis. Some builds may not have such
+    // capability, e.g. because of how backend library implements mouse utils.
+    const bool can_control_mouse = platform->IsMouseControlSupported(usetup.windowed);
+    // The resulting choice is made based on two aforementioned factors.
+    const bool control_sens = should_control_mouse && can_control_mouse;
+    if (control_sens)
+    {
+        Mouse::EnableControl(!usetup.windowed);
+        if (usetup.mouse_speed_def == kMouseSpeed_CurrentDisplay)
+        {
+            Size cur_desktop;
+            get_desktop_resolution(&cur_desktop.Width, &cur_desktop.Height);
+            Mouse::SetSpeedUnit(Math::Max((float)cur_desktop.Width / (float)init_desktop.Width, (float)cur_desktop.Height / (float)init_desktop.Height));
+        }
+        Mouse::SetSpeed(usetup.mouse_speed);
+    }
+    Out::FPrint("Mouse control: %s, base: %f, speed: %f", Mouse::IsControlEnabled() ? "on" : "off",
+        Mouse::GetSpeedUnit(), Mouse::GetSpeed());
     return RETURN_CONTINUE;
 }
 
@@ -1012,12 +1029,9 @@ void display_gfx_mode_error(const Size &game_size, const Size &screen_size)
 
     platform->DisplayAlert("%s\n"
             "(Problem: '%s')\n"
-            "Try to correct the problem, or seek help from the AGS homepage.\n"
-            "\nPossible causes:\n* your graphics card drivers do not support this resolution. "
-            "Run the game setup program and try the other resolution.\n"
-            "* the graphics driver you have selected does not work. Try switching between Direct3D and DirectDraw.\n"
-            "* the graphics filter you have selected does not work. Try another filter.",
-            main_error.GetCStr(), get_allegro_error());
+            "Try to correct the problem, or seek help from the AGS homepage."
+            "%s",
+            main_error.GetCStr(), get_allegro_error(), platform->GetGraphicsTroubleshootingText());
 }
 
 int graphics_mode_init()

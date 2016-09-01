@@ -499,7 +499,7 @@ int my_readkey() {
 
     /*  char message[200];
     sprintf(message, "Scancode: %04X", gott);
-    OutputDebugString(message);*/
+    Out::FPrint(message);*/
 
     /*if ((scancode >= KEY_0_PAD) && (scancode <= KEY_9_PAD)) {
     // fix numeric pad keys if numlock is off (allegro 4.2 changed this behaviour)
@@ -550,7 +550,14 @@ int my_readkey() {
         else if (gott==346) gott=373;
     }
     else
-        gott = gott & 0x00ff;
+    {
+      gott = gott & 0x00ff;
+#if defined(MAC_VERSION)
+      if (scancode==KEY_BACKSPACE) {
+        gott = 8; //j backspace on mac
+      }
+#endif
+    }
 
     // Alt+X, abort (but only once game is loaded)
     if ((gott == play.abort_key) && (displayed_room >= 0)) {
@@ -559,7 +566,7 @@ int my_readkey() {
     }
 
     //sprintf(message, "Keypress: %d", gott);
-    //OutputDebugString(message);
+    //Out::FPrint(message);
 
     return gott;
 }

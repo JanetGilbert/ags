@@ -33,7 +33,7 @@ extern GameSetupStruct game;
 extern roomstruct thisroom;
 extern char *speech_file;
 extern SpeechLipSyncLine *splipsync;
-extern int numLipLines, curLipLine, curLipLinePhenome;
+extern int numLipLines, curLipLine, curLipLinePhoneme;
 
 void StopAmbientSound (int channel) {
     if ((channel < 0) || (channel >= MAX_SOUND_CHANNELS))
@@ -53,7 +53,8 @@ void PlayAmbientSound (int channel, int sndnum, int vol, int x, int y) {
     if ((vol < 1) || (vol > 255))
         quit("!PlayAmbientSound: volume must be 1 to 255");
 
-    if (usetup.digicard == DIGI_NONE)
+    ScriptAudioClip *aclip = get_audio_clip_for_old_style_number(false, sndnum);
+    if (aclip && !is_audiotype_allowed_to_play((AudioFileType)aclip->fileType))
         return;
 
     // only play the sound if it's not already playing
@@ -65,8 +66,7 @@ void PlayAmbientSound (int channel, int sndnum, int vol, int x, int y) {
             // in case a normal non-ambient sound was playing, stop it too
             stop_and_destroy_channel(channel);
 
-            SOUNDCLIP *asound = load_sound_from_path(sndnum, vol, true);
-
+            SOUNDCLIP *asound = aclip ? load_sound_and_play(aclip, true) : NULL;
             if (asound == NULL) {
                 debug_log ("Cannot load ambient sound %d", sndnum);
                 DEBUG_CONSOLE("FAILED to load ambient sound %d", sndnum);
@@ -120,9 +120,9 @@ int PlaySoundEx(int val1, int channel) {
     if (debug_flags & DBG_NOSFX)
         return -1;
 
-    // if no sound, ignore it
-    if (usetup.digicard == DIGI_NONE)
-        return -1;
+    ScriptAudioClip *aclip = get_audio_clip_for_old_style_number(false, val1);
+    if (aclip && !is_audiotype_allowed_to_play((AudioFileType)aclip->fileType))
+        return -1; // if sound is off, ignore it
 
     if ((channel < SCHAN_NORMAL) || (channel >= MAX_SOUND_CHANNELS))
         quit("!PlaySoundEx: invalid channel specified, must be 3-7");
@@ -156,8 +156,7 @@ int PlaySoundEx(int val1, int channel) {
 
     last_sound_played[channel] = val1;
 
-    SOUNDCLIP *soundfx = load_sound_from_path(val1, play.sound_volume, 0);
-
+    SOUNDCLIP *soundfx = aclip ? load_sound_and_play(aclip, false) : NULL;
     if (soundfx == NULL) {
         debug_log("Sound sample load failure: cannot load sound %d", val1);
         DEBUG_CONSOLE("FAILED to load sound %d", val1);
@@ -206,9 +205,6 @@ int GetMIDIPosition () {
 int IsMusicPlaying() {
     // in case they have a "while (IsMusicPlaying())" loop
     if ((play.fast_forward) && (play.skip_until_char_stops < 0))
-        return 0;
-
-    if (usetup.midicard == MIDI_NONE)
         return 0;
 
     if (current_music_type != 0) {
@@ -494,7 +490,7 @@ int play_speech(int charid,int sndid) {
     int ii;  // Compare the base file name to the .pam file name
     char *basefnptr = strchr (&finame[4], '~') + 1;
     curLipLine = -1;  // See if we have voice lip sync for this line
-    curLipLinePhenome = -1;
+    curLipLinePhoneme = -1;
     for (ii = 0; ii < numLipLines; ii++) {
         if (stricmp(splipsync[ii].filename, basefnptr) == 0) {
             curLipLine = ii;
