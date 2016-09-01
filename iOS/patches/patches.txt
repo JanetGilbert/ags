@@ -1,0 +1,6 @@
+patches.dat is for allegro digmid patching
+
+http://alleg.sourceforge.net/digmid.html
+http://www.eglebbk.dds.nl/program/download/digmid.dat
+
+digmid.dat must be extracted and the resulting file renamed to patches.dat
