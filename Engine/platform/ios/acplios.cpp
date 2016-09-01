@@ -29,6 +29,8 @@
 #include "plugin/agsplugin.h"
 #include "util/string_utils.h"
 
+using namespace AGS::Common;
+
 #define IOS_IPHONE_CONFIG_FILENAME "ios_iphone.cfg"
 #define IOS_IPAD_CONFIG_FILENAME "ios_ipad.cfg"
 

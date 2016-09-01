@@ -943,7 +943,7 @@ bool pl_use_builtin_plugin(EnginePlugin* apl)
     }
 #endif
 #endif // BUILTIN_PLUGINS
-
+/* //JG My plugins don't work with this signature
     for(std::vector<InbuiltPluginDetails>::iterator it = _registered_builtin_plugins.begin(); it != _registered_builtin_plugins.end(); ++it) {
         if (stricmp(apl->filename, it->filename) == 0) {
             apl->engineStartup = it->engineStartup;
@@ -955,7 +955,7 @@ bool pl_use_builtin_plugin(EnginePlugin* apl)
             apl->builtin = true;
             return true;
         }
-    }
+    }*/
     
     AGS::Common::Out::FPrint("No built-in plugin found. Plugin loading failed!");
     return false;
