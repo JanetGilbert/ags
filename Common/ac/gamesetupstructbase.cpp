@@ -36,6 +36,8 @@ GameSetupStructBase::~GameSetupStructBase()
 
 void GameSetupStructBase::ReadFromFile(Stream *in)
 {
+    delete [] load_messages;
+    
     in->Read(&gamename[0], GAME_NAME_LENGTH);
     in->ReadArrayOfInt32(options, MAX_OPTIONS);
     in->Read(&paluses[0], 256);
