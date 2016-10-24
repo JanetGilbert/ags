@@ -21,6 +21,8 @@
 using AGS::Common::AlignedStream;
 using AGS::Common::Stream;
 
+extern RoomStatus*croom;
+
 void RoomStatus::ReadFromFile_v321(Stream *in)
 {
     beenhere = in->ReadInt32();
@@ -146,4 +148,6 @@ void resetRoomStatuses()
             }
         }
     }
+    
+    croom = NULL; //J Otherwise it sometimes crashes when trying to restore a game.
 }
