@@ -353,6 +353,8 @@ void unload_old_room() {
         game.chars[play.temporarily_turned_off_character].on = 1;
         play.temporarily_turned_off_character = -1;
     }
+    
+    croom = NULL; //J Otherwise it sometimes crashes when trying to restore a game.
 
 }
 

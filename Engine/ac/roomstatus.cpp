@@ -149,5 +149,5 @@ void resetRoomStatuses()
         }
     }
     
-    croom = NULL; //J Otherwise it sometimes crashes when trying to restore a game.
+    //croom = NULL; //J Otherwise it sometimes crashes when trying to restore a game.
 }
