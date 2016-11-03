@@ -15,7 +15,8 @@
 #ifndef __AC_GAMESETUP_H
 #define __AC_GAMESETUP_H
 
-#include "util/string.h"
+#include "main/graphics_mode.h"
+
 
 // Mouse control activation type
 enum MouseControl
@@ -40,23 +41,14 @@ struct GameSetup {
     int mod_player;
     int textheight;
     int mp3_player;
-    bool want_letterbox; // defines whether game is displayed in letterboxed mode
-    bool windowed;
-    int base_width;
-    int base_height;
-    short refresh;
     bool  no_speech_pack;
     bool  enable_antialiasing;
     bool  force_hicolor_mode;
     bool  disable_exception_handling;
-    bool  prefer_sideborders; // defines whether it is preferred to have side borders
-    bool  prefer_letterbox;  // defines whether it is preferred to have letterbox
     AGS::Common::String data_files_dir;
     AGS::Common::String main_data_filename;
     AGS::Common::String user_data_dir; // directory to write savedgames and custom files to
     AGS::Common::String translation;
-    AGS::Common::String gfxFilterID;
-    AGS::Common::String gfxDriverID;
     bool  mouse_auto_lock;
     int   override_script_os;
     char  override_multitasking;
@@ -64,6 +56,9 @@ struct GameSetup {
     float mouse_speed;
     MouseControl mouse_control;
     MouseSpeedDef mouse_speed_def;
+
+    ScreenSetup Screen;
+
     GameSetup();
 };
 

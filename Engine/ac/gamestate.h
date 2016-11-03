@@ -15,14 +15,17 @@
 #ifndef __AC_GAMESTATE_H
 #define __AC_GAMESTATE_H
 
+#include "ac/characterinfo.h"
 #include "ac/runtime_defines.h"
 #include "media/audio/queuedaudioitem.h"
+#include "util/geometry.h"
+#include "util/string_types.h"
 
 // Forward declaration
 namespace AGS { namespace Common { class Stream; } }
 using namespace AGS; // FIXME later
 
-#define GAME_STATE_RESERVED_INTS 6
+#define GAME_STATE_RESERVED_INTS 5
 
 // Adding to this might need to modify AGSDEFNS.SH and AGSPLUGIN.H
 struct GameState {
@@ -104,6 +107,7 @@ struct GameState {
     int  speech_portrait_y; // a speech portrait y offset 
     int  speech_display_post_time_ms; // keep speech text/portrait on screen after text/voice has finished playing;
                                       // no speech animation is supposed to be played at this time
+    int  dialog_options_highlight_color; // The colour used for highlighted (hovered over) text in dialog options
     int  reserved[GAME_STATE_RESERVED_INTS];  // make sure if a future version adds a var, it doesn't mess anything up
     // ** up to here is referenced in the script "game." object
     int   recording;   // user is recording their moves
@@ -134,7 +138,8 @@ struct GameState {
     int   normal_font, speech_font;
     char  key_skip_wait;
     int   swap_portrait_lastchar;
-    int   seperate_music_lib;
+    int   swap_portrait_lastlastchar;
+    int   separate_music_lib;
     int   in_conversation;
     int   screen_tint;
     int   num_parsed_words;
@@ -151,6 +156,7 @@ struct GameState {
     unsigned long shakesc_delay;  // unsigned long to match loopcounter
     int   shakesc_amount, shakesc_length;
     int   rtint_red, rtint_green, rtint_blue, rtint_level, rtint_light;
+    bool  rtint_enabled;
     int   end_cutscene_music;
     int   skip_until_char_stops;
     int   get_loc_name_last_time;
@@ -186,13 +192,29 @@ struct GameState {
     unsigned long ignore_user_input_until_time;
     int   default_audio_type_volumes[MAX_AUDIO_TYPES];
 
+    // Dynamic custom property values for characters and items
+    std::vector<AGS::Common::StringIMap> charProps;
+    AGS::Common::StringIMap invProps[MAX_INV];
+
     // These variables are not serialized
     bool  speech_in_post_state;
+    // Viewport defines the current position of the playable area;
+    // in basic case it will be identical to game size, but it may be smaller
+    // to support room sizes lesser than game size.
+    Rect  viewport;
+    // game size in low-res units (for backwards-compatibility)
+    Size  native_size;
+
+    void SetViewport(const Size viewport_size);
 
     void ReadFromFile_v321(Common::Stream *in);
     void WriteToFile_v321(Common::Stream *out);
     void ReadQueuedAudioItems_Aligned(Common::Stream *in);
     void WriteQueuedAudioItems_Aligned(Common::Stream *out);
+    void ReadCustomProperties(Common::Stream *in);
+    void WriteCustomProperties(Common::Stream *out);
 };
+
+extern GameState play;
 
 #endif // __AC_GAMESTATE_H

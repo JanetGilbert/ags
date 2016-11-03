@@ -106,7 +106,7 @@ int ccCompiledScript::add_new_function(const char*namm, int *idx) {
 }
 int ccCompiledScript::add_new_import(const char*namm)
 {
-    if (numimports >= importsCapacity) 
+    if (numimports >= importsCapacity)
     {
         importsCapacity += 1000;
         imports = (char**)realloc(imports, sizeof(char*) * importsCapacity);
@@ -122,10 +122,10 @@ int ccCompiledScript::remove_any_import (const char*namm, SymbolDef *oldSym) {
     sidx = sym.find(namm);
     if (sidx < 0)
         return 0;
-    if ((sym.flags[sidx] & SFLG_IMPORTED) == 0)
+    if ((sym.entries[sidx].flags & SFLG_IMPORTED) == 0)
         return 0;
     // if this import has been referenced, flag an error
-    if (sym.flags[sidx] & SFLG_ACCESSED) {
+    if (sym.entries[sidx].flags & SFLG_ACCESSED) {
         cc_error("Already referenced name as import; you must define it before using it");
         return -1;
     }
@@ -139,24 +139,29 @@ int ccCompiledScript::remove_any_import (const char*namm, SymbolDef *oldSym) {
         // Copy the import declaration to a backup struct
         // This allows a type comparison to be done
         // strip the imported flag, since it the real def won't be
-        oldSym->flags = sym.flags[sidx] & ~SFLG_IMPORTED;
-        oldSym->stype = sym.stype[sidx];
-        oldSym->sscope = sym.sscope[sidx];
-        oldSym->ssize = sym.ssize[sidx];
-        oldSym->arrsize = sym.arrsize[sidx];
-        if (sym.stype[sidx] == SYM_FUNCTION) {
+        oldSym->flags = sym.entries[sidx].flags & ~SFLG_IMPORTED;
+        oldSym->stype = sym.entries[sidx].stype;
+        oldSym->sscope = sym.entries[sidx].sscope;
+        // Return size may have been unknown at the time of forward declaration. Check the actual return type for those cases.
+        if(sym.entries[sidx].stype == SYM_FUNCTION && sym.entries[sidx].ssize == 0) {
+            oldSym->ssize = sym.entries[sym.entries[sidx].funcparamtypes[0] & ~(STYPE_POINTER | STYPE_DYNARRAY)].ssize;
+        } else {
+            oldSym->ssize = sym.entries[sidx].ssize;
+        }
+        oldSym->arrsize = sym.entries[sidx].arrsize;
+        if (sym.entries[sidx].stype == SYM_FUNCTION) {
             // <= because of return type
-            for (i = 0; i <= sym.get_num_args(sidx); i++) {
-                oldSym->funcparamtypes[i] = sym.funcparamtypes[sidx][i];
-                oldSym->funcParamDefaultValues[i] = sym.funcParamDefaultValues[sidx][i];
-                oldSym->funcParamHasDefaultValues[i] = sym.funcParamHasDefaultValues[sidx][i];
+            for (i = 0; i <= sym.entries[sidx].get_num_args(); i++) {
+                oldSym->funcparamtypes[i] = sym.entries[sidx].funcparamtypes[i];
+                oldSym->funcParamDefaultValues[i] = sym.entries[sidx].funcParamDefaultValues[i];
+                oldSym->funcParamHasDefaultValues[i] = sym.entries[sidx].funcParamHasDefaultValues[i];
             }
         }
     }
 
     // remove its type so that it can be declared
-    sym.stype[sidx] = 0;
-    sym.flags[sidx] = 0;
+    sym.entries[sidx].stype = 0;
+    sym.entries[sidx].flags = 0;
 
     // check also for a number-of-parameters appended version
     char appended[200];
@@ -181,7 +186,7 @@ int ccCompiledScript::remove_any_import (const char*namm, SymbolDef *oldSym) {
 
 int ccCompiledScript::add_new_export(const char*namm,int etype,long eoffs, int numArgs)
 {
-    if (numexports >= exportsCapacity) 
+    if (numexports >= exportsCapacity)
     {
         exportsCapacity += 1000;
         exports = (char**)realloc(exports, sizeof(char*) * exportsCapacity);
@@ -229,9 +234,10 @@ void ccCompiledScript::write_code(intptr_t byy) {
     code[codesize] = byy;
     codesize++;
 }
+
 const char* ccCompiledScript::start_new_section(const char *name) {
 
-    if ((numSections == 0) || 
+    if ((numSections == 0) ||
         (codesize != sectionOffsets[numSections - 1]))
     {
         if (numSections >= capacitySections)
@@ -285,8 +291,9 @@ void ccCompiledScript::init() {
 // free the extra bits that ccScript doesn't have
 void ccCompiledScript::free_extra() {
     int aa;
-    for (aa=0;aa<numfunctions;aa++)
+	for (aa=0;aa<numfunctions;aa++) {
         free(functions[aa]);
+	}
     numfunctions=0;
 }
 void ccCompiledScript::shutdown() {

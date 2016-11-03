@@ -17,7 +17,6 @@
 //
 
 #include "main/mainheader.h"
-#include "gfx/ali3d.h"
 #include "ac/common.h"
 #include "ac/character.h"
 #include "ac/characterextras.h"
@@ -44,8 +43,9 @@
 #include "font/fonts.h"
 #include "main/config.h"
 #include "main/game_start.h"
-#include "main/graphics_mode.h"
 #include "main/engine.h"
+#include "main/engine_setup.h"
+#include "main/graphics_mode.h"
 #include "main/main.h"
 #include "main/main_allegro.h"
 #include "media/audio/sound.h"
@@ -62,6 +62,7 @@
 #include "core/asset.h"
 
 using namespace AGS::Common;
+using namespace AGS::Engine;
 
 extern char check_dynamic_sprites_at_exit;
 extern int our_eip;
@@ -77,16 +78,13 @@ extern SpriteCache spriteset;
 extern ObjectCache objcache[MAX_INIT_SPR];
 extern ScriptObject scrObj[MAX_INIT_SPR];
 extern ViewStruct*views;
-extern GUIMain*guis;
 extern int displayed_room;
 extern int eip_guinum;
 extern int eip_guiobj;
 extern const char *replayTempFile;
 extern SpeechLipSyncLine *splipsync;
 extern int numLipLines, curLipLine, curLipLinePhoneme;
-extern int scrnwid,scrnhit;
 extern ScriptSystem scsystem;
-extern int final_scrn_wid,final_scrn_hit,final_col_dep;
 extern IGraphicsDriver *gfxDriver;
 extern Bitmap *virtual_screen;
 extern Bitmap **actsps;
@@ -145,12 +143,6 @@ void winclosehook() {
   want_exit = 1;
   abort_engine = 1;
   check_dynamic_sprites_at_exit = 0;
-/*  while (want_exit == 1)
-    yield_timeslice();
-  / *if (want_quit == 0)
-    want_quit = 1;
-  else* / quit("|game aborted");
-*/
 }
 
 void engine_setup_window()
@@ -182,8 +174,11 @@ bool engine_check_run_setup(ConfigTree &cfg, int argc,char*argv[])
 
             // Add information about game resolution and let setup application
             // display some properties to the user
-            INIwriteint(cfg, "misc", "defaultres", game.default_resolution);
+            INIwriteint(cfg, "misc", "defaultres", game.GetDefaultResolution());
             INIwriteint(cfg, "misc", "letterbox", game.options[OPT_LETTERBOX]);
+            INIwriteint(cfg, "misc", "game_width", game.size.Width);
+            INIwriteint(cfg, "misc", "game_height", game.size.Height);
+            INIwriteint(cfg, "misc", "gamecolordepth", game.color_depth * 8);
 
             ConfigTree cfg_out;
             SetupReturnValue res = platform->RunSetup(cfg, cfg_out);
@@ -216,9 +211,12 @@ void engine_force_window()
 {
     // Force to run in a window, override the config file
     if (force_window == 1)
-        usetup.windowed = true;
+    {
+        usetup.Screen.Windowed = true;
+        usetup.Screen.SizeDef = kScreenDef_ByGameScaling;
+    }
     else if (force_window == 2)
-        usetup.windowed = false;
+        usetup.Screen.Windowed = false;
 }
 
 void init_game_file_name_from_cmdline()
@@ -435,18 +433,11 @@ void engine_init_fonts()
 
 int engine_init_mouse()
 {
-    Out::FPrint("Initializing mouse");
-
-#ifdef _DEBUG
-    // Quantify fails with the mouse for some reason
-    minstalled();
-#else
-    if (minstalled()==0) {
-        platform->DisplayAlert(platform->GetNoMouseErrorString());
-        return EXIT_NORMAL;
-    }
-#endif // DEBUG
-
+    int res = minstalled();
+    if (res < 0)
+        Out::FPrint("Initializing mouse: failed");
+    else
+        Out::FPrint("Initializing mouse: number of buttons reported is %d", res);
 	return RETURN_CONTINUE;
 }
 
@@ -535,7 +526,7 @@ int engine_init_speech()
 
 int engine_init_music()
 {
-    play.seperate_music_lib = 0;
+    play.separate_music_lib = 0;
 
     /* Can't just use fopen here, since we need to change the filename
     so that pack functions, etc. will have the right case later */
@@ -566,7 +557,7 @@ int engine_init_music()
         }
         Common::AssetManager::SetDataFile(game_file_name);
         Out::FPrint("Audio vox found and initialized.");
-        play.seperate_music_lib = 1;
+        play.separate_music_lib = 1;
     }
 
     return RETURN_CONTINUE;
@@ -708,7 +699,7 @@ void engine_init_sound()
         // therefore the MIDI soundtrack will be used if present,
         // and the voice mode should not go to Voice Only
         play.want_speech = -2;
-        play.seperate_music_lib = 0;
+        play.separate_music_lib = 0;
     }
 
 #ifdef WINDOWS_VERSION
@@ -839,7 +830,7 @@ void engine_init_directories()
     bool res = false;
     if (!usetup.user_data_dir.IsEmpty())
     {
-        res = SetSaveGameDirectoryPath(String::FromFormat("%s/UserSaves", usetup.user_data_dir.GetCStr()), true);
+        res = SetCustomSaveParent(String::FromFormat("%s/UserSaves", usetup.user_data_dir.GetCStr()));
         if (!res)
         {
             Out::FPrint("WARNING: custom user save path failed, using default system paths");
@@ -878,7 +869,7 @@ int check_write_access() {
 	  sprintf(tempPath, "%s""tmptest.tmp", android_base_directory);
 	  temp_s = Common::File::CreateFile(tempPath);
 	  if (temp_s == NULL) return 0;
-	  else SetSaveGameDirectoryPath(android_base_directory, true);
+	  else SetCustomSaveParent(android_base_directory);
   }
 #else
     return 0;
@@ -917,10 +908,9 @@ int engine_check_disk_space()
     return RETURN_CONTINUE;
 }
 
-// [IKM] I have a feeling this should be merged with engine_init_fonts
-int engine_check_fonts()
+int engine_check_font_was_loaded()
 {
-    if (fontRenderers[0] == NULL) 
+    if (!font_first_renderer_loaded())
     {
         platform->DisplayAlert("No fonts found. If you're trying to run the game from the Debug directory, this is not supported. Use the Build EXE command to create an executable in the Compiled folder.");
         proper_exit = 1;
@@ -961,7 +951,7 @@ void show_preload () {
         Bitmap *tsc = BitmapHelper::CreateBitmapCopy(splashsc, screen_bmp->GetColorDepth());
 
 		screen_bmp->Fill(0);
-        screen_bmp->StretchBlt(tsc, RectWH(0, 0, scrnwid,scrnhit), Common::kBitmap_Transparency);
+        screen_bmp->StretchBlt(tsc, RectWH(0, 0, play.viewport.GetWidth(),play.viewport.GetHeight()), Common::kBitmap_Transparency);
 
         gfxDriver->ClearDrawList();
 
@@ -1010,19 +1000,22 @@ void engine_setup_screen()
 {
     Out::FPrint("Set up screen");
 
-    virtual_screen=BitmapHelper::CreateBitmap(scrnwid,scrnhit,final_col_dep);
+    virtual_screen=BitmapHelper::CreateBitmap(play.viewport.GetWidth(),play.viewport.GetHeight(),ScreenResolution.ColorDepth);
     virtual_screen->Clear();
     gfxDriver->SetMemoryBackBuffer(virtual_screen);
     //  ignore_mouseoff_bitmap = virtual_screen;
     SetVirtualScreen(BitmapHelper::GetScreenBitmap());
-    our_eip=-7;
-
-    for (int ee = 0; ee < MAX_INIT_SPR + game.numcharacters; ee++)
-        actsps[ee] = NULL;
 }
 
-void init_game_settings() {
+void engine_init_game_settings()
+{
+    our_eip=-7;
+    Out::FPrint("Initialize game settings");
+
     int ee;
+
+    for (ee = 0; ee < MAX_INIT_SPR + game.numcharacters; ee++)
+        actsps[ee] = NULL;
 
     for (ee=0;ee<256;ee++) {
         if (game.paluses[ee]!=PAL_BACKGROUND)
@@ -1133,8 +1126,9 @@ void init_game_settings() {
     play.lipsync_speed = 15;
     play.close_mouth_speech_time = 10;
     play.disable_antialiasing = 0;
+    play.rtint_enabled = false;
     play.rtint_level = 0;
-    play.rtint_light = 255;
+    play.rtint_light = 0;
     play.text_speed_modifier = 0;
     play.text_align = SCALIGN_LEFT;
     // Make the default alignment to the right with right-to-left text
@@ -1180,6 +1174,7 @@ void init_game_settings() {
     play.bad_parsed_word[0] = 0;
     play.swap_portrait_side = 0;
     play.swap_portrait_lastchar = -1;
+    play.swap_portrait_lastlastchar = -1;
     play.in_conversation = 0;
     play.skip_display = 3;
     play.no_multiloop_repeat = 0;
@@ -1228,6 +1223,7 @@ void init_game_settings() {
     play.speech_portrait_x = 0;
     play.speech_portrait_y = 0;
     play.speech_display_post_time_ms = 0;
+    play.dialog_options_highlight_color = DIALOG_OPTIONS_HIGHLIGHT_COLOR_DEFAULT;
     play.speech_in_post_state = false;
     play.narrator_speech = game.playercharacter;
     play.crossfading_out_channel = 0;
@@ -1263,24 +1259,26 @@ void init_game_settings() {
 
     update_invorder();
     displayed_room = -10;
+
+    currentcursor=0;
+    our_eip=-4;
+    mousey=100;  // stop icon bar popping up
 }
 
-void engine_init_game_settings()
+void engine_setup_scsystem_screen()
 {
-    Out::FPrint("Initialize game settings");
-
-    init_game_settings();
+    DisplayMode dm = gfxDriver->GetDisplayMode();
+    scsystem.width = game.size.Width;
+    scsystem.height = game.size.Height;
+    scsystem.coldepth = dm.ColorDepth;
+    scsystem.windowed = dm.Windowed;
+    scsystem.vsync = dm.Vsync;
+    scsystem.viewport_width = divide_down_coordinate(play.viewport.GetWidth());
+    scsystem.viewport_height = divide_down_coordinate(play.viewport.GetHeight());
 }
 
-void engine_init_game_shit()
+void engine_setup_scsystem_auxiliary()
 {
-    scsystem.width = final_scrn_wid;
-    scsystem.height = final_scrn_hit;
-    scsystem.coldepth = final_col_dep;
-    scsystem.windowed = 0;
-    scsystem.vsync = 0;
-    scsystem.viewport_width = divide_down_coordinate(scrnwid);
-    scsystem.viewport_height = divide_down_coordinate(scrnhit);
     // ScriptSystem::aci_version is only 10 chars long
     strncpy(scsystem.aci_version, EngineVersion.LongString, 10);
     if (usetup.override_script_os >= 0)
@@ -1291,25 +1289,16 @@ void engine_init_game_shit()
     {
         scsystem.os = platform->GetSystemOSID();
     }
+}
 
-    if (usetup.windowed)
-        scsystem.windowed = 1;
-
-#if defined (DOS_VERSION)
-    filter->SetMouseArea(0,0,BASEWIDTH-1,BASEHEIGHT-1);
-#else
-    filter->SetMouseArea(0, 0, scrnwid-1, scrnhit-1);
-#endif
-    //  mloadwcursor("mouse.spr");
-    //mousecurs[0]=spriteset[2054];
-    currentcursor=0;
-    our_eip=-4;
-    mousey=100;  // stop icon bar popping up
-    init_invalid_regions(final_scrn_hit);
+void engine_setup_graphic_area()
+{
+    Mouse::SetGraphicArea();
+    init_invalid_regions(game.size.Height);
     SetVirtualScreen(virtual_screen);
     our_eip = -41;
 
-    gfxDriver->SetRenderOffset(get_screen_x_adjustment(virtual_screen), get_screen_y_adjustment(virtual_screen));
+    gfxDriver->SetRenderOffset(play.viewport.Left, play.viewport.Top);
 }
 
 void engine_update_mp3_thread()
@@ -1346,7 +1335,8 @@ void engine_prepare_to_start_game()
 {
     Out::FPrint("Prepare to start game");
 
-    engine_init_game_shit();
+    engine_setup_scsystem_auxiliary();
+    engine_setup_graphic_area();
     engine_start_multithreaded_audio();
 
 #if defined(ANDROID_VERSION)
@@ -1528,9 +1518,10 @@ int initialize_engine(int argc,char*argv[])
         return res;
     }
 
-    // [IKM] I do not really understand why is this checked only now;
-    // should not it be checked right after fonts initialization?
-    res = engine_check_fonts();
+    // Make sure that at least one font was loaded in the process of loading
+    // the game data.
+    // TODO: Fold this check into engine_load_game_data()
+    res = engine_check_font_was_loaded();
     if (res != RETURN_CONTINUE) {
         return res;
     }
@@ -1539,10 +1530,19 @@ int initialize_engine(int argc,char*argv[])
 
     engine_init_modxm_player();
 
-    res = graphics_mode_init();
-    if (res != RETURN_CONTINUE) {
-        return res;
-    }
+    ColorDepthOption color_depths;
+    engine_init_resolution_settings(game.size, color_depths);
+
+    const Size init_desktop = get_desktop_size();
+
+    // Attempt to initialize graphics mode
+    if (!graphics_mode_init(usetup.Screen, color_depths))
+        return EXIT_NORMAL;
+
+    engine_post_gfxmode_setup(init_desktop);
+    engine_setup_scsystem_screen();
+
+    platform->PostAllegroInit(scsystem.windowed);
 
     SetMultitasking(0);
 
@@ -1551,7 +1551,7 @@ int initialize_engine(int argc,char*argv[])
     show_os_cursor(MOUSE_CURSOR_NONE);
     
     // If auto lock option is set, lock mouse to the game window
-    if (usetup.mouse_auto_lock && usetup.windowed)
+    if (usetup.mouse_auto_lock && scsystem.windowed)
         Mouse::TryLockToWindow();
 
     engine_show_preload();

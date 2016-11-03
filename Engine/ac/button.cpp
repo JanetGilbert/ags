@@ -14,6 +14,7 @@
 
 #include "ac/button.h"
 #include "ac/common.h"
+#include "ac/gui.h"
 #include "ac/view.h"
 #include "ac/gamesetupstruct.h"
 #include "ac/global_translation.h"
@@ -25,7 +26,6 @@
 
 extern GameSetupStruct game;
 extern ViewStruct*views;
-extern GUIMain*guis;
 extern int spritewidth[MAX_SPRITES],spriteheight[MAX_SPRITES];
 
 // *** BUTTON FUNCTIONS
@@ -50,7 +50,7 @@ void Button_Animate(GUIButton *butt, int view, int loop, int speed, int repeat) 
     if (numAnimButs >= MAX_ANIMATING_BUTTONS)
         quit("!AnimateButton: too many animating GUI buttons at once");
 
-    int buttonId = guis[guin].objrefptr[objn] & 0x000ffff;
+    int buttonId = guis[guin].CtrlRefs[objn] & 0x000ffff;
 
     guibuts[buttonId].pushedpic = 0;
     guibuts[buttonId].overpic = 0;
@@ -247,6 +247,11 @@ void FindAndRemoveButtonAnimation(int guin, int objn) {
 }
 // ** end animating buttons code
 
+void Button_Click(GUIButton *butt, int mbut)
+{
+    process_interface_click(butt->guin, butt->objn, mbut);
+}
+
 //=============================================================================
 //
 // Script API Functions
@@ -362,9 +367,15 @@ RuntimeScriptValue Sc_Button_SetTextColor(void *self, const RuntimeScriptValue *
     API_OBJCALL_VOID_PINT(GUIButton, Button_SetTextColor);
 }
 
+RuntimeScriptValue Sc_Button_Click(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(GUIButton, Button_Click);
+}
+
 void RegisterButtonAPI()
 {
     ccAddExternalObjectFunction("Button::Animate^4",            Sc_Button_Animate);
+    ccAddExternalObjectFunction("Button::Click^1",              Sc_Button_Click);
 	ccAddExternalObjectFunction("Button::GetText^1",            Sc_Button_GetText);
 	ccAddExternalObjectFunction("Button::SetText^1",            Sc_Button_SetText);
 	ccAddExternalObjectFunction("Button::get_ClipImage",        Sc_Button_GetClipImage);

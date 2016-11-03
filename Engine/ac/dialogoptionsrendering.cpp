@@ -25,6 +25,17 @@ extern CCDialog ccDynamicDialog;
 
 // ** SCRIPT DIALOGOPTIONSRENDERING OBJECT
 
+void DialogOptionsRendering_Update(ScriptDialogOptionsRendering *dlgOptRender)
+{
+    dlgOptRender->needRepaint = true;
+}
+
+bool DialogOptionsRendering_RunActiveOption(ScriptDialogOptionsRendering *dlgOptRender)
+{
+    dlgOptRender->chosenOptionID = dlgOptRender->activeOptionID;
+    return dlgOptRender->chosenOptionID >= 0;
+}
+
 int DialogOptionsRendering_GetX(ScriptDialogOptionsRendering *dlgOptRender)
 {
     return dlgOptRender->x;
@@ -127,7 +138,11 @@ void DialogOptionsRendering_SetActiveOptionID(ScriptDialogOptionsRendering *dlgO
     if ((activeOptionID < 0) || (activeOptionID > optionCount))
         quitprintf("DialogOptionsRenderingInfo.ActiveOptionID: invalid ID specified for this dialog (specified %d, valid range: 1..%d)", activeOptionID, optionCount);
 
-    dlgOptRender->activeOptionID = activeOptionID - 1;
+    if (dlgOptRender->activeOptionID != activeOptionID - 1)
+    {
+        dlgOptRender->activeOptionID = activeOptionID - 1;
+        dlgOptRender->needRepaint = true;
+    }
 }
 
 //=============================================================================
@@ -139,6 +154,16 @@ void DialogOptionsRendering_SetActiveOptionID(ScriptDialogOptionsRendering *dlgO
 #include "debug/out.h"
 #include "script/script_api.h"
 #include "script/script_runtime.h"
+
+RuntimeScriptValue Sc_DialogOptionsRendering_Update(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID(ScriptDialogOptionsRendering, DialogOptionsRendering_Update);
+}
+
+RuntimeScriptValue Sc_DialogOptionsRendering_RunActiveOption(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_BOOL(ScriptDialogOptionsRendering, DialogOptionsRendering_RunActiveOption);
+}
 
 // int (ScriptDialogOptionsRendering *dlgOptRender)
 RuntimeScriptValue Sc_DialogOptionsRendering_GetActiveOptionID(void *self, const RuntimeScriptValue *params, int32_t param_count)
@@ -261,6 +286,8 @@ RuntimeScriptValue Sc_DialogOptionsRendering_SetHasAlphaChannel(void *self, cons
 
 void RegisterDialogOptionsRenderingAPI()
 {
+    ccAddExternalObjectFunction("DialogOptionsRenderingInfo::Update^0",             Sc_DialogOptionsRendering_Update);
+    ccAddExternalObjectFunction("DialogOptionsRenderingInfo::RunActiveOption^0",    Sc_DialogOptionsRendering_RunActiveOption);
     ccAddExternalObjectFunction("DialogOptionsRenderingInfo::get_ActiveOptionID",   Sc_DialogOptionsRendering_GetActiveOptionID);
     ccAddExternalObjectFunction("DialogOptionsRenderingInfo::set_ActiveOptionID",   Sc_DialogOptionsRendering_SetActiveOptionID);
     ccAddExternalObjectFunction("DialogOptionsRenderingInfo::get_DialogToRender",   Sc_DialogOptionsRendering_GetDialogToRender);

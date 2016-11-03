@@ -35,8 +35,8 @@ def main():
     project_titlever_str = ".".join(project_ver.version_friendly)
     project_fullver_str = ".".join(project_ver.version)
     project_spver_str = project_ver.version_sp
-    project_app_id = ".".join(project_ver.app_id)
-
+    project_app_id = project_ver.app_id
+    
     compile_installer("ags.iss", {"AgsFriendlyVersion": project_titlever_str, "AgsFullVersion": project_fullver_str, "AgsSpVersion": project_spver_str, "AgsAppId": project_app_id})
 
 def workspace_rel(path):

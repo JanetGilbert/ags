@@ -20,13 +20,6 @@
 
 #include "util/geometry.h"
 
-#define POPUP_NONE      0
-#define POPUP_MOUSEY    1
-#define POPUP_SCRIPT    2
-#define POPUP_NOAUTOREM 3  // don't remove automatically during cutscene
-#define POPUP_NONEINITIALLYOFF 4   // normal GUI, initially off
-#define IFLG_TEXTWINDOW 1
-
 #define PAL_GAMEWIDE        0
 #define PAL_LOCKED          1
 #define PAL_BACKGROUND      2
@@ -78,7 +71,10 @@
 #define OPT_HIGHESTOPTION_330 OPT_SPRITEALPHA
 #define OPT_SAFEFILEPATHS   41
 #define OPT_HIGHESTOPTION_335 OPT_SAFEFILEPATHS
-#define OPT_HIGHESTOPTION   OPT_HIGHESTOPTION_335
+#define OPT_DIALOGOPTIONSAPI 42 // version of dialog options API (-1 for pre-3.4.0 API)
+#define OPT_BASESCRIPTAPI   43 // version of the Script API used to compile game script
+#define OPT_SCRIPTCOMPATLEV 44 // level of API compatibility used to compile game script
+#define OPT_HIGHESTOPTION   OPT_SCRIPTCOMPATLEV
 #define OPT_NOMODMUSIC      98
 #define OPT_LIPSYNCTEXT     99
 #define PORTRAIT_LEFT       0
@@ -101,6 +97,7 @@
 #define FFLG_SIZEMASK 0x003f
 #define FONT_OUTLINE_AUTO -10
 #define MAX_FONT_SIZE 63
+#define DIALOG_OPTIONS_HIGHLIGHT_COLOR_DEFAULT  14 // Yellow
 
 #define MAXVIEWNAMELENGTH 15
 #define MAXLIPSYNCFRAMES  20
@@ -121,6 +118,8 @@ enum GameResolutionType
     kGameResolution_640x480     = 4,
     kGameResolution_800x600     = 5,
     kGameResolution_1024x768    = 6,
+    kGameResolution_1280x720    = 7,
+    kGameResolution_Custom      = 8,
     kNumGameResolutions,
 
     kGameResolution_LastLoRes   = kGameResolution_320x240,

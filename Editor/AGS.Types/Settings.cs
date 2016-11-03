@@ -1,12 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 
 namespace AGS.Types
 {
+    [DeserializeIgnore("LastBuildConfiguration")]
+    [DefaultProperty("DebugMode")]
     public class Settings : ICustomTypeDescriptor
     {
         public const string PROPERTY_GAME_NAME = "Game name";
@@ -15,10 +19,13 @@ namespace AGS.Types
         public const string PROPERTY_SCALE_FONTS = "Fonts designed for 640x480";
 		public const string PROPERTY_ANTI_ALIAS_FONTS = "Anti-alias TTF fonts";
         public const string PROPERTY_LETTERBOX_MODE = "Enable letterbox mode";
+        public const string PROPERTY_BUILD_TARGETS = "Build target platforms";
 		public const string REGEX_FOUR_PART_VERSION = @"^(\d+)\.(\d+)\.(\d+)\.(\d+)$";
 
 		private const string DEFAULT_GENRE = "Adventure";
         private const string DEFAULT_VERSION = "1.0.0.0";
+
+        private const ScriptAPIVersion DEFAULT_SCRIPT_API = ScriptAPIVersion.v340;
 
         public Settings()
         {
@@ -26,7 +33,7 @@ namespace AGS.Types
         }
 
         private string _gameName = "New game";
-        private GameResolutions _resolution = GameResolutions.R320x200;
+        private Size _resolution = new Size(320, 200);
         private GameColorDepth _colorDepth = GameColorDepth.HighColor;
 		private GraphicsDriver _graphicsDriver = GraphicsDriver.DX5;
         private bool _debugMode = true;
@@ -46,10 +53,13 @@ namespace AGS.Types
         private bool _inventoryCursors = true;
         private bool _handleInvInScript = false;
         private bool _displayMultipleInv = false;
+        private ScriptAPIVersion _scriptAPIVersion = DEFAULT_SCRIPT_API;
+        private ScriptAPIVersion _scriptCompatLevel = DEFAULT_SCRIPT_API;
         private bool _enforceObjectScripting = true;
         private bool _leftToRightPrecedence = true;
         private bool _enforceNewStrings = true;
         private bool _enforceNewAudio = true;
+        private bool _oldCustomDlgOptsAPI = false;
         private int _playSoundOnScore = 0;
         private CrossfadeSpeed _crossfadeMusic = CrossfadeSpeed.No;
         private int _dialogOptionsGUI = 0;
@@ -91,6 +101,38 @@ namespace AGS.Types
 		private bool _enhancedSaveGames = false;
         private string _saveGamesFolderName = string.Empty;
         private int _audioIndexer = 0;
+        private string _buildTargets = GetBuildTargetsString(BuildTargetsInfo.GetAvailableBuildTargetNames(), false);
+
+        /// <summary>
+        /// Helper function to validate the BuildTargets string. Excludes data file target
+        /// from the string unless it is the only target, and optionally checks that the
+        /// targets are available for building.
+        /// </summary>
+        private static string GetBuildTargetsString(string[] targets, bool checkAvailable)
+        {
+            if (targets.Length == 0) return BuildTargetsInfo.DATAFILE_TARGET_NAME;
+            List<string> availableTargets = null; // only retrieve available targets on request
+            if (checkAvailable) availableTargets = new List<string>(BuildTargetsInfo.GetAvailableBuildTargetNames());
+            List<string> resultTargetList = new List<string>(targets.Length);
+            foreach (string targ in targets)
+            {
+                if ((!checkAvailable) || (availableTargets.Contains(targ)))
+                {
+                    // only include data file target if it is the only target
+                    if ((targ != BuildTargetsInfo.DATAFILE_TARGET_NAME) || (targets.Length == 1))
+                    {
+                        resultTargetList.Add(targ);
+                    }
+                }
+            }
+            return string.Join(BuildTargetUIEditor.Separators[0], resultTargetList.ToArray());
+        }
+
+        private static string GetBuildTargetsString(string targetList, bool checkAvailable)
+        {
+            return GetBuildTargetsString(targetList.Split(BuildTargetUIEditor.Separators,
+                StringSplitOptions.RemoveEmptyEntries), checkAvailable);
+        }
 
 		public void GenerateNewGameID()
 		{
@@ -139,15 +181,86 @@ namespace AGS.Types
             set { _colorDepth = value; }
         }
 
+        [AGSNoSerialize]
+        [Browsable(false)]
+        [Obsolete("Old Resolution property of Enum type is replaced by CustomResolution of Size type.")]
+        public GameResolutions Resolution
+        {
+            get { return GameResolutions.Custom; }
+            set
+            {
+                switch (value)
+                {
+                    case GameResolutions.R320x200:
+                        CustomResolution = new Size(320, 200); break;
+                    case GameResolutions.R320x240:
+                        CustomResolution = new Size(320, 240); break;
+                    case GameResolutions.R640x400:
+                        CustomResolution = new Size(640, 400); break;
+                    case GameResolutions.R640x480:
+                        CustomResolution = new Size(640, 480); break;
+                    case GameResolutions.R800x600:
+                        CustomResolution = new Size(800, 600); break;
+                    case GameResolutions.R1024x768:
+                        CustomResolution = new Size(1024, 768); break;
+                    case GameResolutions.R1280x720:
+                        CustomResolution = new Size(1280, 720); break;
+                    case GameResolutions.Custom:
+                        throw new ArgumentOutOfRangeException("You are not allowed to explicitly set Custom resolution type to the deprecated Settings.Resolution property.");
+                }
+            }
+        }
+
         [DisplayName(PROPERTY_RESOLUTION)]
         [Description("The graphics resolution of the game (higher allows more detail, but slower performance and larger file size)")]
         [Category("(Setup)")]
-        [TypeConverter(typeof(EnumTypeConverter))]
+        [EditorAttribute(typeof(CustomResolutionUIEditor), typeof(System.Drawing.Design.UITypeEditor))]
+        [TypeConverter(typeof(CustomResolutionTypeConverter))]
         [RefreshProperties(RefreshProperties.All)]
-        public GameResolutions Resolution
+        public Size CustomResolution
         {
             get { return _resolution; }
-            set { _resolution = value; }
+            set
+            {
+                _resolution = value;
+                if (LegacyLetterboxResolution == GameResolutions.Custom)
+                    LetterboxMode = false;
+            }
+        }
+
+        /// <summary>
+        /// Tells if the game should be considered low-resolution.
+        /// For backwards-compatble logic only.
+        /// The "low resolution" assumes that game does not exceed
+        /// 320x240 pixels.
+        /// </summary>
+        [Browsable(false)]
+        public bool LowResolution
+        {
+            get
+            {
+                return (CustomResolution.Width * CustomResolution.Height) <= (320 * 240);
+            }
+        }
+
+        /// <summary>
+        /// Tells which of the legacy resolution types would be represented by
+        /// the current game resolution if designed in letterboxed mode.
+        /// Returns GameResolutions.Custom if current resolution cannot be used
+        /// for letterboxed design.
+        /// For backwards-compatible logic only.
+        /// </summary>
+        [Browsable(false)]
+        public GameResolutions LegacyLetterboxResolution
+        {
+            get
+            {
+                if (CustomResolution.Width == 320 && CustomResolution.Height == 200)
+                    return GameResolutions.R320x200;
+                if (CustomResolution.Width == 640 && CustomResolution.Height == 400)
+                    return GameResolutions.R640x400;
+                return GameResolutions.Custom;
+            }
         }
 
 		[DisplayName("Default graphics driver")]
@@ -247,7 +360,11 @@ namespace AGS.Types
         public bool LetterboxMode
         {
             get { return _letterboxMode; }
-            set { _letterboxMode = value; }
+            set
+            {
+                if (value == false || LegacyLetterboxResolution != GameResolutions.Custom)
+                    _letterboxMode = value;
+            }
         }
 
         [DisplayName("Automatically move the player in Walk mode")]
@@ -417,6 +534,38 @@ namespace AGS.Types
             set { _displayMultipleInv = value; }
         }
 
+        [DisplayName("Script API version")]
+        [Description("Choose the version of the script API to use in your scripts")]
+        [DefaultValue(DEFAULT_SCRIPT_API)]
+        [Category("Backwards Compatibility")]
+        [TypeConverter(typeof(EnumTypeConverter))]
+        public ScriptAPIVersion ScriptAPIVersion
+        {
+            get { return _scriptAPIVersion; }
+            set
+            {
+                _scriptAPIVersion = value;
+                if (_scriptAPIVersion < _scriptCompatLevel)
+                    _scriptCompatLevel = _scriptAPIVersion;
+            }
+        }
+
+        [DisplayName("Script compatibility level")]
+        [Description("Lowest version of the obsoleted script API to support in your script")]
+        [DefaultValue(DEFAULT_SCRIPT_API)]
+        [Category("Backwards Compatibility")]
+        [TypeConverter(typeof(EnumTypeConverter))]
+        public ScriptAPIVersion ScriptCompatLevel
+        {
+            get { return _scriptCompatLevel; }
+            set
+            {
+                _scriptCompatLevel = value;
+                if (_scriptCompatLevel > _scriptAPIVersion)
+                    _scriptAPIVersion = _scriptCompatLevel;
+            }
+        }
+
         [DisplayName("Enforce object-based scripting")]
         [Description("Disable old-style AGS 2.62 script commands")]
         [DefaultValue(true)]
@@ -445,6 +594,16 @@ namespace AGS.Types
         {
             get { return _enforceNewAudio; }
             set { _enforceNewAudio = value; }
+        }
+
+        [DisplayName("Use old-style custom dialog options API")]
+        [Description("Use pre-3.4.0 callback functions to handle custom dialog options GUI")]
+        [DefaultValue(false)]
+        [Category("Backwards Compatibility")]
+        public bool UseOldCustomDialogOptionsAPI
+        {
+            get { return _oldCustomDlgOptsAPI; }
+            set { _oldCustomDlgOptsAPI = value; }
         }
 
         [DisplayName("Left-to-right operator precedence")]
@@ -832,6 +991,20 @@ namespace AGS.Types
             set { _audioIndexer = value; }
         }
 
+        [DisplayName(PROPERTY_BUILD_TARGETS)]
+        [Description("Sets the platforms to compile your game for.")]
+        [Category("Compiler")]
+        [Editor(typeof(BuildTargetUIEditor), typeof(System.Drawing.Design.UITypeEditor))]
+        public string BuildTargets
+        {
+            get { return _buildTargets; }
+
+            set
+            {
+                _buildTargets = GetBuildTargetsString(value, true);
+            }
+        }
+
         public void ToXml(XmlTextWriter writer)
         {
             SerializeUtils.SerializeToXML(this, writer);
@@ -941,9 +1114,9 @@ namespace AGS.Types
                 {
                     wantThisProperty = false;
                 }
-                else if ((_resolution != GameResolutions.R320x200) && 
-                         (_resolution != GameResolutions.R640x400) &&
-                         (property.Name == "LetterboxMode"))
+                // TODO: this must be done other way; leaving for backwards-compatibility only
+                else if (property.Name == "LetterboxMode" &&
+                    LegacyLetterboxResolution == GameResolutions.Custom)
                 {
                     // Only show letterbox option for 320x200 and 640x400 games
                     wantThisProperty = false;

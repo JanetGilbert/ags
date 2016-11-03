@@ -15,6 +15,19 @@
 #ifdef _DEBUG
 
 void Test_DoAllTests();
+// Math tests
+void Test_Math();
+// File tests
+void Test_File();
+void Test_IniFile();
+// Graphics tests
 void Test_Gfx();
+// Memory / bit-byte operations
+void Test_Memory();
+// String tests
+void Test_ScriptSprintf();
+void Test_String();
+void Test_Path();
+void Test_Version();
 
 #endif // _DEBUG

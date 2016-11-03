@@ -15,10 +15,9 @@
 #ifndef __AC_GUITEXTBOX_H
 #define __AC_GUITEXTBOX_H
 
+#include <vector>
 #include "gui/guiobject.h"
-#include "gui/dynamicarray.h"
 
-#define GTF_NOBORDER  1
 struct GUITextBox:public GUIObject
 {
   char text[200];
@@ -51,6 +50,7 @@ struct GUITextBox:public GUIObject
     font = 0;
     textcol = 0;
     text[0] = 0;
+    exflags = 0;
     numSupportedEvents = 1;
     supportedEvents[0] = "Activate";
     supportedEventArgs[0] = "GUIControl *control";
@@ -64,7 +64,7 @@ private:
   void Draw_text_box_contents(Common::Bitmap *ds, color_t text_color);
 };
 
-extern DynamicArray<GUITextBox> guitext;
+extern std::vector<GUITextBox> guitext;
 extern int numguitext;
 
 #endif // __AC_GUITEXTBOX_H

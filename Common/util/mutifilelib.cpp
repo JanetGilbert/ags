@@ -112,17 +112,17 @@ MFLUtil::MFLError MFLUtil::ReadSigsAndVersion(Stream *in, int *p_lib_version, lo
     if (HeadSig.Compare(sig) != 0)
     {
         // signature not found, check signature at the end of file
-        in->Seek(Common::kSeekEnd, -TailSig.GetLength());
+        in->Seek(-TailSig.GetLength(), kSeekEnd);
         sig.ReadCount(in, TailSig.GetLength());
         // signature not found, return error code
         if (TailSig.Compare(sig) != 0)
             return kMFLErrNoLibSig;
 
         // it's an appended-to-end-of-exe thing
-        in->Seek(Common::kSeekEnd, -TailSig.GetLength() - sizeof(int32_t));
+        in->Seek(-TailSig.GetLength() - sizeof(int32_t), kSeekEnd);
         // read multifile lib offset value
         abs_offset = in->ReadInt32();
-        in->Seek(Common::kSeekBegin, abs_offset + HeadSig.GetLength());
+        in->Seek(abs_offset + HeadSig.GetLength(), kSeekBegin);
     }
 
     // read library header
@@ -149,7 +149,7 @@ MFLUtil::MFLError MFLUtil::ReadSingleFileLib(AssetLibInfo &lib, Stream *in, int 
         return kMFLErrLibAssetCount; // too many files in clib, return error code
     lib.AssetInfos.resize(asset_count);
 
-    in->Seek(Common::kSeekCurrent, SingleFilePswLen); // skip password dooberry
+    in->Seek(SingleFilePswLen, kSeekCurrent); // skip password dooberry
     char fn_buf[SingleFilePswLen + 1];
     // read information on contents
     for (size_t i = 0; i < asset_count; ++i)
@@ -165,7 +165,7 @@ MFLUtil::MFLError MFLUtil::ReadSingleFileLib(AssetLibInfo &lib, Stream *in, int 
     {
         lib.AssetInfos[i].Size = in->ReadInt32();
     }
-    in->Seek(Common::kSeekCurrent, 2 * asset_count); // skip flags & ratio
+    in->Seek(2 * asset_count, kSeekCurrent); // skip flags & ratio
     lib.AssetInfos[0].Offset = in->GetPosition();
     // set offsets (assets are positioned in sequence)
     for (size_t i = 1; i < asset_count; ++i)

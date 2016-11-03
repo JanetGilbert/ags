@@ -31,11 +31,11 @@
 #include "gui/guimain.h"
 #include "ac/spritecache.h"
 #include "script/runtimescriptvalue.h"
+#include "gfx/gfx_def.h"
 #include "gfx/gfx_util.h"
 
-using AGS::Common::Bitmap;
-namespace BitmapHelper = AGS::Common::BitmapHelper;
-namespace GfxUtil = AGS::Engine::GfxUtil;
+using namespace AGS::Common;
+using namespace AGS::Engine;
 
 extern GameSetupStruct game;
 extern GameState play;
@@ -43,7 +43,6 @@ extern RoomStatus*croom;
 extern RoomObject*objs;
 extern CharacterCache *charcache;
 extern ObjectCache objcache[MAX_INIT_SPR];
-extern GUIMain*guis;
 extern SpriteCache spriteset;
 extern int spritewidth[MAX_SPRITES],spriteheight[MAX_SPRITES];
 extern Bitmap *dynamicallyCreatedSurfaces[MAX_DYNAMIC_SURFACES];
@@ -89,8 +88,8 @@ void DrawingSurface_Release(ScriptDrawingSurface* sds)
             }
             for (tt = 0; tt < game.numgui; tt++) 
             {
-                if ((guis[tt].bgpic == sds->dynamicSpriteNumber) &&
-                    (guis[tt].on == 1))
+                if ((guis[tt].BgImage == sds->dynamicSpriteNumber) &&
+                    (guis[tt].IsVisible()))
                 {
                     guis_need_update = 1;
                     break;
@@ -215,7 +214,7 @@ void DrawingSurface_DrawSurface(ScriptDrawingSurface* target, ScriptDrawingSurfa
 
     // Draw it transparently
     GfxUtil::DrawSpriteWithTransparency(ds, surfaceToDraw, 0, 0,
-        GfxUtil::Trans100ToAlpha255(translev));
+        GfxDef::Trans100ToAlpha255(translev));
     target->FinishedDrawing();
 }
 
@@ -263,7 +262,7 @@ void DrawingSurface_DrawImage(ScriptDrawingSurface* sds, int xx, int yy, int slo
     }
 
     draw_sprite_support_alpha(ds, sds->hasAlphaChannel != 0, xx, yy, sourcePic, (game.spriteflags[slot] & SPF_ALPHACHANNEL) != 0,
-        GfxUtil::Trans100ToAlpha255(trans));
+        kBlendMode_Alpha, GfxDef::Trans100ToAlpha255(trans));
 
     sds->FinishedDrawing();
 

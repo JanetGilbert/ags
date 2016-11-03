@@ -91,8 +91,11 @@ namespace AGS.CScript.Compiler
 				return string.Empty;
 			}
 
+			Stack<StringBuilder> previousOutput = new Stack<StringBuilder>();
+			Stack<FastString> previousLine = new Stack<FastString>();
 			StringBuilder output = new StringBuilder(lineToProcess.Length);
 			FastString line = new FastString(lineToProcess);
+			Stack<String> ignored = new Stack<String>();
 			while (line.Length > 0)
 			{
 				int i = 0;
@@ -112,27 +115,41 @@ namespace AGS.CScript.Compiler
 
 				output.Append(line.Substring(0, i));
 
-				if (i >= line.Length)
+				if (i < line.Length)
 				{
-					break;
-				}
+					bool precededByDot = false;
+					if (i > 0) precededByDot = (line[i - 1] == '.');
 
-				bool precededByDot = false;
-				if (i > 0) precededByDot = (line[i - 1] == '.');
+					line = line.Substring(i);
 
-				line = line.Substring(i);
+					string realStringLine = line.ToString();
+					string theWord = GetNextWord(ref realStringLine, false, false);
+					line = realStringLine;
 
-				string realStringLine = line.ToString();
-				string theWord = GetNextWord(ref realStringLine, false, false);
-				line = realStringLine;
 
-				if ((!precededByDot) && (_state.Macros.Contains(theWord)))
-				{
-					output.Append(_state.Macros[theWord]);
+					if ((!precededByDot) && (!ignored.Contains(theWord)) && (_state.Macros.Contains(theWord)))
+					{
+						previousOutput.Push(output);
+						previousLine.Push(line);
+						ignored.Push(theWord);
+						line = new FastString(_state.Macros[theWord]);
+						output = new StringBuilder(line.Length);
+					}
+					else
+					{
+						output.Append(theWord);
+					}
 				}
 				else
+					line = "";
+
+				while (line.Length == 0 && previousOutput.Count > 0)
 				{
-					output.Append(theWord);
+					String result = output.ToString();
+					output = previousOutput.Pop();
+					line = previousLine.Pop();
+					ignored.Pop();
+					output.Append(result);
 				}
 
 			}
@@ -188,25 +205,22 @@ namespace AGS.CScript.Compiler
 					includeCodeBlock = !includeCodeBlock;
 				}
 			}
-			else
+			else if (directive == "ifver" || directive == "ifnver")
 			{
-				if (!Char.IsDigit(macroName[0]))
+				// Compare provided version number with the current application version
+				try
 				{
-					RecordError(ErrorCode.InvalidVersionNumber, "Expected version number");
-				}
-				else
-				{
-					string appVer = _applicationVersion;
-					if (appVer.Length > macroName.Length)
-					{
-						// AppVer is "3.0.1.25", macroNAme might be "3.0" or "3.0.1"
-						appVer = appVer.Substring(0, macroName.Length);
-					}
-					includeCodeBlock = (appVer.CompareTo(macroName) >= 0);
+					Version appVersion = new Version(_applicationVersion);
+					Version macroVersion = new Version(macroName);
+					includeCodeBlock = appVersion.CompareTo(macroVersion) >= 0;
 					if (directive == "ifnver")
 					{
 						includeCodeBlock = !includeCodeBlock;
 					}
+				}
+				catch (Exception e)
+				{
+					RecordError(ErrorCode.InvalidVersionNumber, String.Format("Cannot parse version number: {0}", e.Message));
 				}
 			}
 
@@ -288,6 +302,10 @@ namespace AGS.CScript.Compiler
 			else if ((directive == "sectionstart") || (directive == "sectionend"))
 			{
 				// do nothing -- 2.72 put these as markers in the script
+			}
+			else if ((directive == "region") || (directive == "endregion"))
+			{
+				// do nothing -- scintilla can fold it, so it can be used to organize the code
 			}
 			else
 			{

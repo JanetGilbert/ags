@@ -17,8 +17,8 @@
 //
 
 #include "ac/gamesetup.h"
-#include "ac/gamesetupstruct.h"
 #include "ac/gamestate.h"
+#include "ac/global_translation.h"
 #include "debug/debug_log.h"
 #include "main/mainheader.h"
 #include "main/config.h"
@@ -30,11 +30,12 @@
 #include "util/ini_util.h"
 #include "util/textstreamreader.h"
 #include "util/path.h"
+#include "util/string_utils.h"
 
 using namespace AGS::Common;
+using namespace AGS::Engine;
 
 extern GameSetup usetup;
-extern GameSetupStruct game;
 extern int spritewidth[MAX_SPRITES],spriteheight[MAX_SPRITES];
 extern SpriteCache spriteset;
 extern int psp_video_framedrop;
@@ -81,7 +82,7 @@ bool INIreaditem(const ConfigTree &cfg, const String &sectn, const String &item,
     ConfigNode sec_it = cfg.find(sectn);
     if (sec_it != cfg.end())
     {
-        StrStrIter item_it = sec_it->second.find(item);
+        StrStrOIter item_it = sec_it->second.find(item);
         if (item_it != sec_it->second.end())
         {
             value = item_it->second;
@@ -91,11 +92,11 @@ bool INIreaditem(const ConfigTree &cfg, const String &sectn, const String &item,
     return false;
 }
 
-int INIreadint(const ConfigTree &cfg, const String &sectn, const String &item)
+int INIreadint(const ConfigTree &cfg, const String &sectn, const String &item, int def_value)
 {
     String str;
     if (!INIreaditem(cfg, sectn, item, str))
-        return -1;
+        return def_value;
 
     return atoi(str);
 }
@@ -117,14 +118,87 @@ String INIreadstring(const ConfigTree &cfg, const String &sectn, const String &i
     return str;
 }
 
+void INIwriteint(ConfigTree &cfg, const String &sectn, const String &item, int value)
+{
+    cfg[sectn][item] = StrUtil::IntToString(value);
+}
+
 void INIwritestring(ConfigTree &cfg, const String &sectn, const String &item, const String &value)
 {
     cfg[sectn][item] = value;
 }
 
-void INIwriteint(ConfigTree &cfg, const String &sectn, const String &item, int value)
+void parse_scaling_option(const String &scaling_option, FrameScaleDefinition &scale_def, int &scale_factor)
 {
-    cfg[sectn][item] = String::FromFormat("%d", value);
+    const char *game_scale_options[kNumFrameScaleDef - 1] = { "max_round", "stretch", "proportional" };
+    scale_def = kFrame_IntScale;
+    for (int i = 0; i < kNumFrameScaleDef - 1; ++i)
+    {
+        if (scaling_option.CompareNoCase(game_scale_options[i]) == 0)
+        {
+            scale_def = (FrameScaleDefinition)(i + 1);
+            break;
+        }
+    }
+
+    if (scale_def == kFrame_IntScale)
+        scale_factor = StrUtil::StringToInt(scaling_option);
+    else
+        scale_factor = 0;
+}
+
+// Parses legacy filter ID and converts it into current scaling options
+bool parse_legacy_frame_config(const String &scaling_option, String &filter_id, FrameScaleDefinition &scale_def, int &scale_factor)
+{
+    struct
+    {
+        String LegacyName;
+        String CurrentName;
+        int    Scaling;
+    } legacy_filters[6] = { {"none", "none", -1}, {"max", "StdScale", 0}, {"StdScale", "StdScale", -1},
+                           {"AAx", "Linear", -1}, {"Hq2x", "Hqx", 2}, {"Hq3x", "Hqx", 3} };
+
+    for (int i = 0; i < 6; i++)
+    {
+        if (scaling_option.CompareLeftNoCase(legacy_filters[i].LegacyName) == 0)
+        {
+            filter_id = legacy_filters[i].CurrentName;
+            scale_def = legacy_filters[i].Scaling == 0 ? kFrame_MaxRound : kFrame_IntScale;
+            scale_factor = legacy_filters[i].Scaling >= 0 ? legacy_filters[i].Scaling :
+                scaling_option.Mid(legacy_filters[i].LegacyName.GetLength()).ToInt();
+            return true;
+        }
+    }
+    return false;
+}
+
+String make_scaling_option(FrameScaleDefinition scale_def, int scale_factor)
+{
+    switch (scale_def)
+    {
+    case kFrame_MaxRound:
+        return "max_round";
+    case kFrame_MaxStretch:
+        return "stretch";
+    case kFrame_MaxProportional:
+        return "proportional";
+    }
+    return String::FromFormat("%d", scale_factor);
+}
+
+uint32_t convert_scaling_to_fp(int scale_factor)
+{
+    if (scale_factor >= 0)
+        return scale_factor <<= kShift;
+    else
+        return kUnit / abs(scale_factor);
+}
+
+int convert_fp_to_scaling(uint32_t scaling)
+{
+    if (scaling == 0)
+        return 0;
+    return scaling >= kUnit ? (scaling >> kShift) : -kUnit / (int32_t)scaling;
 }
 
 void find_default_cfg_file(const char *alt_cfg_file)
@@ -162,6 +236,7 @@ void find_user_cfg_file()
 
 void config_defaults()
 {
+    usetup.translation = NULL;
 #ifdef WINDOWS_VERSION
     usetup.digicard = DIGI_DIRECTAMX(0);
 #endif
@@ -188,14 +263,45 @@ void read_game_data_location(const ConfigTree &cfg)
     usetup.main_data_filename = INIreadstring(cfg, "misc", "datafile", usetup.main_data_filename);
 }
 
+void read_legacy_graphics_config(const ConfigTree &cfg, const bool should_read_filter)
+{
+    usetup.Screen.Windowed = INIreadint(cfg, "misc", "windowed") > 0;
+    usetup.Screen.DriverID = INIreadstring(cfg, "misc", "gfxdriver");
+
+    if (should_read_filter)
+    {
+        String legacy_filter = INIreadstring(cfg, "misc", "gfxfilter");
+        if (!legacy_filter.IsEmpty())
+        {
+            usetup.Screen.SizeDef = kScreenDef_ByGameScaling;
+
+            int scale_factor;
+            if (parse_legacy_frame_config(legacy_filter, usetup.Screen.Filter.ID, usetup.Screen.GameFrame.ScaleDef, scale_factor))
+            {
+                usetup.Screen.GameFrame.ScaleFactor = convert_scaling_to_fp(scale_factor);
+            }
+
+            // AGS 3.2.1 and 3.3.0 aspect ratio preferences
+            if (!usetup.Screen.Windowed)
+            {
+                usetup.Screen.MatchDeviceRatio =
+                    (INIreadint(cfg, "misc", "sideborders") > 0 || INIreadint(cfg, "misc", "forceletterbox") > 0 ||
+                     INIreadint(cfg, "misc", "prefer_sideborders") > 0 || INIreadint(cfg, "misc", "prefer_letterbox") > 0);
+            }
+        }
+    }
+
+    usetup.Screen.RefreshRate = INIreadint(cfg, "misc", "refresh");
+}
+
 void read_config(const ConfigTree &cfg)
 {
     {
 #ifndef WINDOWS_VERSION
-        usetup.digicard=INIreadint(cfg, "sound","digiid");
-        usetup.midicard=INIreadint(cfg, "sound","midiid");
+        usetup.digicard=INIreadint(cfg, "sound","digiid", DIGI_AUTODETECT);
+        usetup.midicard=INIreadint(cfg, "sound","midiid", MIDI_AUTODETECT);
 #else
-        int idx = INIreadint(cfg, "sound","digiwinindx");
+        int idx = INIreadint(cfg, "sound","digiwinindx", -1);
         if (idx == 0)
             idx = DIGI_DIRECTAMX(0);
         else if (idx == 1)
@@ -208,7 +314,7 @@ void read_config(const ConfigTree &cfg)
             idx = DIGI_AUTODETECT;
         usetup.digicard = idx;
 
-        idx = INIreadint(cfg, "sound","midiwinindx");
+        idx = INIreadint(cfg, "sound","midiwinindx", -1);
         if (idx == 1)
             idx = MIDI_NONE;
         else if (idx == 2)
@@ -216,58 +322,71 @@ void read_config(const ConfigTree &cfg)
         else
             idx = MIDI_AUTODETECT;
         usetup.midicard = idx;
-
-        if (usetup.digicard < 0)
-            usetup.digicard = DIGI_AUTODETECT;
-        if (usetup.midicard < 0)
-            usetup.midicard = MIDI_AUTODETECT;
 #endif
-
 #if !defined (LINUX_VERSION)
-        int threaded_audio = INIreadint(cfg, "sound", "threaded");
-        if (threaded_audio >= 0)
-            psp_audio_multithreaded = threaded_audio;
+        psp_audio_multithreaded = INIreadint(cfg, "sound", "threaded", psp_audio_multithreaded);
 #endif
 
-        usetup.windowed = INIreadint(cfg, "misc", "windowed") > 0;
+        // Filter can also be set by command line
+        // TODO: apply command line arguments to ConfigTree instead to override options read from config file
+        const bool should_read_filter = usetup.Screen.Filter.ID.IsEmpty();
+        // Legacy graphics settings has to be translated into new options;
+        // they must be read first, to let newer options override them, if ones are present
+        read_legacy_graphics_config(cfg, should_read_filter);
 
-        usetup.refresh = INIreadint (cfg, "misc", "refresh");
-        usetup.enable_antialiasing = INIreadint (cfg, "misc", "antialias") > 0;
-        usetup.force_hicolor_mode = INIreadint(cfg, "misc", "notruecolor") > 0;
-        usetup.prefer_sideborders = INIreadint(cfg, "misc", "prefer_sideborders") != 0;
-
-#if defined(IOS_VERSION) || defined(PSP_VERSION) || defined(ANDROID_VERSION)
-        // PSP: Letterboxing is not useful on the PSP.
-        usetup.prefer_letterbox = false;
+        // Graphics mode
+#if defined (WINDOWS_VERSION)
+        usetup.Screen.DriverID = INIreadstring(cfg, "graphics", "driver");
 #else
-        usetup.prefer_letterbox = INIreadint (cfg, "misc", "prefer_letterbox") != 0;
+        usetup.Screen.DriverID = "DX5";
 #endif
+        usetup.Screen.Windowed = INIreadint(cfg, "graphics", "windowed") > 0;
+        const char *screen_sz_def_options[kNumScreenDef] = { "explicit", "scaling", "max" };
+        usetup.Screen.SizeDef = kScreenDef_MaxDisplay;
+        String screen_sz_def_str = INIreadstring(cfg, "graphics", "screen_def");
+        for (int i = 0; i < kNumScreenDef; ++i)
+        {
+            if (screen_sz_def_str.CompareNoCase(screen_sz_def_options[i]) == 0)
+            {
+                usetup.Screen.SizeDef = (ScreenSizeDefinition)i;
+                break;
+            }
+        }
+
+        usetup.Screen.Size.Width = INIreadint(cfg, "graphics", "screen_width");
+        usetup.Screen.Size.Height = INIreadint(cfg, "graphics", "screen_height");
+        usetup.Screen.MatchDeviceRatio = INIreadint(cfg, "graphics", "match_device_ratio", 1) != 0;
+#if defined(IOS_VERSION) || defined(PSP_VERSION) || defined(ANDROID_VERSION)
+        // PSP: No graphic filters are available.
+        usetup.Screen.Filter.ID = "";
+#else
+        if (should_read_filter)
+        {
+            usetup.Screen.Filter.ID = INIreadstring(cfg, "graphics", "filter", "StdScale");
+            int scale_factor;
+            parse_scaling_option(INIreadstring(cfg, "graphics", "game_scale", "max_round"),
+                usetup.Screen.GameFrame.ScaleDef, scale_factor);
+            usetup.Screen.GameFrame.ScaleFactor = convert_scaling_to_fp(scale_factor);
+        }
+#endif
+
+        usetup.Screen.RefreshRate = INIreadint(cfg, "graphics", "refresh");
+        usetup.Screen.VSync = INIreadint(cfg, "graphics", "vsync") > 0;
+
+        usetup.enable_antialiasing = INIreadint(cfg, "misc", "antialias") > 0;
+        usetup.force_hicolor_mode = INIreadint(cfg, "misc", "notruecolor") > 0;
 
         // This option is backwards (usevox is 0 if no_speech_pack)
-        usetup.no_speech_pack = INIreadint(cfg, "sound", "usespeech") == 0;
+        usetup.no_speech_pack = INIreadint(cfg, "sound", "usespeech", 1) == 0;
 
         usetup.user_data_dir = INIreadstring(cfg, "misc", "user_data_dir");
 
-#if defined(IOS_VERSION) || defined(PSP_VERSION) || defined(ANDROID_VERSION)
-        // PSP: No graphic filters are available.
-        usetup.gfxFilterID = "";
-#else
-        usetup.gfxFilterID = INIreadstring(cfg, "misc", "gfxfilter");
-#endif
-
-#if defined (WINDOWS_VERSION)
-        usetup.gfxDriverID = INIreadstring(cfg, "misc", "gfxdriver");
-#else
-        usetup.gfxDriverID = "DX5";
-#endif
-
         usetup.translation = INIreadstring(cfg, "language", "translation");
 
-#if !defined(IOS_VERSION) && !defined(PSP_VERSION) && !defined(ANDROID_VERSION)
         // PSP: Don't let the setup determine the cache size as it is always too big.
-        int tempint = INIreadint(cfg, "misc", "cachemax");
-        if (tempint > 0)
-            spriteset.maxCacheSize = tempint * 1024;
+#if !defined(PSP_VERSION)
+        // the config file specifies cache size in KB, here we convert it to bytes
+        spriteset.maxCacheSize = INIreadint (cfg, "misc", "cachemax", DEFAULTCACHESIZE / 1024) * 1024;
 #endif
 
         String repfile = INIreadstring(cfg, "misc", "replay");
@@ -304,7 +423,7 @@ void read_config(const ConfigTree &cfg)
             }
         }
 
-        usetup.override_multitasking = INIreadint(cfg, "override", "multitasking");
+        usetup.override_multitasking = INIreadint(cfg, "override", "multitasking", -1);
         String override_os = INIreadstring(cfg, "override", "os");
         usetup.override_script_os = -1;
         if (override_os.CompareNoCase("dos") == 0)
@@ -331,18 +450,26 @@ void read_config(const ConfigTree &cfg)
         // default before applying value from config file.
         if (!enable_log_file && !disable_log_file)
         {
-            int log_value = INIreadint (cfg, "misc", "log");
-            if (log_value >= 0)
-                enable_log_file = log_value > 0;
+            enable_log_file = INIreadint (cfg, "misc", "log") != 0;
         }
     }
 }
 
 void post_config()
 {
-    if (usetup.gfxDriverID.IsEmpty())
-        usetup.gfxDriverID = "DX5";
+    if (usetup.Screen.DriverID.IsEmpty())
+        usetup.Screen.DriverID = "DX5";
 
+    // FIXME: this correction is needed at the moment because graphics driver
+    // implementation requires some filter to be created anyway
+    usetup.Screen.Filter.UserRequest = usetup.Screen.Filter.ID;
+    if (usetup.Screen.Filter.ID.IsEmpty() || usetup.Screen.Filter.ID.CompareNoCase("none") == 0)
+    {
+        usetup.Screen.Filter.ID = "StdScale";
+        usetup.Screen.GameFrame.ScaleDef = kFrame_IntScale;
+        usetup.Screen.GameFrame.ScaleFactor = kUnit;
+    }
+    
     if (usetup.user_data_dir.GetLast() == '/' || usetup.user_data_dir.GetLast() == '\\')
         usetup.user_data_dir.ClipRight(1);
 }
@@ -354,7 +481,7 @@ void load_default_config_file(ConfigTree &cfg, const char *alt_cfg_file)
     // Don't read in the standard config file if disabled.
     if (psp_ignore_acsetup_cfg_file)
     {
-        usetup.gfxDriverID = "DX5";
+        usetup.Screen.DriverID = "DX5";
         usetup.enable_antialiasing = psp_gfx_smooth_sprites != 0;
         usetup.translation = psp_translation;
         return;
@@ -374,10 +501,14 @@ void load_user_config_file(AGS::Common::ConfigTree &cfg)
 
 void save_config_file()
 {
+    char buffer[STD_BUFFER_SIZE];
     ConfigTree cfg;
 
     if (Mouse::IsControlEnabled())
         cfg["mouse"]["speed"] = String::FromFormat("%f", Mouse::GetSpeed());
+    bool is_available = GetTranslationName(buffer) != 0 || !buffer[0];
+    if (is_available)
+        cfg["language"]["translation"] = buffer;
 
     IniUtil::Merge(ac_config_file, cfg);
 }

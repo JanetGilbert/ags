@@ -53,8 +53,6 @@ volatile int psp_audio_multithreaded = 0;
 #endif
 
 ScriptAudioChannel scrAudioChannel[MAX_SOUND_CHANNELS + 1];
-CCAudioChannel ccDynamicAudio;
-CCAudioClip ccDynamicAudioClip;
 char acaudio_buffer[256];
 int reserved_channel_count = 0;
 
@@ -68,25 +66,6 @@ void calculate_reserved_channel_count()
         reservedChannels += game.audioClipTypes[i].reservedChannels;
     }
     reserved_channel_count = reservedChannels;
-}
-
-void register_audio_script_objects()
-{
-    int ee;
-    for (ee = 0; ee <= MAX_SOUND_CHANNELS; ee++) 
-    {
-        scrAudioChannel[ee].id = ee;
-        ccRegisterManagedObject(&scrAudioChannel[ee], &ccDynamicAudio);
-    }
-
-    for (ee = 0; ee < game.audioClipCount; ee++)
-    {
-        game.audioClips[ee].id = ee;
-        ccRegisterManagedObject(&game.audioClips[ee], &ccDynamicAudioClip);
-        ccAddExternalDynamicObject(game.audioClips[ee].scriptName, &game.audioClips[ee], &ccDynamicAudioClip);
-    }
-
-    calculate_reserved_channel_count();
 }
 
 void update_clip_default_volume(ScriptAudioClip *audioClip)
@@ -428,6 +407,21 @@ void remove_clips_of_type_from_queue(int audioType)
     }
 }
 
+void update_queued_clips_volume(int audioType, int new_vol)
+{
+    for (int i = 0; i < play.new_music_queue_size; ++i)
+    {
+        // NOTE: if clip is uncached, the volume will be set from defaults when it is loaded
+        SOUNDCLIP *sndclip = play.new_music_queue[i].cachedClip;
+        if (sndclip)
+        {
+            ScriptAudioClip *clip = &game.audioClips[play.new_music_queue[i].audioClipIndex];
+            if (clip->type == audioType)
+                sndclip->set_volume_origin(new_vol);
+        }
+    }
+}
+
 ScriptAudioChannel* play_audio_clip(ScriptAudioClip *clip, int priority, int repeat, int fromOffset, bool queueIfNoChannel)
 {
     if (!queueIfNoChannel)
@@ -458,23 +452,6 @@ void play_audio_clip_by_index(int audioClipIndex)
         AudioClip_Play(&game.audioClips[audioClipIndex], SCR_NO_VALUE, SCR_NO_VALUE);
 }
 
-bool unserialize_audio_script_object(int index, const char *objectType, const char *serializedData, int dataSize)
-{
-    if (strcmp(objectType, "AudioChannel") == 0)
-    {
-        ccDynamicAudio.Unserialize(index, serializedData, dataSize);
-    }
-    else if (strcmp(objectType, "AudioClip") == 0)
-    {
-        ccDynamicAudioClip.Unserialize(index, serializedData, dataSize);
-    }
-    else
-    {
-        return false;
-    }
-    return true;
-}
-
 ScriptAudioClip* get_audio_clip_for_old_style_number(bool isMusic, int indexNumber)
 {
     char audioClipName[200];
@@ -493,8 +470,6 @@ ScriptAudioClip* get_audio_clip_for_old_style_number(bool isMusic, int indexNumb
 
     return NULL;
 }
-
-
 
 void stop_and_destroy_channel_ex(int chid, bool resetLegacyMusicSettings) {
     if ((chid < 0) || (chid > MAX_SOUND_CHANNELS))
@@ -612,14 +587,12 @@ void update_directional_sound_vol()
         if ((channels[chan] != NULL) && (channels[chan]->done == 0) &&
             (channels[chan]->xSource >= 0)) 
         {
-            channels[chan]->directionalVolModifier = 
+            channels[chan]->apply_directional_modifier(
                 get_volume_adjusted_for_distance(channels[chan]->vol, 
                 channels[chan]->xSource,
                 channels[chan]->ySource,
                 channels[chan]->maximumPossibleDistanceAway) -
-                channels[chan]->vol;
-
-            channels[chan]->set_volume(channels[chan]->vol);
+                channels[chan]->vol);
         }
     }
 }

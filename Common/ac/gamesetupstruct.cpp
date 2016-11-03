@@ -20,10 +20,7 @@
 #include "util/alignedstream.h"
 #include "util/math.h"
 
-using AGS::Common::AlignedStream;
-using AGS::Common::Stream;
-using AGS::Common::String;
-namespace Math = AGS::Common::Math;
+using namespace AGS::Common;
 
 
 // Create the missing audioClips data structure for 3.1.x games.
@@ -198,30 +195,28 @@ void GameSetupStruct::read_interaction_scripts(Common::Stream *in, GAME_STRUCT_R
         charScripts = new InteractionScripts*[numcharacters];
         invScripts = new InteractionScripts*[numinvitems];
         for (bb = 0; bb < numcharacters; bb++) {
-            charScripts[bb] = new InteractionScripts();
-            deserialize_interaction_scripts(in, charScripts[bb]);
+            charScripts[bb] = InteractionScripts::CreateFromStream(in);
         }
         for (bb = 1; bb < numinvitems; bb++) {
-            invScripts[bb] = new InteractionScripts();
-            deserialize_interaction_scripts(in, invScripts[bb]);
+            invScripts[bb] = InteractionScripts::CreateFromStream(in);
         }
     }
     else // 2.x
     {
         int bb;
 
-        intrChar = new NewInteraction*[numcharacters];
+        intrChar = new Interaction*[numcharacters];
 
         for (bb = 0; bb < numcharacters; bb++) {
-            intrChar[bb] = deserialize_new_interaction(in);
+            intrChar[bb] = Interaction::CreateFromStream(in);
         }
         for (bb = 0; bb < numinvitems; bb++) {
-            intrInv[bb] = deserialize_new_interaction(in);
+            intrInv[bb] = Interaction::CreateFromStream(in);
         }
 
         numGlobalVars = in->ReadInt32();
         for (bb = 0; bb < numGlobalVars; bb++) {
-            globalvars[bb].ReadFromFile(in);
+            globalvars[bb].Read(in);
         }
     }
 }
@@ -355,16 +350,20 @@ void GameSetupStruct::read_customprops(Common::Stream *in, GAME_STRUCT_READ_DATA
 {
     if (read_data.filever >= kGameVersion_260) // >= 2.60
     {
-        if (propSchema.UnSerialize(in))
+        if (Properties::ReadSchema(propSchema, in))
             quit("load room: unable to deserialize prop schema");
 
         int errors = 0;
         int bb;
 
-        for (bb = 0; bb < numcharacters; bb++)
-            errors += charProps[bb].UnSerialize (in);
-        for (bb = 0; bb < numinvitems; bb++)
-            errors += invProps[bb].UnSerialize (in);
+        for (int i = 0; i < numcharacters; ++i)
+        {
+            errors += Properties::ReadValues(charProps[i], in);
+        }
+        for (int i = 0; i < numinvitems; ++i)
+        {
+            errors += Properties::ReadValues(invProps[i], in);
+        }
 
         if (errors > 0)
             quit("LoadGame: errors encountered reading custom props");
@@ -484,9 +483,9 @@ void GameSetupStruct::ReadFromSaveGame_v321(Stream *in, char* gswas, ccScript* c
     if (invScripts == NULL)
     {
         for (bb = 0; bb < numinvitems; bb++)
-            in->ReadArrayOfInt32(&intrInv[bb]->timesRun[0], MAX_NEWINTERACTION_EVENTS);
+            intrInv[bb]->ReadTimesRunFromSavedgame(in);
         for (bb = 0; bb < numcharacters; bb++)
-            in->ReadArrayOfInt32 (&intrChar[bb]->timesRun[0], MAX_NEWINTERACTION_EVENTS);
+            intrChar[bb]->ReadTimesRunFromSavedgame(in);
     }
 
     // restore pointer members
@@ -511,9 +510,9 @@ void GameSetupStruct::WriteForSaveGame_v321(Stream *out)
     {
       int bb;
       for (bb = 0; bb < numinvitems; bb++)
-        out->WriteArrayOfInt32 (&intrInv[bb]->timesRun[0], MAX_NEWINTERACTION_EVENTS);
+        intrInv[bb]->WriteTimesRunToSavedgame(out);
       for (bb = 0; bb < numcharacters; bb++)
-        out->WriteArrayOfInt32 (&intrChar[bb]->timesRun[0], MAX_NEWINTERACTION_EVENTS); 
+        intrChar[bb]->WriteTimesRunToSavedgame(out);
     }
 
     out->WriteArrayOfInt32 (&options[0], OPT_HIGHESTOPTION_321 + 1);

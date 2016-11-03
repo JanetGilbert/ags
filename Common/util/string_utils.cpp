@@ -12,6 +12,8 @@
 //
 //=============================================================================
 
+#include <errno.h>
+#include <stdlib.h>
 #include "gui/guidefines.h"
 #include "util/string_utils.h"
 #include "util/stream.h"
@@ -20,22 +22,35 @@ using AGS::Common::Stream;
 
 #define STD_BUFFER_SIZE 3000
 
-void removeBackslashBracket(char *lbuffer) {
-    char *slashoffs;
-    while ((slashoffs = strstr(lbuffer, "\\[")) != NULL) {
-        // remove the backslash
-        memmove(slashoffs, slashoffs + 1, strlen(slashoffs));
+// Turn [ into \n and turn \[ into [
+void unescape(char *buffer) {
+    char *offset;
+    // Handle the special case of the first char
+    if(buffer[0] == '[')
+    {
+        buffer[0] = '\n';
+        offset = buffer + 1;
+    }
+    else
+        offset = buffer;
+    // Replace all other occurrences as they're found
+    while((offset = strchr(offset, '[')) != NULL) {
+        if(offset[-1] != '\\')
+            offset[0] = '\n';
+        else
+            memmove(offset - 1, offset, strlen(offset) + 1);
+        offset++;
     }
 }
 
 char lines[MAXLINE][200];
 int  numlines;
 
-// Project-dependant implementation
+// Project-dependent implementation
 extern int wgettextwidth_compensate(const char *tex, int font);
 
-// Break up the text into lines, using normal Western left-right style
-void split_lines_leftright(const char *todis, int wii, int fonnt) {
+// Break up the text into lines
+void split_lines(const char *todis, int wii, int fonnt) {
     // v2.56.636: rewrote this function because the old version
     // was crap and buggy
     int i = 0;
@@ -47,6 +62,7 @@ void split_lines_leftright(const char *todis, int wii, int fonnt) {
     char textCopyBuffer[STD_BUFFER_SIZE];
     strcpy(textCopyBuffer, todis);
     theline = textCopyBuffer;
+    unescape(theline);
 
     while (1) {
         splitAt = -1;
@@ -55,7 +71,6 @@ void split_lines_leftright(const char *todis, int wii, int fonnt) {
             // end of the text, add the last line if necessary
             if (i > 0) {
                 strcpy(lines[numlines], theline);
-                removeBackslashBracket(lines[numlines]);
                 numlines++;
             }
             break;
@@ -65,8 +80,8 @@ void split_lines_leftright(const char *todis, int wii, int fonnt) {
         nextCharWas = theline[i + 1];
         theline[i + 1] = 0;
 
-        // force end of line with the [ character (except if \[ )
-        if ((theline[i] == '[') && ((i == 0) || (theline[i - 1] != '\\')))
+        // force end of line with the \n character
+        if (theline[i] == '\n')
             splitAt = i;
         // otherwise, see if we are too wide
         else if (wgettextwidth_compensate(theline, fonnt) >= wii) {
@@ -89,7 +104,6 @@ void split_lines_leftright(const char *todis, int wii, int fonnt) {
             nextCharWas = theline[splitAt];
             theline[splitAt] = 0;
             strcpy(lines[numlines], theline);
-            removeBackslashBracket(lines[numlines]);
             numlines++;
             theline[splitAt] = nextCharWas;
             if (numlines >= MAXLINE) {
@@ -98,8 +112,8 @@ void split_lines_leftright(const char *todis, int wii, int fonnt) {
             }
             // the next line starts from here
             theline += splitAt;
-            // skip the space or bracket that caused the line break
-            if ((theline[0] == ' ') || (theline[0] == '['))
+            // skip the space or new line that caused the line break
+            if ((theline[0] == ' ') || (theline[0] == '\n'))
                 theline++;
             i = -1;
         }
@@ -136,3 +150,58 @@ void fgetstring(char *sss, Common::Stream *in)
 {
     fgetstring_limit (sss, in, 50000000);
 }
+
+
+namespace AGS
+{
+namespace Common
+{
+
+String StrUtil::IntToString(int d)
+{
+    return String::FromFormat("%d", d);
+}
+
+int StrUtil::StringToInt(const String &s, int def_val)
+{
+    if (!s.GetCStr())
+        return def_val;
+    char *stop_ptr;
+    int val = strtol(s.GetCStr(), &stop_ptr, 0);
+    return (stop_ptr == s.GetCStr() + s.GetLength()) ? val : def_val;
+}
+
+StrUtil::ConversionError StrUtil::StringToInt(const String &s, int &val, int def_val)
+{
+    val = def_val;
+    if (!s.GetCStr())
+        return StrUtil::kFailed;
+    char *stop_ptr;
+    errno = 0;
+    long lval = strtol(s.GetCStr(), &stop_ptr, 0);
+    if (stop_ptr != s.GetCStr() + s.GetLength())
+        return StrUtil::kFailed;
+    if (lval > INT_MAX || lval < INT_MIN || errno == ERANGE)
+        return StrUtil::kOutOfRange;
+    val = (int)lval;
+    return StrUtil::kNoError;
+}
+
+String StrUtil::ReadString(Stream *in)
+{
+    int32_t len = in->ReadInt32();
+    if (len > 0)
+        return String::FromStreamCount(in, len);
+    return String();
+}
+
+void StrUtil::WriteString(const String &s, Stream *out)
+{
+    int32_t len = s.GetLength();
+    out->WriteInt32(len);
+    if (len > 0)
+        out->Write(s.GetCStr(), len);
+}
+
+} // namespace Common
+} // namespace AGS

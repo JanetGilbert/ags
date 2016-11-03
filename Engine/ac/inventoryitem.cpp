@@ -15,6 +15,7 @@
 #include "ac/inventoryitem.h"
 #include "ac/characterinfo.h"
 #include "ac/gamesetupstruct.h"
+#include "ac/gamestate.h"
 #include "ac/global_inventoryitem.h"
 #include "ac/global_translation.h"
 #include "ac/mouse.h"
@@ -82,15 +83,25 @@ int InventoryItem_CheckInteractionAvailable(ScriptInvItem *iitem, int mood) {
 }
 
 int InventoryItem_GetProperty(ScriptInvItem *scii, const char *property) {
-    return get_int_property (&game.invProps[scii->id], property);
+    return get_int_property (game.invProps[scii->id], play.invProps[scii->id], property);
 }
 
 void InventoryItem_GetPropertyText(ScriptInvItem *scii, const char *property, char *bufer) {
-    get_text_property(&game.invProps[scii->id], property, bufer);
+    get_text_property(game.invProps[scii->id], play.invProps[scii->id], property, bufer);
 }
 
 const char* InventoryItem_GetTextProperty(ScriptInvItem *scii, const char *property) {
-    return get_text_property_dynamic_string(&game.invProps[scii->id], property);
+    return get_text_property_dynamic_string(game.invProps[scii->id], play.invProps[scii->id], property);
+}
+
+bool InventoryItem_SetProperty(ScriptInvItem *scii, const char *property, int value)
+{
+    return set_int_property(play.invProps[scii->id], property, value);
+}
+
+bool InventoryItem_SetTextProperty(ScriptInvItem *scii, const char *property, const char *value)
+{
+    return set_text_property(play.invProps[scii->id], property, value);
 }
 
 //=============================================================================
@@ -155,6 +166,16 @@ RuntimeScriptValue Sc_InventoryItem_GetTextProperty(void *self, const RuntimeScr
     API_OBJCALL_OBJ_POBJ(ScriptInvItem, const char, myScriptStringImpl, InventoryItem_GetTextProperty, const char);
 }
 
+RuntimeScriptValue Sc_InventoryItem_SetProperty(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_BOOL_POBJ_PINT(ScriptInvItem, InventoryItem_SetProperty, const char);
+}
+
+RuntimeScriptValue Sc_InventoryItem_SetTextProperty(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_BOOL_POBJ2(ScriptInvItem, InventoryItem_SetTextProperty, const char, const char);
+}
+
 // void (ScriptInvItem *iitem, int mood)
 RuntimeScriptValue Sc_InventoryItem_RunInteraction(void *self, const RuntimeScriptValue *params, int32_t param_count)
 {
@@ -213,6 +234,8 @@ void RegisterInventoryItemAPI()
     ccAddExternalObjectFunction("InventoryItem::GetProperty^1",             Sc_InventoryItem_GetProperty);
     ccAddExternalObjectFunction("InventoryItem::GetPropertyText^2",         Sc_InventoryItem_GetPropertyText);
     ccAddExternalObjectFunction("InventoryItem::GetTextProperty^1",         Sc_InventoryItem_GetTextProperty);
+    ccAddExternalObjectFunction("InventoryItem::SetProperty^2",             Sc_InventoryItem_SetProperty);
+    ccAddExternalObjectFunction("InventoryItem::SetTextProperty^2",         Sc_InventoryItem_SetTextProperty);
     ccAddExternalObjectFunction("InventoryItem::RunInteraction^1",          Sc_InventoryItem_RunInteraction);
     ccAddExternalObjectFunction("InventoryItem::SetName^1",                 Sc_InventoryItem_SetName);
     ccAddExternalObjectFunction("InventoryItem::get_CursorGraphic",         Sc_InventoryItem_GetCursorGraphic);

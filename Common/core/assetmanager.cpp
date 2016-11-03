@@ -366,7 +366,7 @@ Stream *AssetManager::OpenAssetFromLib(const String &asset_name, Common::FileOpe
     if (lib_s)
     {
         // set stream ptr at the beginning of wanted section
-        lib_s->Seek(Common::kSeekBegin, asset->Offset);
+        lib_s->Seek(asset->Offset, kSeekBegin);
         // remember size of opened asset
         _lastAssetSize = asset->Size;
     }

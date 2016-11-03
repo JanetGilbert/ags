@@ -7,19 +7,16 @@ extern bool Scintilla_RegisterClasses(void *hInstance);
 extern int Scintilla_LinkLexers();
 
 int antiAliasFonts = 0;
-#define SAVEBUFFERSIZE 5120
 bool ShouldAntiAliasText() { return (antiAliasFonts != 0); }
 
 int mousex, mousey;
+#include "agsnative.h"
 #include "util/wgt2allg.h"
 #include "util/misc.h"
 #include "ac/spritecache.h"
 #include "ac/actiontype.h"
-#include "ac/common.h"
 #include "ac/roomstruct.h"
 #include "ac/scriptmodule.h"
-#include "ac/view.h"
-#include "ac/dialogtopic.h"
 #include "ac/gamesetupstruct.h"
 #include "font/fonts.h"
 #include "gui/guimain.h"
@@ -30,6 +27,7 @@ int mousex, mousey;
 #include "gui/guilistbox.h"
 #include "gui/guislider.h"
 #include "util/compress.h"
+#include "util/string_types.h"
 #include "util/string_utils.h"    // fputstring, etc
 #include "util/alignedstream.h"
 #include "util/filestream.h"
@@ -38,7 +36,13 @@ int mousex, mousey;
 
 using AGS::Common::AlignedStream;
 using AGS::Common::Stream;
+namespace AGSProps = AGS::Common::Properties;
 namespace BitmapHelper = AGS::Common::BitmapHelper;
+namespace AGSProps = AGS::Common::Properties;
+using AGS::Common::GUIMain;
+using AGS::Common::Interaction;
+using AGS::Common::InteractionCommand;
+using AGS::Common::InteractionCommandList;
 
 //-----------------------------------------------------------------------------
 // [IKM] 2012-09-07
@@ -97,7 +101,7 @@ int numScriptModules;
 ScriptModule* scModules = NULL;
 DialogTopic *dialog;
 char*dlgscript[MAX_DIALOG];
-GUIMain *guis;
+std::vector<GUIMain> guis;
 ViewStruct272 *oldViews;
 ViewStruct *newViews;
 int numNewViews = 0;
@@ -110,7 +114,7 @@ int BaseColorDepth;
 bool reload_font(int curFont);
 void drawBlockScaledAt(int hdc, Common::Bitmap *todraw ,int x, int y, int scaleFactor);
 // this is to shut up the linker, it's used by CSRUN.CPP
-void write_log(char *) { }
+void write_log(const char *) { }
 
 void GUIInv::Draw(Common::Bitmap *ds) {
   color_t draw_color = ds->GetCompatibleColor(15);
@@ -542,7 +546,7 @@ int load_template_file(const char *fileName, char **iconDataBuffer, long *iconDa
 	    Stream *inpu = Common::AssetManager::OpenAsset((char*)old_editor_main_game_file);
 	    if (inpu != NULL) 
 	    {
-		    inpu->Seek(Common::kSeekCurrent, 30);
+		    inpu->Seek(30);
 		    int gameVersion = inpu->ReadInt32();
 		    delete inpu;
 		    if (gameVersion != 32)
@@ -625,7 +629,7 @@ void wputblock_stretch(Common::Bitmap *g, int xpt,int ypt,Common::Bitmap *tblock
   else g->StretchBlt(tblock,RectWH(xpt,ypt,nsx,nsy), Common::kBitmap_Transparency);
 }
 
-void draw_gui_sprite(Common::Bitmap *g, int sprnum, int atxp, int atyp, bool use_alpha) {
+void draw_gui_sprite(Common::Bitmap *g, int sprnum, int atxp, int atyp, bool use_alpha, Common::BlendMode blend_mode) {
   Common::Bitmap *blptr = get_sprite(sprnum);
   Common::Bitmap *towrite=blptr;
   int needtofree=0, main_color_depth = thisgame.color_depth * 8;
@@ -972,7 +976,7 @@ const char* import_sci_font(const char*fnn,int fslot) {
     delete iii;
     return "Not a valid SCI font file";
   }
-  iii->Seek(Common::kSeekCurrent,3);
+  iii->Seek(3);
   if (iii->ReadInt16()!=0x80) {
     delete iii; 
 	  return "Invalid SCI font"; 
@@ -995,7 +999,7 @@ const char* import_sci_font(const char*fnn,int fslot) {
       unlink(wgtfontname);
       return "Invalid character found in file";
     }
-    iii->Seek(Common::kSeekBegin,theiroffs[aa]+2);
+    iii->Seek(theiroffs[aa]+2, Common::kSeekBegin);
     int wwi=iii->ReadByte()-1;
     int hhi=iii->ReadByte();
     coffsets[aa]=ooo->GetPosition();
@@ -1014,7 +1018,7 @@ const char* import_sci_font(const char*fnn,int fslot) {
   ooo->WriteArrayOfInt16(&coffsets[0],0x80);
   delete ooo;
   ooo=Common::File::OpenFile(wgtfontname,Common::kFile_Open,Common::kFile_ReadWrite);
-  ooo->Seek(Common::kSeekBegin,15);
+  ooo->Seek(15, Common::kSeekBegin);
   ooo->WriteInt16(tableat); 
   delete ooo;
   delete iii;
@@ -1286,7 +1290,7 @@ void drawSpriteStretch(int hdc, int x, int y, int width, int height, int spriteN
 
 void drawGUIAt (int hdc, int x,int y,int x1,int y1,int x2,int y2, int scaleFactor) {
 
-  if ((tempgui.wid < 1) || (tempgui.hit < 1))
+  if ((tempgui.Width < 1) || (tempgui.Height < 1))
     return;
 
   //update_font_sizes();
@@ -1295,12 +1299,12 @@ void drawGUIAt (int hdc, int x,int y,int x1,int y1,int x2,int y2, int scaleFacto
     dsc_want_hires = 1;
   }
 
-  Common::Bitmap *tempblock = Common::BitmapHelper::CreateBitmap(tempgui.wid, tempgui.hit, thisgame.color_depth*8);
+  Common::Bitmap *tempblock = Common::BitmapHelper::CreateBitmap(tempgui.Width, tempgui.Height, thisgame.color_depth*8);
   tempblock->Clear(tempblock->GetMaskColor ());
   //Common::Bitmap *abufWas = abuf;
   //abuf = tempblock;
 
-  tempgui.draw_at (tempblock, 0, 0);
+  tempgui.DrawAt (tempblock, 0, 0);
 
   dsc_want_hires = 0;
 
@@ -1476,7 +1480,6 @@ bool reset_sprite_file() {
   return true;
 }
 
-#define MAX_PLUGINS 40
 struct PluginData 
 {
 	char filename[50];
@@ -1579,7 +1582,7 @@ const char *load_dta_file_into_thisgame(const char *fileName)
 
   // skip required engine version
   int stlen = iii->ReadInt32();
-  iii->Seek(Common::kSeekCurrent, stlen);
+  iii->Seek(stlen);
 
   ReadGameSetupStructBase_Aligned(iii);
 
@@ -1592,13 +1595,13 @@ const char *load_dta_file_into_thisgame(const char *fileName)
   iii->ReadArray(&thisgame.invinfo[0], sizeof(InventoryItemInfo), thisgame.numinvitems);
   iii->ReadArray(&thisgame.mcurs[0], sizeof(MouseCursor), thisgame.numcursors);
 
-  thisgame.intrChar = (NewInteraction**)calloc(thisgame.numcharacters, sizeof(NewInteraction*));
+  thisgame.intrChar = (Interaction**)calloc(thisgame.numcharacters, sizeof(Interaction*));
   for (bb = 0; bb < thisgame.numcharacters; bb++) {
-    thisgame.intrChar[bb] = deserialize_new_interaction (iii);
+    thisgame.intrChar[bb] = Interaction::CreateFromStream(iii);
   }
   for (bb = 0; bb < thisgame.numinvitems; bb++) {
     delete thisgame.intrInv[bb];
-    thisgame.intrInv[bb] = deserialize_new_interaction (iii);
+    thisgame.intrInv[bb] = Interaction::CreateFromStream(iii);
   }
 
   numGlobalVars = iii->ReadInt32();
@@ -1633,26 +1636,26 @@ const char *load_dta_file_into_thisgame(const char *fileName)
   thisgame.load_messages = NULL;
 
   read_dialogs(iii, filever, true);
-  read_gui(iii,&guis[0],&thisgame, &guis);
+  read_gui(iii,guis,&thisgame);
   const char *pluginError = read_plugins_from_disk (iii);
   if (pluginError != NULL) return pluginError;
 
-  thisgame.charProps = (CustomProperties*)calloc(thisgame.numcharacters, sizeof(CustomProperties));
+  thisgame.charProps.resize(thisgame.numcharacters);
 
   for (bb = 0; bb < thisgame.numcharacters; bb++)
-    thisgame.charProps[bb].reset();
+    thisgame.charProps[bb].clear();
   for (bb = 0; bb < MAX_INV; bb++)
-    thisgame.invProps[bb].reset();
+    thisgame.invProps[bb].clear();
 
-  if (thisgame.propSchema.UnSerialize (iii))
+  if (AGSProps::ReadSchema(thisgame.propSchema, iii))
     return "unable to deserialize prop schema";
 
   int errors = 0;
 
   for (bb = 0; bb < thisgame.numcharacters; bb++)
-    errors += thisgame.charProps[bb].UnSerialize (iii);
+    errors += AGSProps::ReadValues(thisgame.charProps[bb], iii);
   for (bb = 0; bb < thisgame.numinvitems; bb++)
-    errors += thisgame.invProps[bb].UnSerialize (iii);
+    errors += AGSProps::ReadValues(thisgame.invProps[bb], iii);
 
   if (errors > 0)
     return "errors encountered reading custom props";
@@ -1670,7 +1673,7 @@ const char *load_dta_file_into_thisgame(const char *fileName)
 
   for (bb = 0; bb < thisgame.numgui; bb++)
   {
-	  guis[bb].rebuild_array();
+	  guis[bb].RebuildArray();
   }
 
   // reset colour 0, it's possible for it to get corrupted
@@ -1726,13 +1729,7 @@ void free_old_game_data()
 	  if (dialog[bb].optionscripts != NULL)
 		  free(dialog[bb].optionscripts);
   }
-  if (thisgame.charProps != NULL)
-  {
-    for (bb = 0; bb < thisgame.numcharacters; bb++)
-      thisgame.charProps[bb].reset();
-    free(thisgame.charProps);
-    thisgame.charProps = NULL;
-  }
+  thisgame.charProps.clear();
   if (thisgame.intrChar != NULL)
   {
     for (bb = 0; bb < thisgame.numcharacters; bb++)
@@ -1753,7 +1750,7 @@ void free_old_game_data()
   free(thisgame.viewNames);
   free(oldViews);
   free(newViews);
-  free(guis);
+  guis.clear();
   free(thisgame.chars);
   thisgame.dict->free_memory();
   free(thisgame.dict);
@@ -2119,9 +2116,9 @@ void save_room(const char *files, roomstruct rstruc) {
     opty = ci_fopen(files, Common::kFile_Open, Common::kFile_ReadWrite);
     lee = opty->GetLength()-7;
 
-    opty->Seek(Common::kSeekBegin, 3);
+    opty->Seek(3, Common::kSeekBegin);
     opty->WriteInt32(lee);
-    opty->Seek(Common::kSeekEnd, 0);
+    opty->Seek(0, Common::kSeekEnd);
 
     if (rstruc.scripts != NULL) {
       int hh;
@@ -2152,10 +2149,10 @@ void save_room(const char *files, roomstruct rstruc) {
       rstruc.compiled_script->Write(opty);
      
       wasat = opty->GetPosition();
-      opty->Seek(Common::kSeekBegin, leeat);
+      opty->Seek(leeat, Common::kSeekBegin);
       lee = (wasat - leeat) - 4;
       opty->WriteInt32(lee);
-      opty->Seek(Common::kSeekEnd, 0);
+      opty->Seek(0, Common::kSeekEnd);
     }
 
     if (rstruc.numsprs > 0) {
@@ -2195,9 +2192,9 @@ void save_room(const char *files, roomstruct rstruc) {
 
       opty = ci_fopen(const_cast<char*>(files), Common::kFile_Open, Common::kFile_ReadWrite);
       lenis = (curoffs - lenpos) - 4;
-      opty->Seek(Common::kSeekBegin, lenpos);
+      opty->Seek(lenpos, Common::kSeekBegin);
       opty->WriteInt32(lenis);
-      opty->Seek(Common::kSeekEnd, 0);
+      opty->Seek(0, Common::kSeekEnd);
     }
 
     // Write custom properties
@@ -2206,16 +2203,16 @@ void save_room(const char *files, roomstruct rstruc) {
     lenis = 0;
     opty->WriteInt32(lenis);
     opty->WriteInt32 (1);  // Version 1 of properties block
-    rstruc.roomProps.Serialize (opty);
+    AGSProps::WriteValues(rstruc.roomProps, opty);
     for (gg = 0; gg < rstruc.numhotspots; gg++)
-      rstruc.hsProps[gg].Serialize (opty);
+      AGSProps::WriteValues(rstruc.hsProps[gg], opty);
     for (gg = 0; gg < rstruc.numsprs; gg++)
-      rstruc.objProps[gg].Serialize (opty);
+      AGSProps::WriteValues(rstruc.objProps[gg], opty);
 
     lenis = (opty->GetPosition() - lenpos) - 4;
-    opty->Seek(Common::kSeekBegin, lenpos);
+    opty->Seek(lenpos, Common::kSeekBegin);
     opty->WriteInt32(lenis);
-    opty->Seek(Common::kSeekEnd, 0);
+    opty->Seek(0, Common::kSeekEnd);
 
 
     // Write EOF block
@@ -2266,8 +2263,6 @@ void save_room_file(const char*rtsa)
 namespace MFLUtil = AGS::Common::MFLUtil;
 
 #define MAX_FILES 10000
-#define MAXMULTIFILES 25
-#define MAX_FILENAME_LENGTH 100
 #define MAX_DATAFILENAME_LENGTH 50
 struct MultiFileLibNew {
   char data_filenames[MAXMULTIFILES][MAX_DATAFILENAME_LENGTH];
@@ -2323,7 +2318,6 @@ void write_clib_header(Stream*wout) {
 }
 
 
-#define CHUNKSIZE 256000
 int copy_file_across(Stream*inlibb,Stream*coppy,long leftforthis) {
   int success = 1;
   char*diskbuffer=(char*)malloc(CHUNKSIZE+10);
@@ -2612,7 +2606,7 @@ const char* make_data_file(int numFiles, char * const*fileNames, long splitSize,
   }
 
   wout = Common::File::OpenFile(firstDataFileFullPath, Common::kFile_Open, Common::kFile_ReadWrite);
-  wout->Seek(Common::kSeekBegin, mainHeaderOffset);
+  wout->Seek(mainHeaderOffset, Common::kSeekBegin);
   write_clib_header(wout);
   delete wout;
   return NULL;
@@ -2640,6 +2634,7 @@ public:
 void ConvertStringToCharArray(System::String^ clrString, char *textBuffer);
 void ConvertStringToCharArray(System::String^ clrString, char *textBuffer, int maxLength);
 void ConvertStringToNativeString(System::String^ clrString, Common::String &destStr);
+void ConvertStringToNativeString(System::String^ clrString, Common::String &destStr, int maxLength);
 
 void ThrowManagedException(const char *message) 
 {
@@ -2734,9 +2729,19 @@ void UpdateSpriteFlags(SpriteFolder ^folder)
 	}
 }
 
+void SetGameResolution(Game ^game)
+{
+    // For backwards compatibility, save letterbox-by-design games as having non-custom resolution
+    thisgame.options[OPT_LETTERBOX] = game->Settings->LetterboxMode;
+    if (game->Settings->LetterboxMode)
+        thisgame.SetDefaultResolution((GameResolutionType)game->Settings->LegacyLetterboxResolution);
+    else
+        thisgame.SetCustomResolution(::Size(game->Settings->CustomResolution.Width, game->Settings->CustomResolution.Height));
+}
+
 void GameUpdated(Game ^game) {
   thisgame.color_depth = (int)game->Settings->ColorDepth;
-  thisgame.default_resolution = (GameResolutionType)game->Settings->Resolution;
+  SetGameResolution(game);
 
   thisgame.options[OPT_NOSCALEFNT] = game->Settings->FontsForHiRes;
   thisgame.options[OPT_ANTIALIASFONTS] = game->Settings->AntiAliasFonts;
@@ -3236,35 +3241,36 @@ void ConvertGUIToBinaryFormat(GUI ^guiObj, GUIMain *gui)
   NormalGUI^ normalGui = dynamic_cast<NormalGUI^>(guiObj);
   if (normalGui)
   {
-	ConvertStringToCharArray(normalGui->OnClick, gui->clickEventHandler, 20);
-	gui->x = normalGui->Left;
-	gui->y = normalGui->Top;
-	gui->wid = normalGui->Width;
-	gui->hit = normalGui->Height;
-	gui->flags = (normalGui->Clickable) ? 0 : GUIF_NOCLICK;
-    gui->popupyp = normalGui->PopupYPos;
-    gui->popup = (int)normalGui->Visibility;
-    gui->zorder = normalGui->ZOrder;
-	gui->vtext[0] = 0;
-    gui->fgcol = normalGui->BorderColor;
+	ConvertStringToNativeString(normalGui->OnClick, gui->OnClickHandler, GUIMAIN_EVENTHANDLER_LENGTH);
+	gui->X = normalGui->Left;
+	gui->Y = normalGui->Top;
+	gui->Width = normalGui->Width;
+	gui->Height = normalGui->Height;
+    gui->Flags = (normalGui->Clickable) ? 0 : Common::kGUIMain_NoClick;
+    gui->PopupAtMouseY = normalGui->PopupYPos;
+    gui->PopupStyle = (Common::GUIPopupStyle)normalGui->Visibility;
+    gui->ZOrder = normalGui->ZOrder;
+    gui->FgColor = normalGui->BorderColor;
     gui->SetTransparencyAsPercentage(normalGui->Transparency);
   }
   else
   {
     TextWindowGUI^ twGui = dynamic_cast<TextWindowGUI^>(guiObj);
-	gui->wid = 200;
-	gui->hit = 100;
-    gui->flags = 0;
-	gui->popup = POPUP_SCRIPT;
-	gui->vtext[0] = GUI_TEXTWINDOW;
-  gui->fgcol = twGui->TextColor;
+	gui->Width = 200;
+	gui->Height = 100;
+    gui->Flags = Common::kGUIMain_TextWindow;
+    gui->PopupStyle = Common::kGUIPopupModal;
+	gui->Padding = twGui->Padding;
+    gui->FgColor = twGui->TextColor;
   }
-  gui->bgcol = guiObj->BackgroundColor;
-  gui->bgpic = guiObj->BackgroundImage;
+  gui->BgColor = guiObj->BackgroundColor;
+  gui->BgImage = guiObj->BackgroundImage;
   
-  ConvertStringToCharArray(guiObj->Name, gui->name);
+  ConvertStringToNativeString(guiObj->Name, gui->Name);
 
-  gui->numobjs = 0;
+  gui->ControlCount = 0;
+  gui->CtrlRefs.resize(guiObj->Controls->Count);
+  gui->Controls.resize(guiObj->Controls->Count);
 
   for each (GUIControl^ control in guiObj->Controls)
   {
@@ -3277,6 +3283,7 @@ void ConvertGUIToBinaryFormat(GUI ^guiObj, GUIMain *gui)
 	  AGS::Types::GUITextWindowEdge^ textwindowedge = dynamic_cast<AGS::Types::GUITextWindowEdge^>(control);
 	  if (button)
 	  {
+          guibuts.push_back(::GUIButton());
 		  guibuts[numguibuts].textcol = button->TextColor;
 		  guibuts[numguibuts].font = button->Font;
 		  guibuts[numguibuts].pic = button->Image;
@@ -3290,13 +3297,14 @@ void ConvertGUIToBinaryFormat(GUI ^guiObj, GUIMain *gui)
 		  ConvertStringToCharArray(button->Text, guibuts[numguibuts].text, 50);
 		  ConvertStringToCharArray(button->OnClick, guibuts[numguibuts].eventHandlers[0], MAX_GUIOBJ_EVENTHANDLER_LEN + 1);
 		  
-		  gui->objrefptr[gui->numobjs] = (GOBJ_BUTTON << 16) | numguibuts;
-		  gui->objs[gui->numobjs] = &guibuts[numguibuts];
-		  gui->numobjs++;
+          gui->CtrlRefs[gui->ControlCount] = (Common::kGUIButton << 16) | numguibuts;
+		  gui->Controls[gui->ControlCount] = &guibuts[numguibuts];
+		  gui->ControlCount++;
 		  numguibuts++;
 	  }
 	  else if (label)
 	  {
+          guilabels.push_back(::GUILabel());
 		  guilabels[numguilabels].textcol = label->TextColor;
 		  guilabels[numguilabels].font = label->Font;
 		  guilabels[numguilabels].align = (int)label->TextAlignment;
@@ -3305,13 +3313,14 @@ void ConvertGUIToBinaryFormat(GUI ^guiObj, GUIMain *gui)
 		  ConvertStringToCharArray(label->Text, textBuffer, MAX_GUILABEL_TEXT_LEN);
 		  guilabels[numguilabels].SetText(textBuffer);
 
-		  gui->objrefptr[gui->numobjs] = (GOBJ_LABEL << 16) | numguilabels;
-		  gui->objs[gui->numobjs] = &guilabels[numguilabels];
-		  gui->numobjs++;
+		  gui->CtrlRefs[gui->ControlCount] = (Common::kGUILabel << 16) | numguilabels;
+		  gui->Controls[gui->ControlCount] = &guilabels[numguilabels];
+		  gui->ControlCount++;
 		  numguilabels++;
 	  }
 	  else if (textbox)
 	  {
+          guitext.push_back(::GUITextBox());
 		  guitext[numguitext].textcol = textbox->TextColor;
 		  guitext[numguitext].font = textbox->Font;
 		  guitext[numguitext].flags = 0;
@@ -3319,13 +3328,14 @@ void ConvertGUIToBinaryFormat(GUI ^guiObj, GUIMain *gui)
 		  guitext[numguitext].text[0] = 0;
 		  ConvertStringToCharArray(textbox->OnActivate, guitext[numguitext].eventHandlers[0], MAX_GUIOBJ_EVENTHANDLER_LEN + 1);
 
-		  gui->objrefptr[gui->numobjs] = (GOBJ_TEXTBOX << 16) | numguitext;
-		  gui->objs[gui->numobjs] = &guitext[numguitext];
-		  gui->numobjs++;
+		  gui->CtrlRefs[gui->ControlCount] = (Common::kGUITextBox << 16) | numguitext;
+		  gui->Controls[gui->ControlCount] = &guitext[numguitext];
+		  gui->ControlCount++;
 		  numguitext++;
 	  }
 	  else if (listbox)
 	  {
+          guilist.push_back(::GUIListBox());
 		  guilist[numguilist].textcol = listbox->TextColor;
 		  guilist[numguilist].font = listbox->Font;
 		  guilist[numguilist].backcol = listbox->SelectedTextColor;
@@ -3336,13 +3346,14 @@ void ConvertGUIToBinaryFormat(GUI ^guiObj, GUIMain *gui)
 		  guilist[numguilist].exflags |= (listbox->ShowScrollArrows) ? 0 : GLF_NOARROWS;
 		  ConvertStringToCharArray(listbox->OnSelectionChanged, guilist[numguilist].eventHandlers[0], MAX_GUIOBJ_EVENTHANDLER_LEN + 1);
 
-		  gui->objrefptr[gui->numobjs] = (GOBJ_LISTBOX << 16) | numguilist;
-		  gui->objs[gui->numobjs] = &guilist[numguilist];
-		  gui->numobjs++;
+		  gui->CtrlRefs[gui->ControlCount] = (Common::kGUIListBox << 16) | numguilist;
+		  gui->Controls[gui->ControlCount] = &guilist[numguilist];
+		  gui->ControlCount++;
 		  numguilist++;
 	  }
 	  else if (slider)
 	  {
+          guislider.push_back(::GUISlider());
 		  guislider[numguislider].min = slider->MinValue;
 		  guislider[numguislider].max = slider->MaxValue;
 		  guislider[numguislider].value = slider->Value;
@@ -3351,36 +3362,38 @@ void ConvertGUIToBinaryFormat(GUI ^guiObj, GUIMain *gui)
 		  guislider[numguislider].bgimage = slider->BackgroundImage;
 		  ConvertStringToCharArray(slider->OnChange, guislider[numguislider].eventHandlers[0], MAX_GUIOBJ_EVENTHANDLER_LEN + 1);
 
-		  gui->objrefptr[gui->numobjs] = (GOBJ_SLIDER << 16) | numguislider;
-		  gui->objs[gui->numobjs] = &guislider[numguislider];
-		  gui->numobjs++;
+		  gui->CtrlRefs[gui->ControlCount] = (Common::kGUISlider << 16) | numguislider;
+		  gui->Controls[gui->ControlCount] = &guislider[numguislider];
+		  gui->ControlCount++;
 		  numguislider++;
 	  }
 	  else if (invwindow)
 	  {
+          guiinv.push_back(::GUIInv());
 		  guiinv[numguiinv].charId = invwindow->CharacterID;
 		  guiinv[numguiinv].itemWidth = invwindow->ItemWidth;
 		  guiinv[numguiinv].itemHeight = invwindow->ItemHeight;
 
-		  gui->objrefptr[gui->numobjs] = (GOBJ_INVENTORY << 16) | numguiinv;
-		  gui->objs[gui->numobjs] = &guiinv[numguiinv];
-		  gui->numobjs++;
+		  gui->CtrlRefs[gui->ControlCount] = (Common::kGUIInvWindow << 16) | numguiinv;
+		  gui->Controls[gui->ControlCount] = &guiinv[numguiinv];
+		  gui->ControlCount++;
 		  numguiinv++;
 	  }
 	  else if (textwindowedge)
 	  {
+          guibuts.push_back(::GUIButton());
 		  guibuts[numguibuts].pic = textwindowedge->Image;
 		  guibuts[numguibuts].usepic = guibuts[numguibuts].pic;
 		  guibuts[numguibuts].flags = 0;
 		  guibuts[numguibuts].text[0] = 0;
 		  
-		  gui->objrefptr[gui->numobjs] = (GOBJ_BUTTON << 16) | numguibuts;
-		  gui->objs[gui->numobjs] = &guibuts[numguibuts];
-		  gui->numobjs++;
+		  gui->CtrlRefs[gui->ControlCount] = (Common::kGUIButton << 16) | numguibuts;
+		  gui->Controls[gui->ControlCount] = &guibuts[numguibuts];
+		  gui->ControlCount++;
 		  numguibuts++;
 	  }
 
-	  GUIObject *newObj = gui->objs[gui->numobjs - 1];
+	  GUIObject *newObj = gui->Controls[gui->ControlCount - 1];
 	  newObj->x = control->Left;
 	  newObj->y = control->Top;
 	  newObj->wid = control->Width;
@@ -3390,8 +3403,8 @@ void ConvertGUIToBinaryFormat(GUI ^guiObj, GUIMain *gui)
 	  ConvertStringToCharArray(control->Name, newObj->scriptName, MAX_GUIOBJ_SCRIPTNAME_LEN + 1);
   }
 
-  gui->rebuild_array();
-  gui->resort_zorder();
+  gui->RebuildArray();
+  gui->ResortZOrder();
 }
 
 void drawGUI(int hdc, int x,int y, GUI^ guiObj, int scaleFactor, int selectedControl) {
@@ -3401,10 +3414,16 @@ void drawGUI(int hdc, int x,int y, GUI^ guiObj, int scaleFactor, int selectedCon
   numguilist = 0;
   numguislider = 0;
   numguiinv = 0;
+  guibuts.resize(0);
+  guilabels.resize(0);
+  guitext.resize(0);
+  guilist.resize(0);
+  guislider.resize(0);
+  guiinv.resize(0);
 
   ConvertGUIToBinaryFormat(guiObj, &tempgui);
 
-  tempgui.highlightobj = selectedControl;
+  tempgui.HighlightCtrl = selectedControl;
 
   drawGUIAt(hdc, x, y, -1, -1, -1, -1, scaleFactor);
 }
@@ -3425,29 +3444,27 @@ Dictionary<int, Sprite^>^ load_sprite_dimensions()
 	return sprites;
 }
 
-void ConvertCustomProperties(AGS::Types::CustomProperties ^insertInto, ::CustomProperties *propToConvert)
+void ConvertCustomProperties(AGS::Types::CustomProperties ^insertInto, AGS::Common::StringIMap *propToConvert)
 {
-	for (int j = 0; j < propToConvert->numProps; j++) 
+    for (AGS::Common::StringIMap::const_iterator it = propToConvert->begin();
+         it != propToConvert->end(); ++it)
 	{
 		CustomProperty ^newProp = gcnew CustomProperty();
-		newProp->Name = gcnew String(propToConvert->propName[j]);
-		newProp->Value = gcnew String(propToConvert->propVal[j]);
+		newProp->Name = gcnew String(it->first);
+		newProp->Value = gcnew String(it->second);
 		insertInto->PropertyValues->Add(newProp->Name, newProp);
 	}
 }
 
-void CompileCustomProperties(AGS::Types::CustomProperties ^convertFrom, ::CustomProperties *compileInto)
+void CompileCustomProperties(AGS::Types::CustomProperties ^convertFrom, AGS::Common::StringIMap *compileInto)
 {
-	compileInto->reset();
-	int j = 0;
-	char propName[200];
-	char propVal[MAX_CUSTOM_PROPERTY_VALUE_LENGTH];
+	compileInto->clear();
 	for each (String ^key in convertFrom->PropertyValues->Keys)
 	{
-		ConvertStringToCharArray(convertFrom->PropertyValues[key]->Name, propName, 200);
-		ConvertStringToCharArray(convertFrom->PropertyValues[key]->Value, propVal, MAX_CUSTOM_PROPERTY_VALUE_LENGTH);
-		compileInto->addProperty(propName, propVal);
-		j++;
+        AGS::Common::String name, value;
+		ConvertStringToNativeString(convertFrom->PropertyValues[key]->Name, name);
+		ConvertStringToNativeString(convertFrom->PropertyValues[key]->Value, value);
+		(*compileInto)[name] = value;
 	}
 }
 
@@ -3467,9 +3484,9 @@ const char *GetCharacterScriptName(int charid, AGS::Types::Game ^game)
 	return charScriptNameBuf;
 }
 
-void ConvertInteractionToScript(System::Text::StringBuilder ^sb, NewInteractionCommand *intrcmd, String^ scriptFuncPrefix, AGS::Types::Game ^game, int *runScriptCount, bool *onlyIfInvWasUseds, int commandOffset) 
+void ConvertInteractionToScript(System::Text::StringBuilder ^sb, InteractionCommand *intrcmd, String^ scriptFuncPrefix, AGS::Types::Game ^game, int *runScriptCount, bool *onlyIfInvWasUseds, int commandOffset) 
 {
-  if (intrcmd->type != 1)
+  if (intrcmd->Type != 1)
   {
     // if another type of interaction, we definately can't optimise
     // away the wrapper function
@@ -3480,18 +3497,18 @@ void ConvertInteractionToScript(System::Text::StringBuilder ^sb, NewInteractionC
     runScriptCount[0]++;
   }
 
-  if (intrcmd->type != 20)
+  if (intrcmd->Type != 20)
   {
 	  *onlyIfInvWasUseds = false;
   }
 
-	switch (intrcmd->type)
+	switch (intrcmd->Type)
 	{
 	case 0:
 		break;
 	case 1:  // Run Script
 		sb->Append(scriptFuncPrefix);
-		sb->Append(System::Convert::ToChar(intrcmd->data[0].val + 'a'));
+		sb->Append(System::Convert::ToChar(intrcmd->Data[0].Value + 'a'));
 		sb->AppendLine("();");
 		break;
 	case 3: // Add Score
@@ -3533,24 +3550,24 @@ void ConvertInteractionToScript(System::Text::StringBuilder ^sb, NewInteractionC
 	case 47: // IF player has been in room
 		// For these, the sample script code will work
 		{
-		String ^scriptCode = gcnew String(actions[intrcmd->type].textscript);
+		String ^scriptCode = gcnew String(actions[intrcmd->Type].textscript);
 		if ((*onlyIfInvWasUseds) && (commandOffset > 0))
 		{
 			scriptCode = String::Concat("else ", scriptCode);
 		}
-		scriptCode = scriptCode->Replace("$$1", (gcnew Int32(intrcmd->data[0].val))->ToString() );
-		scriptCode = scriptCode->Replace("$$2", (gcnew Int32(intrcmd->data[1].val))->ToString() );
-		scriptCode = scriptCode->Replace("$$3", (gcnew Int32(intrcmd->data[2].val))->ToString() );
-		scriptCode = scriptCode->Replace("$$4", (gcnew Int32(intrcmd->data[3].val))->ToString() );
+		scriptCode = scriptCode->Replace("$$1", (gcnew Int32(intrcmd->Data[0].Value))->ToString() );
+		scriptCode = scriptCode->Replace("$$2", (gcnew Int32(intrcmd->Data[1].Value))->ToString() );
+		scriptCode = scriptCode->Replace("$$3", (gcnew Int32(intrcmd->Data[2].Value))->ToString() );
+		scriptCode = scriptCode->Replace("$$4", (gcnew Int32(intrcmd->Data[3].Value))->ToString() );
 		sb->AppendLine(scriptCode);
 		}
 		break;
 	case 34: // animate character
 		{
 		char scriptCode[100];
-		int charID = intrcmd->data[0].val;
-		int loop = intrcmd->data[1].val;
-		int speed = intrcmd->data[2].val;
+		int charID = intrcmd->Data[0].Value;
+		int loop = intrcmd->Data[1].Value;
+		int speed = intrcmd->Data[2].Value;
 		sprintf(scriptCode, "%s.Animate(%d, %d, eOnce, eBlock);", GetCharacterScriptName(charID, game), loop, speed);
 		sb->AppendLine(gcnew String(scriptCode));
 		}
@@ -3558,10 +3575,10 @@ void ConvertInteractionToScript(System::Text::StringBuilder ^sb, NewInteractionC
 	case 35: // quick animation
 		{
 		char scriptCode[300];
-		int charID = intrcmd->data[0].val;
-		int view = intrcmd->data[1].val;
-		int loop = intrcmd->data[2].val;
-		int speed = intrcmd->data[3].val;
+		int charID = intrcmd->Data[0].Value;
+		int view = intrcmd->Data[1].Value;
+		int loop = intrcmd->Data[2].Value;
+		int speed = intrcmd->Data[3].Value;
 		sprintf(scriptCode, "%s.LockView(%d);\n"
 							"%s.Animate(%d, %d, eOnce, eBlock);\n"
 							"%s.UnlockView();",
@@ -3574,45 +3591,45 @@ void ConvertInteractionToScript(System::Text::StringBuilder ^sb, NewInteractionC
 	case 14: // Move Object
 		{
 		char scriptCode[100];
-		int objID = intrcmd->data[0].val;
-		int x = intrcmd->data[1].val;
-		int y = intrcmd->data[2].val;
-		int speed = intrcmd->data[3].val;
-		sprintf(scriptCode, "object[%d].Move(%d, %d, %d, %s);", objID, x, y, speed, (intrcmd->data[4].val) ? "eBlock" : "eNoBlock");
+		int objID = intrcmd->Data[0].Value;
+		int x = intrcmd->Data[1].Value;
+		int y = intrcmd->Data[2].Value;
+		int speed = intrcmd->Data[3].Value;
+		sprintf(scriptCode, "object[%d].Move(%d, %d, %d, %s);", objID, x, y, speed, (intrcmd->Data[4].Value) ? "eBlock" : "eNoBlock");
 		sb->AppendLine(gcnew String(scriptCode));
 		}
 		break;
 	case 19: // Move Character
 		{
 		char scriptCode[100];
-		int charID = intrcmd->data[0].val;
-		int x = intrcmd->data[1].val;
-		int y = intrcmd->data[2].val;
-		sprintf(scriptCode, "%s.Walk(%d, %d, %s);", GetCharacterScriptName(charID, game), x, y, (intrcmd->data[3].val) ? "eBlock" : "eNoBlock");
+		int charID = intrcmd->Data[0].Value;
+		int x = intrcmd->Data[1].Value;
+		int y = intrcmd->Data[2].Value;
+		sprintf(scriptCode, "%s.Walk(%d, %d, %s);", GetCharacterScriptName(charID, game), x, y, (intrcmd->Data[3].Value) ? "eBlock" : "eNoBlock");
 		sb->AppendLine(gcnew String(scriptCode));
 		}
 		break;
 	case 18: // Animate Object
 		{
 		char scriptCode[100];
-		int objID = intrcmd->data[0].val;
-		int loop = intrcmd->data[1].val;
-		int speed = intrcmd->data[2].val;
-		sprintf(scriptCode, "object[%d].Animate(%d, %d, %s, eNoBlock);", objID, loop, speed, (intrcmd->data[3].val) ? "eRepeat" : "eOnce");
+		int objID = intrcmd->Data[0].Value;
+		int loop = intrcmd->Data[1].Value;
+		int speed = intrcmd->Data[2].Value;
+		sprintf(scriptCode, "object[%d].Animate(%d, %d, %s, eNoBlock);", objID, loop, speed, (intrcmd->Data[3].Value) ? "eRepeat" : "eOnce");
 		sb->AppendLine(gcnew String(scriptCode));
 		}
 		break;
 	case 23: // IF variable set to value
 		{
 		char scriptCode[100];
-		int valueToCheck = intrcmd->data[1].val;
-		if ((game == nullptr) || (intrcmd->data[0].val >= game->OldInteractionVariables->Count))
+		int valueToCheck = intrcmd->Data[1].Value;
+		if ((game == nullptr) || (intrcmd->Data[0].Value >= game->OldInteractionVariables->Count))
 		{
-			sprintf(scriptCode, "if (__INTRVAL$%d$ == %d) {", intrcmd->data[0].val, valueToCheck);
+			sprintf(scriptCode, "if (__INTRVAL$%d$ == %d) {", intrcmd->Data[0].Value, valueToCheck);
 		}
 		else
 		{
-			OldInteractionVariable^ variableToCheck = game->OldInteractionVariables[intrcmd->data[0].val];
+			OldInteractionVariable^ variableToCheck = game->OldInteractionVariables[intrcmd->Data[0].Value];
 			sprintf(scriptCode, "if (%s == %d) {", variableToCheck->ScriptName, valueToCheck);
 		}
 		sb->AppendLine(gcnew String(scriptCode));
@@ -3621,14 +3638,14 @@ void ConvertInteractionToScript(System::Text::StringBuilder ^sb, NewInteractionC
 	case 33: // Set variable
 		{
 		char scriptCode[100];
-		int valueToCheck = intrcmd->data[1].val;
-		if ((game == nullptr) || (intrcmd->data[0].val >= game->OldInteractionVariables->Count))
+		int valueToCheck = intrcmd->Data[1].Value;
+		if ((game == nullptr) || (intrcmd->Data[0].Value >= game->OldInteractionVariables->Count))
 		{
-			sprintf(scriptCode, "__INTRVAL$%d$ = %d;", intrcmd->data[0].val, valueToCheck);
+			sprintf(scriptCode, "__INTRVAL$%d$ = %d;", intrcmd->Data[0].Value, valueToCheck);
 		}
 		else
 		{
-			OldInteractionVariable^ variableToCheck = game->OldInteractionVariables[intrcmd->data[0].val];
+			OldInteractionVariable^ variableToCheck = game->OldInteractionVariables[intrcmd->Data[0].Value];
 			sprintf(scriptCode, "%s = %d;", variableToCheck->ScriptName, valueToCheck);
 		}
 		sb->AppendLine(gcnew String(scriptCode));
@@ -3637,11 +3654,11 @@ void ConvertInteractionToScript(System::Text::StringBuilder ^sb, NewInteractionC
 	case 12: // Change Room
 		{
 		char scriptCode[200];
-		int room = intrcmd->data[0].val;
+		int room = intrcmd->Data[0].Value;
 		sprintf(scriptCode, "player.ChangeRoomAutoPosition(%d", room);
-		if (intrcmd->data[1].val > 0) 
+		if (intrcmd->Data[1].Value > 0) 
 		{
-			sprintf(&scriptCode[strlen(scriptCode)], ", %d", intrcmd->data[1].val);
+			sprintf(&scriptCode[strlen(scriptCode)], ", %d", intrcmd->Data[1].Value);
 		}
 		strcat(scriptCode, ");");
 		sb->AppendLine(gcnew String(scriptCode));
@@ -3649,7 +3666,7 @@ void ConvertInteractionToScript(System::Text::StringBuilder ^sb, NewInteractionC
 		break;
 	case 2: // Add Score On First Execution
 		{
-		  int points = intrcmd->data[0].val;
+		  int points = intrcmd->Data[0].Value;
       String^ newGuid = System::Guid::NewGuid().ToString();
       String^ scriptCode = String::Format("if (Game.DoOnceOnly(\"{0}\"))", newGuid);
       scriptCode = String::Concat(scriptCode, " {\n  ");
@@ -3663,22 +3680,22 @@ void ConvertInteractionToScript(System::Text::StringBuilder ^sb, NewInteractionC
 	}
 }
 
-void ConvertInteractionCommandList(System::Text::StringBuilder^ sb, NewInteractionCommandList *cmdList, String^ scriptFuncPrefix, AGS::Types::Game^ game, int *runScriptCount, int targetTypeForUnhandledEvent) 
+void ConvertInteractionCommandList(System::Text::StringBuilder^ sb, InteractionCommandList *cmdList, String^ scriptFuncPrefix, AGS::Types::Game^ game, int *runScriptCount, int targetTypeForUnhandledEvent) 
 {
 	bool onlyIfInvWasUseds = true;
 
-	for (int cmd = 0; cmd < cmdList->numCommands; cmd++)
+    for (size_t cmd = 0; cmd < cmdList->Cmds.size(); cmd++)
 	{
-		ConvertInteractionToScript(sb, &cmdList->command[cmd], scriptFuncPrefix, game, runScriptCount, &onlyIfInvWasUseds, cmd);
-		if (cmdList->command[cmd].get_child_list() != NULL) 
+		ConvertInteractionToScript(sb, &cmdList->Cmds[cmd], scriptFuncPrefix, game, runScriptCount, &onlyIfInvWasUseds, cmd);
+		if (cmdList->Cmds[cmd].Children.get() != NULL) 
 		{
-			ConvertInteractionCommandList(sb, cmdList->command[cmd].get_child_list(), scriptFuncPrefix, game, runScriptCount, targetTypeForUnhandledEvent);
+			ConvertInteractionCommandList(sb, cmdList->Cmds[cmd].Children.get(), scriptFuncPrefix, game, runScriptCount, targetTypeForUnhandledEvent);
 			sb->AppendLine("}");
 		}
 	}
 
 	if ((onlyIfInvWasUseds) && (targetTypeForUnhandledEvent > 0) && 
-		(cmdList->numCommands > 0))
+		(cmdList->Cmds.size() > 0))
 	{
 		sb->AppendLine("else {");
 		sb->AppendLine(String::Format(" unhandled_event({0}, 3);", targetTypeForUnhandledEvent));
@@ -3688,31 +3705,31 @@ void ConvertInteractionCommandList(System::Text::StringBuilder^ sb, NewInteracti
 
 void CopyInteractions(AGS::Types::Interactions ^destination, ::InteractionScripts *source)
 {
-	if (source->numEvents > destination->ScriptFunctionNames->Length) 
+    if (source->ScriptFuncNames.size() > (size_t)destination->ScriptFunctionNames->Length) 
 	{
 		throw gcnew AGS::Types::AGSEditorException("Invalid interaction funcs: too many interaction events");
 	}
 
-	for (int i = 0; i < source->numEvents; i++) 
+	for (size_t i = 0; i < source->ScriptFuncNames.size(); i++) 
 	{
-		destination->ScriptFunctionNames[i] = gcnew String(source->scriptFuncNames[i]);
+		destination->ScriptFunctionNames[i] = gcnew String(source->ScriptFuncNames[i]);
 	}
 }
 
-void ConvertInteractions(AGS::Types::Interactions ^interactions, ::NewInteraction *intr, String^ scriptFuncPrefix, AGS::Types::Game ^game, int targetTypeForUnhandledEvent)
+void ConvertInteractions(AGS::Types::Interactions ^interactions, Interaction *intr, String^ scriptFuncPrefix, AGS::Types::Game ^game, int targetTypeForUnhandledEvent)
 {
-	if (intr->numEvents > interactions->ScriptFunctionNames->Length) 
+	if (intr->Events.size() > (size_t)interactions->ScriptFunctionNames->Length) 
 	{
 		throw gcnew AGS::Types::AGSEditorException("Invalid interaction data: too many interaction events");
 	}
 
-	for (int i = 0; i < intr->numEvents; i++) 
+	for (size_t i = 0; i < intr->Events.size(); i++) 
 	{
-		if (intr->response[i] != NULL) 
+        if (intr->Events[i].Response.get() != NULL) 
 		{
       int runScriptCount = 0;
 			System::Text::StringBuilder^ sb = gcnew System::Text::StringBuilder();
-			ConvertInteractionCommandList(sb, intr->response[i], scriptFuncPrefix, game, &runScriptCount, targetTypeForUnhandledEvent);
+			ConvertInteractionCommandList(sb, intr->Events[i].Response.get(), scriptFuncPrefix, game, &runScriptCount, targetTypeForUnhandledEvent);
       if (runScriptCount == 1)
       {
         sb->Append("$$SINGLE_RUN_SCRIPT$$");
@@ -3763,7 +3780,7 @@ Game^ load_old_game_dta_file(const char *fileName)
     game->Settings->NumberDialogOptions = (thisgame.options[OPT_DIALOGNUMBERED] != 0) ? DialogOptionsNumbering::Normal : DialogOptionsNumbering::KeyShortcutsOnly;
 	game->Settings->PixelPerfect = (thisgame.options[OPT_PIXPERFECT] != 0);
 	game->Settings->PlaySoundOnScore = thisgame.options[OPT_SCORESOUND];
-	game->Settings->Resolution = (GameResolutions)thisgame.default_resolution;
+	game->Settings->Resolution = (GameResolutions)thisgame.GetDefaultResolution();
 	game->Settings->RoomTransition = (RoomTransitionStyle)thisgame.options[OPT_FADETYPE];
 	game->Settings->SaveScreenshots = (thisgame.options[OPT_SAVESCREENSHOT] != 0);
 	game->Settings->SkipSpeech = (SkipSpeechStyle)thisgame.options[OPT_NOSKIPTEXT];
@@ -3824,7 +3841,7 @@ Game^ load_old_game_dta_file(const char *fileName)
 	for (i = 0; i < numGlobalVars; i++)
 	{
 		OldInteractionVariable ^intVar;
-		intVar = gcnew OldInteractionVariable(gcnew String(globalvars[i].name), globalvars[i].value);
+		intVar = gcnew OldInteractionVariable(gcnew String(globalvars[i].Name), globalvars[i].Value);
 		game->OldInteractionVariables->Add(intVar);
 	}
 	
@@ -4026,58 +4043,58 @@ Game^ load_old_game_dta_file(const char *fileName)
 		game->InventoryItems->Add(invItem);
 	}
 
-	//AGS::Types::CustomPropertySchema ^schema = gcnew AGS::Types::CustomPropertySchema();
-	for (i = 0; i < thisgame.propSchema.numProps; i++) 
+    for (AGS::Common::PropertySchema::const_iterator it = thisgame.propSchema.begin();
+         it != thisgame.propSchema.end(); ++it)
 	{
 		CustomPropertySchemaItem ^schemaItem = gcnew CustomPropertySchemaItem();
-		schemaItem->Name = gcnew String(thisgame.propSchema.propName[i]);
-		schemaItem->Description = gcnew String(thisgame.propSchema.propDesc[i]);
-		schemaItem->DefaultValue = gcnew String(thisgame.propSchema.defaultValue[i]);
-		schemaItem->Type = (AGS::Types::CustomPropertyType)thisgame.propSchema.propType[i];
+		schemaItem->Name = gcnew String(it->second.Name);
+		schemaItem->Description = gcnew String(it->second.Description);
+		schemaItem->DefaultValue = gcnew String(it->second.DefaultValue);
+		schemaItem->Type = (AGS::Types::CustomPropertyType)it->second.Type;
 
 		game->PropertySchema->PropertyDefinitions->Add(schemaItem);
 	}
 
 	for (i = 0; i < thisgame.numgui; i++)
 	{
-		guis[i].rebuild_array();
-	    guis[i].resort_zorder();
+		guis[i].RebuildArray();
+	    guis[i].ResortZOrder();
 
 		GUI^ newGui;
-		if (guis[i].is_textwindow()) 
+		if (guis[i].IsTextWindow()) 
 		{
 			newGui = gcnew TextWindowGUI();
 			newGui->Controls->Clear();  // we'll add our own edges
-      ((TextWindowGUI^)newGui)->TextColor = guis[i].fgcol;
+      ((TextWindowGUI^)newGui)->TextColor = guis[i].FgColor;
 		}
 		else 
 		{
 			newGui = gcnew NormalGUI();
-			((NormalGUI^)newGui)->Clickable = ((guis[i].flags & GUIF_NOCLICK) == 0);
-			((NormalGUI^)newGui)->Top = guis[i].y;
-			((NormalGUI^)newGui)->Left = guis[i].x;
-			((NormalGUI^)newGui)->Width = (guis[i].wid > 0) ? guis[i].wid : 1;
-			((NormalGUI^)newGui)->Height = (guis[i].hit > 0) ? guis[i].hit : 1;
-			((NormalGUI^)newGui)->PopupYPos = guis[i].popupyp;
-			((NormalGUI^)newGui)->Visibility = (GUIVisibility)guis[i].popup;
-			((NormalGUI^)newGui)->ZOrder = guis[i].zorder;
-			((NormalGUI^)newGui)->OnClick = gcnew String(guis[i].clickEventHandler);
-      ((NormalGUI^)newGui)->BorderColor = guis[i].fgcol;
+			((NormalGUI^)newGui)->Clickable = ((guis[i].Flags & Common::kGUIMain_NoClick) == 0);
+			((NormalGUI^)newGui)->Top = guis[i].Y;
+			((NormalGUI^)newGui)->Left = guis[i].X;
+			((NormalGUI^)newGui)->Width = (guis[i].Width > 0) ? guis[i].Width : 1;
+			((NormalGUI^)newGui)->Height = (guis[i].Height > 0) ? guis[i].Height : 1;
+			((NormalGUI^)newGui)->PopupYPos = guis[i].PopupAtMouseY;
+			((NormalGUI^)newGui)->Visibility = (GUIVisibility)guis[i].PopupStyle;
+			((NormalGUI^)newGui)->ZOrder = guis[i].ZOrder;
+			((NormalGUI^)newGui)->OnClick = gcnew String(guis[i].OnClickHandler);
+      ((NormalGUI^)newGui)->BorderColor = guis[i].FgColor;
 		}
-		newGui->BackgroundColor = guis[i].bgcol;
-		newGui->BackgroundImage = guis[i].bgpic;
+		newGui->BackgroundColor = guis[i].BgColor;
+		newGui->BackgroundImage = guis[i].BgImage;
 		newGui->ID = i;
-		newGui->Name = gcnew String(guis[i].name);
+		newGui->Name = gcnew String(guis[i].Name);
 
-		for (int j = 0; j < guis[i].numobjs; j++)
+		for (int j = 0; j < guis[i].ControlCount; j++)
 		{
-			GUIObject* curObj = guis[i].objs[j];
+			GUIObject* curObj = guis[i].Controls[j];
 			GUIControl ^newControl = nullptr;
-			switch (guis[i].objrefptr[j] >> 16)
+			switch (guis[i].CtrlRefs[j] >> 16)
 			{
-			case GOBJ_BUTTON:
+			case Common::kGUIButton:
 				{
-				if (guis[i].is_textwindow())
+				if (guis[i].IsTextWindow())
 				{
 					AGS::Types::GUITextWindowEdge^ edge = gcnew AGS::Types::GUITextWindowEdge();
 					::GUIButton *copyFrom = (::GUIButton*)curObj;
@@ -4103,7 +4120,7 @@ Game^ load_old_game_dta_file(const char *fileName)
 				}
 				break;
 				}
-			case GOBJ_LABEL:
+			case Common::kGUILabel:
 				{
 				AGS::Types::GUILabel^ newLabel = gcnew AGS::Types::GUILabel();
 				::GUILabel *copyFrom = (::GUILabel*)curObj;
@@ -4114,7 +4131,7 @@ Game^ load_old_game_dta_file(const char *fileName)
 				newLabel->Text = gcnew String(copyFrom->GetText());
 				break;
 				}
-			case GOBJ_TEXTBOX:
+			case Common::kGUITextBox:
 				{
 				  AGS::Types::GUITextBox^ newTextbox = gcnew AGS::Types::GUITextBox();
 				  ::GUITextBox *copyFrom = (::GUITextBox*)curObj;
@@ -4126,7 +4143,7 @@ Game^ load_old_game_dta_file(const char *fileName)
 				  newTextbox->OnActivate = gcnew String(copyFrom->eventHandlers[0]);
 				  break;
 				}
-			case GOBJ_LISTBOX:
+			case Common::kGUIListBox:
 				{
 				  AGS::Types::GUIListBox^ newListbox = gcnew AGS::Types::GUIListBox();
 				  ::GUIListBox *copyFrom = (::GUIListBox*)curObj;
@@ -4142,7 +4159,7 @@ Game^ load_old_game_dta_file(const char *fileName)
 				  newListbox->OnSelectionChanged = gcnew String(copyFrom->eventHandlers[0]);
 				  break;
 				}
-			case GOBJ_SLIDER:
+			case Common::kGUISlider:
 				{
 				  AGS::Types::GUISlider^ newSlider = gcnew AGS::Types::GUISlider();
 				  ::GUISlider *copyFrom = (::GUISlider*)curObj;
@@ -4156,7 +4173,7 @@ Game^ load_old_game_dta_file(const char *fileName)
 				  newSlider->OnChange = gcnew String(copyFrom->eventHandlers[0]);
 				  break;
 				}
-			case GOBJ_INVENTORY:
+			case Common::kGUIInvWindow:
 				{
 					AGS::Types::GUIInventory^ invwindow = gcnew AGS::Types::GUIInventory();
 				    ::GUIInv *copyFrom = (::GUIInv*)curObj;
@@ -4167,7 +4184,7 @@ Game^ load_old_game_dta_file(const char *fileName)
 					break;
 				}
 			default:
-				throw gcnew AGSEditorException("Unknown control type found: " + (guis[i].objrefptr[j] >> 16));
+				throw gcnew AGSEditorException("Unknown control type found: " + (guis[i].CtrlRefs[j] >> 16));
 			}
 			newControl->Width = (curObj->wid > 0) ? curObj->wid : 1;
 			newControl->Height = (curObj->hit > 0) ? curObj->hit : 1;
@@ -4233,7 +4250,7 @@ System::String ^load_room_script(System::String ^fileName)
 		}
 		else 
 		{
-			opty->Seek(Common::kSeekCurrent, blockLen);
+			opty->Seek(blockLen);
 		}
 	}
 
@@ -4290,7 +4307,7 @@ AGS::Types::Room^ load_crm_file(UnloadedRoom ^roomToLoad)
 	for (i = 0; i < thisroom.numLocalVars; i++)
 	{
 		OldInteractionVariable ^intVar;
-		intVar = gcnew OldInteractionVariable(gcnew String(thisroom.localvars[i].name), thisroom.localvars[i].value);
+		intVar = gcnew OldInteractionVariable(gcnew String(thisroom.localvars[i].Name), thisroom.localvars[i].Value);
 		room->OldInteractionVariables->Add(intVar);
 	}
 
@@ -4330,6 +4347,8 @@ AGS::Types::Room^ load_crm_file(UnloadedRoom ^roomToLoad)
     if (thisroom.wasversion <= kRoomVersion_300a)
       obj->StartY += GetSpriteHeight(thisroom.sprs[i].sprnum);
 		obj->Visible = (thisroom.sprs[i].on != 0);
+		obj->Clickable = ((thisroom.objectFlags[i] & OBJF_NOINTERACT) == 0);
+		obj->Locked = ((thisroom.objectFlags[i] & OBJF_LOCKED) != 0);
 		obj->Baseline = thisroom.objbaseline[i];
 		obj->Name = gcnew String(jibbledScriptName);
 		obj->Description = gcnew String(thisroom.objectnames[i]);
@@ -4357,7 +4376,7 @@ AGS::Types::Room^ load_crm_file(UnloadedRoom ^roomToLoad)
 		hotspot->ID = i;
 		hotspot->Description = gcnew String(thisroom.hotspotnames[i]);
 		hotspot->Name = (gcnew String(thisroom.hotspotScriptNames[i]))->Trim();
-		hotspot->WalkToPoint = Point(thisroom.hswalkto[i].x, thisroom.hswalkto[i].y);
+        hotspot->WalkToPoint = System::Drawing::Point(thisroom.hswalkto[i].x, thisroom.hswalkto[i].y);
 		ConvertCustomProperties(hotspot->Properties, &thisroom.hsProps[i]);
 
 		if (thisroom.wasversion < kRoomVersion_300a)
@@ -4401,12 +4420,21 @@ AGS::Types::Room^ load_crm_file(UnloadedRoom ^roomToLoad)
 	{
 		RoomRegion ^area = room->Regions[i];
 		area->ID = i;
-		area->UseColourTint = ((thisroom.regionTintLevel[i] & TINT_IS_ENABLED) != 0);
-		area->LightLevel = thisroom.regionLightLevel[i] + 100;
+		// NOTE: Region's light level value exposed in editor is always 100 units higher,
+		// for compatibility with older versions of the editor.
+		// TODO: probably we could remove this behavior? Need to consider possible compat mode
+		area->LightLevel = thisroom.get_region_lightlevel(i) + 100;
+		area->UseColourTint = thisroom.has_region_tint(i);
 		area->BlueTint = (thisroom.regionTintLevel[i] >> 16) & 0x00ff;
 		area->GreenTint = (thisroom.regionTintLevel[i] >> 8) & 0x00ff;
 		area->RedTint = thisroom.regionTintLevel[i] & 0x00ff;
-		area->TintSaturation = (thisroom.regionLightLevel[i] > 0) ? thisroom.regionLightLevel[i] : 50;
+		// Set saturation's and luminance's default values in the editor if it is disabled in room data
+		int saturation = (thisroom.regionTintLevel[i] >> 24) & 0xFF;
+		area->TintSaturation = (saturation > 0 && area->UseColourTint) ? saturation :
+			Utilities::GetDefaultValue(area->GetType(), "TintSaturation", 0);
+		int luminance = thisroom.get_region_tintluminance(i);
+		area->TintLuminance = area->UseColourTint ? luminance :
+			Utilities::GetDefaultValue(area->GetType(), "TintLuminance", 0);
 
 		if (thisroom.wasversion < kRoomVersion_300a)
 		{
@@ -4499,6 +4527,8 @@ void save_crm_file(Room ^room)
 		thisroom.objectFlags[i] = 0;
 		if (obj->UseRoomAreaScaling) thisroom.objectFlags[i] |= OBJF_USEROOMSCALING;
 		if (obj->UseRoomAreaLighting) thisroom.objectFlags[i] |= OBJF_USEREGIONTINTS;
+		if (!obj->Clickable) thisroom.objectFlags[i] |= OBJF_NOINTERACT;
+		if (obj->Locked) thisroom.objectFlags[i] |= OBJF_LOCKED;
 		CompileCustomProperties(obj->Properties, &thisroom.objProps[i]);
 	}
 
@@ -4547,12 +4577,14 @@ void save_crm_file(Room ^room)
 		thisroom.regionTintLevel[i] = 0;
 		if (area->UseColourTint) 
 		{
-			thisroom.regionTintLevel[i] = TINT_IS_ENABLED;
-			thisroom.regionTintLevel[i] |= area->RedTint | (area->GreenTint << 8) | (area->BlueTint << 16);
-			thisroom.regionLightLevel[i] = area->TintSaturation;
+            thisroom.regionTintLevel[i]  = area->RedTint | (area->GreenTint << 8) | (area->BlueTint << 16) | (area->TintSaturation << 24);
+            thisroom.regionLightLevel[i] = (area->TintLuminance * 25) / 10;
 		}
 		else 
 		{
+            thisroom.regionTintLevel[i] = 0;
+			// NOTE: Region's light level value exposed in editor is always 100 units higher,
+			// for compatibility with older versions of the editor.
 			thisroom.regionLightLevel[i] = area->LightLevel - 100;
 		}
 	}
@@ -4763,14 +4795,14 @@ void save_thisgame_to_file(const char *fileName, Game ^game)
 	  free(buffer);
   }
   ooo->WriteArray(&dialog[0], sizeof(DialogTopic), thisgame.numdialog);
-  write_gui(ooo,&guis[0],&thisgame,false);
+  write_gui(ooo,guis,&thisgame,false);
   write_plugins_to_disk(ooo);
   // write the custom properties & schema
-  thisgame.propSchema.Serialize(ooo);
+  AGSProps::WriteSchema(thisgame.propSchema, ooo);
   for (bb = 0; bb < thisgame.numcharacters; bb++)
-    thisgame.charProps[bb].Serialize (ooo);
+    AGSProps::WriteValues(thisgame.charProps[bb], ooo);
   for (bb = 0; bb < thisgame.numinvitems; bb++)
-    thisgame.invProps[bb].Serialize (ooo);
+    AGSProps::WriteValues(thisgame.invProps[bb], ooo);
 
   for (bb = 0; bb < thisgame.numviews; bb++)
     fputstring(thisgame.viewNames[bb], ooo);
@@ -4875,7 +4907,7 @@ void save_game_to_dta_file(Game^ game, const char *fileName)
 	thisgame.options[OPT_DIALOGNUMBERED] = (int)game->Settings->NumberDialogOptions;
 	thisgame.options[OPT_PIXPERFECT] = game->Settings->PixelPerfect;
 	thisgame.options[OPT_SCORESOUND] = 0; // saved elsewhere now to make it 32-bit
-	thisgame.default_resolution = (GameResolutionType)game->Settings->Resolution;
+    SetGameResolution(game);
 	thisgame.options[OPT_FADETYPE] = (int)game->Settings->RoomTransition;
 	thisgame.options[OPT_RUNGAMEDLGOPTS] = game->Settings->RunGameLoopsWhileDialogOptionsDisplayed;
 	thisgame.options[OPT_SAVESCREENSHOT] = game->Settings->SaveScreenshots;
@@ -4891,6 +4923,9 @@ void save_game_to_dta_file(Game^ game, const char *fileName)
 	thisgame.options[OPT_WALKONLOOK] = game->Settings->WalkInLookMode;
 	thisgame.options[OPT_DISABLEOFF] = (int)game->Settings->WhenInterfaceDisabled;
     thisgame.options[OPT_SAFEFILEPATHS] = 1; // always use safe file paths in new games
+    thisgame.options[OPT_DIALOGOPTIONSAPI] = game->Settings->UseOldCustomDialogOptionsAPI ? -1 : 1;
+    thisgame.options[OPT_BASESCRIPTAPI] = (int)game->Settings->ScriptAPIVersion;
+    thisgame.options[OPT_SCRIPTCOMPATLEV] = (int)game->Settings->ScriptCompatLevel;
 	thisgame.uniqueid = game->Settings->UniqueID;
   ConvertStringToCharArray(game->Settings->GUIDAsString, thisgame.guid, MAX_GUID_LENGTH);
   ConvertStringToCharArray(game->Settings->SaveGameFolderName, thisgame.saveGameFolderName, MAX_SG_FOLDER_LEN);
@@ -4965,7 +5000,7 @@ void save_game_to_dta_file(Game^ game, const char *fileName)
 	// ** Characters **
 	thisgame.numcharacters = game->Characters->Count;
 	thisgame.chars = (CharacterInfo*)calloc(sizeof(CharacterInfo) * thisgame.numcharacters, 1);
-  thisgame.charProps = (::CustomProperties*)calloc(thisgame.numcharacters, sizeof(::CustomProperties));
+    thisgame.charProps.resize(thisgame.numcharacters);
 	for (i = 0; i < thisgame.numcharacters; i++) 
 	{
 		AGS::Types::Character ^character = game->Characters[i];
@@ -5167,19 +5202,15 @@ void save_game_to_dta_file(Game^ game, const char *fileName)
 
 	// ** Custom Properties Schema **
 	List<AGS::Types::CustomPropertySchemaItem ^> ^schema = game->PropertySchema->PropertyDefinitions;
-	if (schema->Count > MAX_CUSTOM_PROPERTIES)
+	for (int i = 0; i < schema->Count; i++) 
 	{
-		throw gcnew CompileError("Too many custom properties defined");
-	}
-	thisgame.propSchema.numProps = schema->Count;
-	for (i = 0; i < thisgame.propSchema.numProps; i++) 
-	{
+        AGS::Common::PropertyDesc desc;
 		CustomPropertySchemaItem ^schemaItem = schema[i];
-		ConvertStringToCharArray(schemaItem->Name, thisgame.propSchema.propName[i], 20);
-		ConvertStringToCharArray(schemaItem->Description, thisgame.propSchema.propDesc[i], 100);
-		thisgame.propSchema.defaultValue[i] = (char*)malloc(schemaItem->DefaultValue->Length + 1);
-		ConvertStringToCharArray(schemaItem->DefaultValue, thisgame.propSchema.defaultValue[i]);
-		thisgame.propSchema.propType[i] = (int)schemaItem->Type;
+        ConvertStringToNativeString(schemaItem->Name, desc.Name);
+        ConvertStringToNativeString(schemaItem->Description, desc.Description);
+        ConvertStringToNativeString(schemaItem->DefaultValue, desc.DefaultValue);
+        desc.Type = (AGS::Common::PropertyType)schemaItem->Type;
+        thisgame.propSchema[desc.Name] = desc;
 	}
 
 	// ** GUIs **
@@ -5189,14 +5220,20 @@ void save_game_to_dta_file(Game^ game, const char *fileName)
 	numguilist = 0;
 	numguislider = 0;
 	numguiinv = 0;
+    guibuts.resize(0);
+    guilabels.resize(0);
+    guitext.resize(0);
+    guilist.resize(0);
+    guislider.resize(0);
+    guiinv.resize(0);
 
 	thisgame.numgui = game->GUIs->Count;
-  guis = (GUIMain*)calloc(thisgame.numgui, sizeof(GUIMain));
+  guis.resize(thisgame.numgui);
 	for (i = 0; i < thisgame.numgui; i++)
 	{
-		guis[i].init();
+		guis[i].Init();
 		ConvertGUIToBinaryFormat(game->GUIs[i], &guis[i]);
-		guis[i].highlightobj = -1;
+		guis[i].HighlightCtrl = -1;
 	}
 
 	// this cannot be null, so set it randomly
@@ -5238,7 +5275,7 @@ void load_script_configuration(Stream*iii) { int aa;
   int numvarnames=getlong(iii);
   for (aa=0;aa<numvarnames;aa++) {
     int lenoft=iii->ReadByte();
-    iii->Seek(Common::kSeekCurrent,lenoft);
+    iii->Seek(lenoft);
   }
 }
 
@@ -5260,7 +5297,7 @@ void load_graphical_scripts(Stream*iii,roomstruct*rst) {
     }
     // skip the data
     long lee = iii->ReadInt32();
-    iii->Seek (Common::kSeekCurrent, lee);
+    iii->Seek (lee);
   }
 }
 

@@ -12,6 +12,7 @@
 //
 //=============================================================================
 
+#include "debug/assert.h"
 #include "util/alignedstream.h"
 #include "util/stream.h"
 #include "util/math.h"
@@ -289,10 +290,12 @@ size_t AlignedStream::WriteArrayOfInt64(const int64_t *buffer, size_t count)
     return 0;
 }
 
-size_t AlignedStream::Seek(StreamSeek seek, int pos)
+size_t AlignedStream::Seek(int offset, StreamSeek origin)
 {
-    // Not supported
-    return 0;
+    // TODO: split out Seekable Stream interface
+    assert(false); // aligned stream should not be used in cases
+                   // where Seek() is required to be called
+    return GetPosition();
 }
 
 void AlignedStream::ReadPadding(size_t next_type)
@@ -317,7 +320,8 @@ void AlignedStream::ReadPadding(size_t next_type)
         {
             // We do not know and should not care if the underlying stream
             // supports seek, so use read to skip the padding instead.
-            _stream->Read(_paddingBuffer, next_type - pad);
+            for (size_t i = next_type - pad; i > 0; --i)
+                _stream->ReadByte();
             _block += next_type - pad;
         }
 
@@ -350,7 +354,7 @@ void AlignedStream::WritePadding(size_t next_type)
         // Write padding only if have to
         if (pad)
         {
-            _stream->Write(_paddingBuffer, next_type - pad);
+            _stream->WriteByteCount(0, next_type - pad);
             _block += next_type - pad;
         }
 

@@ -29,6 +29,7 @@
 #include "debug/agseditordebugger.h"
 #include "debug/debug_log.h"
 #include "debug/out.h"
+#include "main/config.h"
 #include "main/engine.h"
 #include "main/mainheader.h"
 #include "main/main.h"
@@ -42,9 +43,8 @@
 #include "test/test_all.h"
 #endif
 
-namespace Directory = AGS::Common::Directory;
-namespace Out       = AGS::Common::Out;
-namespace Path      = AGS::Common::Path;
+using namespace AGS::Common;
+using namespace AGS::Engine;
 
 char appDirectory[512]; // Needed for library loading
 
@@ -81,7 +81,6 @@ extern char editor_debugger_instance_token[100];
 
 
 // Startup flags, set from parameters to engine
-char force_gfxfilter[50];
 int datafile_argv=0, change_to_game_dir = 0, force_window = 0;
 int override_start_room = 0, force_16bit = 0;
 bool justDisplayHelp = false;
@@ -190,9 +189,10 @@ void main_print_help() {
            "  --windowed                   Force display mode to windowed\n"
            "  --fullscreen                 Force display mode to fullscreen\n"
            "  --hicolor                    Downmix 32bit colors to 16bit\n"
-           "  --letterbox                  Enable letterbox mode\n"
-           "  --gfxfilter <filter>         Enable graphics filter. Available options:\n"
-           "                                 StdScale2, StdScale3, StdScale4, Hq2x or Hq3x\n"
+           "  --gfxfilter <filter> [<scaling>]\n"
+           "                               Request graphics filter. Available options:\n"
+           "                                 none, stdscale, hq2x, hq3x;\n"
+           "                                 scaling is specified by integer number\n"
            "  --log                        Enable program output to the log file\n"
            "  --no-log                     Disable program output to the log file,\n"
            "                                 overriding configuration file setting\n"
@@ -207,8 +207,6 @@ void main_print_help() {
 
 int main_process_cmdline(int argc,char*argv[])
 {
-    force_gfxfilter[0] = '\0';
-
     for (int ee=1;ee<argc;ee++) {
         if (stricmp(argv[ee],"--help") == 0 || stricmp(argv[ee],"/?") == 0 || stricmp(argv[ee],"-?") == 0)
         {
@@ -227,16 +225,24 @@ int main_process_cmdline(int argc,char*argv[])
             force_window = 2;
         else if (stricmp(argv[ee],"-hicolor") == 0 || stricmp(argv[ee],"--hicolor") == 0)
             force_16bit = 1;
-        else if (stricmp(argv[ee],"-letterbox") == 0 || stricmp(argv[ee],"--letterbox") == 0)
-            usetup.prefer_letterbox = 1;
         else if (stricmp(argv[ee],"-record") == 0)
             play.recording = 1;
         else if (stricmp(argv[ee],"-playback") == 0)
             play.playback = 1;
         else if ((stricmp(argv[ee],"-gfxfilter") == 0 || stricmp(argv[ee],"--gfxfilter") == 0) && (argc > ee + 1))
         {
-            strncpy(force_gfxfilter, argv[ee + 1], 49);
-            ee++;
+            usetup.Screen.Filter.ID = argv[++ee];
+            if (argc > ee + 1 && argv[ee + 1][0] != '-')
+            {
+                int scale_factor;
+                parse_scaling_option(argv[++ee], usetup.Screen.GameFrame.ScaleDef, scale_factor);
+                usetup.Screen.GameFrame.ScaleFactor = convert_scaling_to_fp(scale_factor);
+            }
+            else
+            {
+                usetup.Screen.GameFrame.ScaleDef = kFrame_MaxRound;
+            }
+            
         }
 #ifdef _DEBUG
         else if ((stricmp(argv[ee],"--startr") == 0) && (ee < argc-1)) {
@@ -501,6 +507,4 @@ int main(int argc,char*argv[]) {
     }
 }
 
-#if !defined (DOS_VERSION)
 END_OF_MAIN()
-#endif

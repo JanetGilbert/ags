@@ -21,17 +21,10 @@ GameSetup::GameSetup()
     midicard=MIDI_AUTODETECT;
     mod_player=1;
     mp3_player=1;
-    want_letterbox = false;
-    windowed = false;
     no_speech_pack = false;
-    refresh = 0;
     enable_antialiasing = false;
     force_hicolor_mode = false;
     disable_exception_handling = false;
-    prefer_sideborders = true;
-    prefer_letterbox = true;
-    base_width = 320;
-    base_height = 200;
     mouse_auto_lock = false;
     override_script_os = -1;
     override_multitasking = -1;
@@ -39,4 +32,12 @@ GameSetup::GameSetup()
     mouse_speed = 1.f;
     mouse_control = kMouseCtrl_Fullscreen;
     mouse_speed_def = kMouseSpeed_CurrentDisplay;
+
+    Screen.MatchDeviceRatio = false;
+    Screen.SizeDef = kScreenDef_MaxDisplay;
+    Screen.RefreshRate = 0;
+    Screen.VSync = false;
+    Screen.Windowed = false;
+    Screen.GameFrame.ScaleDef = kFrame_MaxRound;
+    Screen.GameFrame.ScaleFactor = 0;
 }

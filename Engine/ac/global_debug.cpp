@@ -14,7 +14,6 @@
 
 #include <stdio.h>
 #include "ac/global_debug.h"
-#include "gfx/ali3d.h"
 #include "ac/common.h"
 #include "ac/characterinfo.h"
 #include "ac/draw.h"
@@ -40,9 +39,10 @@
 #include "ac/spritecache.h"
 #include "gfx/bitmap.h"
 #include "gfx/graphicsdriver.h"
+#include "main/graphics_mode.h"
 
-using AGS::Common::Bitmap;
-namespace BitmapHelper = AGS::Common::BitmapHelper;
+using namespace AGS::Common;
+using namespace AGS::Engine;
 
 extern GameSetupStruct game;
 extern GameSetup usetup;
@@ -57,9 +57,36 @@ extern TreeMap *transtree;
 extern int offsetx, offsety;
 extern int displayed_room, starting_room;
 extern MoveList *mls;
-extern int final_scrn_wid,final_scrn_hit,final_col_dep;
-extern int scrnwid,scrnhit;
 extern char transFileName[MAX_PATH];
+
+String GetRuntimeInfo()
+{
+    DisplayMode mode = gfxDriver->GetDisplayMode();
+    Rect render_frame = gfxDriver->GetRenderDestination();
+    String runtimeInfo = String::FromFormat(
+        "Adventure Game Studio run-time engine[ACI version %s"
+        "[Game resolution %d x %d"
+        "[Running %d x %d at %d-bit%s%s[GFX: %s; %s[Draw frame %d x %d["
+        "Sprite cache size: %d KB (limit %d KB; %d locked)",
+        EngineVersion.LongString.GetCStr(), game.size.Width, game.size.Height,
+        mode.Width, mode.Height, mode.ColorDepth, (convert_16bit_bgr) ? " BGR" : "",
+        mode.Windowed ? " W" : "",
+        gfxDriver->GetDriverName(), filter->GetInfo().Name.GetCStr(),
+        render_frame.GetWidth(), render_frame.GetHeight(),
+        spriteset.cachesize / 1024, spriteset.maxCacheSize / 1024, spriteset.lockedSize / 1024);
+    if (play.separate_music_lib)
+        runtimeInfo.Append("[AUDIO.VOX enabled");
+    if (play.want_speech >= 1)
+        runtimeInfo.Append("[SPEECH.VOX enabled");
+    if (transtree != NULL) {
+        runtimeInfo.Append("[Using translation ");
+        runtimeInfo.Append(transFileName);
+    }
+    if (opts.mod_player == 0)
+        runtimeInfo.Append("[(mod/xm player discarded)");
+
+    return runtimeInfo;
+}
 
 void script_debug(int cmdd,int dataa) {
     if (play.debug_mode==0) return;
@@ -71,25 +98,8 @@ void script_debug(int cmdd,int dataa) {
         //    Display("invorder decided there are %d items[display %d",play.inv_numorder,play.inv_numdisp);
     }
     else if (cmdd==1) {
-        char toDisplay[STD_BUFFER_SIZE];
-        const char *filterName = filter->GetVersionBoxText();
-        DisplayResolution mode = gfxDriver->GetResolution();
-        sprintf(toDisplay,"Adventure Game Studio run-time engine[ACI version %s"
-            "[Running %d x %d at %d-bit, game frame is %d x %d %s[GFX: %s[%s" "Sprite cache size: %d KB (limit %d KB; %d locked)",
-            EngineVersion.LongString.GetCStr(), mode.Width, mode.Height, final_col_dep, final_scrn_wid, final_scrn_hit, (convert_16bit_bgr) ? "BGR" : "",
-            gfxDriver->GetDriverName(), filterName,
-            spriteset.cachesize / 1024, spriteset.maxCacheSize / 1024, spriteset.lockedSize / 1024);
-        if (play.seperate_music_lib)
-            strcat(toDisplay,"[AUDIO.VOX enabled");
-        if (play.want_speech >= 1)
-            strcat(toDisplay,"[SPEECH.VOX enabled");
-        if (transtree != NULL) {
-            strcat(toDisplay,"[Using translation ");
-            strcat(toDisplay, transFileName);
-        }
-        if (opts.mod_player == 0)
-            strcat(toDisplay,"[(mod/xm player discarded)");
-        Display(toDisplay);
+        String toDisplay = GetRuntimeInfo();
+        Display(toDisplay.GetCStr());
         //    Display("shftR: %d  shftG: %d  shftB: %d", _rgb_r_shift_16, _rgb_g_shift_16, _rgb_b_shift_16);
         //    Display("Remaining memory: %d kb",_go32_dpmi_remaining_virtual_memory()/1024);
         //Display("Play char bcd: %d",->GetColorDepth(spriteset[views[playerchar->view].frames[playerchar->loop][playerchar->frame].pic]));
@@ -98,7 +108,7 @@ void script_debug(int cmdd,int dataa) {
     {  // show walkable areas from here
         Bitmap *tempw=BitmapHelper::CreateBitmap(thisroom.walls->GetWidth(),thisroom.walls->GetHeight());
         tempw->Blit(prepare_walkable_areas(-1),0,0,0,0,tempw->GetWidth(),tempw->GetHeight());
-        Bitmap *stretched = BitmapHelper::CreateBitmap(scrnwid, scrnhit);
+        Bitmap *stretched = BitmapHelper::CreateBitmap(play.viewport.GetWidth(), play.viewport.GetHeight());
         stretched->StretchBlt(tempw,
 			RectWH(-offsetx, -offsety, get_fixed_pixel_size(tempw->GetWidth()), get_fixed_pixel_size(tempw->GetHeight())),
 			Common::kBitmap_Transparency);

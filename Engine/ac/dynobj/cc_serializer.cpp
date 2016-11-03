@@ -18,7 +18,8 @@
 #include "ac/dynobj/all_dynamicclasses.h"
 #include "ac/dynobj/all_scriptclasses.h"
 #include "ac/dynobj/scriptfile.h"
-#include "media/audio/audio.h"
+#include "ac/dynobj/scriptuserobject.h"
+#include "ac/game.h"
 #include "debug/debug_log.h"
 
 #undef _WINGDI_ // FIXME later (prevents conflict with BITMAP declaration)
@@ -105,6 +106,10 @@ void AGSDeSerializer::Unserialize(int index, const char *objectType, const char 
     else if (strcmp(objectType, "DialogOptionsRendering") == 0)
     {
         ccDialogOptionsRendering.Unserialize(index, serializedData, dataSize);
+    }
+    else if (strcmp(objectType, "UserObject") == 0) {
+        ScriptUserObject *suo = new ScriptUserObject();
+        suo->Unserialize(index, serializedData, dataSize);
     }
     else if (!unserialize_audio_script_object(index, objectType, serializedData, dataSize)) 
     {

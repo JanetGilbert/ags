@@ -500,7 +500,6 @@
       <SubType>Designer</SubType>
       <DependentUpon>CustomPropertySchemaItemEditor.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\splash.bmp" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\License.txt">
@@ -574,6 +573,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\SelectReligion.resx">
       <DependentUpon>SelectReligion.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\CustomResolutionDialog.resx">
+      <DependentUpon>CustomResolutionDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\SplashPage.resx">
+      <DependentUpon>SplashPage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\StartNewGameWizardPage2.resx">
       <DependentUpon>StartNewGameWizardPage2.cs</DependentUpon>
@@ -669,6 +674,7 @@
     <Content Include="ikpMP3.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="Resources\ags_cup.png" />
     <Content Include="Resources\audio_player-pause.ico" />
     <Content Include="Resources\audio_player-play.ico" />
     <Content Include="Resources\audio_player-stop.ico" />
@@ -759,6 +765,11 @@
     <Compile Include="Audio\IAudioPreviewer.cs" />
     <Compile Include="Audio\IrrklangPlayer.cs" />
     <Compile Include="AutoComplete.cs" />
+    <Compile Include="BuildTargets\BuildTargetBase.cs" />
+    <Compile Include="BuildTargets\BuildTargetDataFile.cs" />
+    <Compile Include="BuildTargets\BuildTargetDebug.cs" />
+    <Compile Include="BuildTargets\BuildTargetLinux.cs" />
+    <Compile Include="BuildTargets\BuildTargetWindows.cs" />
     <Compile Include="ComponentController.cs" />
     <Compile Include="Components\AudioComponent.cs" />
     <Compile Include="Components\BaseComponent.cs" />
@@ -772,6 +783,7 @@
     <Compile Include="Components\StatisticsSenderComponent.cs" />
     <Compile Include="Components\TranslationsComponent.cs" />
     <Compile Include="Components\WelcomeComponent.cs" />
+    <Compile Include="DataFileWriter.cs" />
     <Compile Include="Debugger\DebugController.cs" />
     <Compile Include="Debugger\IEngineCommunication.cs" />
     <Compile Include="Debugger\NamedPipesEngineCommunication.cs" />
@@ -802,6 +814,18 @@
     </Compile>
     <Compile Include="GUI\PropertiesPanel.Designer.cs">
       <DependentUpon>PropertiesPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\CustomResolutionDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\CustomResolutionDialog.Designer.cs">
+      <DependentUpon>CustomResolutionDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\SplashPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\SplashPage.Designer.cs">
+      <DependentUpon>SplashPage.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\ToolStripExtended.cs">
       <SubType>Component</SubType>
@@ -924,6 +948,7 @@
       <DependentUpon>WelcomePane.cs</DependentUpon>
     </Compile>
     <Compile Include="Plugins\EditorPlugin.cs" />
+    <Compile Include="Utils\NativeConstants.cs" />
     <Compile Include="Utils\SpriteUsageChecker.cs" />
     <Compile Include="Tasks.cs" />
     <Compile Include="TextProcessing\BaseTextProcess.cs" />

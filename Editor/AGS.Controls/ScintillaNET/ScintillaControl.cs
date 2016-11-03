@@ -638,21 +638,37 @@ namespace Scintilla
         #endregion
 
         #region Event Dispatch Mechanism
+        
         protected override void WndProc(ref Message m)
-        {
-            if (m.Msg == WinAPI.WM_SETCURSOR)
+        {            
+            //	If we get a destroy message we make this window
+            //	a message-only window so that it doesn't actually
+            //	get destroyed, causing Scintilla to wipe out all
+            //	its settings associated with this window handle.
+            //	We do send a WM_DESTROY message to Scintilla in the
+            //	Dispose() method so that it does clean up its 
+            //	resources when this control is actually done with.
+            //	Solution was taken from QuickSharp.
+            if (m.Msg == WinAPI.WM_DESTROY)
             {
-                base.DefWndProc(ref m); // Make sure message is sent to Scintilla
-                return;
+                if (this.IsHandleCreated)
+                {
+                    WinAPI.SetParent(this.Handle, WinAPI.HWND_MESSAGE);
+                    return;
+                }
             }
+            //	Uh-oh. Code based on undocumented unsupported .NET behavior coming up!
+            //	Windows Forms Sends Notify messages back to the originating
+            //	control ORed with 0x2000. This is way cool becuase we can listen for
+            //	WM_NOTIFY messages originating form our own hWnd (from Scintilla)
             else if ((m.Msg ^ 0x2000) != WinAPI.WM_NOTIFY)
             {
-                //	Uh-oh. Code based on undocumented unsupported .NET behavior coming up!
-                //	Windows Forms Sends Notify messages back to the originating
-                //	control ORed with 0x2000. This is way cool becuase we can listen for
-                //	WM_NOTIFY messages originating form our own hWnd (from Scintilla)
-
                 base.WndProc(ref m);
+                return;
+            }
+            else if (m.Msg == WinAPI.WM_SETCURSOR)
+            {
+                base.DefWndProc(ref m); // Make sure message is sent to Scintilla
                 return;
             }
 

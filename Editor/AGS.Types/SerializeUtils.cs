@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Reflection;
 using System.Text;
 using System.Xml;
@@ -104,6 +105,13 @@ namespace AGS.Types
 						{
 							writer.WriteElementString(prop.Name, ((DateTime)prop.GetValue(obj, null)).ToString("yyyy-MM-dd"));
 						}
+                        // For compatibility with various Custom Resolution beta builds
+                        // TODO: find a generic solution for doing a conversions like this without
+                        // using hard-coded property name (some serialization attribute perhaps)
+                        else if (prop.PropertyType == typeof(Size) && prop.Name == "CustomResolution")
+                        {
+                            writer.WriteElementString(prop.Name, ResolutionToCompatString((Size)prop.GetValue(obj, null)));
+                        }
 						else
 						{
 							writer.WriteElementString(prop.Name, prop.GetValue(obj, null).ToString());
@@ -130,13 +138,21 @@ namespace AGS.Types
                 }
             }
 
+            DeserializeIgnoreAttribute[] ignoreAttributes =
+                (DeserializeIgnoreAttribute[])obj.GetType().GetCustomAttributes(typeof(DeserializeIgnoreAttribute), true);
+
             foreach (XmlNode child in mainNode.ChildNodes)
             {
                 string elementValue = child.InnerText;
                 PropertyInfo prop = obj.GetType().GetProperty(child.Name);
                 if (prop == null)
                 {
-                    throw new InvalidDataException("The property '" + child.Name + "' could not be read. This game may require a newer version of AGS.");
+                    if (ignoreAttributes.Length == 0 ||
+                        !Array.Exists(ignoreAttributes, DeserializeIgnoreAttribute.MatchesPropertyName(child.Name)))
+                    {
+                        throw new InvalidDataException("The property '" + child.Name + "' could not be read. This game may require a newer version of AGS.");
+                    }
+                    continue;
                 }
 
                 // Process any existing value conversions; this helps to upgrade game from older version
@@ -179,7 +195,17 @@ namespace AGS.Types
                     // Must use CultureInfo.InvariantCulture otherwise DateTime.Parse
                     // crashes if the system regional settings short date format has
                     // spaces in it (.NET bug)
-					prop.SetValue(obj, DateTime.Parse(elementValue, CultureInfo.InvariantCulture), null);
+                    DateTime dateTime = DateTime.MinValue;
+                    if(DateTime.TryParseExact(elementValue, "u", CultureInfo.InvariantCulture, DateTimeStyles.None, out dateTime))
+                    {
+                        // Get and set audio files time stamps
+                        prop.SetValue(obj, dateTime, null);
+                    }
+                    else
+                    {
+                        // Release Date timestamp doesn't store time of the day, and as such it ends up in the else-statement
+                        prop.SetValue(obj, DateTime.Parse(elementValue, CultureInfo.InvariantCulture), null);
+                    }					                    
 				}
                 else if (prop.PropertyType.IsEnum)
                 {
@@ -189,6 +215,13 @@ namespace AGS.Types
                 {
                     ConstructorInfo constructor = prop.PropertyType.GetConstructor(new Type[] { typeof(XmlNode) });
                     prop.SetValue(obj, constructor.Invoke(new object[] { child }), null);
+                }
+                // For compatibility with various Custom Resolution beta builds
+                // TODO: find a generic solution for doing a conversions like this without
+                // using hard-coded property name (some serialization attribute perhaps)
+                else if (prop.PropertyType == typeof(Size) && prop.Name == "CustomResolution")
+                {
+                    prop.SetValue(obj, CompatStringToResolution(elementValue), null);
                 }
                 else
                 {
@@ -209,6 +242,17 @@ namespace AGS.Types
         public static int GetAttributeInt(XmlNode node, string attrName)
         {
             return Convert.ToInt32(GetAttributeString(node, attrName));
+        }
+
+        public static Size CompatStringToResolution(String s)
+        {
+            String[] parts = s.Split(',');
+            return new Size(Int32.Parse(parts[0]), Int32.Parse(parts[1]));
+        }
+
+        public static String ResolutionToCompatString(Size size)
+        {
+            return String.Format("{0},{1}", size.Width, size.Height);
         }
     }
 }

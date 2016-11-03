@@ -48,10 +48,8 @@ extern GameState play;
 extern ScriptObject scrObj[MAX_INIT_SPR];
 extern ScriptInvItem scrInv[MAX_INV];
 extern int offsetx, offsety;
-extern int guis_need_update;
 extern ScreenOverlay screenover[MAX_SCREEN_OVERLAYS];
 extern int numscreenover;
-extern int scrnwid,scrnhit;
 
 // defined in character unit
 extern CharacterExtras *charextra;
@@ -337,7 +335,7 @@ void MoveCharacterToObject(int chaa,int obbj) {
         return;
 
     walk_character(chaa,objs[obbj].x+5,objs[obbj].y+6,0, true);
-    do_main_cycle(UNTIL_MOVEEND,(long)&game.chars[chaa].walking);
+    GameLoopUntilEvent(UNTIL_MOVEEND,(long)&game.chars[chaa].walking);
 }
 
 void MoveCharacterToHotspot(int chaa,int hotsp) {
@@ -345,7 +343,7 @@ void MoveCharacterToHotspot(int chaa,int hotsp) {
         quit("!MovecharacterToHotspot: invalid hotspot");
     if (thisroom.hswalkto[hotsp].x<1) return;
     walk_character(chaa,thisroom.hswalkto[hotsp].x,thisroom.hswalkto[hotsp].y,0, true);
-    do_main_cycle(UNTIL_MOVEEND,(long)&game.chars[chaa].walking);
+    GameLoopUntilEvent(UNTIL_MOVEEND,(long)&game.chars[chaa].walking);
 }
 
 void MoveCharacterBlocking(int chaa,int xx,int yy,int direct) {
@@ -361,7 +359,7 @@ void MoveCharacterBlocking(int chaa,int xx,int yy,int direct) {
         MoveCharacterDirect(chaa,xx,yy);
     else
         MoveCharacter(chaa,xx,yy);
-    do_main_cycle(UNTIL_MOVEEND,(long)&game.chars[chaa].walking);
+    GameLoopUntilEvent(UNTIL_MOVEEND,(long)&game.chars[chaa].walking);
 }
 
 int GetCharacterSpeechAnimationDelay(CharacterInfo *cha)
@@ -429,7 +427,7 @@ int AreCharactersColliding(int cchar1,int cchar2) {
 int GetCharacterProperty (int cha, const char *property) {
     if (!is_valid_character(cha))
         quit("!GetCharacterProperty: invalid character");
-    return get_int_property (&game.charProps[cha], property);
+    return get_int_property (game.charProps[cha], play.charProps[cha], property);
 }
 
 void SetCharacterProperty (int who, int flag, int yesorno) {
@@ -440,7 +438,7 @@ void SetCharacterProperty (int who, int flag, int yesorno) {
 }
 
 void GetCharacterPropertyText (int item, const char *property, char *bufer) {
-    get_text_property (&game.charProps[item], property, bufer);
+    get_text_property (game.charProps[item], play.charProps[item], property, bufer);
 }
 
 int GetCharacterAt (int xx, int yy) {
@@ -554,7 +552,7 @@ int DisplaySpeechBackground(int charid, const char*speel) {
         }
     }
 
-    int ovrl=CreateTextOverlay(OVR_AUTOPLACE,charid,scrnwid/2,FONT_SPEECH,
+    int ovrl=CreateTextOverlay(OVR_AUTOPLACE,charid,play.viewport.GetWidth()/2,FONT_SPEECH,
         -game.chars[charid].talkcolor, get_translation(speel));
 
     int scid = find_overlay_of_type(ovrl);

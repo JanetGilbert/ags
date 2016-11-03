@@ -297,6 +297,14 @@ namespace AGS.Editor
             _mainForm.RemovePaneIfExists(pane);
         }
 
+        public IList<ContentDocument> Panes
+        {
+            get
+            {
+                return _mainForm.Panes;
+            }
+        }
+
         public void ShowOutputPanel(CompileMessages errors)
         {
             _mainForm.pnlOutput.ErrorsToList = errors;
@@ -756,6 +764,7 @@ namespace AGS.Editor
                 ScriptFunctionUIEditor.OpenScriptEditor = new ScriptFunctionUIEditor.OpenScriptEditorHandler(ScriptFunctionUIEditor_OpenScriptEditor);
                 ScriptFunctionUIEditor.CreateScriptFunction = new ScriptFunctionUIEditor.CreateScriptFunctionHandler(ScriptFunctionUIEditor_CreateScriptFunction);
                 RoomMessagesUIEditor.ShowRoomMessagesEditor = new RoomMessagesUIEditor.RoomMessagesEditorType(ShowRoomMessageEditorFromPropertyGrid);
+                CustomResolutionUIEditor.CustomResolutionSetGUI = new CustomResolutionUIEditor.CustomResolutionGUIType(ShowCustomResolutionChooserFromPropertyGrid);
             }
         }
 
@@ -809,6 +818,7 @@ namespace AGS.Editor
 		private bool ProcessCommandLineArgumentsAndReturnWhetherToShowWelcomeScreen()
 		{
 			bool compileAndExit = false;
+			bool forceRebuild;
 
 			foreach (string arg in _commandLineArgs)
 			{
@@ -830,7 +840,10 @@ namespace AGS.Editor
 					{
 						if (compileAndExit)
 						{
-							if (!_agsEditor.CompileGame(false, false).HasErrors)
+							forceRebuild = _agsEditor.NeedsRebuildForDebugMode();
+							if (forceRebuild)
+								_agsEditor.SaveGameFiles();
+							if (!_agsEditor.CompileGame(forceRebuild, false).HasErrors)
 							{
 								_batchProcessShutdown = true;
 								this.ExitApplication();
@@ -976,6 +989,7 @@ namespace AGS.Editor
                     _agsEditor.CurrentGame.Settings.SaveGameFolderName = newGameName;
                     _agsEditor.CurrentGame.Settings.GenerateNewGameID();
                     Factory.GUIController.GameNameUpdated();
+                    _agsEditor.CurrentGame.WorkspaceState.LastBuildConfiguration = _agsEditor.CurrentGame.Settings.DebugMode ? BuildConfiguration.Debug : BuildConfiguration.Release;
                     if (_agsEditor.SaveGameFiles())
                     {
                         // Force a rebuild to remove the key in the room
@@ -1332,6 +1346,11 @@ namespace AGS.Editor
                 eventName = eventName.Replace("$$0" + i, game.Cursors[i].Name);
             }
             return eventName;
+        }
+
+        private Size ShowCustomResolutionChooserFromPropertyGrid(Size currentSize)
+        {
+            return CustomResolutionDialog.Show(currentSize);
         }
 
         private void ShowPropertiesEditorFromPropertyGrid(CustomProperties props, object objectThatHasProperties)

@@ -30,15 +30,11 @@
 #include "util/file.h"
 #include "util/stream.h"
 
-using AGS::Common::Bitmap;
-namespace BitmapHelper = AGS::Common::BitmapHelper;
-
-using AGS::Common::Stream;
-namespace File = AGS::Common::File;
+using namespace AGS::Common;
 
 //#define DEBUG_SPRITECACHE
 // [IKM] We have to forward-declare these because their implementations are in the Engine
-extern void write_log(char *);
+extern void write_log(const char *);
 extern void initialize_sprite(int);
 extern void pre_save_sprite(int);
 extern void get_new_size_for_sprite(int, int, int, int &, int &);
@@ -47,12 +43,6 @@ extern int spritewidth[], spriteheight[];
 #define SPRITE_LOCKED -1
 #define START_OF_LIST -1
 #define END_OF_LIST   -1
-// PSP: Use smaller sprite cache due to limited total memory.
-#if defined (PSP_VERSION)
-#define DEFAULTCACHESIZE 5000000
-#else
-#define DEFAULTCACHESIZE 20240000        // max size, in bytes (20 MB)
-#endif
 
 const char *spindexid = "SPRINDEX";
 const char *spindexfilename = "sprindex.dat";
@@ -366,7 +356,7 @@ void SpriteCache::precache(int index)
 
 void SpriteCache::seekToSprite(int index) {
   if (index - 1 != lastLoad)
-      cache_stream->Seek(Common::kSeekBegin, offsets[index]);
+      cache_stream->Seek(offsets[index], kSeekBegin);
 }
 
 int SpriteCache::loadSprite(int index)
@@ -560,9 +550,9 @@ int SpriteCache::saveToFile(const char *filnam, int lastElement, bool compressOu
 
         size_t fileSizeSoFar = output->GetPosition();
         // write the length of the compressed data
-        output->Seek(Common::kSeekBegin, lenloc);
+        output->Seek(lenloc, kSeekBegin);
         output->WriteInt32((fileSizeSoFar - lenloc) - 4);
-        output->Seek(Common::kSeekEnd, 0);
+        output->Seek(0, kSeekEnd);
       }
       else
         output->WriteArray(images[i]->GetDataForWriting(), spritewidths[i] * bpss, spriteheights[i]);
@@ -703,7 +693,7 @@ int SpriteCache::initFile(const char *filnam)
 
   if (vers < 5) {
     // skip the palette
-      cache_stream->Seek(Common::kSeekCurrent, 256 * 3);
+      cache_stream->Seek(256 * 3);
   }
 
   numspri = cache_stream->ReadInt16();
@@ -772,7 +762,7 @@ int SpriteCache::initFile(const char *filnam)
       spriteDataSize = wdd * coldep * htt;
     }
 
-    cache_stream->Seek(Common::kSeekCurrent, spriteDataSize);
+    cache_stream->Seek(spriteDataSize);
   }
 
   sprite0InitialOffset = offsets[0];

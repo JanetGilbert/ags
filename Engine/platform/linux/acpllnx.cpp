@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include <allegro.h>
 #include <xalleg.h>
-#include "gfx/ali3d.h"
 #include "ac/runtime_defines.h"
 #include "platform/base/agsplatformdriver.h"
 #include "plugin/agsplugin.h"

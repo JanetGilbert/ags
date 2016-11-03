@@ -20,7 +20,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "gfx/ali3d.h"
 #include "ac/common.h"
 #include "ac/draw.h"
 #include "ac/gamesetup.h"
@@ -34,12 +33,14 @@
 #include "main/engine.h"
 #include "media/audio/audio.h"
 #include "platform/base/agsplatformdriver.h"
+#include "platform/windows/setup/winsetup.h"
 #include "plugin/agsplugin.h"
 #include "util/file.h"
 #include "util/stream.h"
 #include "util/string_utils.h"
 
 using namespace AGS::Common;
+using namespace AGS::Engine;
 
 extern GameSetupStruct game;
 extern GameSetup usetup;
@@ -90,7 +91,6 @@ extern void dxmedia_pause_video();
 extern void dxmedia_resume_video();
 extern char lastError[200];
 extern SetupReturnValue acwsetup(const ConfigTree &cfg_in, ConfigTree &cfg_out, const String &game_data_dir, const char*, const char*);
-extern void set_icon();
 
 struct AGSWin32 : AGSPlatformDriver {
   AGSWin32();
@@ -125,6 +125,7 @@ struct AGSWin32 : AGSPlatformDriver {
   virtual void RegisterGameWithGameExplorer();
   virtual void UnRegisterGameWithGameExplorer();
   virtual int  ConvertKeycodeToScanCode(int keyCode);
+  virtual void ValidateWindowSize(int &x, int &y, bool borderless) const;
   virtual bool LockMouseToWindow();
   virtual void UnlockMouse();
 
@@ -662,7 +663,7 @@ const char *AGSWin32::GetFileWriteTroubleshootingText()
 const char *AGSWin32::GetGraphicsTroubleshootingText()
 {
   return "\n\nPossible causes:\n"
-    "* your graphics card drivers do not support this resolution. "
+    "* your graphics card drivers do not support requested resolution. "
     "Run the game setup program and try another resolution.\n"
     "* the graphics driver you have selected does not work. Try switching between Direct3D and DirectDraw.\n"
     "* the graphics filter you have selected does not work. Try another filter.\n"
@@ -830,14 +831,12 @@ void AGSWin32::PostAllegroExit() {
 
 SetupReturnValue AGSWin32::RunSetup(const ConfigTree &cfg_in, ConfigTree &cfg_out)
 {
-  const char *engineVersion = get_engine_version();
-  char titleBuffer[200];
-  sprintf(titleBuffer, "Adventure Game Studio v%s setup", engineVersion);
-  return acwsetup(cfg_in, cfg_out, usetup.data_files_dir, titleBuffer, engineVersion);
+  String version_str = String::FromFormat("Adventure Game Studio v%s setup", get_engine_version());
+  return AGS::Engine::WinSetup(cfg_in, cfg_out, usetup.data_files_dir, version_str);
 }
 
 void AGSWin32::SetGameWindowIcon() {
-  set_icon();
+  SetWinIcon();
 }
 
 void AGSWin32::WriteStdOut(const char *fmt, ...) {
@@ -880,6 +879,35 @@ int AGSWin32::ConvertKeycodeToScanCode(int keycode)
   if ((scancode >= 0) && (scancode < 256))
     keycode = hw_to_mycode[scancode];
   return keycode;
+}
+
+void AGSWin32::ValidateWindowSize(int &x, int &y, bool borderless) const
+{
+    // MS Windows DirectDraw and Direct3D renderers do not support a window
+    // which exceeds the height of current desktop resolution
+    RECT rc;
+    SystemParametersInfo(SPI_GETWORKAREA, 0, &rc, 0);
+    int cx = rc.right - rc.left;
+    int cy = rc.bottom - rc.top;
+    if (!borderless)
+    {
+        OSVERSIONINFO OS;
+        OS.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
+        GetVersionEx (&OS);
+
+        NONCLIENTMETRICS ncm;
+        size_t ncm_sz = sizeof(ncm);
+        if (OS.dwMajorVersion < 6)
+            ncm_sz -= sizeof(ncm.iPaddedBorderWidth);
+        ncm.cbSize = ncm_sz;
+        SystemParametersInfo(SPI_GETNONCLIENTMETRICS, ncm_sz, &ncm, 0);
+        int border = ncm.iBorderWidth * 2 + ncm.iCaptionHeight;
+        if (OS.dwMajorVersion >= 6)
+            border += ncm.iPaddedBorderWidth * 2;
+        cy -= border;
+    }
+    x = Math::Clamp(1, cx, x);
+    y = Math::Clamp(1, cy, y);
 }
 
 bool AGSWin32::LockMouseToWindow()

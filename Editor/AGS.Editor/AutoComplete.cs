@@ -80,26 +80,33 @@ namespace AGS.Editor
 
         private static bool IncrementIndexToSkipAnyComments(FastString script, ref int index)
         {
-            if (index < script.Length - 1)
+            while (index < script.Length - 1 && (script[index] == '/'))
             {
-                if ((script[index] == '/') && (script[index + 1] == '/'))
+                if ((script[index + 1] == '/'))
                 {
-                    while ((script[index] != '\r') && (index < script.Length - 1))
-                    {
-                        index++;
-                    }
-                }
-                if ((script[index] == '/') && (script[index + 1] == '*'))
-                {
-                    index = script.IndexOf("*/", index + 2);
+                    index = script.IndexOf('\r', index + 2);
                     if (index < 0)
                     {
-                        index = script.Length - 1;
-                        return true;
+                        index = script.Length;
+                    }
+                }
+                else
+                {
+                    if ((script[index + 1] == '*'))
+                    {
+                        index = script.IndexOf("*/", index + 2);
+                        if (index < 0)
+                        {
+                            index = script.Length;
+                        }
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
             }
-            return false;
+            return index == script.Length;
         }
 
         private static void SkipUntilMatchingClosingBrace(ref FastString script)
@@ -246,8 +253,11 @@ namespace AGS.Editor
                 if (thisWord == "(")
                 {
                     List<ScriptFunction> functionList = functions;
-                    bool isExtenderMethod = AdjustFunctionListForExtenderFunction(structs, ref functionList, ref script);
-                    if (AddFunctionDeclaration(functionList, ref script, thisWord, state, isExtenderMethod))
+                    bool isStaticExtender = script.StartsWith("static ");
+                    bool isExtenderMethod = isStaticExtender || script.StartsWith("this ");
+                    if(isExtenderMethod)
+                        AdjustFunctionListForExtenderFunction(structs, ref functionList, ref script);
+                    if (AddFunctionDeclaration(functionList, ref script, thisWord, state, isExtenderMethod, isStaticExtender, isStaticExtender))
                     {
                         lastFunction = functionList[functionList.Count - 1];
                     }
@@ -331,36 +341,32 @@ namespace AGS.Editor
 			scriptToCache.AutoCompleteData.Populated = true;
         }
 
-        private static bool AdjustFunctionListForExtenderFunction(List<ScriptStruct> structs, ref List<ScriptFunction> functionList, ref FastString script)
+        private static void AdjustFunctionListForExtenderFunction(List<ScriptStruct> structs, ref List<ScriptFunction> functionList, ref FastString script)
         {
-            if (script.StartsWith("this "))
+            GetNextWord(ref script);
+            string structName = GetNextWord(ref script);
+            while ((script.Length > 0) && (script[0] != ',') && (script[0] != ')'))
             {
-                GetNextWord(ref script);
-                string structName = GetNextWord(ref script);
-                while ((script.Length > 0) && (script[0] != ',') && (script[0] != ')'))
-                {
-                    script = script.Substring(1);
-                }
-                if ((script.Length > 0) && script[0] == ',')
-                {
-                    script = script.Substring(1);
-                }
-                script = script.Trim();
-
-                foreach (ScriptStruct struc in structs)
-                {
-                    if (struc.Name == structName)
-                    {
-                        functionList = struc.Functions;
-                        return true;
-                    }
-                }
-                ScriptStruct newStruct = new ScriptStruct(structName);
-                functionList = newStruct.Functions;
-                structs.Add(newStruct);
-                return true;
+                script = script.Substring(1);
             }
-            return false;
+            if ((script.Length > 0) && script[0] == ',')
+            {
+                script = script.Substring(1);
+            }
+            script = script.Trim();
+
+            foreach (ScriptStruct struc in structs)
+            {
+                if (struc.Name == structName)
+                {
+                    functionList = struc.Functions;
+                    return;
+                }
+            }
+            ScriptStruct newStruct = new ScriptStruct(structName);
+            functionList = newStruct.Functions;
+            structs.Add(newStruct);
+            return;
         }
 
         private static ScriptStruct CreateInheritedStruct(ScriptStruct baseStruct, AutoCompleteParserState state)
@@ -460,7 +466,7 @@ namespace AGS.Editor
             return false;
         }
 
-        private static bool AddFunctionDeclaration(List<ScriptFunction> functions, ref FastString script, string thisWord, AutoCompleteParserState state, bool isExtenderMethod)
+        private static bool AddFunctionDeclaration(List<ScriptFunction> functions, ref FastString script, string thisWord, AutoCompleteParserState state, bool isExtenderMethod, bool isStatic, bool isStaticOnly)
         {
             bool succeeded = false;
 
@@ -471,7 +477,6 @@ namespace AGS.Editor
                     string functionName = state.LastWord;
                     string type = state.WordBeforeLast;
                     bool isPointer = false, isNoInherit = false;
-                    bool isStatic = false, isStaticOnly = false;
                     bool isProtected = false;
                     if (type == "::")
                     {

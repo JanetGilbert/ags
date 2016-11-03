@@ -29,13 +29,11 @@
 #include <ddstream.h>	// DirectDraw multimedia stream interfaces
 #include <initguid.h>   // Defines DEFINE_GUID macro and enables GUID initialization
 //#include <dsound.h>
-#include "gfx/ali3d.h"
 #include "gfx/bitmap.h"
 #include "gfx/graphicsdriver.h"
 
-using AGS::Common::Bitmap;
-namespace BitmapHelper = AGS::Common::BitmapHelper;
-using namespace AGS; // FIXME later
+using namespace AGS::Common;
+using namespace AGS::Engine;
 
 //link with the following libraries under project/settings/link...
 //amstrmid.lib quartz.lib strmbase.lib ddraw.lib 
@@ -45,7 +43,7 @@ extern void update_polled_stuff_if_runtime();
 extern int rec_mgetbutton();
 extern int rec_kbhit();
 extern int rec_getch();
-extern void next_iteration();
+extern void NextIteration();
 extern void update_music_volume();
 extern void render_to_screen(Bitmap *toRender, int atx, int aty);
 extern int crossFading, crossFadeStep;
@@ -390,7 +388,7 @@ int dxmedia_play_video(const char* filename, bool pUseSound, int canskip, int st
 
     while (currentlyPaused) ;
 
-    next_iteration();
+    NextIteration();
     RenderToSurface(vscreen);
     //Sleep(0);
     if (rec_kbhit()) {

@@ -14,7 +14,6 @@
 
 #include <stdio.h>
 #include "event.h"
-#include "gfx/ali3d.h"
 #include "ac/common.h"
 #include "ac/draw.h"
 #include "ac/gamesetupstruct.h"
@@ -35,8 +34,8 @@
 #include "gfx/ddb.h"
 #include "gfx/graphicsdriver.h"
 
-using AGS::Common::Bitmap;
-namespace BitmapHelper = Common::BitmapHelper;
+using namespace AGS::Common;
+using namespace AGS::Engine;
 
 extern GameSetupStruct game;
 extern roomstruct thisroom;
@@ -49,7 +48,6 @@ extern AGSPlatformDriver *platform;
 extern Bitmap *temp_virtual;
 extern Bitmap *virtual_screen;
 extern volatile int timerloop;
-extern int scrnwid,scrnhit;
 extern color old_palette[256];
 
 int in_enters_screen=0,done_es_error = 0;
@@ -61,12 +59,13 @@ int numevents=0;
 char*evblockbasename;
 int evblocknum;
 
+int inside_processevent=0;
 int eventClaimed = EVENT_NONE;
 
 char*tsnames[4]={NULL, REP_EXEC_NAME, "on_key_press","on_mouse_click"};
 
 
-int run_claimable_event(char *tsname, bool includeRoom, int numParams, RuntimeScriptValue *params, bool *eventWasClaimed) {
+int run_claimable_event(const char *tsname, bool includeRoom, int numParams, const RuntimeScriptValue *params, bool *eventWasClaimed) {
     *eventWasClaimed = true;
     // Run the room script function, and if it is not claimed,
     // then run the main one
@@ -101,12 +100,9 @@ int run_claimable_event(char *tsname, bool includeRoom, int numParams, RuntimeSc
 }
 
 // runs the global script on_event function
-void run_on_event (int evtype, RuntimeScriptValue &wparam) {
-    if (inside_script) {
-        curscript->run_another("#on_event", RuntimeScriptValue().SetInt32(evtype), wparam);
-    }
-    else
-        gameinst->RunTextScript2IParam("on_event", RuntimeScriptValue().SetInt32(evtype), wparam);
+void run_on_event (int evtype, RuntimeScriptValue &wparam)
+{
+    QueueScriptFunction(kScInstGame, "on_event", 2, RuntimeScriptValue().SetInt32(evtype), wparam);
 }
 
 void run_room_event(int id) {
@@ -146,24 +142,26 @@ void setevent(int evtyp,int ev1,int ev2,int ev3) {
     if (numevents>=MAXEVENTS) quit("too many events posted");
 }
 
+// TODO: this is kind of a hack, which forces event to be processed even if
+// it was fired from insides of other event processing.
+// The proper solution would be to do the event processing overhaul in AGS.
+void force_event(int evtyp,int ev1,int ev2,int ev3)
+{
+    if (inside_processevent)
+        runevent_now(evtyp, ev1, ev2, ev3);
+    else
+        setevent(evtyp, ev1, ev2, ev3);
+}
+
 void process_event(EventHappened*evp) {
     RuntimeScriptValue rval_null;
     if (evp->type==EV_TEXTSCRIPT) {
         int resl=0; ccError=0;
         if (evp->data2 > -1000) {
-            if (inside_script) {
-                char nameToExec[50];
-                sprintf (nameToExec, "!%s", tsnames[evp->data1]);
-                curscript->run_another(nameToExec, RuntimeScriptValue().SetInt32(evp->data2), rval_null /*0*/);
-            }
-            else
-                resl=gameinst->RunTextScriptIParam(tsnames[evp->data1],RuntimeScriptValue().SetInt32(evp->data2));
+            QueueScriptFunction(kScInstGame, tsnames[evp->data1], 1, RuntimeScriptValue().SetInt32(evp->data2));
         }
         else {
-            if (inside_script)
-                curscript->run_another (tsnames[evp->data1], rval_null, rval_null /*0, 0*/);
-            else
-                resl=gameinst->RunTextScript(tsnames[evp->data1]);
+            QueueScriptFunction(kScInstGame, tsnames[evp->data1]);
         }
         //    Display("relt: %d err:%d",resl,scErrorNo);
     }
@@ -171,7 +169,7 @@ void process_event(EventHappened*evp) {
         NewRoom(evp->data1);
     }
     else if (evp->type==EV_RUNEVBLOCK) {
-        NewInteraction*evpt=NULL;
+        Interaction*evpt=NULL;
         InteractionScripts *scriptPtr = NULL;
         char *oldbasename = evblockbasename;
         int   oldblocknum = evblocknum;
@@ -276,12 +274,12 @@ void process_event(EventHappened*evp) {
                 render_to_screen(screen_bmp, 0, 0);
 
                 int boxwid = get_fixed_pixel_size(16);
-                int boxhit = multiply_up_coordinate(GetMaxScreenHeight() / 20);
+                int boxhit = multiply_up_coordinate(BASEHEIGHT / 20);
                 while (boxwid < screen_bmp->GetWidth()) {
                     timerloop = 0;
                     boxwid += get_fixed_pixel_size(16);
-                    boxhit += multiply_up_coordinate(GetMaxScreenHeight() / 20);
-                    int lxp = scrnwid / 2 - boxwid / 2, lyp = scrnhit / 2 - boxhit / 2;
+                    boxhit += multiply_up_coordinate(BASEHEIGHT / 20);
+                    int lxp = play.viewport.GetWidth() / 2 - boxwid / 2, lyp = play.viewport.GetHeight() / 2 - boxhit / 2;
                     gfxDriver->Vsync();
                     screen_bmp->Blit(virtual_screen, lxp, lyp, lxp, lyp,
                         boxwid, boxhit);
@@ -344,8 +342,8 @@ void process_event(EventHappened*evp) {
                 }
                 // do the dissolving
                 int maskCol = temp_virtual->GetMaskColor();
-                for (bb=0;bb<scrnwid;bb+=4) {
-                    for (cc=0;cc<scrnhit;cc+=4) {
+                for (bb=0;bb<play.viewport.GetWidth();bb+=4) {
+                    for (cc=0;cc<play.viewport.GetHeight();cc+=4) {
                         temp_virtual->PutPixel(bb+pattern[aa]/4, cc+pattern[aa]%4, maskCol);
                     }
                 }
@@ -382,7 +380,6 @@ void runevent_now (int evtyp, int ev1, int ev2, int ev3) {
     process_event(&evh);
 }
 
-int inside_processevent=0;
 void processallevents(int numev,EventHappened*evlist) {
     int dd;
 

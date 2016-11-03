@@ -27,10 +27,6 @@
 namespace AGS { namespace Common { class Stream; } }
 using namespace AGS; // FIXME later
 
-#ifdef DJGPP
-#define DOS_VERSION
-#endif
-
 enum eScriptSystemOSID {
     eOS_DOS = 1,
     eOS_Win = 2,
@@ -88,6 +84,8 @@ struct AGSPlatformDriver
     virtual void RegisterGameWithGameExplorer();
     virtual void UnRegisterGameWithGameExplorer();
     virtual int  ConvertKeycodeToScanCode(int keyCode);
+    // Adjust window size to ensure it is in the supported limits
+    virtual void ValidateWindowSize(int &x, int &y, bool borderless) const {}
 
     virtual int  InitializeCDPlayer() = 0;  // return 0 on success
     virtual int  CDPlayerCommand(int cmdd, int datt) = 0;

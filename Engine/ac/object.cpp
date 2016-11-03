@@ -13,7 +13,6 @@
 //=============================================================================
 
 #include "ac/object.h"
-#include "gfx/ali3d.h"
 #include "ac/common.h"
 #include "ac/gamesetupstruct.h"
 #include "ac/draw.h"
@@ -33,11 +32,12 @@
 #include "ac/route_finder.h"
 #include "gfx/graphicsdriver.h"
 #include "gfx/bitmap.h"
-#include "gfx/gfx_util.h"
+#include "gfx/gfx_def.h"
 #include "script/runtimescriptvalue.h"
 #include "ac/dynobj/cc_object.h"
+#include "main/graphics_mode.h"
 
-using AGS::Common::Bitmap;
+using namespace AGS::Common;
 
 
 extern ScriptObject scrObj[MAX_INIT_SPR];
@@ -45,7 +45,6 @@ extern RoomStatus*croom;
 extern RoomObject*objs;
 extern roomstruct thisroom;
 extern ObjectCache objcache[MAX_INIT_SPR];
-extern int final_scrn_wid,final_scrn_hit,final_col_dep;
 extern MoveList *mls;
 extern GameSetupStruct game;
 extern Bitmap *walkable_areas_temp;
@@ -90,7 +89,7 @@ int Object_GetTransparency(ScriptObject *objj) {
     if (!is_valid_object(objj->id))
         quit("!Object.Transparent: invalid object number specified");
 
-    return GfxUtil::LegacyTrans255ToTrans100(objs[objj->id].transparent);
+    return GfxDef::LegacyTrans255ToTrans100(objs[objj->id].transparent);
 }
 
 void Object_SetBaseline(ScriptObject *objj, int basel) {
@@ -195,6 +194,17 @@ int Object_GetMoving(ScriptObject *objj) {
     return IsObjectMoving(objj->id);
 }
 
+void Object_SetLightLevel(ScriptObject *objj, int light_level)
+{
+    int obj = objj->id;
+    if (!is_valid_object(obj))
+        quit("!SetObjectTint: invalid object number specified");
+
+    objs[obj].tint_light = light_level;
+    objs[obj].flags &= ~OBJF_HASTINT;
+    objs[obj].flags |= OBJF_HASLIGHT;
+}
+
 void Object_SetPosition(ScriptObject *objj, int xx, int yy) {
     SetObjectPosition(objj->id, xx, yy);
 }
@@ -218,6 +228,15 @@ const char* Object_GetName_New(ScriptObject *objj) {
     return CreateNewScriptString(get_translation(thisroom.objectnames[objj->id]));
 }
 
+bool Object_IsInteractionAvailable(ScriptObject *oobj, int mood) {
+
+    play.check_interaction_only = 1;
+    RunObjectInteraction(oobj->id, mood);
+    int ciwas = play.check_interaction_only;
+    play.check_interaction_only = 0;
+    return (ciwas == 2);
+}
+
 void Object_Move(ScriptObject *objj, int x, int y, int speed, int blocking, int direct) {
     if ((direct == ANYWHERE) || (direct == 1))
         direct = 1;
@@ -229,7 +248,7 @@ void Object_Move(ScriptObject *objj, int x, int y, int speed, int blocking, int 
     move_object(objj->id, x, y, speed, direct);
 
     if ((blocking == BLOCKING) || (blocking == 1))
-        do_main_cycle(UNTIL_SHORTIS0,(long)&objs[objj->id].moving);
+        GameLoopUntilEvent(UNTIL_SHORTIS0,(long)&objs[objj->id].moving);
     else if ((blocking != IN_BACKGROUND) && (blocking != 0))
         quit("Object.Move: invalid BLOCKING paramter");
 }
@@ -336,7 +355,7 @@ void move_object(int objj,int tox,int toy,int spee,int ignwal) {
     set_route_move_speed(spee, spee);
     set_color_depth(8);
     int mslot=find_route(objX, objY, tox, toy, prepare_walkable_areas(-1), objj+1, 1, ignwal);
-    set_color_depth(final_col_dep);
+    set_color_depth(ScreenResolution.ColorDepth);
     if (mslot>0) {
         objs[objj].moving = mslot;
         mls[mslot].direct = ignwal;
@@ -360,8 +379,20 @@ int Object_GetProperty (ScriptObject *objj, const char *property) {
 void Object_GetPropertyText(ScriptObject *objj, const char *property, char *bufer) {
     GetObjectPropertyText(objj->id, property, bufer);
 }
-const char* Object_GetTextProperty(ScriptObject *objj, const char *property) {
-    return get_text_property_dynamic_string(&thisroom.objProps[objj->id], property);
+
+const char* Object_GetTextProperty(ScriptObject *objj, const char *property)
+{
+    return get_text_property_dynamic_string(thisroom.objProps[objj->id], croom->objProps[objj->id], property);
+}
+
+bool Object_SetProperty(ScriptObject *objj, const char *property, int value)
+{
+    return set_int_property(croom->objProps[objj->id], property, value);
+}
+
+bool Object_SetTextProperty(ScriptObject *objj, const char *property, const char *value)
+{
+    return set_text_property(croom->objProps[objj->id], property, value);
 }
 
 void get_object_blocking_rect(int objid, int *x1, int *y1, int *width, int *y2) {
@@ -500,10 +531,25 @@ RuntimeScriptValue Sc_Object_GetTextProperty(void *self, const RuntimeScriptValu
     API_OBJCALL_OBJ_POBJ(ScriptObject, const char, myScriptStringImpl, Object_GetTextProperty, const char);
 }
 
+RuntimeScriptValue Sc_Object_SetProperty(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_BOOL_POBJ_PINT(ScriptObject, Object_SetProperty, const char);
+}
+
+RuntimeScriptValue Sc_Object_SetTextProperty(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_BOOL_POBJ2(ScriptObject, Object_SetTextProperty, const char, const char);
+}
+
 // void (ScriptObject *objj)
 RuntimeScriptValue Sc_Object_MergeIntoBackground(void *self, const RuntimeScriptValue *params, int32_t param_count)
 {
     API_OBJCALL_VOID(ScriptObject, Object_MergeIntoBackground);
+}
+
+RuntimeScriptValue Sc_Object_IsInteractionAvailable(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_BOOL_PINT(ScriptObject, Object_IsInteractionAvailable);
 }
 
 // void (ScriptObject *objj, int x, int y, int speed, int blocking, int direct)
@@ -522,6 +568,11 @@ RuntimeScriptValue Sc_Object_RemoveTint(void *self, const RuntimeScriptValue *pa
 RuntimeScriptValue Sc_Object_RunInteraction(void *self, const RuntimeScriptValue *params, int32_t param_count)
 {
     API_OBJCALL_VOID_PINT(ScriptObject, Object_RunInteraction);
+}
+
+RuntimeScriptValue Sc_Object_SetLightLevel(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT(ScriptObject, Object_SetLightLevel);
 }
 
 // void (ScriptObject *objj, int xx, int yy)
@@ -756,10 +807,14 @@ void RegisterObjectAPI()
     ccAddExternalObjectFunction("Object::GetProperty^1",            Sc_Object_GetProperty);
     ccAddExternalObjectFunction("Object::GetPropertyText^2",        Sc_Object_GetPropertyText);
     ccAddExternalObjectFunction("Object::GetTextProperty^1",        Sc_Object_GetTextProperty);
+    ccAddExternalObjectFunction("Object::SetProperty^2",            Sc_Object_SetProperty);
+    ccAddExternalObjectFunction("Object::SetTextProperty^2",        Sc_Object_SetTextProperty);
+    ccAddExternalObjectFunction("Object::IsInteractionAvailable^1", Sc_Object_IsInteractionAvailable);
     ccAddExternalObjectFunction("Object::MergeIntoBackground^0",    Sc_Object_MergeIntoBackground);
     ccAddExternalObjectFunction("Object::Move^5",                   Sc_Object_Move);
     ccAddExternalObjectFunction("Object::RemoveTint^0",             Sc_Object_RemoveTint);
     ccAddExternalObjectFunction("Object::RunInteraction^1",         Sc_Object_RunInteraction);
+    ccAddExternalObjectFunction("Object::SetLightLevel^1",          Sc_Object_SetLightLevel);
     ccAddExternalObjectFunction("Object::SetPosition^2",            Sc_Object_SetPosition);
     ccAddExternalObjectFunction("Object::SetView^3",                Sc_Object_SetView);
     ccAddExternalObjectFunction("Object::StopAnimating^0",          Sc_Object_StopAnimating);

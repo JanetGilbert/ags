@@ -13,15 +13,16 @@
 //=============================================================================
 
 #include "ac/mouse.h"
-#include "gfx/ali3d.h"
 #include "ac/common.h"
 #include "ac/characterinfo.h"
 #include "ac/draw.h"
 #include "ac/dynobj/scriptmouse.h"
+#include "ac/dynobj/scriptsystem.h"
 #include "ac/gamesetup.h"
 #include "ac/gamesetupstruct.h"
 #include "ac/gamestate.h"
 #include "ac/global_mouse.h"
+#include "ac/global_plugin.h"
 #include "ac/global_screen.h"
 #include "ac/viewframe.h"
 #include "debug/debug_log.h"
@@ -30,19 +31,19 @@
 #include "device/mousew32.h"
 #include "ac/spritecache.h"
 #include "gfx/graphicsdriver.h"
+#include "gfx/gfxfilter.h"
+#include "main/graphics_mode.h"
 
-using AGS::Common::Bitmap;
-namespace BitmapHelper = AGS::Common::BitmapHelper;
+using namespace AGS::Common;
+using namespace AGS::Engine;
 
-extern GameSetup usetup;
 extern GameSetupStruct game;
 extern GameState play;
+extern ScriptSystem scsystem;
 extern Bitmap *mousecurs[MAXCURSORS];
 extern int spritewidth[MAX_SPRITES],spriteheight[MAX_SPRITES];
 extern SpriteCache spriteset;
-extern int guis_need_update;
 extern CharacterInfo*playerchar;
-extern GUIMain*guis;
 extern IGraphicsDriver *gfxDriver;
 
 extern "C" void ios_set_mouse(int x, int y); //JG
@@ -89,7 +90,7 @@ void SetMouseBounds (int x1, int y1, int x2, int y2) {
     play.mboundx2 = x2;
     play.mboundy1 = y1;
     play.mboundy2 = y2;
-    filter->SetMouseLimit(x1,y1,x2,y2);
+    Mouse::SetMoveLimit(Rect(x1, y1, x2, y2));
 }
 
 // mouse cursor functions:
@@ -230,9 +231,9 @@ void enable_cursor_mode(int modd) {
     int uu,ww;
 
     for (uu=0;uu<game.numgui;uu++) {
-        for (ww=0;ww<guis[uu].numobjs;ww++) {
-            if ((guis[uu].objrefptr[ww] >> 16)!=GOBJ_BUTTON) continue;
-            GUIButton*gbpt=(GUIButton*)guis[uu].objs[ww];
+        for (ww=0;ww<guis[uu].ControlCount;ww++) {
+            if ((guis[uu].CtrlRefs[ww] >> 16)!=kGUIButton) continue;
+            GUIButton*gbpt=(GUIButton*)guis[uu].Controls[ww];
             if (gbpt->leftclick!=IBACT_SETMODE) continue;
             if (gbpt->lclickdata!=modd) continue;
             gbpt->Enable();
@@ -247,9 +248,9 @@ void disable_cursor_mode(int modd) {
     int uu,ww;
 
     for (uu=0;uu<game.numgui;uu++) {
-        for (ww=0;ww<guis[uu].numobjs;ww++) {
-            if ((guis[uu].objrefptr[ww] >> 16)!=GOBJ_BUTTON) continue;
-            GUIButton*gbpt=(GUIButton*)guis[uu].objs[ww];
+        for (ww=0;ww<guis[uu].ControlCount;ww++) {
+            if ((guis[uu].CtrlRefs[ww] >> 16)!=kGUIButton) continue;
+            GUIButton*gbpt=(GUIButton*)guis[uu].Controls[ww];
             if (gbpt->leftclick!=IBACT_SETMODE) continue;
             if (gbpt->lclickdata!=modd) continue;
             gbpt->Disable();
@@ -272,11 +273,11 @@ void SetMousePosition (int newx, int newy) {
         newy = 0;
     if (newx >= BASEWIDTH)
         newx = BASEWIDTH - 1;
-    if (newy >= GetMaxScreenHeight())
-        newy = GetMaxScreenHeight() - 1;
+    if (newy >= BASEHEIGHT)
+        newy = BASEHEIGHT - 1;
 
     multiply_up_coordinates(&newx, &newy);
-    filter->SetMousePosition(newx, newy);
+    Mouse::SetPosition(Point(newx, newy));
     ios_set_mouse(newx, newy); //JG - You need to reset the raw coordinates for the change to take effect.
     RefreshMouse();
 }
@@ -345,7 +346,7 @@ void set_new_cursor_graphic (int spriteslot) {
     {
         if (blank_mouse_cursor == NULL)
         {
-            blank_mouse_cursor = BitmapHelper::CreateTransparentBitmap(1, 1, final_col_dep);
+            blank_mouse_cursor = BitmapHelper::CreateTransparentBitmap(1, 1, ScreenResolution.ColorDepth);
         }
         mousecurs[0] = blank_mouse_cursor;
     }
@@ -505,6 +506,10 @@ RuntimeScriptValue Sc_Mouse_SetVisible(const RuntimeScriptValue *params, int32_t
     API_SCALL_VOID_PINT(Mouse_SetVisible);
 }
 
+RuntimeScriptValue Sc_Mouse_Click(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_VOID_PINT(PluginSimulateMouseClick);
+}
 
 RuntimeScriptValue Sc_Mouse_GetControlEnabled(const RuntimeScriptValue *params, int32_t param_count)
 {
@@ -528,6 +533,7 @@ void RegisterMouseAPI()
     ccAddExternalStaticFunction("Mouse::ChangeModeGraphic^2",       Sc_ChangeCursorGraphic);
     ccAddExternalStaticFunction("Mouse::ChangeModeHotspot^3",       Sc_ChangeCursorHotspot);
     ccAddExternalStaticFunction("Mouse::ChangeModeView^2",          Sc_Mouse_ChangeModeView);
+    ccAddExternalStaticFunction("Mouse::Click^1",                   Sc_Mouse_Click);
     ccAddExternalStaticFunction("Mouse::DisableMode^1",             Sc_disable_cursor_mode);
     ccAddExternalStaticFunction("Mouse::EnableMode^1",              Sc_enable_cursor_mode);
     ccAddExternalStaticFunction("Mouse::GetModeGraphic^1",          Sc_Mouse_GetModeGraphic);

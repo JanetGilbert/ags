@@ -5,8 +5,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Drawing.Text;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Text;
 using System.Windows.Forms;
 
@@ -83,7 +86,7 @@ namespace AGS.Editor
 
         public static void EnsureStandardSubFoldersExist()
         {
-            string[] foldersToCreate = { "Speech", AudioClip.AUDIO_CACHE_DIRECTORY, "Compiled" };
+            List<string> foldersToCreate = new List<string> { "Speech", AudioClip.AUDIO_CACHE_DIRECTORY, "Compiled" };
             foreach (string folderName in foldersToCreate)
             {
                 if (!Directory.Exists(folderName))
@@ -414,6 +417,189 @@ namespace AGS.Editor
             DestroyIcon(UnmanagedIconHandle);
 
             return icon;
+        }
+
+        /// <summary>
+        /// Sets security permissions for a specific file.
+        /// </summary>
+        public static void SetFileAccess(string fileName, SecurityIdentifier sid, FileSystemRights rights, AccessControlType type)
+        {
+            try
+            {
+                FileSecurity fsec = File.GetAccessControl(fileName);
+                fsec.AddAccessRule(new FileSystemAccessRule(sid, rights, type));
+                File.SetAccessControl(fileName, fsec);
+            }
+            catch (UnauthorizedAccessException)
+            {
+            }
+        }
+
+        public static void SetDirectoryFilesAccess(string directory)
+        {
+            SetDirectoryFilesAccess(directory, new SecurityIdentifier(WellKnownSidType.WorldSid, null));
+        }
+
+        public static void SetDirectoryFilesAccess(string directory, SecurityIdentifier sid)
+        {
+            SetDirectoryFilesAccess(directory, sid, FileSystemRights.Modify);
+        }
+
+        public static void SetDirectoryFilesAccess(string directory, SecurityIdentifier sid, FileSystemRights rights)
+        {
+            SetDirectoryFilesAccess(directory, sid, rights, AccessControlType.Allow);
+        }
+
+        /// <summary>
+        /// Sets security permissions for all files in a directory.
+        /// </summary>
+        public static void SetDirectoryFilesAccess(string directory, SecurityIdentifier sid, FileSystemRights rights, AccessControlType type)
+        {
+            try
+            {
+                // first we will attempt to take ownership of the file
+                // this ensures (if successful) that all users can change security
+                // permissions for the file without admin access
+                ProcessStartInfo si = new ProcessStartInfo("cmd.exe");
+                si.RedirectStandardInput = false;
+                si.RedirectStandardOutput = false;
+                si.RedirectStandardError = false;
+                si.UseShellExecute = false;
+                si.Arguments = string.Format("/c takeown /f \"{0}\" /r /d y", directory);
+                si.CreateNoWindow = true;
+                si.WindowStyle = ProcessWindowStyle.Hidden;
+                if (Utilities.IsMonoRunning())
+                {
+                    si.FileName = "chown";
+                    si.Arguments = string.Format("-R $USER:$USER \"{0}\"", directory);
+                }
+                Process process = Process.Start(si);
+                bool result = (process != null);
+                if (result)
+                {
+                    process.EnableRaisingEvents = true;
+                    process.WaitForExit();
+                    if (process.ExitCode != 0) return;
+                    process.Close();
+                    // after successfully gaining ownership, parse each file in the
+                    // directory (recursively) and update its access rights
+                    foreach (string filename in Utilities.GetDirectoryFileList(directory, "*", SearchOption.AllDirectories))
+                    {
+                        Utilities.SetFileAccess(filename, sid, rights, type);
+                    }
+                }
+            }
+            catch (UnauthorizedAccessException)
+            {
+            }
+        }
+
+        public static bool IsWindowsXPOrHigher()
+        {
+            OperatingSystem os = Environment.OSVersion;
+            // Windows XP reports platform as Win32NT and version number >= 5.1
+            return ((os.Platform == PlatformID.Win32NT) && ((os.Version.Major > 5) || ((os.Version.Major == 5) && (os.Version.Minor == 1))));
+        }
+
+        public static bool IsWindowsVistaOrHigher()
+        {
+            OperatingSystem os = Environment.OSVersion;
+            // Windows Vista reports platform as Win32NT and version number >= 6
+            return ((os.Platform == PlatformID.Win32NT) && (os.Version.Major >= 6));
+        }
+
+        public static bool CreateHardLink(string destFileName, string sourceFileName)
+        {
+            return CreateHardLink(destFileName, sourceFileName, false);
+        }
+
+        public static bool CreateHardLink(string destFileName, string sourceFileName, bool overwrite)
+        {
+            if (File.Exists(destFileName))
+            {
+                if (overwrite) File.Delete(destFileName);
+                else return false;
+            }
+            char[] invalidFileNameChars = Path.GetInvalidFileNameChars();
+            if (Path.GetFileName(destFileName).IndexOfAny(invalidFileNameChars) != -1)
+            {
+                throw new ArgumentException("Cannot create hard link! Invalid destination file name. (" + destFileName + ")");
+            }
+            if (Path.GetFileName(sourceFileName).IndexOfAny(invalidFileNameChars) != -1)
+            {
+                throw new ArgumentException("Cannot create hard link! Invalid source file name. (" + sourceFileName + ")");
+            }
+            if (!File.Exists(sourceFileName))
+            {
+                throw new FileNotFoundException("Cannot create hard link! Source file does not exist. (" + sourceFileName + ")");
+            }
+            ProcessStartInfo si = new ProcessStartInfo("cmd.exe");
+            si.RedirectStandardInput = false;
+            si.RedirectStandardOutput = false;
+            si.RedirectStandardError = false;
+            si.UseShellExecute = false;
+            si.Arguments = string.Format("/c mklink /h \"{0}\" \"{1}\"", destFileName, sourceFileName);
+            si.CreateNoWindow = true;
+            si.WindowStyle = ProcessWindowStyle.Hidden;
+            if ((!IsWindowsVistaOrHigher()) && (IsWindowsXPOrHigher())) // running Windows XP
+            {
+                si.Arguments = string.Format("/c fsutil hardlink create \"{0}\" \"{1}\"", destFileName, sourceFileName);
+            }
+            if (IsMonoRunning())
+            {
+                si.FileName = "ln";
+                si.Arguments = string.Format("\"{0}\" \"{1}\"", sourceFileName, destFileName);
+            }
+            Process process = Process.Start(si);
+            bool result = (process != null);
+            if (result)
+            {
+                process.EnableRaisingEvents = true;
+                process.WaitForExit();
+                if (process.ExitCode != 0) return false;
+                process.Close();
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Iterates given array of font family names and return the first
+        /// FontFamily object that is installed in the system. If none was
+        /// found, returns generic Sans-Serif system font.
+        /// </summary>
+        /// <param name="fontNames"></param>
+        /// <returns></returns>
+        public static FontFamily FindExistingFont(string[] fontNames)
+        {
+            FontFamily fontfam = null;
+            foreach (string name in fontNames)
+            {
+                try
+                {
+                    fontfam = new FontFamily(name);
+                }
+                catch (System.ArgumentException)
+                {
+                    continue;
+                }
+                if (fontfam.Name == name)
+                    return fontfam;
+            }
+            return new FontFamily(GenericFontFamilies.SansSerif);
+        }
+
+        /// <summary>
+        /// Returns relation between current graphics resolution and default DpiY (96.0).
+        /// Can be used when arranging controls and resizing forms.
+        /// </summary>
+        /// <param name="control"></param>
+        /// <returns></returns>
+        public static float CalculateGraphicsProportion(Control control)
+        {
+            Graphics graphics = control.CreateGraphics();
+            float proportion = (float)(graphics.DpiY / 96.0);
+            graphics.Dispose();
+            return proportion;
         }
     }
 }

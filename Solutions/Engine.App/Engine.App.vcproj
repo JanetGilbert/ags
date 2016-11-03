@@ -767,6 +767,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\Engine\ac\dynobj\scriptuserobject.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\Engine\ac\dynobj\scriptviewframe.cpp"
 						>
 					</File>
@@ -812,7 +816,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\Engine\gfx\gfxfilter.cpp"
+					RelativePath="..\..\Engine\gfx\gfxdriverbase.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Engine\gfx\gfxdriverfactory.cpp"
 					>
 				</File>
 				<File
@@ -828,19 +836,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\Engine\gfx\gfxfilter_hq2x.cpp"
+					RelativePath="..\..\Engine\gfx\gfxfilter_hqx.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\Engine\gfx\gfxfilter_hq3x.cpp"
+					RelativePath="..\..\Engine\gfx\gfxfilter_ogl.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\Engine\gfx\gfxfilter_scaling.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\gfx\gfxfilter_scalingallegro.cpp"
 					>
 				</File>
 			</Filter>
@@ -1040,6 +1044,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Engine\main\engine_setup.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Engine\main\game_file.cpp"
 					>
 				</File>
@@ -1064,7 +1072,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\Engine\main\udpate.cpp"
+					RelativePath="..\..\Engine\main\update.cpp"
 					>
 				</File>
 				<File
@@ -1108,7 +1116,7 @@
 				Name="setup"
 				>
 				<File
-					RelativePath="..\..\Engine\setup\acwsetup.cpp"
+					RelativePath="..\..\Engine\platform\windows\setup\winsetup.cpp"
 					>
 				</File>
 			</Filter>
@@ -1145,6 +1153,14 @@
 				</File>
 				<File
 					RelativePath="..\..\Engine\test\test_inifile.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Engine\test\test_math.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Engine\test\test_memory.cpp"
 					>
 				</File>
 				<File
@@ -1701,6 +1717,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\Engine\ac\dynobj\scriptuserobject.h"
+						>
+					</File>
+					<File
 						RelativePath="..\..\Engine\ac\dynobj\scriptviewframe.h"
 						>
 					</File>
@@ -1738,7 +1758,19 @@
 				Name="gfx"
 				>
 				<File
-					RelativePath="..\..\Engine\gfx\ali3d.h"
+					RelativePath="..\..\Engine\platform\windows\gfx\ali3dd3d.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Engine\gfx\ali3dexception.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Engine\gfx\ali3dogl.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Engine\gfx\ali3dsw.h"
 					>
 				</File>
 				<File
@@ -1751,6 +1783,22 @@
 				</File>
 				<File
 					RelativePath="..\..\Engine\gfx\gfx_util.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Engine\gfx\gfxdefines.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Engine\gfx\gfxdriverbase.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Engine\gfx\gfxdriverfactory.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Engine\gfx\gfxdriverfactorybase.h"
 					>
 				</File>
 				<File
@@ -1770,27 +1818,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\Engine\gfx\gfxfilter_hq2x.h"
+					RelativePath="..\..\Engine\gfx\gfxfilter_hqx.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\Engine\gfx\gfxfilter_hq3x.h"
+					RelativePath="..\..\Engine\gfx\gfxfilter_ogl.h"
 					>
 				</File>
 				<File
 					RelativePath="..\..\Engine\gfx\gfxfilter_scaling.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\gfx\gfxfilter_scalingallegro.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\gfx\gfxfilterdefines.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\gfx\gfxfilterhelpers.h"
 					>
 				</File>
 				<File
@@ -1994,6 +2030,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Engine\main\engine_setup.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Engine\main\game_file.h"
 					>
 				</File>
@@ -2109,14 +2149,6 @@
 					RelativePath="..\..\Engine\test\test_all.h"
 					>
 				</File>
-				<File
-					RelativePath="..\..\Engine\test\test_file.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Engine\test\test_string.h"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="util"
@@ -2154,6 +2186,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Engine\util\scaling.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Engine\util\thread.h"
 					>
 				</File>
@@ -2167,6 +2203,14 @@
 				</File>
 				<File
 					RelativePath="..\..\Engine\util\thread_windows.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="setup"
+				>
+				<File
+					RelativePath="..\..\Engine\platform\windows\setup\winsetup.h"
 					>
 				</File>
 			</Filter>

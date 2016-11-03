@@ -28,6 +28,16 @@
 #define NULL 0
 #endif
 
+#ifndef FORCEINLINE
+#if defined(_MSC_VER)
+#define FORCEINLINE __forceinline
+#elif defined (__GNUC__)
+#define FORCEINLINE inline __attribute__((__always_inline__))
+#else
+#define FORCEINLINE inline
+#endif
+#endif
+
 #include <stddef.h>
 #if !defined (WINDOWS_VERSION)
 #include <stdint.h>
@@ -66,5 +76,12 @@
 
 #define fixed_t int32_t // fixed point type
 #define color_t int32_t
+
+// TODO: use distinct fixed point class
+enum
+{
+    kShift    = 16,
+    kUnit     = 1 << kShift
+};
 
 #endif // __AGS_CN_CORE__TYPES_H

@@ -22,10 +22,7 @@
 #include "core/assetmanager.h"
 #include "gfx/bitmap.h"
 
-using AGS::Common::Bitmap;
-namespace BitmapHelper = AGS::Common::BitmapHelper;
-
-using AGS::Common::Stream;
+using namespace AGS::Common;
 
 Bitmap *backups[5];
 int _acroom_bpp = 1;  // bytes per pixel of currently loading room
@@ -62,15 +59,15 @@ roomstruct::roomstruct() {
         walk_area_bottom[i] = -1;
     }
     for (i = 0; i < MAX_HOTSPOTS; i++) {
-        intrHotspot[i] = new NewInteraction();
+        intrHotspot[i] = new Interaction();
         hotspotnames[i] = NULL;
         hotspotScriptNames[i][0] = 0;
     }
     for (i = 0; i < MAX_INIT_SPR; i++)
-        intrObject[i] = new NewInteraction();
+        intrObject[i] = new Interaction();
     for (i = 0; i < MAX_REGIONS; i++)
-        intrRegion[i] = new NewInteraction();
-    intrRoom = new NewInteraction();
+        intrRegion[i] = new Interaction();
+    intrRoom = new Interaction();
     gameId = 0;
     numRegions = 0;
     hotspotScripts = NULL;
@@ -133,6 +130,34 @@ void roomstruct::freescripts()
         delete[] regionScripts;
         regionScripts = NULL;
     }
+}
+
+bool roomstruct::has_region_lightlevel(int id) const
+{
+    if (id >= 0 && id < MAX_REGIONS)
+        return regionTintLevel[id] == 0;
+    return false;
+}
+
+bool roomstruct::has_region_tint(int id) const
+{
+    if (id >= 0 && id < MAX_REGIONS)
+        return regionTintLevel[id] != 0;
+    return false;
+}
+
+int roomstruct::get_region_lightlevel(int id) const
+{
+    if (id >= 0 && id < MAX_REGIONS)
+        return has_region_lightlevel(id) ? regionLightLevel[id] : 0;
+    return 0;
+}
+
+int roomstruct::get_region_tintluminance(int id) const
+{
+    if (id >= 0 && id < MAX_REGIONS)
+        return has_region_tint(id) ? (regionLightLevel[id] * 10) / 25 : 0;
+    return 0;
 }
 
 void room_file_header::ReadFromFile(Stream *in)
@@ -256,7 +281,7 @@ void load_main_block(roomstruct *rstruc, const char *files, Stream *in, room_fil
 
       for (int iteratorCount = 0; iteratorCount < rstruc->numLocalVars; ++iteratorCount)
       {
-          rstruc->localvars[iteratorCount].ReadFromFile(in);
+          rstruc->localvars[iteratorCount].Read(in);
       }
     }
   }
@@ -277,9 +302,9 @@ void load_main_block(roomstruct *rstruc, const char *files, Stream *in, room_fil
 	  if (rfh.version < kRoomVersion_300a) 
 	  {
 		  if (f < rstruc->numhotspots)
-			rstruc->intrHotspot[f] = deserialize_new_interaction (in);
+			rstruc->intrHotspot[f] = Interaction::CreateFromStream(in);
 		  else
-			rstruc->intrHotspot[f] = new NewInteraction();
+			rstruc->intrHotspot[f] = new Interaction();
 	  }
     }
 
@@ -292,22 +317,22 @@ void load_main_block(roomstruct *rstruc, const char *files, Stream *in, room_fil
 	  if (rfh.version < kRoomVersion_300a) 
 	  {
 		  if (f < rstruc->numsprs)
-			rstruc->intrObject[f] = deserialize_new_interaction (in);
+			rstruc->intrObject[f] = Interaction::CreateFromStream(in);
 		  else
-			rstruc->intrObject[f] = new NewInteraction();
+			rstruc->intrObject[f] = new Interaction();
 	  }
     }
 
 	if (rfh.version < kRoomVersion_300a) 
 	{
 	    delete rstruc->intrRoom;
-		rstruc->intrRoom = deserialize_new_interaction (in);
+		rstruc->intrRoom = Interaction::CreateFromStream(in);
 	}
 
     for (f = 0; f < MAX_REGIONS; f++) {
       if (rstruc->intrRegion[f] != NULL)
         delete rstruc->intrRegion[f];
-      rstruc->intrRegion[f] = new NewInteraction();
+      rstruc->intrRegion[f] = new Interaction();
     }
 
     if (rfh.version >= kRoomVersion_255b) {
@@ -319,7 +344,7 @@ void load_main_block(roomstruct *rstruc, const char *files, Stream *in, room_fil
 	  {
         for (f = 0; f < rstruc->numRegions; f++) {
           delete rstruc->intrRegion[f];
-          rstruc->intrRegion[f] = deserialize_new_interaction (in);
+          rstruc->intrRegion[f] = Interaction::CreateFromStream(in);
 		}
       }
     }
@@ -329,20 +354,16 @@ void load_main_block(roomstruct *rstruc, const char *files, Stream *in, room_fil
 	  rstruc->hotspotScripts = new InteractionScripts*[rstruc->numhotspots];
 	  rstruc->objectScripts = new InteractionScripts*[rstruc->numsprs];
       rstruc->regionScripts = new InteractionScripts*[rstruc->numRegions];
-	  rstruc->roomScripts = new InteractionScripts();
-	  deserialize_interaction_scripts(in, rstruc->roomScripts);
+      rstruc->roomScripts = InteractionScripts::CreateFromStream(in);
 	  int bb;
       for (bb = 0; bb < rstruc->numhotspots; bb++) {
-        rstruc->hotspotScripts[bb] = new InteractionScripts();
-        deserialize_interaction_scripts(in, rstruc->hotspotScripts[bb]);
+        rstruc->hotspotScripts[bb] = InteractionScripts::CreateFromStream(in);
       }
       for (bb = 0; bb < rstruc->numsprs; bb++) {
-        rstruc->objectScripts[bb] = new InteractionScripts();
-        deserialize_interaction_scripts(in, rstruc->objectScripts[bb]);
+        rstruc->objectScripts[bb] = InteractionScripts::CreateFromStream(in);
       }
 	  for (bb = 0; bb < rstruc->numRegions; bb++) {
-        rstruc->regionScripts[bb] = new InteractionScripts();
-        deserialize_interaction_scripts(in, rstruc->regionScripts[bb]);
+        rstruc->regionScripts[bb] = InteractionScripts::CreateFromStream(in);
       }
 
 	}
@@ -427,7 +448,7 @@ void load_main_block(roomstruct *rstruc, const char *files, Stream *in, room_fil
 
     if (rstruc->numanims > 0)
         // [IKM] CHECKME later: this will cause trouble if structure changes
-        in->Seek (Common::kSeekCurrent, sizeof(FullAnimation) * rstruc->numanims);
+        in->Seek (sizeof(FullAnimation) * rstruc->numanims);
 //      in->ReadArray(&rstruc->anims[0], sizeof(FullAnimation), rstruc->numanims);
   }
   else {
@@ -446,6 +467,22 @@ void load_main_block(roomstruct *rstruc, const char *files, Stream *in, room_fil
   if (rfh.version >= kRoomVersion_255b) {
     in->ReadArrayOfInt16 (&rstruc->regionLightLevel[0], rstruc->numRegions);
     in->ReadArrayOfInt32 (&rstruc->regionTintLevel[0], rstruc->numRegions);
+  }
+
+  if (rfh.version < kRoomVersion_3404)
+  {
+    // Convert the old format tint saturation
+    for (int i = 0; i < MAX_REGIONS; ++i)
+    {
+      if ((rstruc->regionTintLevel[i] & LEGACY_TINT_IS_ENABLED) != 0)
+      {
+        rstruc->regionTintLevel[i] &= ~LEGACY_TINT_IS_ENABLED;
+        // older versions of the editor had a bug - work around it
+        int tint_amount = (rstruc->regionLightLevel[i] > 0 ? rstruc->regionLightLevel[i] : 50);
+        rstruc->regionTintLevel[i] |= (tint_amount & 0xFF) << 24;
+        rstruc->regionLightLevel[i] = 255;
+      }
+    }
   }
 
   update_polled_stuff_if_runtime();
@@ -487,7 +524,7 @@ void load_main_block(roomstruct *rstruc, const char *files, Stream *in, room_fil
     rstruc->regions->Blit (rstruc->walls, 0, 0, 0, 0, rstruc->regions->GetWidth(), rstruc->regions->GetHeight());
     for (f = 0; f <= 15; f++) {
       rstruc->regionLightLevel[f] = rstruc->walk_area_light[f];
-      rstruc->regionTintLevel[f] = 0;
+      rstruc->regionTintLevel[f] = 255;
     }
   }
 
@@ -535,10 +572,10 @@ void load_room(const char *files, roomstruct *rstruc, bool gameIsHighRes) {
   }
 
   for (i = 0; i < rstruc->numhotspots; i++)
-    rstruc->hsProps[i].reset();
+    rstruc->hsProps[i].clear();
   for (i = 0; i < rstruc->numsprs; i++)
-    rstruc->objProps[i].reset();
-  rstruc->roomProps.reset();
+    rstruc->objProps[i].clear();
+  rstruc->roomProps.clear();
 
   if (rstruc->localvars != NULL)
     free (rstruc->localvars);
@@ -650,17 +687,17 @@ void load_room(const char *files, roomstruct *rstruc, bool gameIsHighRes) {
     else if (thisblock == BLOCKTYPE_PROPERTIES) {
       // Read custom properties
       if (opty->ReadInt32() != 1)
-        quit("LoadRoom: unknown Custom Properties Bitmap *encounreted");
+        quit("LoadRoom: unknown Custom Properties block encountered");
 
       int errors = 0, gg;
 
-      if (rstruc->roomProps.UnSerialize (opty))
-        quit("LoadRoom: error reading custom properties Bitmap *");
+      if (Properties::ReadValues(rstruc->roomProps, opty))
+        quit("LoadRoom: error reading custom properties block");
 
       for (gg = 0; gg < rstruc->numhotspots; gg++)
-        errors += rstruc->hsProps[gg].UnSerialize (opty);
+        errors += Properties::ReadValues(rstruc->hsProps[gg], opty);
       for (gg = 0; gg < rstruc->numsprs; gg++)
-        errors += rstruc->objProps[gg].UnSerialize (opty);
+        errors += Properties::ReadValues(rstruc->objProps[gg], opty);
 
       if (errors > 0)
         quit("LoadRoom: errors encountered reading custom props");
@@ -679,7 +716,7 @@ void load_room(const char *files, roomstruct *rstruc, bool gameIsHighRes) {
 
     // The GetPosition call below has caused crashes
     if (opty->GetPosition() != bloklen)
-        opty->Seek(Common::kSeekBegin, bloklen);
+        opty->Seek(bloklen, kSeekBegin);
   }
 
   // sync bpalettes[0] with room.pal

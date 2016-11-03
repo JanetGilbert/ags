@@ -16,10 +16,51 @@
 #include <stdlib.h> // free
 #include "ac/common.h"
 #include "ac/roomstatus.h"
+#include "game/customproperties.h"
 #include "util/alignedstream.h"
 
-using AGS::Common::AlignedStream;
-using AGS::Common::Stream;
+using namespace AGS::Common;
+
+RoomStatus::RoomStatus()
+{
+    beenhere = 0;
+    numobj = 0;
+    memset(&flagstates, 0, sizeof(flagstates));
+    tsdatasize = 0;
+    tsdata = NULL;
+    
+    memset(&hotspot_enabled, 0, sizeof(hotspot_enabled));
+    memset(&region_enabled, 0, sizeof(region_enabled));
+    memset(&walkbehind_base, 0, sizeof(walkbehind_base));
+    memset(&interactionVariableValues, 0, sizeof(interactionVariableValues));
+}
+
+RoomStatus::~RoomStatus()
+{
+    if (tsdata)
+        free(tsdata);
+}
+
+void RoomStatus::FreeScriptData()
+{
+    if (tsdata)
+        free(tsdata);
+    tsdata = NULL;
+    tsdatasize = 0;
+}
+
+void RoomStatus::FreeProperties()
+{
+    roomProps.clear();
+    for (int i = 0; i < MAX_HOTSPOTS; ++i)
+    {
+        hsProps[i].clear();
+    }
+    for (int i = 0; i < MAX_INIT_SPR; ++i)
+    {
+        objProps[i].clear();
+    }
+}
 
 extern RoomStatus*croom;
 
@@ -33,21 +74,34 @@ void RoomStatus::ReadFromFile_v321(Stream *in)
     in->ReadInt32(); // tsdata
     for (int i = 0; i < MAX_HOTSPOTS; ++i)
     {
-        intrHotspot[i].ReadFromFile(in);
+        intrHotspot[i].ReadFromSavedgame_v321(in);
     }
     for (int i = 0; i < MAX_INIT_SPR; ++i)
     {
-        intrObject[i].ReadFromFile(in);
+        intrObject[i].ReadFromSavedgame_v321(in);
     }
     for (int i = 0; i < MAX_REGIONS; ++i)
     {
-        intrRegion[i].ReadFromFile(in);
+        intrRegion[i].ReadFromSavedgame_v321(in);
     }
-    intrRoom.ReadFromFile(in);
+    intrRoom.ReadFromSavedgame_v321(in);
     in->ReadArrayOfInt8((int8_t*)hotspot_enabled, MAX_HOTSPOTS);
     in->ReadArrayOfInt8((int8_t*)region_enabled, MAX_REGIONS);
     in->ReadArrayOfInt16(walkbehind_base, MAX_OBJ);
     in->ReadArrayOfInt32(interactionVariableValues, MAX_GLOBAL_VARIABLES);
+
+    if (loaded_game_file_version >= kGameVersion_340_4)
+    {
+        Properties::ReadValues(roomProps, in);
+        for (int i = 0; i < MAX_HOTSPOTS; ++i)
+        {
+            Properties::ReadValues(hsProps[i], in);
+        }
+        for (int i = 0; i < MAX_INIT_SPR; ++i)
+        {
+            Properties::ReadValues(objProps[i], in);
+        }
+    }
 }
 
 void RoomStatus::WriteToFile_v321(Stream *out)
@@ -60,21 +114,34 @@ void RoomStatus::WriteToFile_v321(Stream *out)
     out->WriteInt32(0); // tsdata
     for (int i = 0; i < MAX_HOTSPOTS; ++i)
     {
-        intrHotspot[i].WriteToFile(out);
+        intrHotspot[i].WriteToSavedgame_v321(out);
     }
     for (int i = 0; i < MAX_INIT_SPR; ++i)
     {
-        intrObject[i].WriteToFile(out);
+        intrObject[i].WriteToSavedgame_v321(out);
     }
     for (int i = 0; i < MAX_REGIONS; ++i)
     {
-        intrRegion[i].WriteToFile(out);
+        intrRegion[i].WriteToSavedgame_v321(out);
     }
-    intrRoom.WriteToFile(out);
+    intrRoom.WriteToSavedgame_v321(out);
     out->Write(hotspot_enabled, MAX_HOTSPOTS);
     out->Write(region_enabled, MAX_REGIONS);
     out->WriteArrayOfInt16(walkbehind_base, MAX_OBJ);
     out->WriteArrayOfInt32(interactionVariableValues,MAX_GLOBAL_VARIABLES);
+
+    if (loaded_game_file_version >= kGameVersion_340_4)
+    {
+        Properties::WriteValues(roomProps, out);
+        for (int i = 0; i < MAX_HOTSPOTS; ++i)
+        {
+            Properties::WriteValues(hsProps[i], out);
+        }
+        for (int i = 0; i < MAX_INIT_SPR; ++i)
+        {
+            Properties::WriteValues(objProps[i], out);
+        }
+    }
 }
 
 void RoomStatus::ReadRoomObjects_Aligned(Common::Stream *in)
@@ -107,8 +174,7 @@ RoomStatus* getRoomStatus(int room)
     if (room_statuses[room] == NULL)
     {
         // First access, allocate and initialise the status
-        room_statuses[room] = new RoomStatus;
-        memset(room_statuses[room], 0, sizeof(RoomStatus));
+        room_statuses[room] = new RoomStatus();
     }
     return room_statuses[room];
 }
@@ -128,24 +194,8 @@ void resetRoomStatuses()
     {
         if (room_statuses[i] != NULL)
         {
-            if ((room_statuses[i]->tsdata != NULL) && (room_statuses[i]->tsdatasize > 0))
-                free(room_statuses[i]->tsdata);
-
-            // Don't delete the status on 2.x. The status struct contains NewInteraction
-            // pointer that are also referenced in the current room struct.
-            // If they are freed here this will lead to an access violation when the
-            // room unloading function tries to frees them.
-            if (loaded_game_file_version <= kGameVersion_272)
-            {
-                room_statuses[i]->tsdatasize = 0;
-                room_statuses[i]->tsdata = 0;
-                room_statuses[i]->beenhere = 0;
-            }
-            else
-            {
-                delete room_statuses[i];
-                room_statuses[i] = NULL;
-            }
+            delete room_statuses[i];
+            room_statuses[i] = NULL;
         }
     }
     

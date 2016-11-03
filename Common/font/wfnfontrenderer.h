@@ -16,22 +16,23 @@
 #define __AC_WFNFONTRENDERER_H
 
 #include "font/agsfontrenderer.h"
+#include "font/wfnfont.h"
+
+#include <map>
 
 class WFNFontRenderer : public IAGSFontRenderer {
 public:
   virtual bool LoadFromDisk(int fontNumber, int fontSize);
   virtual void FreeMemory(int fontNumber);
-  virtual bool SupportsExtendedCharacters(int fontNumber) { return false; }
+  virtual bool SupportsExtendedCharacters(int fontNumber);
   virtual int GetTextWidth(const char *text, int fontNumber);
   virtual int GetTextHeight(const char *text, int fontNumber);
-  virtual void RenderText(const char *text, int fontNumber, BITMAP *destination, int x, int y, int colour) ;
+  virtual void RenderText(const char *text, int fontNumber, BITMAP *destination, int x, int y, int colour);
   virtual void AdjustYCoordinateForFont(int *ycoord, int fontNumber);
   virtual void EnsureTextValidForFont(char *text, int fontNumber);
 
 private:
-    int printchar(Common::Bitmap *ds, int xxx, int yyy, wgtfont foo, color_t text_color, int charr);
+  std::map<int, WFNFont*> _fontData;
 };
-
-extern WFNFontRenderer wfnRenderer;
 
 #endif // __AC_WFNFONTRENDERER_H

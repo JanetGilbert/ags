@@ -13,7 +13,6 @@
 //=============================================================================
 
 #include <stdio.h>
-#include "gfx/ali3d.h"
 #include "ac/global_object.h"
 #include "ac/common.h"
 #include "ac/object.h"
@@ -38,9 +37,9 @@
 #include "ac/spritecache.h"
 #include "gfx/graphicsdriver.h"
 #include "gfx/bitmap.h"
-#include "gfx/gfx_util.h"
+#include "gfx/gfx_def.h"
 
-using AGS::Common::Bitmap;
+using namespace AGS::Common;
 
 #define OVERLAPPING_OBJECT 1000
 
@@ -112,6 +111,7 @@ void SetObjectTint(int obj, int red, int green, int blue, int opacity, int lumin
     objs[obj].tint_b = blue;
     objs[obj].tint_level = opacity;
     objs[obj].tint_light = (luminance * 25) / 10;
+    objs[obj].flags &= ~OBJF_HASLIGHT;
     objs[obj].flags |= OBJF_HASTINT;
 }
 
@@ -119,9 +119,9 @@ void RemoveObjectTint(int obj) {
     if (!is_valid_object(obj))
         quit("!RemoveObjectTint: invalid object");
 
-    if (objs[obj].flags & OBJF_HASTINT) {
+    if (objs[obj].flags & (OBJF_HASTINT | OBJF_HASLIGHT)) {
         DEBUG_CONSOLE("Un-tint object %d", obj);
-        objs[obj].flags &= ~OBJF_HASTINT;
+        objs[obj].flags &= ~(OBJF_HASTINT | OBJF_HASLIGHT);
     }
     else {
         debug_log("RemoveObjectTint called but object was not tinted");
@@ -179,7 +179,7 @@ void SetObjectTransparency(int obn,int trans) {
     if (!is_valid_object(obn)) quit("!SetObjectTransparent: invalid object number specified");
     if ((trans < 0) || (trans > 100)) quit("!SetObjectTransparent: transparency value must be between 0 and 100");
 
-    objs[obn].transparent = GfxUtil::Trans100ToLegacyTrans255(trans);
+    objs[obn].transparent = GfxDef::Trans100ToLegacyTrans255(trans);
 }
 
 
@@ -236,7 +236,7 @@ void AnimateObjectEx(int obn,int loopn,int spdd,int rept, int direction, int blo
     CheckViewFrame (objs[obn].view, loopn, objs[obn].frame);
 
     if (blocking)
-        do_main_cycle(UNTIL_CHARIS0,(long)&objs[obn].cycling);
+        GameLoopUntilEvent(UNTIL_CHARIS0,(long)&objs[obn].cycling);
 }
 
 
@@ -479,14 +479,16 @@ int AreThingsOverlapping(int thing1, int thing2) {
     return 0;
 }
 
-int GetObjectProperty (int hss, const char *property) {
+int GetObjectProperty (int hss, const char *property)
+{
     if (!is_valid_object(hss))
         quit("!GetObjectProperty: invalid object");
-    return get_int_property (&thisroom.objProps[hss], property);
+    return get_int_property(thisroom.objProps[hss], croom->objProps[hss], property);
 }
 
-void GetObjectPropertyText (int item, const char *property, char *bufer) {
-    get_text_property (&thisroom.objProps[item], property, bufer);
+void GetObjectPropertyText (int item, const char *property, char *bufer)
+{
+    get_text_property(thisroom.objProps[item], croom->objProps[item], property, bufer);
 }
 
 Bitmap *GetObjectImage(int obj, int *isFlipped) 

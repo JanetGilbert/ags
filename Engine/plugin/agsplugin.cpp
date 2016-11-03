@@ -16,7 +16,6 @@
 
 #include "util/wgt2allg.h"
 #include "plugin/agsplugin.h"
-#include "gfx/ali3d.h"
 #include "ac/common.h"
 #include "ac/roomstruct.h"
 #include "ac/view.h"
@@ -42,6 +41,7 @@
 #include "util/string_utils.h"
 #include "debug/debug_log.h"
 #include "debug/debugger.h"
+#include "device/mousew32.h"
 #include "gui/guidefines.h"
 #include "main/engine.h"
 #include "media/audio/audio.h"
@@ -51,16 +51,16 @@
 #include "script/script_runtime.h"
 #include "ac/spritecache.h"
 #include "util/stream.h"
-#include "gfx/graphicsdriver.h"
 #include "gfx/bitmap.h"
+#include "gfx/graphicsdriver.h"
+#include "gfx/gfxfilter.h"
 #include "script/runtimescriptvalue.h"
 #include "debug/out.h"
 #include "ac/dynobj/scriptstring.h"
+#include "main/graphics_mode.h"
 
-using AGS::Common::Stream;
-
-using AGS::Common::Bitmap;
-namespace BitmapHelper = AGS::Common::BitmapHelper;
+using namespace AGS::Common;
+using namespace AGS::Engine;
 
 
 #if defined(BUILTIN_PLUGINS)
@@ -95,8 +95,6 @@ extern "C"
 
 
 extern IGraphicsDriver *gfxDriver;
-extern int scrnwid,scrnhit;
-extern int final_scrn_wid,final_scrn_hit,final_col_dep;
 extern int mousex, mousey;
 extern int displayed_room;
 extern roomstruct thisroom;
@@ -119,7 +117,6 @@ extern color palette[256];
 extern int offsetx, offsety;
 extern PluginObjectReader pluginReaders[MAX_PLUGIN_OBJECT_READERS];
 extern int numPluginReaders;
-extern IAGSFontRenderer* fontRenderers[MAX_FONTS];
 extern RuntimeScriptValue GlobalReturnValue;
 extern ScriptString myScriptStringImpl;
 
@@ -170,7 +167,7 @@ const char* IAGSEngine::GetEngineVersion () {
     return get_engine_version();
 }
 void IAGSEngine::RegisterScriptFunction (const char*name, void*addy) {
-    ccAddExternalPluginFunction ((char*)name, addy);
+    ccAddExternalPluginFunction (name, addy);
 }
 const char* IAGSEngine::GetGraphicsDriverID()
 {
@@ -249,11 +246,11 @@ void IAGSEngine::DrawText (int32 x, int32 y, int32 font, int32 color, char *text
 }
 void IAGSEngine::GetScreenDimensions (int32 *width, int32 *height, int32 *coldepth) {
     if (width != NULL)
-        width[0] = scrnwid;
+        width[0] = play.viewport.GetWidth();
     if (height != NULL)
-        height[0] = scrnhit;
+        height[0] = play.viewport.GetHeight();
     if (coldepth != NULL)
-        coldepth[0] = final_col_dep;
+        coldepth[0] = ScreenResolution.ColorDepth;
 }
 unsigned char ** IAGSEngine::GetRawBitmapSurface (BITMAP *bmp) {
     if (!is_linear_bitmap (bmp))
@@ -557,7 +554,7 @@ int IAGSEngine::GetFontType(int32 fontNum) {
     if ((fontNum < 0) || (fontNum >= game.numfonts))
         return FNT_INVALID;
 
-    if (fontRenderers[fontNum]->SupportsExtendedCharacters(fontNum))
+    if (font_supports_extended_characters(fontNum))
         return FNT_TTF;
 
     return FNT_SCI;
@@ -605,9 +602,7 @@ int IAGSEngine::CallGameScriptFunction(const char *name, int32 globalScript, int
     if (inside_script)
         return -300;
 
-    ccInstance *toRun = gameinst;
-    if (!globalScript)
-        toRun = roominst;
+    ccInstance *toRun = GetScriptInstanceByType(globalScript ? kScInstGame : kScInstRoom);
 
     RuntimeScriptValue params[3];
     params[0].SetPluginArgument(arg1);
@@ -651,40 +646,11 @@ void IAGSEngine::QueueGameScriptFunction(const char *name, int32 globalScript, i
         return;
     }
 
-    // queue it up, baby!
-    char scNameToRun[100];
-    if (globalScript) {
+    if (numArgs < 0 || numArgs > 2)
+        quit("IAGSEngine::QueueGameScriptFunction: invalid number of arguments");
 
-        if (numArgs == 0) {
-            strcpy(scNameToRun, "");
-        }
-        else if (numArgs == 1) {
-            strcpy(scNameToRun, "!");
-        }
-        else if (numArgs == 2) {
-            strcpy(scNameToRun, "#");
-        }
-        else
-            quit("IAGSEngine::QueueGameScriptFunction: invalid number of arguments");
-    }
-    else {
-        // room script
-        if (numArgs == 0) {
-            strcpy(scNameToRun, "|");
-        }
-        else if (numArgs == 1) {
-            strcpy(scNameToRun, "$");
-        }
-        else if (numArgs == 2) {
-            strcpy(scNameToRun, "%");
-        }
-        else
-            quit("IAGSEngine::QueueGameScriptFunction: invalid number of arguments");
-
-    }
-    strcat(scNameToRun, name);
-
-    curscript->run_another(scNameToRun, RuntimeScriptValue().SetPluginArgument(arg1), RuntimeScriptValue().SetPluginArgument(arg2));
+    curscript->run_another(name, globalScript ? kScInstGame : kScInstRoom, numArgs,
+        RuntimeScriptValue().SetPluginArgument(arg1), RuntimeScriptValue().SetPluginArgument(arg2));
 }
 
 int IAGSEngine::RegisterManagedObject(const void *object, IAGSScriptManagedObject *callback) {
@@ -749,7 +715,7 @@ int IAGSEngine::DecrementManagedObjectRefCount(const char *address) {
 }
 
 void IAGSEngine::SetMousePosition(int32 x, int32 y) {
-    filter->SetMousePosition(x, y);
+    Mouse::SetPosition(Point(x, y));
     RefreshMouse();
 }
 
@@ -792,9 +758,7 @@ void IAGSEngine::BreakIntoDebugger()
 
 IAGSFontRenderer* IAGSEngine::ReplaceFontRenderer(int fontNumber, IAGSFontRenderer *newRenderer)
 {
-    IAGSFontRenderer* oldOne = fontRenderers[fontNumber];
-    fontRenderers[fontNumber] = newRenderer;
-    return oldOne;
+    return font_replace_renderer(fontNumber, newRenderer);
 }
 
 
@@ -978,9 +942,10 @@ void pl_read_plugins_from_disk (Stream *in) {
         fgetstring (pluginNameBuffer, in);
         datasize = in->ReadInt32();
 
-        if (pluginNameBuffer[strlen(pluginNameBuffer) - 1] == '!') {
+        size_t name_len = strlen(pluginNameBuffer);
+        if (pluginNameBuffer[name_len - 1] == '!') {
             // editor-only plugin, ignore it
-            in->Seek(Common::kSeekCurrent, datasize);
+            in->Seek(datasize);
             a--;
             numPlugins--;
             continue;
@@ -990,20 +955,19 @@ void pl_read_plugins_from_disk (Stream *in) {
         if ((datasize < 0) || (datasize > 10247680))
             quit("Too much plugin save data for this engine");
 
-        // load the actual plugin from disk
-        EnginePlugin *apl = &plugins[a];
-        
-        // remove extension (examples of extension could be .dll, .dylib, .so, .so.1, etc)
-        {
-            char *ext = strchr(pluginNameBuffer, '.');
-            if (ext) {
-                *ext = 0;
-            }
-        }
-        
-        if (strlen(pluginNameBuffer) > PLUGIN_FILENAME_MAX) {
+        // AGS Editor currently saves plugin names in game data with
+        // ".dll" extension appended; we need to take care of that
+        const char *name_ext = ".dll";
+        const size_t ext_len = strlen(name_ext);
+        if (name_len <= ext_len || name_len > PLUGIN_FILENAME_MAX + ext_len ||
+            stricmp(&pluginNameBuffer[name_len - ext_len], name_ext)) {
             quitprintf("Plugin '%s' is not a valid AGS plugin because the filename is invalid.", pluginNameBuffer);
         }
+        // remove ".dll" from plugin's name
+        pluginNameBuffer[name_len - ext_len] = 0;
+
+        // load the actual plugin from disk
+        EnginePlugin *apl = &plugins[a];
         
         strncpy(apl->filename, pluginNameBuffer, PLUGIN_FILENAME_MAX+1);
         
@@ -1056,4 +1020,17 @@ void pl_read_plugins_from_disk (Stream *in) {
         apl->available = true;
     }
 
+}
+
+bool pl_is_plugin_loaded(const char *pl_name)
+{
+    if (!pl_name)
+        return false;
+
+    for (int i = 0; i < numPlugins; ++i)
+    {
+        if (stricmp(pl_name, plugins[i].filename) == 0)
+            return plugins[i].available;
+    }
+    return false;
 }

@@ -16,7 +16,6 @@
 // Quit game procedure
 //
 
-#include "gfx/ali3d.h"
 #include "ac/cdaudio.h"
 #include "ac/gamesetup.h"
 #include "ac/gamesetupstruct.h"
@@ -38,9 +37,8 @@
 #include "gfx/bitmap.h"
 #include "core/assetmanager.h"
 
-using AGS::Common::Bitmap;
-namespace BitmapHelper = AGS::Common::BitmapHelper;
-namespace Out = AGS::Common::Out;
+using namespace AGS::Common;
+using namespace AGS::Engine;
 
 extern GameSetupStruct game;
 extern int spritewidth[MAX_SPRITES],spriteheight[MAX_SPRITES];
@@ -213,9 +211,7 @@ void quit_message_on_exit(const char *qmsg, String &alertis, QuitReason qreason)
 
 void quit_release_data()
 {
-    // wipe all the interaction structs so they don't de-alloc the children twice
     resetRoomStatuses();
-    memset (&troom, 0, sizeof(RoomStatus));
 
     /*  _CrtMemState memstart;
     _CrtMemCheckpoint(&memstart);

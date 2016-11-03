@@ -29,22 +29,23 @@
 #include "debug/debug_log.h"
 #include "debug/debugger.h"
 #include "debug/out.h"
+#include "gfx/ali3dexception.h"
 #include "main/mainheader.h"
 #include "main/game_run.h"
 #include "main/game_start.h"
 #include "script/script.h"
 
-namespace Out = AGS::Common::Out;
+using namespace AGS::Common;
+using namespace AGS::Engine;
 
 extern int our_eip, displayed_room;
 extern const char *load_game_errors[9];
 extern volatile char want_exit, abort_engine;
-extern unsigned int load_new_game;
 extern GameSetupStruct game;
 extern GameState play;
 extern volatile int timerloop;
 extern const char *loadSaveGameOnStartup;
-extern ccInstance *moduleInst[MAX_SCRIPT_MODULES];
+extern std::vector<ccInstance *> moduleInst;
 extern int numScriptModules;
 extern CharacterInfo*playerchar;
 extern int convert_16bit_bgr;
@@ -102,7 +103,7 @@ void start_game_load_savegame_on_startup()
 
 void start_game() {
     set_cursor_mode(MODE_WALK);
-    filter->SetMousePosition(160,100);
+    Mouse::SetPosition(Point(160, 100));
     newmusic(0);
 
     our_eip = -42;
@@ -133,18 +134,6 @@ void do_start_game()
     // only start if replay playback hasn't loaded a game
     if (displayed_room < 0)
         start_game();
-}
-
-void do_play_game()
-{
-    while (!abort_engine) {
-        main_game_loop();
-
-        if (load_new_game) {
-            RunAGSGame (NULL, load_new_game, 0);
-            load_new_game = 0;
-        }
-    }
 }
 
 void initialize_start_and_play_game(int override_start_room, const char *loadSaveGameOnStartup)
@@ -179,7 +168,7 @@ void initialize_start_and_play_game(int override_start_room, const char *loadSav
 
         do_start_game();
 
-        do_play_game();
+        RunGameUntilAborted();
 
     } catch (Ali3DException gfxException)
     {

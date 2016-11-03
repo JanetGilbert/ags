@@ -8,7 +8,7 @@
 \parskip=10pt%
 \parindent=0pt%
 \backgroundcolour{255;255;225}\textcolour{0;0;0}% Has an effect in HTML only
-\title{Adventure Game Studio 3.3.5}%
+\title{Adventure Game Studio 3.4.0}%
 \author{by Chris Jones et al.}%
 \makeindex%
 \begin{document}%
@@ -202,19 +202,39 @@ The engine Setup program allows the player to customize certain game settings.
 The options in setup are divided into two parts: common and advanced. Advanced
 options could be accessed by pressing "Advanced" button.
 
-\bf{Graphics options}
+\bf{Graphics settings}
 
 \begin{description}
-\item [Run in the window instead of fullscreen]
-  If checked, the game will be run in windowed mode, as opposed to fullscreen.
 \item [Driver]
   Lets player choose a graphics driver. Currently supported are DirectX 5 (old driver)
 and Direct3D 9 (newer and faster driver with hardware acceleration).
+\item [Run in the window instead of fullscreen]
+  If checked, the game will be run in windowed mode, as opposed to fullscreen.
+\item [Mode]
+  Lets choose a fullscreen display mode (otherwise shows the approximate size of
+window the game will be running in). The list of modes depends on graphic card and
+system capabilities.
+\item [Scaling]
+  Determines the method game will be scaled (when required):
+  \begin{description}
+  \item \bf{None}. The game will be shown in its native resolution. Note that low-resolution games will
+be running in a tiniest window on modern monitors, so this choice is more suitable for
+high-resolution games.
+  \item \bf{Max round multiplier}. The game will be scaled up using a maximal round integer (2, 3, 4, etc)
+multiplier with which it still fits inside the screen.
+  \item \bf{Stretch to fit screen}. The game will be stretched to fill whole screen. Note that if
+the game's native aspect ratio is different from screen one's, the game image will appear deformed.
+  \item \bf{Stretch to fit screen (preserve aspect ratio)}. The game will be stretched to screen borders
+while respecting game's native aspect ratio (width/height proportions). This ensures that game image will
+always look correct, but may cause black borders appear at the left & right or top & bottom sides of the
+screen.
+  \end{description}
 \item [Filter]
   Here player may choose a graphics scaling filter. Filter type defines the method of
-scaling (nearest-neighbour is most simple one), as well as scaling multiplier.
-  Selecting a filter with higher scaling multiplier will make game stretch to higher resolution.
-  The list of available filters depend on driver selection.
+scaling (nearest-neighbour is most simple one). Some of the filters (notably Hqx filter) are restricted
+to which scaling multiplier they may use; if the filter own scaling is not enough to resize the game,
+the most basic image scaling method will be applied additionally.
+  The list of available filters depend on graphics driver selection.
 \end{description}
 
 \bf{Gameplay settings}
@@ -222,20 +242,16 @@ scaling (nearest-neighbour is most simple one), as well as scaling multiplier.
 \begin{description}
 \item [Game language]
   Here player may choose one of the available game translations.
-\item [Custom game saves path]
-  When unchecked, the game will store its files - saved games, and custom runtime data -
-in the default Windows folders: "C:/Users/<Username>/Saved Games/<Game Title>" and
-"C:/Program Data/Adventure Game Studio/<Game Title>" respectively.
-  Players may enable this option and define their own location to store game files.
 \end{description}
 
 \bf{Advanced graphics options}
 
 \begin{description}
-\item [Enable side-borders / Enable top & bottom borders]
-  These two options allow the game to choose from wider range of resolutions, including
-the ones which display game surrounded by horizontal and/or vertical borders (the
-so-called "letterboxed" and "pillarboxed" modes).
+\item [Vertical sync]
+  This option enables vertical synchronisation mode, which reduces "tearing" effect on game image, but may decrease the game running speed.
+\item [Use 85 Hz display]
+  This option sets the monitor refresh rate to 85 Hz to run the game, which eliminates flicker. However, this does not work on all monitors, and not at all on flat
+panel displays, which is why it is disabled by default.
 \item [Smooth scaled sprites]
   This option will apply anti-aliasing to scaled characters, in order to give
 a smoother look to the resizing. This can slow down the game though, so it is off by default.
@@ -244,9 +260,6 @@ a smoother look to the resizing. This can slow down the game though, so it is of
 to choose to play the game at 16-bit instead, in order to boost performance.
 If they use this, the graphical quality will reduce, but it should at least allow them to play
 the game at a decent speed.
-\item [Use 85 Hz display]
-  This option sets the monitor refresh rate to 85 Hz to run the game, which eliminates flicker. However, this does not work on all monitors, and not at all on flat
-panel displays, which is why it is disabled by default.
 \end{description}
 
 \bf{Sound options}
@@ -282,6 +295,11 @@ game is run in fullscreen mode.
   slowdowns during game play.
   Of course, higher values make the game use more memory. Usually only high-resolution games with long animations need
   to have this value increased.
+\item [Custom game saves path]
+  When unchecked, the game will store its files - saved games, and custom runtime data -
+in the default Windows folders: "C:/Users/<Username>/Saved Games/<Game Title>" and
+"C:/Program Data/Adventure Game Studio/<Game Title>" respectively.
+  Players may enable this option and define their own location to store game files.
 \end{description}
 
 
@@ -717,7 +735,7 @@ you exported earlier. A new character slot will be created and all the settings 
 \it{NOTE: Because importing always creates a new slot, you cannot use it to
 overwrite an existing character.}
 
-\subsection{Conversations}\index{Dialogs}\index{run-script}\index{add-inv}\index{goto-dialog}\index{new-room}\index{option-off}\index{option-on}\index{option-off-forever}\index{play-sound}\index{return}%
+\subsection{Conversations}\index{Dialogs}\index{run-script}\index{add-inv}\index{goto-dialog}\index{new-room}\index{option-off}\index{option-on}\index{option-off-forever}\index{play-sound}\index{return (dialog script)}%
 
 While the old Sierra games were mainly based on action and not talking, the
 Lucasarts games took the opposite approach.
@@ -1602,6 +1620,9 @@ make sure that it fills up the whole window.
 To set the text colour in the window, simply set the Foreground Colour of
 the GUI and that will be used to print the message text in.
 
+Additionally, you may configure padding - the distance kept between text
+window's border and text inside of it.
+
 \subsection{Custom inventory}\index{Inventory, Lucasarts-style}%
 
 Another option you may have noticed in the GUI editor is the Add Inventory
@@ -1669,14 +1690,22 @@ You may wish to ignore this or to do something useful with it.
 \section{Distributing your game}\label{DistGame}\index{Compiling the game}\index{Splash screen, creating}\index{Loading screen, creating}%
 
 When you choose the "Build EXE" option in the Editor, a "Compiled" sub-directory
-is created in your game's folder, with all the files that you need to distribute
-your game. At its simplest this will just be your game executable and the setup
+is created in your game's folder, where more subdirectories are created in turn
+for every target platform you are building the game for. For example, "Compiled/Windows"
+subfolder will be created if you have Windows build checked in General Settings, and
+"Compiled/Linux" subfolder if you have Linux build enabled.
+The "Compiled" folder itself will contain all the "raw" game files that cannot be
+run on their own, but distinct subfolders will contain a runnable variant of the compiled
+game for corresponding operating system.
+For example, if you want to distribute Windows version of your game, you need to
+take the contents of "Windows" subfolder.
+At its simplest this will just be your game executable and the setup
 program, but you may also have audio and speech libraries (AUDIO.VOX and
 SPEECH.VOX); and if you have selected to split resources files, you will also
 have several files named "game.001", "game.002", and so forth.
 
 So, when you want to upload your game to the internet, just zip up the files in
-the Compiled folder, and there you go!
+the "Windows" folder, and there you go!
 
 \it{NOTE: It is not possible to load the exe file back into the AGS Editor. This
 means two things when only the EXE file is available: (1) other people can't
@@ -2018,19 +2047,24 @@ All types of game item share the same schema. That is, if you create a "Jibble" 
 in the schema editor for a hotspot, it will also appear in the properties window for
 characters, objects, and so on.
 
-\bf{Getting values in the script}
+\bf{Getting and setting values in the script}
 
 To access the properties from the script, there are various script functions. See
 their descriptions for how they work:
 
 \helprefn{Character.GetProperty}{Character.GetProperty}, \helprefn{Character.GetTextProperty}{Character.GetTextProperty} ILBRK
+\helprefn{Character.SetProperty}{Character.SetProperty}, \helprefn{Character.SetTextProperty}{Character.SetTextProperty} ILBRK
 \helprefn{Hotspot.GetProperty}{Hotspot.GetProperty}, \helprefn{Hotspot.GetTextProperty}{Hotspot.GetTextProperty} ILBRK
+\helprefn{Hotspot.SetProperty}{Hotspot.SetProperty}, \helprefn{Hotspot.SetTextProperty}{Hotspot.SetTextProperty} ILBRK
 \helprefn{InventoryItem.GetProperty}{InventoryItem.GetProperty}, \helprefn{InventoryItem.GetTextProperty}{InventoryItem.GetTextProperty} ILBRK
+\helprefn{InventoryItem.SetProperty}{InventoryItem.SetProperty}, \helprefn{InventoryItem.SetTextProperty}{InventoryItem.SetTextProperty} ILBRK
 \helprefn{Object.GetProperty}{Object.GetProperty}, \helprefn{Object.GetTextProperty}{Object.GetTextProperty} ILBRK
-\helprefn{GetRoomProperty}{GetRoomProperty}, \helprefn{Room.GetTextProperty}{Room.GetTextProperty}
+\helprefn{Object.SetProperty}{Object.SetProperty}, \helprefn{Object.SetTextProperty}{Object.SetTextProperty} ILBRK
+\helprefn{Room.GetProperty}{Room.GetProperty}, \helprefn{Room.GetTextProperty}{Room.GetTextProperty} ILBRK
+\helprefn{Room.SetProperty}{Room.SetProperty}, \helprefn{Room.SetTextProperty}{Room.SetTextProperty} 
 
-Custom property values cannot currently be set from within the game script - they are read-only
-at runtime.
+\bf{NOTE:} Calling \helprefn{ResetRoom}{ResetRoom} will reset that room's properties to default values, as well as that room's
+hotspot and object properties.
 
 \section{Plugins}%
 
@@ -2921,8 +2955,8 @@ to access the array. You can change the size of an array by simply using another
 \verb$new$ command with a different size; but this will erase the contents of the
 array in the process.
 
-Currently dynamic arrays are supported as global and local variables, but
-you can't put one inside a struct.
+Currently dynamic arrays are supported as global and local variables, or members of
+normal (not managed) structs.
 Also, at present you can create arrays of basic types (int, char, etc) and
 of built-in types (String, Character, etc) but not of custom structs.
 
@@ -2981,6 +3015,7 @@ All the following variables are \verb$int$ variables.
 }\row{ { game.close_mouth_end_speech_time }&{ At the end of speech text, the speech animation
                            will stop for this number of game loops. Default 10. No affect in voice mode.}
 }\row{ { game.debug_mode    }&{     Whether we are in debug mode or not.}
+}\row{ { game.dialog_options_highlight_color }&{ Color used to draw the active (selected) dialog option }
 }\row{ { game.dialog_options_x    }&{ Offset into dialog options GUI to compensate for borders }
 }\row{ { game.dialog_options_y    }&{ Offset into dialog options GUI to compensate for borders }
 }\row{ { game.disable_antialiasing }&{ Set to 1 to disable smoothing of scaled characters,
@@ -3308,30 +3343,45 @@ By setting the width and height to values greater than 0, the custom dialog syst
 \item Add a \verb$dialog_options_render$ function, which is called by AGS when it needs to
 draw the dialog options. A standard script \helprefn{DrawingSurface}{DrawingSurfaceFunctions} is
 supplied, which you can use to draw onto.
-\item Add a \verb$dialog_options_get_active$ function, which is called by AGS as the player moves
-the mouse around the screen. This needs to work out which option the mouse is currently hovering
-over, so that AGS knows which option to process if the player clicks the mouse button.
 \item Optionally, add a \verb$dialog_options_mouse_click$ function. This is called by AGS if the
-player clicks the mouse when it is not over one of the options. You might want to use this to
-process clicks on some custom scroll arrows, for example.
+player clicks the mouse anywhere on dialog options GUI. You might want to use this to process
+clicks on dialog options, and also on some custom scroll arrows, for example.
+\item Optionally, add a \verb$dialog_options_key_press$ function. This is called by AGS if the
+player presses any key while custom dialog options are shown on screen. You can use this to
+implement key-controlled selection of dialog option, for example.
+\item Optionally, add a \verb$dialog_options_repexec$ function. This works similarily to
+general \verb$repeatedly_execute$ function, but is called only if custom dialog options are
+shown on screen. You may use this to handle any other situations, such as determining which
+option the mouse is currently hovering over, or scripting time-related actions.
 \end{itemize}
+
 These functions don't have to go in the global script; you can put them in any script you like.
 However, beware that if the functions are present in more than one script they could interfere
 with each other and cause problems.
 
-\bf{IMPORTANT:} When adding the functions to the script, they all take in a parameter of
-type \helprefn{DialogOptionsRenderingInfo}{DialogOptionsRenderingInfoFunctions} and the
-dialog_options_mouse_click function has an extra parameter for the mouse button. See the example below.
+\bf{COMPATIBILITY NOTE:} The older versions of AGS (pre-3.4.0) supported slightly different set
+of functions. Thus, there was no \verb$dialog_options_repexec$, but you had to add
+\verb$dialog_options_get_active$ function instead, in which you set active option property.
+Clicks on the options were processed by AGS automatically, so doing this was essential.
+If you have imported older project and want to keep old dialog option scripts, then you should
+go to General Settings and enable "Use old-style dialog options rendering API".
 
-\bf{IMPORTANT:} The four Custom Dialog functions all run on the non-blocking thread. That means
+\bf{IMPORTANT:} When adding the functions to the script, they all take in a parameter of
+type \helprefn{DialogOptionsRenderingInfo}{DialogOptionsRenderingInfoFunctions}. The
+dialog_options_mouse_click function has an extra parameter for the mouse button, and
+dialog_options_key_press has an extra parameter for the key code. See the example below.
+
+\bf{IMPORTANT:} All of the Custom Dialog functions run on the non-blocking thread. That means
 that you should not make any blocking calls, such as Character.Say, Wait or Display within them,
 as they may not behave correctly.
 
-\bf{Example}
-
-Below is a very simple implementation of a dialog options screen.
+\bf{Example A. Classic mouse controls}
 
 \begin{verbatim}
+int dlg_opt_color = 14;
+int dlg_opt_acolor = 13;
+int dlg_opt_ncolor = 4;
+
 function dialog_options_get_dimensions(DialogOptionsRenderingInfo *info)
 {
   // Create a 200x200 dialog options area at (50,100)
@@ -3349,28 +3399,37 @@ function dialog_options_get_dimensions(DialogOptionsRenderingInfo *info)
 
 function dialog_options_render(DialogOptionsRenderingInfo *info)
 {
-  // Clear the area yellow
-  info.Surface.Clear(14);
+  info.Surface.Clear(dlg_opt_color);
   int i = 1,  ypos = 0;
   // Render all the options that are enabled
   while (i <= info.DialogToRender.OptionCount)
   {
     if (info.DialogToRender.GetOptionState(i) == eOptionOn)
     {
-      if (info.ActiveOptionID == i) info.Surface.DrawingColor = 13;
-      else info.Surface.DrawingColor = 4;
-      info.Surface.DrawStringWrapped(5, ypos, info.Width - 10,
-                         eFontFont0, eAlignLeft, info.DialogToRender.GetOptionText(i));
+      if (info.ActiveOptionID == i)
+        info.Surface.DrawingColor = dlg_opt_acolor;
+      else
+        info.Surface.DrawingColor = dlg_opt_ncolor;
+        
+      info.Surface.DrawStringWrapped(5, ypos, info.Width - 10, 
+              eFontFont0, eAlignLeft, info.DialogToRender.GetOptionText(i));
       ypos += GetTextHeight(info.DialogToRender.GetOptionText(i), eFontFont0, info.Width - 10);
     }
     i++;
   }
 }
 
-function dialog_options_get_active(DialogOptionsRenderingInfo *info)
+function dialog_options_repexec(DialogOptionsRenderingInfo *info)
 {
-  int i = 1,  ypos = 0;
-  // Find the option that corresponds to where the player clicked
+  info.ActiveOptionID = 0;
+  if (mouse.y < info.Y || mouse.y >= info.Y + info.Height ||
+      mouse.x < info.X || mouse.x >= info.X + info.Width)
+  {
+    return; // return if the mouse is outside UI bounds
+  }
+
+  int i = 1, ypos = 0;
+  // Find the option that corresponds to where the mouse cursor is
   while (i <= info.DialogToRender.OptionCount)
   {
     if (info.DialogToRender.GetOptionState(i) == eOptionOn)
@@ -3388,12 +3447,65 @@ function dialog_options_get_active(DialogOptionsRenderingInfo *info)
 
 function dialog_options_mouse_click(DialogOptionsRenderingInfo *info, MouseButton button)
 {
-  // do something here if you want!
+  if (info.ActiveOptionID > 0)
+    info.RunActiveOption();
 }
 \end{verbatim}
-The example above is slightly naive; in reality you would probably want to track
+
+The examples above are slightly naive; in reality you would probably want to track
 the Y position of each option in a variable to save having to continually scan through
 all the options.
+
+
+\bf{Example B. Keyboard controls}
+
+\begin{verbatim}
+int dlg_opt_color = 14;
+int dlg_opt_acolor = 13;
+int dlg_opt_ncolor = 4;
+
+function dialog_options_get_dimensions(DialogOptionsRenderingInfo *info)
+{
+  // Create a 200x200 dialog options area at (50,100)
+  info.X = 50;
+  info.Y = 100;
+  info.Width = 200;
+  info.Height = 200;
+  info.ActiveOptionID = 1; // set to first option
+}
+
+function dialog_options_render(DialogOptionsRenderingInfo *info)
+{
+  info.Surface.Clear(dlg_opt_color);
+  int i = 1,  ypos = 0;
+  // Render all the options that are enabled
+  while (i <= info.DialogToRender.OptionCount)
+  {
+    if (info.DialogToRender.GetOptionState(i) == eOptionOn)
+    {
+      if (info.ActiveOptionID == i)
+        info.Surface.DrawingColor = dlg_opt_acolor;
+      else
+        info.Surface.DrawingColor = dlg_opt_ncolor;
+
+      info.Surface.DrawStringWrapped(5, ypos, info.Width - 10, 
+          eFontFont0, eAlignLeft, info.DialogToRender.GetOptionText(i));
+      ypos += GetTextHeight(info.DialogToRender.GetOptionText(i), eFontFont0, info.Width - 10);
+    }
+    i++;
+  }
+}
+
+function dialog_options_key_press(DialogOptionsRenderingInfo *info, eKeyCode keycode) 
+{
+  if (keycode == eKeyUpArrow && info.ActiveOptionID > 1)
+    info.ActiveOptionID = info.ActiveOptionID - 1;
+  if (keycode == eKeyDownArrow && info.ActiveOptionID < info.DialogToRender.OptionCount)
+    info.ActiveOptionID = info.ActiveOptionID + 1;
+  if (keycode == eKeyReturn || keycode == eKeySpace)
+    info.RunActiveOption();
+}
+\end{verbatim}
 
 For more detail on the commands used here, see the \helprefn{DialogOptionsRenderingInfo}{DialogOptionsRenderingInfoFunctions}
 page.
@@ -3423,6 +3535,22 @@ enum BlockingStyle {
 \helprefn{Character.WalkStraight}{Character.WalkStraight},
 \helprefn{Object.Animate}{Object.Animate},
 \helprefn{Object.Move}{Object.Move}
+
+\begin{verbatim}
+enum CharacterDirection {
+  eDirectionDown = 0,
+  eDirectionLeft,
+  eDirectionRight,
+  eDirectionUp,
+  eDirectionDownRight,
+  eDirectionUpRight,
+  eDirectionDownLeft,
+  eDirectionUpLeft,
+  eDirectionNone = SCR_NO_VALUE
+};
+\end{verbatim}
+\it{Used by:} \helprefn{Character.ChangeRoom}{Character.ChangeRoom},
+\helprefn{Character.FaceDirection}{Character.FaceDirection}
 
 \begin{verbatim}
 enum Direction {
@@ -3611,7 +3739,7 @@ The CursorMode enumeration is generated automatically based on your mouse cursor
 The cursor mode name is taken, all its spaces are removed, and \it{eMode} is added
 to the front. ILBRK
 \it{Used by:} \helprefn{IsInteractionAvailable}{IsInteractionAvailable},
-\helprefn{ProcessClick}{ProcessClick},
+\helprefn{Room.ProcessClick}{Room.ProcessClick},
 \helprefn{Mouse.ChangeModeGraphic}{Mouse.ChangeModeGraphic},
 \helprefn{Mouse.ChangeModeHotspot}{Mouse.ChangeModeHotspot},
 \helprefn{Mouse.DisableMode}{Mouse.DisableMode},
@@ -3620,8 +3748,11 @@ to the front. ILBRK
 \helprefn{Mouse.Mode}{Mouse.Mode},
 \helprefn{InventoryItem.IsInteractionAvailable}{InventoryItem.IsInteractionAvailable},
 \helprefn{InventoryItem.RunInteraction}{InventoryItem.RunInteraction},
+\helprefn{Hotspot.IsInteractionAvailable}{Hotspot.IsInteractionAvailable},
 \helprefn{Hotspot.RunInteraction}{Hotspot.RunInteraction},
+\helprefn{Object.IsInteractionAvailable}{Object.IsInteractionAvailable},
 \helprefn{Object.RunInteraction}{Object.RunInteraction},
+\helprefn{Character.IsInteractionAvailable}{Character.IsInteractionAvailable},
 \helprefn{Character.RunInteraction}{Character.RunInteraction}
 
 \begin{verbatim}
@@ -3667,6 +3798,15 @@ enum FileMode {
 };
 \end{verbatim}
 \it{Used by:} \helprefn{File.Open}{File.Open}
+
+\begin{verbatim}
+enum FileSeek {
+  eSeekBegin = 0,
+  eSeekCurrent = 1,
+  eSeekEnd = 2
+};
+\end{verbatim}
+\it{Used by:} \helprefn{File.Seek}{File.Seek}
 
 \begin{verbatim}
 enum DialogOptionSayStyle {
@@ -3856,14 +3996,16 @@ The following predefined macros are available in your scripts:
 \begin{tabular}{|l|l|}
 \row{ \bf{ Name } & \bf{ Description }
 }\row{{ DEBUG } & { Defined if the game is being compiled in debug mode, not defined otherwise }
-}\row{{ STRICT } & { Defined if "Enforce Object Based Scripting" is ticked, not defined otherwise }
-}\row{{ STRICT_STRINGS } & { Defined if "Enforce new-style strings" is ticked, not defined otherwise }
-}\row{{ STRICT_AUDIO } & { Defined if "Enforce new-style audio scripting" is ticked, not defined otherwise }
-}\row{{ LRPRECEDENCE } & { Defined if "Left-to-right operator precedence" is ticked, not defined otherwise }
+}\row{{ SCRIPT_API_vXXX } & { Defined if corresponding version of script API is enabled (e.g. SCRIPT_API_v340) }
+}\row{{ SCRIPT_COMPAT_vXXX } & { Defined if certain compatibility level is enabled (e.g. SCRIPT_COMPAT_v321) }
+}\row{{ STRICT } & { Defined if "Enforce Object Based Scripting" is enabled, not defined otherwise }
+}\row{{ STRICT_STRINGS } & { Defined if "Enforce new-style strings" is enabled, not defined otherwise }
+}\row{{ STRICT_AUDIO } & { Defined if "Enforce new-style audio scripting" is enabled, not defined otherwise }
+}\row{{ LRPRECEDENCE } & { Defined if "Left-to-right operator precedence" is enabled, not defined otherwise }
 }\row{{ AGS_NEW_STRINGS } & { Defined if AGS 2.71 or later (with new-String support), not defined otherwise }
+}\row{{ NEW_DIALOGOPTS_API } & { Defined if "Use old-style dialog options rendering API" is disabled }
 }\row{{ AGS_SUPPORTS_IFVER } & { Defined if AGS 2.72 or later (with \verb$#ifver$ support), not defined otherwise }
 }\row{{ AGS_MAX_INV_ITEMS } & { The maximum number of inventory items }
-}\row{{ AGS_MAX_CONTROLS_PER_GUI } & { The maximum number of controls on a GUI }
 }\row{{ AGS_MAX_OBJECTS } & { The maximum objects per room }
 }\row{{ AGS_MAX_HOTSPOTS } & { The maximum hotspots per room }
 }\row{{ AGS_MAX_REGIONS } & { The maximum regions per room }
@@ -3962,6 +4104,69 @@ else {
 \end{verbatim}
 
 
+\subsection{switch, case statements}\label{switchstatement}\index{case statement}%
+
+\bf{switch (} \it{expression} \bf{)}  \verb${$ ILBRK
+  [
+  \bf{case} \it{constant expression}: ILBRK
+    \it{statements} ILBRK
+    [ \bf{break}; ]
+  ] ILBRK
+  [
+  \bf{default:} ILBRK
+    \it{statements} ILBRK
+    [ \bf{break}; ]
+  ]  ILBRK
+\verb$}$
+
+Calculates first \it{expression} in the \bf{switch} header, then finds a \bf{case} statement
+which \it{constant expression} matches the \it{result} of the previous calculation, and begins
+executing statements under that \bf{case}. When doing so, it ignores any other \bf{case} statements,
+but runs all the statements under them. Stops only when reaching the switch's end, or \bf{break}
+statement.
+If the result of \it{expression} is not found in any of the \bf{case} lines, then goes to \bf{default}
+line and runs statements from that point. If no \bf{default} statement found in the switch, then
+the whole switch is skipped.
+\bf{Switch} may have any number of \bf{case} statements and only one \bf{default} statement, but
+they may be arranged in any order.
+
+Unlike many programming languages, AGS allows expression result of any type (integer, boolean,
+string, pointers).
+
+Example:
+
+\begin{verbatim}
+switch (player)
+{
+case cEgo: Display("Hello, my name is Ego, default player controlled character."); break;
+case cJohn: Display("Greetings, I am John, the male character."); break;
+case cMary: Display("Hi there, I am Mary, the female character."); break;
+default:
+  Display("I am not really sure what character the player is controlling, this might be a bug");
+  break;
+}
+\end{verbatim}
+
+Example with "fall-through" cases:
+
+\begin{verbatim}
+switch (player)
+{
+case cJohn:
+case cMary:
+  player.Say("I like oranges.")
+  break;
+case cEgo:
+  player.Say("I like apples.");
+default:
+  player.Say("I would like some berries.");
+}
+\end{verbatim}
+In the above example both cJohn and cMary cases lead to "I like oranges" line.
+cEgo sais "I like apples" and then also "I would like some berries". If there were any other player
+controlled character, not mentioned in this switch, they would go straight to default line.
+
+
 \subsection{while}\label{whilestatement}%
 
 \bf{while (} \it{expression} \bf{)}  \verb${$ ILBRK
@@ -3980,6 +4185,119 @@ while (cEgo.Moving) {
 
 will run the script \verb$Wait(1);$ repeatedly, as long as \verb$cEgo.Moving$ is
 not zero. Once it is zero, the \bf{while} statement will exit at the end of the loop.
+
+
+\subsection{do..while}\label{dowhilestatement}%
+
+\bf{do}  \verb${$ ILBRK
+  \it{statements} ILBRK
+\verb$}$
+\bf{while (} \it{expression} \bf{);}
+
+Similarily to \helprefn{while}{whilestatement} runs \it{statements} continuously, so long as \it{expression} is true,
+but unlike \bf{while} it checks the expression AFTER executing statements, not before. This also means that the statements
+will be executed at least once.
+
+For example:
+
+\begin{verbatim}
+do
+{
+  cEgo.Move(cEgo.x + 1, cEgo.y);
+}
+while (IsKeyPressed(eKeyRightArrow));
+\end{verbatim}
+
+will run the script \verb$cEgo.Move(cEgo.x + 1, cEgo.y);$ once, and then continue run it repeatedly, as long as the right
+arrow key is pressed by player.
+
+
+\subsection{for}\label{forstatement}%
+
+\bf{for (} [\it{initialization}]\bf{;} [\it{expression}]\bf{;} [\it{iteration}] \bf{)}  \verb${$ ILBRK
+  \it{statements} ILBRK
+\verb$}$
+
+This loop command first performs \it{initialization} statements, then runs \it{statements} inside curved brackets continuously.
+Each time before executing these statements it checks whether \it{expression} is true, and if not - ends the loop.
+Each time after statements were executed it additionally runs \it{iteration} statements.
+
+\it{Initialization} is commonly used to declare variables or setting up existing variable values. If a new variable is declared
+in \it{initialization} - such variable will exist and may be used only inside the loop.
+\it{Iteration} step is usually meant to "move" to the next step, by changing some variable value.
+Every part of the command header - \it{initialization}, \it{expression} and \it{iteration} - is optional: there may be \bf{for}
+command without initialization, or without iteration, or even without conditional expression (in which case loop should be ended
+with either \helprefn{break}{breakstatement} or \helprefn{return}{returnstatement} statement).
+
+For example:
+
+\begin{verbatim}
+for (int i = 0; i < Game.CharacterCount; i++)
+{
+  Display("My name is %s", character[i].Name);
+}
+\end{verbatim}
+
+will look over every character in game and display their names.
+
+
+Another example (note missing initialization and iteration):
+
+\begin{verbatim}
+for (; cEgo.x < 100;)
+{
+  Wait(1);
+}
+\end{verbatim}
+
+This will repeat \verb$Wait(1);$ until cEgo character does not move beyond coordinate x = 100.
+
+
+\subsection{break}\label{breakstatement}%
+
+\bf{break};
+
+\verb$break$ statement ends the execution of most inner loop or \helprefn{switch}{switchstatement}
+immediately. After this script continues running from the next line after loop or switch.
+
+For example:
+
+\begin{verbatim}
+while (cEgo.Moving) {
+  if (IsKeyPressed(eKeyEscape))
+    break;
+
+  Wait(1);
+}
+\end{verbatim}
+
+will run the script \verb$Wait(1);$ repeatedly, as long as \verb$cEgo.Moving$ is
+not zero. If player presses Escape key, the loop is terminated immediately.
+
+
+\subsection{continue}\label{continuestatement}%
+
+\bf{continue};
+
+\verb$continue$ statement makes the loop skip remaining statements in current iteration and proceed to the next end-condition check,
+followed by the loop restart, if condition is still met, or loop end.
+If in \helprefn{for}{forstatement} kind of loop, the \it{iteration} statement is executed right before that.
+
+For example:
+
+\begin{verbatim}
+for (int i = 0; i < 100; i++)
+{
+  // multiple statements here
+  
+  if (i > 50)
+    continue;
+  
+  // more statements following
+}
+\end{verbatim}
+
+will run first part of the loop statements always, and second part only when \verb$i <= 50$.
 
 
 \subsection{function}\label{function}%
@@ -4025,6 +4343,39 @@ in the script header. The default values cannot be specified in the actual funct
 itself.
 
 
+\subsection{return}\label{returnstatement}\index{return (game script)}%
+
+\bf{return};
+
+Immediately quits currently run function and returns to the previous script function current one
+was called from, if there was any, otherwise passes execution to engine.
+\bf{return} can be put in any place in the the function, no matter if it is inside the
+if/else statement group, loop or switch - it will still work as immediate function exit.
+
+If the function is declared with return type other than \bf{void} (or simply like \verb$function$),
+then the \bf{return} statement \bf{has} to specify \bf{return value}.
+
+\begin{verbatim}
+int GetHowManyTradeGoodsShopkeeperHas() {
+  return 2;
+}
+\end{verbatim}
+
+Alternatively, when function is not supposed to have any return value, sometimes you may want to break
+out of current function before it ends naturally:
+
+\begin{verbatim}
+function DoThisAndOptionallyThat(bool do_all) {
+  // multiple statements here
+  
+  if (!do_all)
+    return; // quit the function prematurely
+    
+  // more statements following
+}
+\end{verbatim}
+
+
 \subsection{struct}\label{struct}\index{class}%
 
 \bf{struct} \it{name} \verb${$
@@ -4068,6 +4419,139 @@ weapons[1].price = 80;
 weapons[1].name = "Poison dagger";
 \end{verbatim}
 structs are essential if you have complex data that you need to store in your scripts.
+
+
+\subsection{managed (struct)}\label{managedmodifier}%
+
+\bf{managed struct} \it{name} \verb${$
+
+\bf{Managed} is a modifier that can be applied to \bf{struct} declaration to make them
+managed structs.
+
+Managed structs are special in the way that objects of their types are created in dynamic pool
+as opposed to global variables, that exist from the game start to when the game is shut down,
+and local variables, that exist only when their function is run. You cannot declare a variable
+of managed struct, but only a pointer variable.
+
+The advantage of such managed (or dynamic) objects is that they are created only when needed
+and disposed of when no longer needed. Also, since you work with pointer to object instead of
+object itself, you may assign them to another variable without copying object itself, pass them
+to function as parameter, or return from the function.
+
+\bf{IMPORTANT:} there is a big limitation for user-defined managed structs now, it is that they
+themselves cannot have members of pointer types (or dynamic arrays).
+
+Example:
+
+\begin{verbatim}
+managed struct Apple {
+  int color;
+  int freshness;
+};
+\end{verbatim}
+This declares managed struct. To declare a pointer to such struct you do:
+
+\begin{verbatim}
+Apple* my_apple;
+\end{verbatim}
+This creates a pointer variable \verb$my_apple$ of managed type \verb$Apple$.
+
+However, this does \bf{not} create an object itself yet, and \verb$my_apple$ is assigned
+\bf{null} value now. If you try to access struct members using \verb$my_apple$ now, you will
+get errors.
+To create an actual object you need to use a \helprefn{new}{newstatement} keyword:
+
+\begin{verbatim}
+my_apple = new Apple;
+\end{verbatim}
+
+The object is now created in the dynamic memory pool, and variable \verb$my_apple$
+\bf{points} to it. This lets us access object contents:
+
+\begin{verbatim}
+my_apple.color = Game.GetColorFromRGB(255, 0, 0);
+my_apple.freshness = 100;
+\end{verbatim}
+
+You may copy pointer to another variable of same type:
+\begin{verbatim}
+Apple* apple2 = my_apple;
+\end{verbatim}
+
+This does \bf{not} copy object itself, only its address in dynamic pool, meaning both
+variables - \verb$my_apple$ and \verb$appl2$ - point to same object!
+
+You may write a function that take such pointer as parameter:
+
+\begin{verbatim}
+function DisplayAppleDescription(Apple* apple) {
+  String s = String.Format("Apple has color %d and freshness %d", apple.color, apple.freshness);
+  Display(s);
+}
+\end{verbatim}
+
+and then call it like:
+\begin{verbatim}
+DisplayAppleDescription(my_apple);
+\end{verbatim}
+
+You may write a function that returns pointer to apple:
+
+\begin{verbatim}
+Apple* CreateYellowApple(int fresh) {
+  Apple* apple = new Apple;
+  apple.color = Game.GetColorFromRGB(255, 0, 255);
+  apple.freshness = fresh;
+  return apple;
+}
+\end{verbatim}
+
+and then use such function just like:
+
+\begin{verbatim}
+Apple *my_apple = CreateYellowApple(50);
+\end{verbatim}
+
+
+\bf{When does the dynamic object gets destroyed?}
+After you created dynamic object as described above, it will exist in memory as long as
+\it{there is at least one pointer variable pointing to it}. As soon as the last pointer
+gets destroyed itself (for example, if it was local function variable, and function ended),
+or is assigned another object, or simply assigned \verb$null$, then the dynamic object is
+removed from your game forever.
+
+See Also: \helprefn{new}{newstatement},
+\helprefn{Pointers in AGS}{Pointers}
+
+
+\subsection{new}\label{newstatement}%
+
+\it{pointer_variable} = \bf{new} \it{managed_type};
+
+Creates a new dynamic (managed) object of \it{managed_type} and assigns it to \it{pointer_variable}.
+
+Example:
+
+\begin{verbatim}
+// Here we declare a managed struct for Apple
+managed struct Apple {
+  int color;
+  int freshness;
+};
+
+// ...and declare a global pointer to Apple
+Apple* SomeApple;
+
+// At the game start we create a new dynamic object of Apple type
+// and assign its address to the pointer variable
+function game_start()
+{
+  SomeApple = new Apple;
+}
+\end{verbatim}
+
+See Also: \helprefn{managed (struct)}{managedmodifier},
+\helprefn{Pointers in AGS}{Pointers}
 
 
 \subsection{enum}\label{enum}%
@@ -4253,7 +4737,7 @@ The AudioChannel instance represents a currently playing audio file. You can use
 instance to check the status of playing sounds, and adjust them.
 
 
-\subsection{Seek}\label{AudioChannel.Seek}\index{AudioChannel.Seek}\index{SeekMODPattern}\index{SeekMP3PosMillis}\index{SeekMIDIPosition}%
+\subsection{Seek (audio channel)}\label{AudioChannel.Seek}\index{AudioChannel.Seek}\index{SeekMODPattern}\index{SeekMP3PosMillis}\index{SeekMIDIPosition}%
 
 \it{(Formerly known as SeekMIDIPosition, which is now obsolete)} ILBRK
 \it{(Formerly known as SeekMODPattern, which is now obsolete)} ILBRK
@@ -4315,6 +4799,26 @@ room object.
 \it{Compatibility:} Supported by \bf{AGS 3.2.0} and later versions.
 
 \it{See Also:} \helprefn{AudioChannel.Volume}{AudioChannel.Volume}
+
+
+\subsection{Speed property (audio channel)}\label{AudioChannel.Speed}\index{AudioChannel.Speed}%
+
+\begin{verbatim}
+int AudioChannel.Speed
+\end{verbatim}
+Gets/sets the playing audio clip's playback speed. The value is defined in clip's milliseconds per second:
+1000 is default, meaning 1000 of clip's ms in 1 real second (scale 1:1). Set < 1000 for slower play and > 1000
+for faster play.
+\bf{NOTE:} currently works for MP3 and OGG audio clips only.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+AudioChannel *channel = aFunnyTalk.Play();
+channel.Speed = 2000;
+\end{verbatim}
+plays \it{aFunnyTalk} clip at the double speed.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
 
 
 \subsection{Stop (audio channel)}\label{AudioChannel.Stop}\index{AudioChannel.Stop}\index{StopChannel}\index{StopAmbientSound}%
@@ -4460,7 +4964,7 @@ will display what is currently playing on audio channel 2.
 \it{See Also:} \helprefn{AudioClip.Play}{AudioClip.Play}, \helprefn{System.AudioChannels}{System.AudioChannels}
 
 
-\subsection{Position property}\label{AudioChannel.Position}\index{AudioChannel.Position}\index{GetMODPattern}\index{GetMP3PosMillis}\index{GetMIDIPosition}%
+\subsection{Position property (audio channel)}\label{AudioChannel.Position}\index{AudioChannel.Position}\index{GetMODPattern}\index{GetMP3PosMillis}\index{GetMIDIPosition}%
 
 \it{(Formerly known as GetMIDIPosition, which is now obsolete)} ILBRK
 \it{(Formerly known as GetMODPattern, which is now obsolete)} ILBRK
@@ -4875,7 +5379,7 @@ wait until the animation finishes before returning.
 \it{(Formerly known as NewRoomNPC, which is now obsolete)}
 
 \begin{verbatim}
-Character.ChangeRoom(int room_number, optional int x, optional int y)
+Character.ChangeRoom(int room_number, optional int x, optional int y, optional CharacterDirection direction)
 \end{verbatim}
 
 Changes the room that the character is in.
@@ -4897,12 +5401,17 @@ Optionally, you can include an X and Y co-ordinate (you must include either both
 or neither). If you do so, then the character will also be moved to the specified
 co-ordinates in the new room.
 
+Optionally, you can also include direction parameter, that determines which
+direction this character will be facing after room change.
+
 \fcol{red}{Example:}
 \begin{verbatim}
-player.ChangeRoom(4, 100, 50);
+player.ChangeRoom(4, 100, 50, eDirectionRight);
 \end{verbatim}
 will move the player character to room 4 and also place him at coordinates 100,50.
 This will also mean that the game moves into room 4.
+
+\it{Compatibility:} Optional \it{direction} parameter is supported only by \bf{AGS 3.4.0} and later versions.
 
 \it{See Also:} \helprefn{Character.ChangeRoomAutoPosition}{Character.ChangeRoomAutoPosition}
 
@@ -5000,7 +5509,43 @@ cEgo.FaceCharacter(cMan);
 \end{verbatim}
 will make the character EGO face the character MAN
 
-\it{See Also:} \helprefn{Character.FaceLocation}{Character.FaceLocation},
+\it{See Also:} \helprefn{Character.FaceDirection}{Character.FaceDirection},
+\helprefn{Character.FaceLocation}{Character.FaceLocation},
+\helprefn{Character.FaceObject}{Character.FaceObject},
+\helprefn{Character.Walk}{Character.Walk}
+
+
+\subsection{FaceDirection}\label{Character.FaceDirection}\index{Character.FaceDirection}%
+
+\begin{verbatim}
+Character.FaceDirection(CharacterDirection direction, BlockingStyle=eBlock)
+\end{verbatim}
+Turns the graphic of the character so that it looks like he is facing
+direction \it{direction}. This involves changing the current loop to the appropriate
+loop number, and setting the frame number to 0 (standing).
+
+If the character has Turning enabled (ie. the "Characters turn to face direction" game
+option is turned on, and the character does not have the "Do not turn before walking"
+option checked), then the character will turn on the spot in order to face the new direction.
+In this case, the BlockingStyle parameter determines whether the script waits for the
+character to finish turning (eBlock, the default) or whether the script continues immediately
+and the character finishes turning later on (eNoBlock).
+
+If the character does not have Turning enabled, he will immediately turn to face the
+new direction and the BlockingStyle parameter has no effect. In this case, the screen
+will not be refreshed straight away -- if you want to see the character facing his new direction
+immediately, call  Wait(1);
+
+\fcol{red}{Example:}
+\begin{verbatim}
+cEgo.FaceDirection(eDirectionUpRight);
+\end{verbatim}
+will make the character EGO face up-right.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{Character.FaceCharacter}{Character.FaceCharacter},
+\helprefn{Character.FaceLocation}{Character.FaceLocation},
 \helprefn{Character.FaceObject}{Character.FaceObject},
 \helprefn{Character.Walk}{Character.Walk}
 
@@ -5036,7 +5581,10 @@ cEgo.FaceLocation(cEgo.x + 50, cEgo.y);
 \end{verbatim}
 will make the character face to the east.
 
-\it{See Also:} \helprefn{Character.FaceCharacter}{Character.FaceCharacter}
+\it{See Also:} \helprefn{Character.FaceCharacter}{Character.FaceCharacter},
+\helprefn{Character.FaceDirection}{Character.FaceDirection},
+\helprefn{Character.FaceObject}{Character.FaceObject},
+\helprefn{Character.Walk}{Character.Walk}
 
 
 \subsection{FaceObject}\label{Character.FaceObject}\index{Character.FaceObject}%
@@ -5065,7 +5613,10 @@ player.FaceObject(object[2]);
 \end{verbatim}
 will make the player character face object 2.
 
-\it{See Also:} \helprefn{Character.FaceCharacter}{Character.FaceCharacter}
+\it{See Also:} \helprefn{Character.FaceCharacter}{Character.FaceCharacter},
+\helprefn{Character.FaceDirection}{Character.FaceDirection},
+\helprefn{Character.FaceLocation}{Character.FaceLocation},
+\helprefn{Character.Walk}{Character.Walk}
 
 
 \subsection{FollowCharacter}\label{Character.FollowCharacter}\index{Character.FollowCharacter}\index{FollowCharacter}\index{FollowCharacterEx}%
@@ -5195,6 +5746,54 @@ Display("EGO's description: %s", description);
 will retrieve EGO's "description" property and display it.
 
 \it{See Also:} \helprefn{Character.GetProperty}{Character.GetProperty}
+
+
+\subsection{SetProperty (character)}\label{Character.SetProperty}\index{Character.SetProperty}%
+
+\begin{verbatim}
+bool Character.SetProperty(const string property, int value)
+\end{verbatim}
+Sets the new \it{value} for the custom \it{property} for the specified character. Returns
+TRUE if such property exists and FALSE on failure.
+
+This command works with Number properties (it sets the numeric value), and with Boolean
+properties (sets FALSE is value is equal to 0, or TRUE otherwise).
+
+Use the equivalent SetTextProperty function to set new text property value.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+cEgo.SetProperty("XPLevel", 10);
+\end{verbatim}
+will change EGO character's "XPLevel" custom property to 10.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{Character.SetTextProperty}{Character.SetTextProperty}
+
+
+\subsection{SetTextProperty (character)}\label{Character.SetTextProperty}\index{Character.SetTextProperty}%
+
+\begin{verbatim}
+bool Character.SetTextProperty(const string property, const string value)
+\end{verbatim}
+Sets the new \it{value} text for the custom \it{property} for the specified character. Returns
+TRUE if such property exists and FALSE on failure.
+
+This command works with Text properties only. The property's text will be
+changed to new value.
+
+Use the equivalent SetProperty function to set a non-text property.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+cEgo.SetTextProperty("Description", "I am handsome!");
+\end{verbatim}
+will change EGO's "description" property.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{Character.SetProperty}{Character.SetProperty}
 
 
 \subsection{HasInventory}\label{Character.HasInventory}\index{Character.HasInventory}%
@@ -5537,6 +6136,30 @@ will tint the player character green for a second, then turn it back to normal.
 \helprefn{Character.Tint}{Character.Tint}
 
 
+\subsection{IsInteractionAvailable (character)}\label{Character.IsInteractionAvailable}\index{Character.IsInteractionAvailable}%
+
+\begin{verbatim}
+Character.IsInteractionAvailable(CursorMode)
+\end{verbatim}
+Checks whether there is an event handler defined for activating the character
+in cursor mode MODE.
+
+This function is very similar to RunInteraction, except that rather than run the event
+handler script function, it simply returns \it{true} if something would have happened,
+or \it{false} if unhandled_event would have been run.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+if (cNPC.IsInteractionAvailable(eModeTalkto) == 0)
+  Display("speaking with this character would not do anything.");
+\end{verbatim}
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{IsInteractionAvailable}{IsInteractionAvailable},
+\helprefn{Character.RunInteraction}{Character.RunInteraction}
+
+
 \subsection{RunInteraction (character)}\label{Character.RunInteraction}\index{Character.RunInteraction}\index{RunCharacterInteraction}%
 
 \it{(Formerly known as RunCharacterInteraction, which is now obsolete)}
@@ -5554,7 +6177,9 @@ cMan.RunInteraction(eModeTalk);
 \end{verbatim}
 will execute the code defined in the MAN's "TALK TO CHARACTER" event.
 
-\it{See Also:} \helprefn{ProcessClick}{ProcessClick}, \helprefn{Hotspot.RunInteraction}{Hotspot.RunInteraction},
+\it{See Also:} \helprefn{Room.ProcessClick}{Room.ProcessClick},
+\helprefn{Character.IsInteractionAvailable}{Character.IsInteractionAvailable},
+\helprefn{Hotspot.RunInteraction}{Hotspot.RunInteraction},
 \helprefn{InventoryItem.RunInteraction}{InventoryItem.RunInteraction}
 
 
@@ -5669,6 +6294,38 @@ that MAN is in, if he is not in the current room.
 
 \it{See Also:} \helprefn{Character.ID}{Character.ID},
 \helprefn{Character.ChangeRoom}{Character.ChangeRoom}
+
+
+\subsection{SetLightLevel (character)}\label{Character.SetLightLevel}\index{Character.SetLightLevel}%
+
+\begin{verbatim}
+void Character.SetLightLevel(int light_level)
+\end{verbatim}
+Sets individual light level for this character.
+
+The light level is from \bf{-100 to 100}.
+
+In 8-bit games you cannot use positive light level for brightening effect, but you
+may still use negative values to produce darkening effect.
+
+To disable character lighting and tinting effects, call SetLightLevel with parameter \it{light_level} 0.
+
+\bf{NOTE}: Setting a light level will disable any RGB tint set for the character.
+
+\bf{NOTE:} Character's individual light level OVERRIDES both ambient light level and local region light level.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+cEgo.LightLevel = 100;
+\end{verbatim}
+This will give character EGO maximal individual brightness.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{Character.Tint}{Character.Tint},
+\helprefn{SetAmbientLightLevel}{SetAmbientLightLevel},
+\helprefn{Object.SetLightLevel}{Object.SetLightLevel},
+\helprefn{Region.LightLevel}{Region.LightLevel}
 
 
 \subsection{SetIdleView}\label{Character.SetIdleView}\index{Character.SetIdleView}\index{SetCharacterIdle}%
@@ -6180,7 +6837,42 @@ cMan.Clickable = 0;
 \end{verbatim}
 will make the game ignore clicks on the character MAN.
 
-\it{See Also:} \helprefn{Object.Clickable}{Object.Clickable}
+\it{See Also:} \helprefn{Object.Clickable}{Object.Clickable},
+\helprefn{Character.Move}{Character.Move},
+\helprefn{Character.Moving}{Character.Moving},
+\helprefn{Character.Walk}{Character.Walk}
+
+
+\subsection{DestinationX property}\label{Character.DestinationX}\index{Character.DestinationX}%
+
+\begin{verbatim}
+readonly int Character.DestinationX
+\end{verbatim}
+Gets the X coordinate of the character's final moving destination. If character is not walking
+or moving it is equal to its current position.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{Character.DestinationY}{Character.DestinationY},
+\helprefn{Character.Move}{Character.Move},
+\helprefn{Character.Moving}{Character.Moving},
+\helprefn{Character.Walk}{Character.Walk}
+
+
+\subsection{DestinationY property}\label{Character.DestinationY}\index{Character.DestinationY}%
+
+\begin{verbatim}
+readonly int Character.DestinationY
+\end{verbatim}
+Gets the Y coordinate of the character's final moving destination. If character is not walking
+or moving it is equal to its current position.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{Character.DestinationX}{Character.DestinationX},
+\helprefn{Character.Move}{Character.Move},
+\helprefn{Character.Moving}{Character.Moving},
+\helprefn{Character.Walk}{Character.Walk}
 
 
 \subsection{DiagonalLoops property}\label{Character.DiagonalLoops}\index{Character.DiagonalLoops}%
@@ -7544,6 +8236,49 @@ The DialogOptionsRenderingInfo instance is used by the \helprefn{custom dialog o
 system. You can never create one yourself, it will be passed in to the dialog option functions as
 described in the linked page.
 
+\subsection{RunActiveOption}\label{DialogOptionsRenderingInfo.RunActiveOption}\index{DialogOptionsRenderingInfo.RunActiveOption}%
+
+\begin{verbatim}
+bool DialogOptionsRenderingInfo.RunActiveOption();
+\end{verbatim}
+Runs the currently selected dialog option, the one set in ActiveOptionID, and returns \bf{true} on success.
+
+As of AGS 3.4.0 you must call this function for conversation to continue, most common places
+for such call are \verb$dialog_options_mouse_click$ and \verb$dialog_options_key_press$ functions.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+function dialog_options_key_press(DialogOptionsRenderingInfo *info, eKeyCode key)
+{
+  if (keycode == eKeyReturn)
+    info.RunActiveOption();
+}
+\end{verbatim}
+runs selected dialog option when player presses Enter/Return key.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{DialogOptionsRenderingInfo.ActiveOptionID}{DialogOptionsRenderingInfo.ActiveOptionID}
+
+
+\subsection{Update}\label{DialogOptionsRenderingInfo.Update}\index{DialogOptionsRenderingInfo.Update}%
+
+\begin{verbatim}
+void DialogOptionsRenderingInfo.Update();
+\end{verbatim}
+Forces dialog options to redraw, eventually leading to be \verb$dialog_options_render$ function run.
+
+Like other elements of interface, dialog options GUI does not redraw itself every game loop;
+in attempt to optimize perfomance it aims to do so only when there are changes to its look.
+But sometimes you may want to change GUI looks based on your own decision, and not automatic
+behavior. For example, you want to script animated text, or other element belonging to dialog
+options. This is when you call DialogOptionsRenderingInfo.Update().
+
+\bf{IMPORTANT:} Keep in mind that calling \bf{Update} does not immediately run \verb$dialog_options_render$,
+render function will be run at least after current script ends.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
 
 \subsection{ActiveOptionID property}\label{DialogOptionsRenderingInfo.ActiveOptionID}\index{DialogOptionsRenderingInfo.ActiveOptionID}%
 
@@ -7571,7 +8306,8 @@ always selects the first option
 
 \it{Compatibility:} Supported by \bf{AGS 3.1.0} and later versions.
 
-\it{See Also:} \helprefn{Dialog.GetOptionState}{Dialog.GetOptionState}
+\it{See Also:} \helprefn{DialogOptionsRenderingInfo.RunActiveOption}{DialogOptionsRenderingInfo.RunActiveOption},
+\helprefn{Dialog.GetOptionState}{Dialog.GetOptionState}
 
 
 \subsection{DialogToRender property}\label{DialogOptionsRenderingInfo.DialogToRender}\index{DialogOptionsRenderingInfo.DialogToRender}%
@@ -7614,7 +8350,7 @@ creates a 300x150 size area with alpha channel to draw the dialog options in.
 \it{Compatibility:} Supported by \bf{AGS 3.3.0} and later versions.
 
 \it{See Also:}
-\helprefn{DialogOptionsRenderingInfo.Height}{DialogOptionsRenderingInfo.Height}
+\helprefn{DialogOptionsRenderingInfo.Height}{DialogOptionsRenderingInfo.Height},
 \helprefn{DialogOptionsRenderingInfo.Width}{DialogOptionsRenderingInfo.Width}
 
 
@@ -9375,6 +10111,44 @@ read a string into the buffer. Then close the file.
 \it{See Also:} \helprefn{File.Open}{File.Open}, \helprefn{File.WriteString}{File.WriteString}
 
 
+\subsection{Seek (file)}\label{File.Seek}\index{File.Seek}%
+
+\begin{verbatim}
+int Seek(int offset, optional FileSeek origin);
+\end{verbatim}
+Moves read/write position by \it{offset} bytes related to \it{origin}. Returns new read/write position.
+This is usually used when you are reading file and want to skip over some data, or writing a file
+and want to move back and overwrite a piece of data in the previous section for some reason.
+
+The \it{origin} is determined by one of the FileSeek types:
+eSeekBegin - counts \it{offset} bytes starting from the file's beginning; \it{offset} must be positive. ILBRK
+eSeekCurrent - counts \it{offset} bytes starting from the current position; \it{offset} may be either
+positive or negative. ILBRK
+eSeekEnd - counts \it{offset} bytes starting from the file's end, going backwards; \it{offset} must be positive.
+
+If optional \it{origin} parameter is not specified, eSeekCurrent type is used by default.
+
+\bf{IMPORTANT:} Do not use Seek on files which you have written with safe data writing functions,
+such as WriteInt and WriteString. These functions add additional data for the purpose of
+protection against incorrect reading, and Seek ignores that protection. If you use Seek and then try
+to ReadIntBack, for example, most probably you will receive a reading error. Only use it on files
+that contain "raw" data, or when you know written format precisely.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+File *input = File.Open("test.dat", eFileRead);
+int first_value = input.ReadRawInt();
+input.Seek(256);
+int second_value = input.ReadRawInt();
+input.Close();
+\end{verbatim}
+will open the file test.dat, read \verb$first_value$, skip 256 bytes, read \verb$second_value$, and close the file.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{File.Position}{File.Position}
+
+
 \subsection{WriteInt}\label{File.WriteInt}\index{File.WriteInt}\index{FileWriteInt}%
 
 \it{(Formerly known as FileWriteInt, which is now obsolete)}
@@ -9534,6 +10308,33 @@ output.Close();
 will write a number to the file 'test.dat', and display a message if there was a problem.
 
 \it{See Also:} \helprefn{File.EOF}{File.EOF}, \helprefn{File.ReadStringBack}{File.ReadStringBack}
+
+
+\subsection{Position property (file)}\label{File.Position}\index{File.Position}%
+
+\begin{verbatim}
+readonly int File.Position
+\end{verbatim}
+Gets current File's reading or writing position. This value means number of bytes between file's
+beginning and current place you are reading from or writing to.
+
+This may be useful, for example, if you are passing the file pointer to another script module
+function and want to know how much data that function has read or written.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+File *output = File.Open("test.dat", eFileWrite);
+int old_pos = output.Position;
+WriteCustomModuleData(output);
+int new_pos = output.Position;
+Display("Custom module has written %d bytes", new_pos - old_pos);
+output.Close();
+\end{verbatim}
+will open file, pass the file pointer to some custom function, then display amount of data that function wrote.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{File.Seek}{File.Seek}
 
 
 
@@ -9711,7 +10512,8 @@ what they do:
     on the screen. Pass DATA as 1 to turn this on, 0 to turn it off.
 \end{verbatim}
 
-\it{See Also:} \helprefn{Debugging features}{Debuggingfeatures}
+\it{See Also:} \helprefn{Debugging features}{Debuggingfeatures},
+\helprefn{System.RuntimeInfo}{System.RuntimeInfo}
 
 
 \subsection{DeleteSaveSlot}\label{DeleteSaveSlot}%
@@ -9987,7 +10789,7 @@ Returns the name of whatever is on the screen at (X,Y). This allows you to
 create the Lucasarts-style status lines reading "Look at xxx" as the player
 moves the cursor over them.
 
-\bf{NOTE:} Unlike ProcessClick, this function actually works on what the player can
+\bf{NOTE:} Unlike Room.ProcessClick, this function actually works on what the player can
 see on the screen - therefore, if the co-ordinates are on a GUI, a blank string is returned.
 
 \bf{NOTE:} The co-ordinates are SCREEN co-ordinates, NOT ROOM co-ordinates. This
@@ -10325,7 +11127,7 @@ IsInteractionAvailable (int x, int y, int mode)
 Checks whether there is an interaction defined for clicking on the screen at (X,Y)
 in cursor mode MODE.
 
-This function is very similar to ProcessClick, except that rather than carry out any
+This function is very similar to Room.ProcessClick, except that rather than carry out any
 interactions it encounters, it simply returns 1 if something would have happened, or 0 if
 unhandled_event would have been run.
 
@@ -10338,7 +11140,10 @@ if (IsInteractionAvailable(mouse.x,mouse.y, eModeLookat) == 0)
 \end{verbatim}
 
 \it{See Also:} \helprefn{InventoryItem.IsInteractionAvailable}{InventoryItem.IsInteractionAvailable},
-\helprefn{ProcessClick}{ProcessClick}
+\helprefn{Hotspot.IsInteractionAvailable}{Hotspot.IsInteractionAvailable},
+\helprefn{Object.IsInteractionAvailable}{Object.IsInteractionAvailable},
+\helprefn{Character.IsInteractionAvailable}{Character.IsInteractionAvailable},
+\helprefn{Room.ProcessClick}{Room.ProcessClick}
 
 
 \subsection{IsKeyPressed}\label{IsKeyPressed}%
@@ -10370,6 +11175,27 @@ if (IsKeyPressed(eKeyUpArrow) == 1)
 will move the character EGO upwards 3 pixels when the up arrow is pressed.
 
 \it{See Also:} \helprefn{Mouse.IsButtonDown}{Mouse.IsButtonDown}
+
+
+\subsection{IsPluginLoaded}\label{IsPluginLoaded}%
+
+\begin{verbatim}
+static bool Game.IsPluginLoaded(const string name)
+\end{verbatim}
+Checks whether the plugin of the given \it{name} was present and loaded for the game.
+
+\bf{IMPORTANT:} If the plugin exports its own script functions that you used in your
+game script, and not found when the game is launched, then the game won't start up
+at all, exiting with error. IsPluginLoaded may therefore be useful to check for plugins
+that are not interacted with from game script, but just run on their own.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+if (Game.IsPluginLoaded("my_plugin")) {
+  Display("My plugin is found and running!");
+}
+\end{verbatim}
+will display a message if plugin is present.
 
 
 \subsection{IsTimerExpired}\label{IsTimerExpired}%
@@ -10481,36 +11307,6 @@ if (IsKeyPressed(32)==1) PauseGame();
 will pause the game if the player presses the space bar
 
 \it{See Also:} \helprefn{UnPauseGame}{UnPauseGame}
-
-
-\subsection{ProcessClick}\label{ProcessClick}%
-
-\begin{verbatim}
-ProcessClick (int x, int y, CursorMode)
-\end{verbatim}
-Simulates clicking the mouse on the location (X,Y) on the screen, in the
-specified cursor mode. Any conditions attached will be executed. For example,
-\begin{verbatim}
-ProcessClick (100, 50, eModeLookat);
-\end{verbatim}
-will simulate clicking the mouse on co-ordinates (100,50) in the Look mode.
-
-\bf{NOTE:} This function ignores all interfaces and acts as though the point is
-directly visible. In other words, if the co-ordinates you pass happen to
-lie on a button on an interface, what actually happens will be as if the
-user clicked behind the interface onto the actual screen.
-
-The available cursor modes are the ones you define on your Cursors tab (but with eMode
-prepended to them). Usually these are eModeWalkto, eModeLookat, etc.
-
-\fcol{red}{Example:}
-\begin{verbatim}
-ProcessClick(mouse.x,mouse.y, eModeLookat);
-\end{verbatim}
-will simulate a click in the LOOK MODE where the cursor is.
-
-\it{See Also:} \helprefn{IsInteractionAvailable}{IsInteractionAvailable},
-\helprefn{Hotspot.RunInteraction}{Hotspot.RunInteraction}
 
 
 \subsection{QuitGame}\label{QuitGame}%
@@ -10730,6 +11526,42 @@ will prompt the player for a filename and then save the screenshot with the file
 \it{See Also:} \helprefn{DynamicSprite.SaveToFile}{DynamicSprite.SaveToFile}
 
 
+\subsection{SetAmbientLightLevel}\label{SetAmbientLightLevel}%
+
+\begin{verbatim}
+void SetAmbientTint(int light_level);
+\end{verbatim}
+
+Sets an ambient light level that affects all objects and characters in the room.
+
+The light level is from \bf{-100 to 100}, where 0 means that no adjustment will be
+applied to sprites.
+
+In 8-bit games you cannot use positive light level for brightening effect, but you
+may still use negative values to produce darkening effect.
+
+To turn light level off, call this command again but pass the \it{light_level} as 0.
+
+\bf{NOTE:} This function overrides any specific region light levels or tints on the screen,
+but does NOT override individual character and object light levels.
+
+\bf{NOTE}: Setting an ambient light level will disable ambient RGB tint,
+if there one was previously set.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+SetAmbientLightLevel(50);
+\end{verbatim}
+will apply light level 50 to every character and object on screen (which do not have individual light levels).
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{SetAmbientTint}{SetAmbientTint},
+\helprefn{Character.SetLightLevel}{Character.SetLightLevel},
+\helprefn{Object.SetLightLevel}{Object.SetLightLevel},
+\helprefn{Region.LightLevel}{Region.LightLevel}
+
+
 \subsection{SetAmbientTint}\label{SetAmbientTint}%
 
 \begin{verbatim}
@@ -10763,8 +11595,10 @@ SetAmbientTint(0, 0, 250, 30, 100);
 \end{verbatim}
 will tint everything on the screen with a hint of blue.
 
-\it{See Also:} \helprefn{DrawingSurface.DrawSurface}{DrawingSurface.DrawSurface},
-\helprefn{Character.Tint}{Character.Tint}, \helprefn{Object.Tint}{Object.Tint}
+\it{See Also:} \helprefn{SetAmbientLightLevel}{SetAmbientLightLevel},
+\helprefn{Character.Tint}{Character.Tint},
+\helprefn{Object.Tint}{Object.Tint},
+\helprefn{Region.Tint}{Region.Tint}
 
 
 
@@ -10962,8 +11796,8 @@ You cannot use fully qualified directories with this command (eg. \verb$C:\Games
 the player might have installed your game to any folder, and they might not be running Windows.
 
 Therefore, only two types of path are supported: ILBRK
-1. Relative paths (eg. "Saves"). This will create a "Saves" folder inside your game folder ILBRK
-2. The special tag \verb!$MYDOCS$! which allows you to create a folder for your save games
+1. Relative paths (eg. "Saves"). This will create a subfolder inside \bf{default game save folder} ILBRK
+2. The special tag \verb!$MYDOCS$! which allows you to explicitly create a different folder for your save games
 inside the user's documents folder.
 
 The actual folder referenced with \verb!$MYDOCS$! is different on every platform:
@@ -10974,9 +11808,8 @@ MacOS: game installation folder.
 
 Returns \it{true} if the save game directory has been changed successfully; \it{false} if not.
 
-\bf{NOTE:} It is recommended that you do not use this function. Instead, set the "Save games
-folder name" property in the General Settings of the editor, which allows the save games to be
-detected by Windows Game Explorer, and avoids problems writing to the Program Files folder.
+\bf{NOTE:} We advise you against using this function without strong need. In the most cases setting the
+"Save games folder name" property in the General Settings of the editor should be sufficient.
 
 \fcol{red}{Example:}
 \begin{verbatim}
@@ -11193,6 +12026,45 @@ will pause the script and wait until 5 seconds have passed or the player presses
 clicks the mouse.
 
 \it{See Also:} \helprefn{Wait}{Wait}, \helprefn{WaitKey}{WaitKey}
+
+
+\subsection{AudioClipCount property}\label{Game.AudioClipCount}\index{Game.AudioClipCount}%
+
+\begin{verbatim}
+readonly static int Game.AudioClipCount
+\end{verbatim}
+Returns the number of audio clips in the game.
+
+This is useful for script modules if you need to iterate through all the audio clips for some reason.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{Game.AudioClips}{Game.AudioClips}
+
+
+\subsection{AudioClips property}\label{Game.AudioClips}\index{Game.AudioClips}%
+
+\begin{verbatim}
+readonly static int Game.AudioClips[int slot]
+\end{verbatim}
+Returns the AudioClip* pointer by its index in game resources.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+int i = 0;
+int music_count = 0;
+while (i < Game.AudioClipCount)
+{
+  if (Game.AudioClips[i].Type == eAudioTypeMusic)
+    music_count++;
+  i++;
+}
+Display("We have %d musical clips in our game", music_count);
+\end{verbatim}
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{Game.AudioClipCount}{Game.AudioClipCount}
 
 
 \subsection{CharacterCount property}\label{Game.CharacterCount}\index{Game.CharacterCount}%
@@ -11721,6 +12593,30 @@ will centre the CONTROLPANEL GUI in the middle of the screen.
 \it{See Also:} \helprefn{GUI.SetPosition}{GUI.SetPosition}
 
 
+\subsection{Click (gui)}\label{GUI.Click}\index{GUI.Click}%
+
+\begin{verbatim}
+GUI.Click()
+\end{verbatim}
+Forces GUI's OnClick event. If there is a script function bound to that event it will be
+run, otherwise nothing happens.
+
+\bf{NOTE:} GUI.Click should not to be confused with \bf{static} function GUI.ProcessClick.
+GUI.Click is called for specific GUI and does not impose any other conditions, while
+GUI.ProcessClick is called for "any GUI element that happen to be at the given coordinates".
+
+\fcol{red}{Example:}
+\begin{verbatim}
+gMainMenu.Click();
+\end{verbatim}
+triggers OnClick event for gMainMenu.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{Button.Click}{Button.Click},
+\helprefn{GUI.ProcessClick}{GUI.ProcessClick}
+
+
 \subsection{GetAtScreenXY (GUI)}\label{GUI.GetAtScreenXY}\index{GUI.GetAtScreenXY}\index{GetGUIAt}%
 
 \it{(Formerly known as GetGUIAt, which is now obsolete)}
@@ -11756,6 +12652,33 @@ will display the number of the GUI that the mouse is over.
 
 \it{See Also:} \helprefn{GUIControl.GetAtScreenXY}{GUIControl.GetAtScreenXY}, \helprefn{GUI.ID}{GUI.ID},
 \helprefn{GUI.ZOrder}{GUI.ZOrder}
+
+
+\subsection{ProcessClick (GUI)}\label{GUI.ProcessClick}\index{GUI.ProcessClick}%
+
+\begin{verbatim}
+static void GUI.ProcessClick(int x, int y, CursorMode)
+\end{verbatim}
+Simulates clicking the mouse on the location (X,Y) on the screen, in the
+specified cursor mode. This "click" has special behavior in that it \bf{only
+affects GUI and GUI controls} under given coordinates. Any conditions attached
+to the first interface elements on given coordinates will be executed.
+Other game elements (room objects, hotspots, characters) will be \bf{ignored}.
+
+The available cursor modes are the ones you define on your Cursors tab (but with eMode
+prepended to them). Usually these are eModeWalkto, eModeLookat, etc.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+ProcessClick(100, 50, eModePointer);
+\end{verbatim}
+will simulate clicking the mouse on co-ordinates (100, 50) in the Pointer mode,
+which will ignore anything but interface.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{Mouse.Click}{Mouse.Click},
+\helprefn{Room.ProcessClick}{Room.ProcessClick}
 
 
 \subsection{SetPosition (GUI)}\label{GUI.SetPosition}\index{GUI.SetPosition}\index{SetGUIPosition}%
@@ -12085,7 +13008,7 @@ moves the VERBCOIN GUI down 5 pixels.
 \it{See Also:} \helprefn{GUI.SetPosition}{GUI.SetPosition}, \helprefn{GUI.X}{GUI.X}
 
 
-\subsection{ZOrder property}\label{GUI.ZOrder}\index{GUI.ZOrder}\index{SetGUIZOrder}%
+\subsection{ZOrder property (gui)}\label{GUI.ZOrder}\index{GUI.ZOrder}\index{SetGUIZOrder}%
 
 \it{(Formerly known as SetGUIZOrder, which is now obsolete)}
 
@@ -12193,7 +13116,9 @@ btnBigButton.BringToFront();
 \end{verbatim}
 will move the \it{btnBigButton} button to be in front of all other controls on the GUI.
 
-\it{See Also:} \helprefn{GUIControl.SendToBack}{GUIControl.SendToBack}
+\it{See Also:}
+\helprefn{GUIControl.SendToBack}{GUIControl.SendToBack},
+\helprefn{GUIControl.ZOrder}{GUIControl.ZOrder}
 
 
 \subsection{Clickable property (GUI controls)}\label{GUIControl.Clickable}\index{Button.Clickable}\index{InvWindow.Clickable}\index{Label.Clickable}\index{ListBox.Clickable}\index{Slider.Clickable}\index{TextBox.Clickable}%
@@ -12355,7 +13280,9 @@ btnBigButton.SendToBack();
 \end{verbatim}
 will move the \it{btnBigButton} button to be behind all other controls on the GUI.
 
-\it{See Also:} \helprefn{GUIControl.BringToFront}{GUIControl.BringToFront}
+\it{See Also:}
+\helprefn{GUIControl.BringToFront}{GUIControl.BringToFront},
+\helprefn{GUIControl.ZOrder}{GUIControl.ZOrder}
 
 
 \subsection{SetPosition (GUI controls)}\label{GUIControl.SetPosition}\index{Button.SetPosition}\index{InvWindow.SetPosition}\index{Label.SetPosition}\index{ListBox.SetPosition}\index{Slider.SetPosition}\index{TextBox.SetPosition}\index{SetGUIObjectPosition}%
@@ -12512,6 +13439,35 @@ will move the \it{btnConfirm} button to be positioned 20 pixels from the top of 
 \helprefn{GUIControl.X}{GUIControl.X}
 
 
+\subsection{ZOrder property (GUI controls)}\label{GUIControl.ZOrder}\index{Button.ZOrder}\index{InvWindow.ZOrder}\index{Label.ZOrder}\index{ListBox.ZOrder}\index{Slider.ZOrder}\index{TextBox.ZOrder}%
+
+\begin{verbatim}
+int GUIControl.ZOrder;
+\end{verbatim}
+Gets/sets the control's Z-order relative to other controls within the same owning GUI.
+This allows you to precisely arrange the display order of controls at runtime and to
+know which position the control had at certain moment in time.
+
+For AGS GUI Z-order means the order in wich controls are displayed from bottom to top.
+That means that control at the bottom has Z-order equal to 0, and control at the top
+has highest Z-order, equal to (number of controls - 1).
+
+Setting \verb$GUIControl.ZOrder = 0;$ will do same thing as calling \verb$GUIControl.SendToBack()$,
+and setting \verb$GUIControl.ZOrder = GUIControl.OwningGUI.ControlCount - 1;$ will
+do same thing as calling \verb$GUIControl.BringToFront()$.
+
+If you try to set inappropriate ZOrder, the nearest acceptable one will be applied instead.
+
+\bf{Applies To}
+
+Inherited by the Button, InvWindow, Label, ListBox, Slider and TextBox.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{GUIControl.BringToFront}{GUIControl.BringToFront},
+\helprefn{GUIControl.SendToBack}{GUIControl.SendToBack}
+
+
 
 \section{GUI Button functions and properties}%
 
@@ -12527,7 +13483,22 @@ will move the \it{btnConfirm} button to be positioned 20 pixels from the top of 
 \helprefn{Visible property (inherited)}{GUIControl.Visible}ILBRK
 \helprefn{Width property (inherited)}{GUIControl.Width}ILBRK
 \helprefn{X property (inherited)}{GUIControl.X}ILBRK
-\helprefn{Y property (inherited)}{GUIControl.Y}
+\helprefn{Y property (inherited)}{GUIControl.Y}ILBRK
+\helprefn{ZOrder property (inherited)}{GUIControl.ZOrder}
+
+
+\subsection{Click (button)}\label{Button.Click}\index{Button.Click}%
+
+\begin{verbatim}
+Button.Click()
+\end{verbatim}
+Forces Button's OnClick event. If there is a script function bound to that event it will be
+run, otherwise nothing happens.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{GUI.Click}{GUI.Click},
+\helprefn{GUI.ProcessClick}{GUI.ProcessClick}
 
 
 \subsection{Animate (button)}\label{Button.Animate}\index{Button.Animate}\index{AnimateButton}%
@@ -12761,7 +13732,8 @@ will change button 'btnRestart' to have white text.
 \helprefn{Visible property (inherited)}{GUIControl.Visible}ILBRK
 \helprefn{Width property (inherited)}{GUIControl.Width}ILBRK
 \helprefn{X property (inherited)}{GUIControl.X}ILBRK
-\helprefn{Y property (inherited)}{GUIControl.Y}
+\helprefn{Y property (inherited)}{GUIControl.Y}ILBRK
+\helprefn{ZOrder property (inherited)}{GUIControl.ZOrder}
 
 
 \subsection{ScrollDown (inv window)}\label{InvWindow.ScrollDown}\index{InvWindow.ScrollDown}%
@@ -12992,7 +13964,8 @@ inventory list can be scrolled up.
 \helprefn{Visible property (inherited)}{GUIControl.Visible}ILBRK
 \helprefn{Width property (inherited)}{GUIControl.Width}ILBRK
 \helprefn{X property (inherited)}{GUIControl.X}ILBRK
-\helprefn{Y property (inherited)}{GUIControl.Y}
+\helprefn{Y property (inherited)}{GUIControl.Y}ILBRK
+\helprefn{ZOrder property (inherited)}{GUIControl.ZOrder}
 
 
 \subsection{Font property (label)}\label{Label.Font}\index{Label.Font}\index{SetLabelFont}%
@@ -13076,7 +14049,8 @@ will change label 'lblStatus' to have yellow text.
 \helprefn{Visible property (inherited)}{GUIControl.Visible}ILBRK
 \helprefn{Width property (inherited)}{GUIControl.Width}ILBRK
 \helprefn{X property (inherited)}{GUIControl.X}ILBRK
-\helprefn{Y property (inherited)}{GUIControl.Y}
+\helprefn{Y property (inherited)}{GUIControl.Y}ILBRK
+\helprefn{ZOrder property (inherited)}{GUIControl.ZOrder}
 
 
 \subsection{AddItem}\label{ListBox.AddItem}\index{ListBox.AddItem}\index{ListBoxAdd}%
@@ -13517,7 +14491,8 @@ Gets/sets whether the list box's items are translated to the selected game langu
 \helprefn{Visible property (inherited)}{GUIControl.Visible}ILBRK
 \helprefn{Width property (inherited)}{GUIControl.Width}ILBRK
 \helprefn{X property (inherited)}{GUIControl.X}ILBRK
-\helprefn{Y property (inherited)}{GUIControl.Y}
+\helprefn{Y property (inherited)}{GUIControl.Y}ILBRK
+\helprefn{ZOrder property (inherited)}{GUIControl.ZOrder}
 
 
 \subsection{BackgroundGraphic property (slider)}\label{Slider.BackgroundGraphic}\index{Slider.BackgroundGraphic}%
@@ -13665,7 +14640,8 @@ will set the audio volume to the value of the slider \it{sldVolume}.
 \helprefn{Visible property (inherited)}{GUIControl.Visible}ILBRK
 \helprefn{Width property (inherited)}{GUIControl.Width}ILBRK
 \helprefn{X property (inherited)}{GUIControl.X}ILBRK
-\helprefn{Y property (inherited)}{GUIControl.Y}
+\helprefn{Y property (inherited)}{GUIControl.Y}ILBRK
+\helprefn{ZOrder property (inherited)}{GUIControl.ZOrder}
 
 
 \subsection{Font property (text box)}\label{TextBox.Font}\index{TextBox.Font}\index{SetTextBoxFont}%
@@ -13819,6 +14795,78 @@ will retrieve hotspot 2's "description" property and display it.
 \it{See Also:} \helprefn{Hotspot.GetProperty}{Hotspot.GetProperty}
 
 
+\subsection{SetProperty (hotspot)}\label{Hotspot.SetProperty}\index{Hotspot.SetProperty}%
+
+\begin{verbatim}
+bool Hotspot.SetProperty(const string property, int value)
+\end{verbatim}
+Sets the new \it{value} for the custom \it{property} for the specified hotspot. Returns
+TRUE if such property exists and FALSE on failure.
+
+This command works with Number properties (it sets the numeric value), and with Boolean
+properties (sets FALSE is value is equal to 0, or TRUE otherwise).
+
+Use the equivalent SetTextProperty function to set new text property value.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+hDoor.SetProperty("LockDifficulty", 5);
+\end{verbatim}
+will change Door hotspot's "LockDifficulty" custom property to 5.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{Hotspot.SetTextProperty}{Hotspot.SetTextProperty}
+
+
+\subsection{SetTextProperty (hotspot)}\label{Hotspot.SetTextProperty}\index{Hotspot.SetTextProperty}%
+
+\begin{verbatim}
+bool Hotspot.SetTextProperty(const string property, const string value)
+\end{verbatim}
+Sets the new \it{value} text for the custom \it{property} for the specified hotspot. Returns
+TRUE if such property exists and FALSE on failure.
+
+This command works with Text properties only. The property's text will be
+changed to new value.
+
+Use the equivalent SetProperty function to set a non-text property.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+hDoor.SetTextProperty("Description", "The sturdy door");
+\end{verbatim}
+will change Door's "description" property.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{Hotspot.SetProperty}{Hotspot.SetProperty}
+
+
+
+\subsection{IsInteractionAvailable (hotspot)}\label{Hotspot.IsInteractionAvailable}\index{Hotspot.IsInteractionAvailable}%
+
+\begin{verbatim}
+Hotspot.IsInteractionAvailable(CursorMode)
+\end{verbatim}
+Checks whether there is an event handler defined for activating the hotspot
+in cursor mode MODE.
+
+This function is very similar to RunInteraction, except that rather than run the event
+handler script function, it simply returns \it{true} if something would have happened,
+or \it{false} if unhandled_event would have been run.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+if (hTable.IsInteractionAvailable(eModeLookat) == 0)
+  Display("looking on this table would not do anything.");
+\end{verbatim}
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{IsInteractionAvailable}{IsInteractionAvailable},
+\helprefn{Hotspot.RunInteraction}{Hotspot.RunInteraction}
+
 
 \subsection{RunInteraction (hotspot)}\label{Hotspot.RunInteraction}\index{Hotspot.RunInteraction}\index{RunHotspotInteraction}%
 
@@ -13836,7 +14884,8 @@ hDoor.RunInteraction(eModeLookat);
 \end{verbatim}
 will run the code defined in the "LOOK AT HOTSPOT" event for hotspot hDoor.
 
-\it{See Also:} \helprefn{ProcessClick}{ProcessClick},
+\it{See Also:} \helprefn{Room.ProcessClick}{Room.ProcessClick},
+\helprefn{Hotspot.IsInteractionAvailable}{Hotspot.IsInteractionAvailable},
 \helprefn{Character.RunInteraction}{Character.RunInteraction},
 \helprefn{Object.RunInteraction}{Object.RunInteraction}
 
@@ -14037,6 +15086,54 @@ will retrieve inv item 2's "description" property and display it.
 \it{See Also:} \helprefn{InventoryItem.GetProperty}{InventoryItem.GetProperty}
 
 
+\subsection{SetProperty (inventory)}\label{InventoryItem.SetProperty}\index{InventoryItem.SetProperty}%
+
+\begin{verbatim}
+bool InventoryItem.SetProperty(const string property, int value)
+\end{verbatim}
+Sets the new \it{value} for the custom \it{property} for the specified inventory item. Returns
+TRUE if such property exists and FALSE on failure.
+
+This command works with Number properties (it sets the numeric value), and with Boolean
+properties (sets FALSE is value is equal to 0, or TRUE otherwise).
+
+Use the equivalent SetTextProperty function to set new text property value.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+iStone.SetProperty("Weight", 120);
+\end{verbatim}
+will change Stone's "weight" custom property to 120.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{InventoryItem.SetTextProperty}{InventoryItem.SetTextProperty}
+
+
+\subsection{SetTextProperty (inventory)}\label{InventoryItem.SetTextProperty}\index{InventoryItem.SetTextProperty}%
+
+\begin{verbatim}
+bool InventoryItem.SetTextProperty(const string property, const string value)
+\end{verbatim}
+Sets the new \it{value} text for the custom \it{property} for the specified inventory item. Returns
+TRUE if such property exists and FALSE on failure.
+
+This command works with Text properties only. The property's text will be
+changed to new value.
+
+Use the equivalent SetProperty function to set a non-text property.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+iKey.SetTextProperty("Description", "A rusty key");
+\end{verbatim}
+will change key's "description" property.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{InventoryItem.SetProperty}{InventoryItem.SetProperty}
+
+
 \subsection{IsInteractionAvailable (inventory)}\label{InventoryItem.IsInteractionAvailable}\index{InventoryItem.IsInteractionAvailable}\index{IsInventoryInteractionAvailable}%
 
 \it{(Formerly known as IsInventoryInteractionAvailable, which is now obsolete)}
@@ -14082,7 +15179,7 @@ will run the inventory event handler for the current cursor mode when the player
 on the item (Handle Inv Clicks needs to be enabled for this to work)
 
 \it{See Also:} \helprefn{InventoryItem.IsInteractionAvailable}{InventoryItem.IsInteractionAvailable},
-\helprefn{ProcessClick}{ProcessClick}, \helprefn{Character.RunInteraction}{Character.RunInteraction}
+\helprefn{Room.ProcessClick}{Room.ProcessClick}, \helprefn{Character.RunInteraction}{Character.RunInteraction}
 
 
 \subsection{CursorGraphic property (inventory)}\label{InventoryItem.CursorGraphic}\index{InventoryItem.CursorGraphic}%
@@ -14668,6 +15765,29 @@ will change the Look cursor's view to ROLLEYES.
 \helprefn{Mouse.ChangeModeHotspot}{Mouse.ChangeModeHotspot}
 
 
+\subsection{Click (mouse)}\label{Mouse.Click}\index{Mouse.Click}%
+
+\begin{verbatim}
+static void Click(MouseButton)
+\end{verbatim}
+Fires mouse click event at current mouse position (at mouse.x / mouse.y).
+This is in all aspects identical to what would happen if a player clicked
+actual mouse button. This function may be useful to simulate player actions
+in game, or create automatic demonstrations (like tutorials).
+
+\fcol{red}{Example:}
+\begin{verbatim}
+Mouse.SetPosition(100, 100);
+Mouse.Click(eMouseLeft);
+\end{verbatim}
+This will simulate user click at (100,100).
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{GUI.ProcessClick}{GUI.ProcessClick},
+\helprefn{Room.ProcessClick}{Room.ProcessClick}
+
+
 \subsection{ControlEnabled property}\label{Mouse.ControlEnabled}\index{Mouse.ControlEnabled}\index{ControlEnabled}%
 
 \begin{verbatim}
@@ -14876,7 +15996,7 @@ will place the mouse cursor in the centre of the screen.
 \it{See Also:} \helprefn{Mouse.SetBounds}{Mouse.SetBounds}
 
 
-\subsection{Speed property (mouse)}\label{Mouse.Speed}\index{Mouse.Speed}\index{Speed}%
+\subsection{Speed property (mouse)}\label{Mouse.Speed}\index{Mouse.Speed}%
 
 \begin{verbatim}
 static float Mouse.Speed;
@@ -15460,6 +16580,53 @@ will retrieve Object 0's "description" property then display it.
 \it{See Also:} \helprefn{Object.GetProperty}{Object.GetProperty}
 
 
+\subsection{SetProperty (object)}\label{Object.SetProperty}\index{Object.SetProperty}%
+
+\begin{verbatim}
+bool Object.SetProperty(const string property, int value)
+\end{verbatim}
+Sets the new \it{value} for the custom \it{property} for the specified room object. Returns
+TRUE if such property exists and FALSE on failure.
+
+This command works with Number properties (it sets the numeric value), and with Boolean
+properties (sets FALSE is value is equal to 0, or TRUE otherwise).
+
+Use the equivalent SetTextProperty function to set new text property value.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+oTable.SetProperty("ItemCapacity", 5);
+\end{verbatim}
+will change Table's "ItemCapacity" custom property to 5.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{Object.SetTextProperty}{Object.SetTextProperty}
+
+
+\subsection{SetTextProperty (object)}\label{Object.SetTextProperty}\index{Object.SetTextProperty}%
+
+\begin{verbatim}
+void Object.SetTextProperty(const string property, const string value)
+\end{verbatim}
+Sets the new \it{value} text for the custom \it{property} for the specified room object.
+
+This command works with Text properties only. The property's text will be
+changed to new value.
+
+Use the equivalent SetProperty function to set a non-text property.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+oTable.SetTextProperty("Description", "A dull furniture");
+\end{verbatim}
+will change table's "description" property.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{Object.SetProperty}{Object.SetProperty}
+
+
 \subsection{IsCollidingWithObject (object)}\label{Object.IsCollidingWithObject}\index{Object.IsCollidingWithObject}\index{AreObjectsColliding}%
 
 \it{(Formerly known as AreObjectsColliding, which is now obsolete)}
@@ -15569,6 +16736,30 @@ will tint object 1 green for a second, then turn it back to normal.
 \it{See Also:} \helprefn{Object.Tint}{Object.Tint}
 
 
+\subsection{IsInteractionAvailable (object)}\label{Object.IsInteractionAvailable}\index{Object.IsInteractionAvailable}%
+
+\begin{verbatim}
+Object.IsInteractionAvailable(CursorMode)
+\end{verbatim}
+Checks whether there is an event handler defined for activating the room object
+in cursor mode MODE.
+
+This function is very similar to RunInteraction, except that rather than run the event
+handler script function, it simply returns \it{true} if something would have happened,
+or \it{false} if unhandled_event would have been run.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+if (oDoor.IsInteractionAvailable(eModeInteract) == 0)
+  Display("interacting with this door would not do anything.");
+\end{verbatim}
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{IsInteractionAvailable}{IsInteractionAvailable},
+\helprefn{Object.RunInteraction}{Object.RunInteraction}
+
+
 \subsection{RunInteraction (object)}\label{Object.RunInteraction}\index{Object.RunInteraction}\index{RunObjectInteraction}%
 
 \it{(Formerly known as RunObjectInteraction, which is now obsolete)}
@@ -15585,9 +16776,42 @@ object[3].RunInteraction(eModeInteract);
 \end{verbatim}
 will execute the code defined in object 3's "Interact with object" event handler.
 
-\it{See Also:} \helprefn{ProcessClick}{ProcessClick},
+\it{See Also:} \helprefn{Room.ProcessClick}{Room.ProcessClick},
+\helprefn{Object.IsInteractionAvailable}{Object.IsInteractionAvailable},
 \helprefn{Character.RunInteraction}{Character.RunInteraction},
 \helprefn{Hotspot.RunInteraction}{Hotspot.RunInteraction}
+
+
+\subsection{SetLightLevel (object)}\label{Object.SetLightLevel}\index{Object.SetLightLevel}%
+
+\begin{verbatim}
+void Object.SetLightLevel(int light_level)
+\end{verbatim}
+Sets individual light level for this room object.
+
+The light level is from \bf{-100 to 100}.
+
+In 8-bit games you cannot use positive light level for brightening effect, but you
+may still use negative values to produce darkening effect.
+
+To disable object lighting and tinting effects, call SetLightLevel with parameter \it{light_level} 0.
+
+\bf{NOTE}: Setting a light level will disable any RGB tint set for the object.
+
+\bf{NOTE:} Object's individual light level OVERRIDES both ambient light level and local region light level.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+oLamp.LightLevel = 100;
+\end{verbatim}
+This will give the lamp maximal individual brightness.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{Object.Tint}{Object.Tint},
+\helprefn{SetAmbientLightLevel}{SetAmbientLightLevel},
+\helprefn{Character.SetLightLevel}{Character.SetLightLevel},
+\helprefn{Region.LightLevel}{Region.LightLevel}
 
 
 \subsection{SetPosition (object)}\label{Object.SetPosition}\index{Object.SetPosition}\index{SetObjectPosition}%
@@ -16634,15 +17858,15 @@ for region 4.
 \it{(Formerly known as SetRegionTint, which is now obsolete)}
 
 \begin{verbatim}
-Region.Tint(int red, int green, int blue, int amount)
+Region.Tint(int red, int green, int blue, int amount, optional int luminance)
 \end{verbatim}
-Changes the region to have RGB tint (RED, GREEN, BLUE).
+Changes the region to have RGB tint (RED, GREEN, BLUE) with AMOUNT percent
+saturation.
 
 The red, green and blue values are between 0 and 255, and you supply the same
 values that you would use in the editor.
 
-AMOUNT determines the extent of the tinting, and is from 1 to 100, reflecting a percentage
-figure. 100\verb$%$ will completely colourize characters in that area to the specified colour.
+For the meaning of all the parameters, see \helprefn{SetAmbientTint}{SetAmbientTint}.
 
 \bf{NOTE}: The tint will be reset when the player leaves the room,
 so you need to use it in Player Enters Room if you want a permanent
@@ -16658,7 +17882,10 @@ region[2].Tint(180, 20, 20, 50);
 \end{verbatim}
 will set region 2's RGB tint to (180, 20, 20) with 50\verb$%$ opacity.
 
-\it{See Also:} \helprefn{Region.LightLevel}{Region.LightLevel}
+\it{Compatibility:} Optional \it{luminance} parameter is supported only by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{Region.LightLevel}{Region.LightLevel},
+\helprefn{SetAmbientTint}{SetAmbientTint}
 
 
 
@@ -16720,6 +17947,9 @@ takes values from 0 to 200.
 Subtract 100 from the value you would use in the editor when calling this function.
 The reason for this discrepancy is legacy reasons from the DOS editor days.
 
+In 8-bit games you cannot use positive light level for brightening effect, but you
+may still use negative values to produce darkening effect.
+
 To disable region lighting and tinting effects, set LightLevel to 0.
 
 \bf{NOTE}: The light level will be reset to the editor settings when the player leaves the
@@ -16728,6 +17958,8 @@ change.
 
 \bf{NOTE}: Setting a light level will disable any RGB tint set for the region.
 
+\bf{NOTE:} Region's light level does NOT override individual character and object light levels.
+
 \fcol{red}{Example:}
 \begin{verbatim}
 if (GetGlobalInt(10)==1)
@@ -16735,7 +17967,10 @@ if (GetGlobalInt(10)==1)
 \end{verbatim}
 will set region 2's level light to 100 if the Global Integer 10 is 1.
 
-\it{See Also:} \helprefn{Region.Tint}{Region.Tint}
+\it{See Also:} \helprefn{Region.Tint}{Region.Tint},
+\helprefn{SetAmbientLightLevel}{SetAmbientLightLevel},
+\helprefn{Character.SetLightLevel}{Character.SetLightLevel},
+\helprefn{Object.SetLightLevel}{Object.SetLightLevel}
 
 
 \subsection{TintEnabled property}\label{Region.TintEnabled}\index{Region.TintEnabled}%
@@ -16748,7 +17983,7 @@ Gets whether the region currently has an RGB tint enabled for it.
 Returns \it{true} if it does, and \it{false} if it does not. If it does not, then
 the LightLevel property reflects the region lighting.
 
-If this property is \it{false}, then the TintRed, TintGreen, TintBlue and TintSaturation
+If this property is \it{false}, then the TintRed, TintGreen, TintBlue, TintSaturation and TintLuminance
 properties are invalid.
 
 \fcol{red}{Example:}
@@ -16785,7 +18020,8 @@ if (region[4].TintEnabled) {
 will display a message with the region's tints.
 
 \it{See Also:} \helprefn{Region.Tint}{Region.Tint}, \helprefn{Region.TintEnabled}{Region.TintEnabled},
-\helprefn{Region.TintGreen}{Region.TintGreen}, \helprefn{Region.TintRed}{Region.TintRed}
+\helprefn{Region.TintGreen}{Region.TintGreen}, \helprefn{Region.TintRed}{Region.TintRed},
+\helprefn{Region.TintLuminance}{Region.TintLuminance}
 
 
 \subsection{TintGreen property}\label{Region.TintGreen}\index{Region.TintGreen}%
@@ -16811,7 +18047,8 @@ if (region[4].TintEnabled) {
 will display a message with the region's tints.
 
 \it{See Also:} \helprefn{Region.Tint}{Region.Tint}, \helprefn{Region.TintEnabled}{Region.TintEnabled},
-\helprefn{Region.TintBlue}{Region.TintBlue}, \helprefn{Region.TintRed}{Region.TintRed}
+\helprefn{Region.TintBlue}{Region.TintBlue}, \helprefn{Region.TintRed}{Region.TintRed},
+\helprefn{Region.TintSaturation}{Region.TintSaturation}, \helprefn{Region.TintLuminance}{Region.TintLuminance}
 
 
 \subsection{TintRed property}\label{Region.TintRed}\index{Region.TintRed}%
@@ -16837,7 +18074,8 @@ if (region[4].TintEnabled) {
 will display a message with the region's tints.
 
 \it{See Also:} \helprefn{Region.Tint}{Region.Tint}, \helprefn{Region.TintEnabled}{Region.TintEnabled},
-\helprefn{Region.TintBlue}{Region.TintBlue}, \helprefn{Region.TintGreen}{Region.TintGreen}
+\helprefn{Region.TintBlue}{Region.TintBlue}, \helprefn{Region.TintGreen}{Region.TintGreen},
+\helprefn{Region.TintSaturation}{Region.TintSaturation}, \helprefn{Region.TintLuminance}{Region.TintLuminance}
 
 
 \subsection{TintSaturation property}\label{Region.TintSaturation}\index{Region.TintSaturation}%
@@ -16863,8 +18101,26 @@ if (region[4].TintEnabled) {
 will display a message with the region's tints.
 
 \it{See Also:} \helprefn{Region.Tint}{Region.Tint}, \helprefn{Region.TintEnabled}{Region.TintEnabled},
-\helprefn{Region.TintBlue}{Region.TintBlue}, \helprefn{Region.TintGreen}{Region.TintGreen}
-, \helprefn{Region.TintRed}{Region.TintRed}
+\helprefn{Region.TintBlue}{Region.TintBlue}, \helprefn{Region.TintGreen}{Region.TintGreen},
+\helprefn{Region.TintRed}{Region.TintRed}, \helprefn{Region.TintLuminance}{Region.TintLuminance}
+
+
+\subsection{TintLuminance property}\label{Region.TintLuminance}\index{Region.TintLuminance}%
+
+\begin{verbatim}
+readonly int Region.TintLuminance
+\end{verbatim}
+Gets the \it{luminance} setting for the region's current tint.
+
+This property is read-only; to change it, use the \helprefn{Region.Tint}{Region.Tint} command.
+
+\bf{NOTE:} If the \helprefn{Region.TintEnabled}{Region.TintEnabled} property is false, then
+this value is meaningless.
+
+
+\it{See Also:} \helprefn{Region.Tint}{Region.Tint}, \helprefn{Region.TintEnabled}{Region.TintEnabled},
+\helprefn{Region.TintBlue}{Region.TintBlue}, \helprefn{Region.TintGreen}{Region.TintGreen},
+\helprefn{Region.TintRed}{Region.TintRed}, \helprefn{Region.TintSaturation}{Region.TintSaturation}
 
 
 
@@ -17021,10 +18277,12 @@ Display("The player character number is %d", player.ID);
 \it{See Also:} \helprefn{Character.ID}{Character.ID}
 
 
-\subsection{GetRoomProperty}\label{GetRoomProperty}%
+\subsection{GetProperty (room)}\label{Room.GetProperty}\index{Room.GetProperty}\index{GetRoomProperty}%
+
+\it{(Formerly known as global function GetRoomProperty, which is now obsolete)}
 
 \begin{verbatim}
-GetRoomProperty (string property)
+Room.GetProperty(string property)
 \end{verbatim}
 Returns the custom property setting of the PROPERTY for the current room.
 
@@ -17038,7 +18296,7 @@ can be checked.
 
 \fcol{red}{Example:}
 \begin{verbatim}
-if (GetRoomProperty("CanBeAttackedHere"))
+if (Room.GetProperty("CanBeAttackedHere"))
   Display("An evil monster lunges at you!");
 \end{verbatim}
 will print the message if the current room has its "CanBeAttackedHere" box ticked.
@@ -17058,7 +18316,7 @@ Returns the custom property setting of the PROPERTY for the current room.
 This command works with Text properties only. The property's text will be
 returned from this function.
 
-Use the equivalent GetRoomProperty function to get a non-text property.
+Use the equivalent Room.GetProperty function to get a non-text property.
 
 Note that you cannot retrieve room properties of other rooms - only the current room
 can be checked.
@@ -17070,7 +18328,59 @@ Display("The room's description: %s", description);
 \end{verbatim}
 will retrieve the room's "description" property then display it.
 
-\it{See Also:} \helprefn{GetRoomProperty}{GetRoomProperty}
+\it{See Also:} \helprefn{Room.GetProperty}{Room.GetProperty}
+
+
+\subsection{SetProperty (room)}\label{Room.SetProperty}\index{Room.SetProperty}%
+
+\begin{verbatim}
+static bool Room.SetProperty(const string property, int value)
+\end{verbatim}
+Sets the new \it{value} for the custom \it{property} for the specified room. Returns
+TRUE if such property exists and FALSE on failure.
+
+This command works with Number properties (it sets the numeric value), and with Boolean
+properties (sets FALSE is value is equal to 0, or TRUE otherwise).
+
+Use the equivalent SetTextProperty function to set new text property value.
+
+Note that you cannot set room properties of other rooms - only the current room.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+Room.SetProperty("Darkness", 10);
+\end{verbatim}
+will change room's "Darkness" custom property to 10.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{Room.SetTextProperty}{Room.SetTextProperty}
+
+
+\subsection{SetTextProperty (room)}\label{Room.SetTextProperty}\index{Room.SetTextProperty}%
+
+\begin{verbatim}
+bool Room.SetTextProperty(const string property, const string value)
+\end{verbatim}
+Sets the new \it{value} text for the custom \it{property} for the specified room. Returns
+TRUE if such property exists and FALSE on failure.
+
+This command works with Text properties only. The property's text will be
+changed to new value.
+
+Use the equivalent SetProperty function to set a non-text property.
+
+Note that you cannot set room properties of other rooms - only the current room.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+Room.SetTextProperty("Description", "The Throne Room");
+\end{verbatim}
+will change room's "description" property.
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{Room.SetProperty}{Room.SetProperty}
 
 
 \subsection{GetScalingAt}\label{GetScalingAt}%
@@ -17187,6 +18497,36 @@ if (HasPlayerBeenInRoom(14)) {
 will display a message if the player has been to room 14.
 
 \it{See Also:} \helprefn{ResetRoom}{ResetRoom}
+
+
+\subsection{ProcessClick (Room)}\label{Room.ProcessClick}\index{Room.ProcessClick}\index{ProcessClick}%
+
+\it{(Formerly known as global function ProcessClick, which is now obsolete)}
+
+\begin{verbatim}
+static void Room.ProcessClick(int x, int y, CursorMode)
+\end{verbatim}
+Simulates clicking the mouse on the location (X,Y) on the screen, in the
+specified cursor mode. This "click" has special behavior in that it \bf{only
+affects Room elements and characters} under given coordinates. Any conditions attached
+to the first object found on given coordinates will be executed. Game interface
+(buttons, sliders, and so on) will be \bf{ignored}. Even if the coordinates happen
+to lie on a button, the simulated click will "pass through" that button as if it
+was not present.
+
+The available cursor modes are the ones you define on your Cursors tab (but with eMode
+prepended to them). Usually these are eModeWalkto, eModeLookat, etc.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+Room.ProcessClick(100, 50, eModeLookat);
+\end{verbatim}
+will simulate a click in the Look mode on co-ordinates (100, 50).
+
+\it{See Also:} \helprefn{GUI.ProcessClick}{GUI.ProcessClick},
+\helprefn{Mouse.Click}{Mouse.Click},
+\helprefn{IsInteractionAvailable}{IsInteractionAvailable},
+\helprefn{Hotspot.RunInteraction}{Hotspot.RunInteraction}
 
 
 \subsection{ReleaseViewport}\label{ReleaseViewport}%
@@ -18774,6 +20114,32 @@ else {
 \end{verbatim}
 
 
+\subsection{RuntimeInfo property}\label{System.RuntimeInfo}\index{System.RuntimeInfo}%
+
+\begin{verbatim}
+readonly static String System.RuntimeInfo;
+\end{verbatim}
+Returns the string containing short description of the enviroment the game is currently
+running in, such as engine version, graphics mode, and available game resources.
+
+This is meant mainly for debug purposes.
+
+\bf{NOTE:} System.RuntimeInfo is a more convenient analogue of Debug(1, 0) command,
+being more explicit and working on both release and debug modes of the game.
+
+\fcol{red}{Example:}
+\begin{verbatim}
+function on_key_press(eKeyCode keycode) {
+  if (keycode == eKeyCtrlV) {
+    Display(System.RuntimeInfo);
+}
+\end{verbatim}
+
+\it{Compatibility:} Supported by \bf{AGS 3.4.0} and later versions.
+
+\it{See Also:} \helprefn{Debug}{Debug}
+
+
 \subsection{ScreenHeight property}\label{System.ScreenHeight}\index{System.ScreenHeight}%
 
 \it{(Formerly known as system.screen_height, which is now obsolete)}
@@ -19782,7 +21148,6 @@ There are maximum...
      299  state-saving rooms per game
      300  inventory items
    30000  imported sprites
-      30  controls on each GUI
      500  dialog topics
       30  options per dialog topic
       20  screen overlays at a time
@@ -19795,12 +21160,14 @@ unlimited words in the text parser dictionary
 unlimited characters
 unlimited views
 unlimited GUIs
+unlimited controls on each GUI
 unlimited loops per view
 unlimited frames per loop
+unlimited custom properties
 \end{verbatim}
 
-If you think any of these limits is a serious problem, contact me and I can
-probably increase it.
+We are working on removing existing limitations in the AGS, so some of the remaining
+restrictions might be loosened or eliminated in the following updates.
 
 \section{Keyboard Shortcuts}\label{KeyboardShortcuts}%
 
@@ -20647,6 +22014,146 @@ The config in saves folder overrides default one.
 This way it should be totally safe to install AGS games into C:/Program Files, without having administrative rights.
 
 
+\chapter{Upgrading to AGS 3.4}\label{UpgradeTo34}%
+
+AGS 3.4 introduces a number of significant enhancements to game creation process.
+
+\bf{Building game for multiple platforms}
+
+AGS can now compile and deploy your game for more than one target platform. Currently Windows and
+Linux are officially supported, but other may be added in following updates. Check the "Built target platforms"
+option in the "Compiler" section of the General Settings.
+
+\bf{NOTE:} for deploying your game for Linux you need to have a Linux-related utilities to be placed in the
+"Linux" folder at your AGS Editor installation. Those files are distributed along with the official AGS
+release.
+
+\bf{Custom game resolution}
+
+Your native game resolution can now be anything, not limited to predefined variants anymore.
+
+Similarily, the engine is now capable of running any game in any display mode your system supports.
+To achieve this it uses scaling filter of player's choice, and additional simple image stretching
+when required. The setup program has been altered to reflect this feature.
+
+\bf{Script API selector}
+
+You can now choose the variant of Script API (built-in functions and properties available for use)
+with two switches in the "Backwards Compatibility" section of the General Settings.
+
+One switch is called "Script API version" and defines the topmost level of built-in script content
+that you want to enable for your project. It is suggested to set this to the highest possible
+value. However, there may be cases when you load an lder project in the newer version of AGS,
+and new built-in function names conflict with names in some of the scripts you used in your
+project. In such cases you may decide between fixing your script or lowering AGS API version.
+The latter will let you compile game scripts without any changes, at the price of not being able
+to use newer built-in functions.
+
+Second switch is called "Script Compatibility Level" and defines the lowest level of built-in
+content. It is useful if you wish to keep using some of the old functions that were declared
+obsolete by newer version of AGS. You do so by setting this switch to version that still had
+those functions.
+
+\bf{NOTE:} You may change those two settings anytime if you'd like to experiment, or your plans
+has changed. It is recommended to do full game rebuild after you do so though.
+
+\bf{Mutable custom properties}
+
+Since introduction Custom Properties could not be changed at runtime, they had to keep their
+default values set in the Editor throughout the course of the game.
+Now this restriction was eliminated and you can change any existing custom property in game
+script, using appropriate SetProperty and SetTextProperty functions:
+
+\helprefn{Character.SetProperty}{Character.SetProperty},
+\helprefn{Character.SetTextProperty}{Character.SetTextProperty},
+\helprefn{Hotspot.SetProperty}{Hotspot.SetProperty},
+\helprefn{Hotspot.SetTextProperty}{Hotspot.SetTextProperty},
+\helprefn{InventoryItem.SetProperty}{InventoryItem.SetProperty},
+\helprefn{InventoryItem.SetTextProperty}{InventoryItem.SetTextProperty},
+\helprefn{Object.SetProperty}{Object.SetProperty},
+\helprefn{Object.SetTextProperty}{Object.SetTextProperty},
+\helprefn{Room.SetProperty}{Room.SetProperty},
+\helprefn{Room.SetTextProperty}{Room.SetTextProperty}
+
+Besides, the number of properties is no longer limited by 30, you may make as much of them as
+you need for your game.
+
+\bf{Extended WFN fonts}
+
+WFN (bitmap fonts) can now have up to 256 characters (as opposed to previously supported 128). You
+may need a specialized editor to create such fonts (for example, there is a good Editor plugin
+around meant for this task), and AGS will properly draw any of the 256 characters.
+
+\bf{New script features}
+
+First of all, you can now create your own managed structs and objects of their type in script. The
+difference from common structs is that you use pointers to work with these objects, and can pass them
+around as function parameters and function return values as well.
+\bf{IMPORTANT:} there is a big limitation for user-defined managed structs now, it is that they themselves
+cannot have members of pointer types (or dynamic arrays). We suppose that this restriction is only
+temporary and hope to remove it in future updates.
+
+You can now have some new forms of loop in your script, in addition to previously existing \verb$while$.
+First is \verb$do..while$ kind of loop that always performs its commands at least once before checking
+end condition, second is \verb$for$ loop that lets you initialize internal variable, define end condition
+and write iteration - all in its header.
+Another introduced command is \verb$switch$. One \verb$switch$ can replace a long list of \verb$if$ and \verb$else if$
+blocks.
+
+See:
+\helprefn{switch}{switchstatement},
+\helprefn{do..while}{dowhilestatement},
+\helprefn{for}{forstatement},
+\helprefn{break}{breakstatement},
+\helprefn{continue}{continuestatement},
+\helprefn{managed}{managedmodifier},
+\helprefn{new}{newstatement}
+
+\bf{Custom Dialog Options rendering extended}
+
+In the past the custom dialog rendering was strictly tied to mouse movement and clicks. Now it is
+extended to give you more freedom in setting it up.
+
+Two more related callbacks are added: \verb$dialog_options_repexec$ - that is an analogue of
+\verb$repeatedly_execute$ function, but is called only while dialog options are displayed, and
+\verb$dialog_options_key_press$ function, which is called whenever player presses a key when dialog
+options are on screen.
+
+The \verb$dialog_options_mouse_click$ will now be called always, even if user clicks on the option, but
+on other hand option won't be run without explicit command: \helprefn{RunActiveOption}{DialogOptionsRenderingInfo.RunActiveOption}.
+
+Along with RunActiveOption, \helprefn{DialogOptionsRenderingInfo}{DialogOptionsRenderingInfo} struct
+received another member function: \helprefn{Update}{DialogOptionsRenderingInfo.Update}. It forces
+options GUI to redraw itself, hence may be used to implement custom animation, or similar behavior.
+
+\bf{IMPORTANT:} The \verb$dialog_options_get_active$ callback was deprecated and won't be called, at all.
+You will need to slightly change the logic of your script. In most cases it may be enough to simply rename
+\verb$dialog_options_get_active$ to \verb$dialog_options_repexec$.
+
+\bf{NOTE:} For backwards compatibility you may use an option in General Settings called "Use old-style
+custom dialog options API". This will disable all the new stuff, but return \verb$dialog_options_get_active$
+and make \verb$dialog_options_mouse_click$ behave as it did before.
+
+For detailed information see: \helprefn{Custom dialog options rendering}{Dialog options, custom rendering}.
+
+\bf{Some functions object-ised}
+
+\begin{tabular}{|l|l|}
+\row{ {\bf obsolete function/variable }&{\bf replace with } }
+\row{ { GetRoomProperty }&{ \helprefn{Room.GetProperty}{Room.GetProperty} }}
+\row{ { ProcessClick }&{ \helprefn{Room.ProcessClick}{Room.ProcessClick} }}
+\end{tabular}
+
+\bf{REMINDER:} you can also use "Script Compatibility Level" switch to enable old functions.
+
+\bf{System limits update}
+
+The maximal number of GUI Controls per GUI is no longer limited.
+The maximal number of script modules is no longer limited.
+
+
+
+
 \chapter{Anonymous usage information}\label{AnonymousUsageInfo}%
 
 AGS contains an option to send anonymous usage information to the AGS website.
@@ -20697,7 +22204,7 @@ No, only the editor does this.
 
 
 
-\chapter{Contacting the author}%
+\chapter{Contacting the developers}%
 
 If you have any comments or suggestions, the first place to go is the AGS
 Forums. Linked off the main AGS website, it's where the AGS community
@@ -20706,8 +22213,7 @@ meets and you will find answers to many questions there.
 If you think you've found a bug, if you need help or can't get it to work,
 please check the following:\begin{itemize}
 \item That your question is not already answered in this manual. AGS has been
-painstakingly documented, so PLEASE read this manual through before asking
-me a question.
+painstakingly documented, so PLEASE read this manual through before asking a question.
 \item If it is not covered in the manual, check the CHANGES.TXT file. If a new
 feature has been added then it will be described there, if it has not yet
 been added to this manual.
@@ -20726,18 +22232,14 @@ Whatever the problem, if you can't solve it then post to the Technical Forums
 for help and include all the details of the problem -- there are lots of
 people there who will try to help you out.
 
-Please don't send me e-mail or private messages about problems using AGS.
+Please don't send us e-mails or private messages about problems using AGS.
 Post them to the forums, where others can help you and your question will
 then be searchable so that people in future can find out the answer without
 having to ask again!
 
-\bf{IMPORTANT: Please DO NOT e-mail me your game.} When you have a demo or
-full game to show off, please post it in the appropriate forum.
-
-\it{NOTE:} If you want to mail me an attachment to demonstrate a problem you are
-having, PLEASE COMPRESS IT using WinZip, PKZIP, etc and send it to me as a
-zip file. Also, please get permission in advance before sending me any
-attachments, or your message may get automatically deleted.
+\it{NOTE:} If you want to provide your game as an attachment to demonstrate a problem you are
+having, PLEASE COMPRESS IT using WinZip, PKZIP, etc and send it as a
+zip file.
 
 \bf{REMEMBER:} When you post a question to the forums, give it at least 24
 hours before posting again asking "WHY IS NOBODY HELPING ME?!?!?". We don't
@@ -20745,7 +22247,7 @@ all read the forums 24/7, good things come to those who wait.
 
 The AGS website: http://www.adventuregamestudio.co.uk
 
-The AGS forum:   http://www.adventuregamestudio.co.uk/forum/
+The AGS forum:   http://www.adventuregamestudio.co.uk/forums/
 
 
 \chapter{Credits}\label{Credits}%
@@ -20758,11 +22260,14 @@ The AGS forum:   http://www.adventuregamestudio.co.uk/forum/
   Benoit Pierre
   Bernhard Rosenkraenzer
   Cristian Morales Vega
+  Edward Rudd
+  Ferdinand Thiessen
   Francesco Ariis
   Gilad Shaham
   Ivan Mogilko
   Janet Gilbert
   Jochen Schleu
+  Joe Lee
   Michael Rittenhouse
   Morgan Willcock
   Nick Sonneveld
@@ -20784,6 +22289,7 @@ The AGS forum:   http://www.adventuregamestudio.co.uk/forum/
 \end{verbatim}
 \item Demo Quest III updated by RickJ.
 \item The default icon bar graphics were done by Teemu Eramaa (teemue@nic.fi)
+\item Windows editor original splash design by abstauber.
 \item Windows editor icons by Klaus.
 \item Blank Game template created by AGA.
 \item Default Game template enhanced by Rui "Trovatore" Pires.

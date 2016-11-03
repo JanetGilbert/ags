@@ -53,7 +53,7 @@ bool IniUtil::Read(const String &file, ConfigTree &tree)
     {
         if (!sec->GetItemCount())
             continue; // skip empty sections
-        StringMap &subtree = tree[sec->GetName()];
+        StringOrderMap &subtree = tree[sec->GetName()];
         for (CItemIterator item = sec->CBegin(); item != sec->CEnd(); ++item)
         {
             if (!item->IsKeyValue())
@@ -72,7 +72,7 @@ void IniUtil::Write(const String &file, const ConfigTree &tree)
     for (ConfigNode it_sec = tree.begin(); it_sec != tree.end(); ++it_sec)
     {
         const String &sec_key     = it_sec->first;
-        const StringMap &sec_tree = it_sec->second;
+        const StringOrderMap &sec_tree = it_sec->second;
 
         if (!sec_tree.size())
             continue; // skip empty sections
@@ -83,7 +83,7 @@ void IniUtil::Write(const String &file, const ConfigTree &tree)
             writer.WriteLineBreak();
         }
         // write all items
-        for (StrStrIter keyval = sec_tree.begin(); keyval != sec_tree.end(); ++keyval)
+        for (StrStrOIter keyval = sec_tree.begin(); keyval != sec_tree.end(); ++keyval)
         {
             const String &item_key   = keyval->first;
             const String &item_value = keyval->second;
@@ -120,16 +120,16 @@ bool IniUtil::Merge(const String &file, const ConfigTree &tree)
 
         // Remember the items we find in this section, if some items are not found,
         // they will be appended to the end of section.
-        const StringMap &subtree = tree_node->second;
+        const StringOrderMap &subtree = tree_node->second;
         std::map<String, bool> items_found;
-        for (StrStrIter keyval = subtree.begin(); keyval != subtree.end(); ++keyval)
+        for (StrStrOIter keyval = subtree.begin(); keyval != subtree.end(); ++keyval)
             items_found[keyval->first] = false;
 
         // Replace matching items
         for (ItemIterator item = sec->Begin(); item != sec->End(); ++item)
         {
             String key        = item->GetKey();
-            StrStrIter keyval = subtree.find(key);
+            StrStrOIter keyval = subtree.find(key);
             if (keyval == subtree.end())
                 continue; // this item is not interesting for us
 
@@ -148,7 +148,7 @@ bool IniUtil::Merge(const String &file, const ConfigTree &tree)
             {
                 if (item_f->second)
                     continue; // item was already found
-                StrStrIter keyval = subtree.find(item_f->first);
+                StrStrOIter keyval = subtree.find(item_f->first);
                 ini.InsertItem(sec, sec->End(), keyval->first, keyval->second);
             }
             sections_found[secname] = true; // mark section as known
@@ -161,8 +161,8 @@ bool IniUtil::Merge(const String &file, const ConfigTree &tree)
         if (sec_f->second)
             continue;
         SectionIterator sec = ini.InsertSection(ini.End(), sec_f->first);
-        const StringMap &subtree = tree.find(sec_f->first)->second;
-        for (StrStrIter keyval = subtree.begin(); keyval != subtree.end(); ++keyval)
+        const StringOrderMap &subtree = tree.find(sec_f->first)->second;
+        for (StrStrOIter keyval = subtree.begin(); keyval != subtree.end(); ++keyval)
             ini.InsertItem(sec, sec->End(), keyval->first, keyval->second);
     }
 

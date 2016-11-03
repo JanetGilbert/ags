@@ -27,11 +27,11 @@ namespace AGS
 namespace Common
 {
 
-typedef std::map<String, String>    StringMap;
-typedef StringMap::const_iterator   StrStrIter;
+typedef std::map<String, String>         StringOrderMap;
+typedef StringOrderMap::const_iterator   StrStrOIter;
 
-typedef std::map<String, StringMap> ConfigTree;
-typedef ConfigTree::const_iterator  ConfigNode;
+typedef std::map<String, StringOrderMap> ConfigTree;
+typedef ConfigTree::const_iterator       ConfigNode;
 
 namespace IniUtil
 {

@@ -14,9 +14,9 @@
 
 #include <cctype>
 #include "util/wgt2allg.h"
-#include "gfx/ali3d.h"
 #include "ac/common.h"
 #include "ac/gamesetup.h"
+#include "ac/gamestate.h"
 #include "ac/gui.h"
 #include "ac/keycode.h"
 #include "ac/mouse.h"
@@ -135,7 +135,7 @@ void WINAPI _export CSCIEraseWindow(Bitmap *ds, int handl)
 
 int WINAPI _export CSCIWaitMessage(Bitmap *ds, CSCIMessage * cscim)
 {
-    next_iteration();
+    NextIteration();
     for (int uu = 0; uu < MAXCONTROLS; uu++) {
         if (vobjs[uu] != NULL) {
             //      domouse(2);
@@ -150,7 +150,7 @@ int WINAPI _export CSCIWaitMessage(Bitmap *ds, CSCIMessage * cscim)
 
     while (1) {
         timerloop = 0;
-        next_iteration();
+        NextIteration();
         refresh_screen();
 
         cscim->id = -1;

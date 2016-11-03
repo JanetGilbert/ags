@@ -15,8 +15,8 @@
 #ifndef __AC_GUISLIDER_H
 #define __AC_GUISLIDER_H
 
+#include <vector>
 #include "gui/guiobject.h"
-#include "gui/dynamicarray.h"
 
 struct GUISlider:public GUIObject
 {
@@ -74,6 +74,10 @@ struct GUISlider:public GUIObject
     min = 0;
     max = 10;
     value = 0;
+    mpressed = 0;
+    handlepic = -1;
+    handleoffset = 0;
+    bgimage = 0;
     activated = 0;
     cached_handtlx = cached_handbrx = 0;
     cached_handtly = cached_handbry = 0;
@@ -87,7 +91,7 @@ struct GUISlider:public GUIObject
   }
 };
 
-extern DynamicArray<GUISlider> guislider;
+extern std::vector<GUISlider> guislider;
 extern int numguislider;
 
 #endif // __AC_GUISLIDER_H

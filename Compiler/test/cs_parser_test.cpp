@@ -13,6 +13,11 @@ void cc_error_at_line(char *buffer, const char *error_msg)
     last_seen_cc_error = _strdup(error_msg);
 }
 
+void cc_error_without_line(char *buffer, const char *error_msg)
+{
+    last_seen_cc_error = _strdup(error_msg);
+}
+
 ccCompiledScript *newScriptFixture() {
     // TODO: investigate proper google test fixtures.
     ccCompiledScript *scrip = new ccCompiledScript();
@@ -220,21 +225,21 @@ TEST(Compile, EnumNegative) {
     ASSERT_EQ(0, compileResult);
 
     // C enums default to 0!
-    EXPECT_EQ(1, sym.soffs[sym.find("cat")]);
-    EXPECT_EQ(2, sym.soffs[sym.find("dog")]);
-    EXPECT_EQ(3, sym.soffs[sym.find("fish")]);
+    EXPECT_EQ(1, sym.entries[sym.find("cat")].soffs);
+    EXPECT_EQ(2, sym.entries[sym.find("dog")].soffs);
+    EXPECT_EQ(3, sym.entries[sym.find("fish")].soffs);
 
-    EXPECT_EQ(100, sym.soffs[sym.find("money")]);
-    EXPECT_EQ(101, sym.soffs[sym.find("death")]);
-    EXPECT_EQ(102, sym.soffs[sym.find("taxes")]);
+    EXPECT_EQ(100, sym.entries[sym.find("money")].soffs);
+    EXPECT_EQ(101, sym.entries[sym.find("death")].soffs);
+    EXPECT_EQ(102, sym.entries[sym.find("taxes")].soffs);
 
-    EXPECT_EQ(-3, sym.soffs[sym.find("popularity")]);
-    EXPECT_EQ(-2, sym.soffs[sym.find("x")]);
-    EXPECT_EQ(-1, sym.soffs[sym.find("y")]);
-    EXPECT_EQ(0, sym.soffs[sym.find("z")]);
+    EXPECT_EQ(-3, sym.entries[sym.find("popularity")].soffs);
+    EXPECT_EQ(-2, sym.entries[sym.find("x")].soffs);
+    EXPECT_EQ(-1, sym.entries[sym.find("y")].soffs);
+    EXPECT_EQ(0, sym.entries[sym.find("z")].soffs);
 
-    EXPECT_EQ((-2147483648), sym.soffs[sym.find("intmin")]);
-    EXPECT_EQ((2147483647), sym.soffs[sym.find("intmax")]);
+    EXPECT_EQ((-2147483648), sym.entries[sym.find("intmin")].soffs);
+    EXPECT_EQ((2147483647), sym.entries[sym.find("intmax")].soffs);
 }
 
 
@@ -262,32 +267,54 @@ TEST(Compile, DefaultParametersLargeInts) {
     int funcidx;
     funcidx = sym.find("importedfunc");
 
-    EXPECT_EQ(true, sym.funcParamHasDefaultValues[funcidx][1]);
-    EXPECT_EQ(0, sym.funcParamDefaultValues[funcidx][1]);
+    EXPECT_EQ(true, sym.entries[funcidx].funcParamHasDefaultValues[1]);
+    EXPECT_EQ(0, sym.entries[funcidx].funcParamDefaultValues[1]);
 
-    EXPECT_EQ(true, sym.funcParamHasDefaultValues[funcidx][2]);
-    EXPECT_EQ(1, sym.funcParamDefaultValues[funcidx][2]);
+    EXPECT_EQ(true, sym.entries[funcidx].funcParamHasDefaultValues[2]);
+    EXPECT_EQ(1, sym.entries[funcidx].funcParamDefaultValues[2]);
 
-    EXPECT_EQ(true, sym.funcParamHasDefaultValues[funcidx][3]);
-    EXPECT_EQ(2, sym.funcParamDefaultValues[funcidx][3]);
+    EXPECT_EQ(true, sym.entries[funcidx].funcParamHasDefaultValues[3]);
+    EXPECT_EQ(2, sym.entries[funcidx].funcParamDefaultValues[3]);
 
-    EXPECT_EQ(true, sym.funcParamHasDefaultValues[funcidx][4]);
-    EXPECT_EQ(-32000, sym.funcParamDefaultValues[funcidx][4]);
+    EXPECT_EQ(true, sym.entries[funcidx].funcParamHasDefaultValues[4]);
+    EXPECT_EQ(-32000, sym.entries[funcidx].funcParamDefaultValues[4]);
 
-    EXPECT_EQ(true, sym.funcParamHasDefaultValues[funcidx][5]);
-    EXPECT_EQ(32001, sym.funcParamDefaultValues[funcidx][5]);
+    EXPECT_EQ(true, sym.entries[funcidx].funcParamHasDefaultValues[5]);
+    EXPECT_EQ(32001, sym.entries[funcidx].funcParamDefaultValues[5]);
 
-    EXPECT_EQ(true, sym.funcParamHasDefaultValues[funcidx][6]);
-    EXPECT_EQ((2147483647), sym.funcParamDefaultValues[funcidx][6]);
+    EXPECT_EQ(true, sym.entries[funcidx].funcParamHasDefaultValues[6]);
+    EXPECT_EQ((2147483647), sym.entries[funcidx].funcParamDefaultValues[6]);
 
-    EXPECT_EQ(true, sym.funcParamHasDefaultValues[funcidx][7]);
-    EXPECT_EQ((-2147483648), sym.funcParamDefaultValues[funcidx][7]);
+    EXPECT_EQ(true, sym.entries[funcidx].funcParamHasDefaultValues[7]);
+    EXPECT_EQ((-2147483648), sym.entries[funcidx].funcParamDefaultValues[7]);
 
-    EXPECT_EQ(true, sym.funcParamHasDefaultValues[funcidx][8]);
-    EXPECT_EQ(-1, sym.funcParamDefaultValues[funcidx][8]);
+    EXPECT_EQ(true, sym.entries[funcidx].funcParamHasDefaultValues[8]);
+    EXPECT_EQ(-1, sym.entries[funcidx].funcParamDefaultValues[8]);
 
-    EXPECT_EQ(true, sym.funcParamHasDefaultValues[funcidx][9]);
-    EXPECT_EQ(-2, sym.funcParamDefaultValues[funcidx][9]);
+    EXPECT_EQ(true, sym.entries[funcidx].funcParamHasDefaultValues[9]);
+    EXPECT_EQ(-2, sym.entries[funcidx].funcParamDefaultValues[9]);
+}
+
+TEST(Compile, ImportFunctionReturningDynamicArray) {
+    ccCompiledScript *scrip = newScriptFixture();
+
+    char *inpl = "\
+        struct A\
+        {\
+            import static int[] MyFunc();\
+        };\
+        ";
+
+    last_seen_cc_error = 0;
+    int compileResult = cc_compile(inpl, scrip);
+    ASSERT_EQ(0, compileResult);
+
+    int funcidx;
+    funcidx = sym.find("A::MyFunc");
+
+    ASSERT_TRUE(funcidx != -1);
+
+    EXPECT_EQ(STYPE_DYNARRAY, sym.entries[funcidx].funcparamtypes[0] & STYPE_DYNARRAY);
 }
 
 TEST(Compile, DoubleNegatedConstant) {

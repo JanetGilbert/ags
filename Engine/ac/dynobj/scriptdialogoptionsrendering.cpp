@@ -43,6 +43,8 @@ void ScriptDialogOptionsRendering::Reset()
     surfaceToRenderTo = NULL;
     surfaceAccessed = false;
     activeOptionID = -1;
+    chosenOptionID = -1;
+    needRepaint = false;
 }
 
 ScriptDialogOptionsRendering::ScriptDialogOptionsRendering()

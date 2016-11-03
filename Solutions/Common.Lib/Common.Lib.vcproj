@@ -360,19 +360,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\Common\ac\customproperties.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\Common\ac\gamesetupstruct.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\Common\ac\gamesetupstructbase.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Common\ac\interaction.cpp"
 					>
 				</File>
 				<File
@@ -416,15 +408,15 @@
 				Name="font"
 				>
 				<File
-					RelativePath="..\..\Common\font\agsfontrenderer.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\Common\font\fonts.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\Common\font\ttffontrenderer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Common\font\wfnfont.cpp"
 					>
 				</File>
 				<File
@@ -493,6 +485,10 @@
 				</File>
 				<File
 					RelativePath="..\..\Common\util\filestream.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Common\util\geometry.cpp"
 					>
 				</File>
 				<File
@@ -604,6 +600,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="game"
+				>
+				<File
+					RelativePath="..\..\Common\game\customproperties.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Common\game\interactions.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -634,10 +642,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\Common\ac\customproperties.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\Common\ac\dialogtopic.h"
 					>
 				</File>
@@ -655,10 +659,6 @@
 				</File>
 				<File
 					RelativePath="..\..\Common\ac\gamestructdefines.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Common\ac\interaction.h"
 					>
 				</File>
 				<File
@@ -730,6 +730,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Common\font\wfnfont.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Common\font\wfnfontrenderer.h"
 					>
 				</File>
@@ -737,10 +741,6 @@
 			<Filter
 				Name="gui"
 				>
-				<File
-					RelativePath="..\..\Common\gui\dynamicarray.h"
-					>
-				</File>
 				<File
 					RelativePath="..\..\Common\gui\guibutton.h"
 					>
@@ -858,6 +858,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Common\util\string_types.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Common\util\string_utils.h"
 					>
 				</File>
@@ -961,12 +965,28 @@
 					RelativePath="..\..\Common\gfx\bitmap.h"
 					>
 				</File>
+				<File
+					RelativePath="..\..\common\gfx\gfx_def.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="api"
 				>
 				<File
 					RelativePath="..\..\Common\api\stream_api.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="game"
+				>
+				<File
+					RelativePath="..\..\Common\game\customproperties.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Common\game\interactions.h"
 					>
 				</File>
 			</Filter>

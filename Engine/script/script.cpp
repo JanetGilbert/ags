@@ -52,7 +52,6 @@ extern int gameHasBeenRestored, displayed_room;
 extern unsigned int load_new_game;
 extern RoomObject*objs;
 extern int our_eip;
-extern int guis_need_update;
 extern CharacterInfo*playerchar;
 
 ExecutingScript scripts[MAX_SCRIPT_AT_ONCE];
@@ -76,13 +75,15 @@ NonBlockingScriptFunction getDialogOptionsDimensionsFunc("dialog_options_get_dim
 NonBlockingScriptFunction renderDialogOptionsFunc("dialog_options_render", 1);
 NonBlockingScriptFunction getDialogOptionUnderCursorFunc("dialog_options_get_active", 1);
 NonBlockingScriptFunction runDialogOptionMouseClickHandlerFunc("dialog_options_mouse_click", 2);
+NonBlockingScriptFunction runDialogOptionKeyPressHandlerFunc("dialog_options_key_press", 2);
+NonBlockingScriptFunction runDialogOptionRepExecFunc("dialog_options_repexec", 1);
 
 ScriptSystem scsystem;
 
-ccScript *scriptModules[MAX_SCRIPT_MODULES];
-ccInstance *moduleInst[MAX_SCRIPT_MODULES];
-ccInstance *moduleInstFork[MAX_SCRIPT_MODULES];
-RuntimeScriptValue moduleRepExecAddr[MAX_SCRIPT_MODULES];
+std::vector<ccScript *> scriptModules;
+std::vector<ccInstance *> moduleInst;
+std::vector<ccInstance *> moduleInstFork;
+std::vector<RuntimeScriptValue> moduleRepExecAddr;
 int numScriptModules = 0;
 
 char **characterScriptObjNames = NULL;
@@ -123,18 +124,18 @@ void run_function_on_non_blocking_thread(NonBlockingScriptFunction* funcToRun) {
     // run modules
     // modules need a forkedinst for this to work
     for (int kk = 0; kk < numScriptModules; kk++) {
-        moduleInstFork[kk]->DoRunScriptFuncCantBlock(funcToRun, &funcToRun->moduleHasFunction[kk]);
+        funcToRun->moduleHasFunction[kk] = moduleInstFork[kk]->DoRunScriptFuncCantBlock(funcToRun, funcToRun->moduleHasFunction[kk]);
 
         if (room_changes_was != play.room_changes)
             return;
     }
 
-    gameinstFork->DoRunScriptFuncCantBlock(funcToRun, &funcToRun->globalScriptHasFunction);
+    funcToRun->globalScriptHasFunction = gameinstFork->DoRunScriptFuncCantBlock(funcToRun, funcToRun->globalScriptHasFunction);
 
     if (room_changes_was != play.room_changes)
         return;
 
-    roominstFork->DoRunScriptFuncCantBlock(funcToRun, &funcToRun->roomHasFunction);
+    funcToRun->roomHasFunction = roominstFork->DoRunScriptFuncCantBlock(funcToRun, funcToRun->roomHasFunction);
 }
 
 //-----------------------------------------------------------
@@ -150,14 +151,16 @@ void run_function_on_non_blocking_thread(NonBlockingScriptFunction* funcToRun) {
 // Returns 0 normally, or -1 to indicate that the NewInteraction has
 // become invalid and don't run another interaction on it
 // (eg. a room change occured)
-int run_interaction_event (NewInteraction *nint, int evnt, int chkAny, int isInv) {
+int run_interaction_event (Interaction *nint, int evnt, int chkAny, int isInv) {
 
-    if ((nint->response[evnt] == NULL) || (nint->response[evnt]->numCommands == 0)) {
+    if (evnt >= nint->Events.size() ||
+        (nint->Events[evnt].Response.get() == NULL) || (nint->Events[evnt].Response->Cmds.size() == 0)) {
         // no response defined for this event
         // If there is a response for "Any Click", then abort now so as to
         // run that instead
         if (chkAny < 0) ;
-        else if ((nint->response[chkAny] != NULL) && (nint->response[chkAny]->numCommands > 0))
+        else if (chkAny < nint->Events.size() &&
+                (nint->Events[chkAny].Response.get() != NULL) && (nint->Events[chkAny].Response->Cmds.size() > 0))
             return 0;
 
         // Otherwise, run unhandled_event
@@ -173,7 +176,7 @@ int run_interaction_event (NewInteraction *nint, int evnt, int chkAny, int isInv
 
     int cmdsrun = 0, retval = 0;
     // Right, so there were some commands defined in response to the event.
-    retval = run_interaction_commandlist (nint->response[evnt], &nint->timesRun[evnt], &cmdsrun);
+    retval = run_interaction_commandlist (nint->Events[evnt].Response.get(), &nint->Events[evnt].TimesRun, &cmdsrun);
 
     // An inventory interaction, but the wrong item was used
     if ((isInv) && (cmdsrun == 0))
@@ -187,12 +190,12 @@ int run_interaction_event (NewInteraction *nint, int evnt, int chkAny, int isInv
 // (eg. a room change occured)
 int run_interaction_script(InteractionScripts *nint, int evnt, int chkAny, int isInv) {
 
-    if ((nint->scriptFuncNames[evnt] == NULL) || (nint->scriptFuncNames[evnt][0] == 0)) {
+    if ((nint->ScriptFuncNames[evnt] == NULL) || (nint->ScriptFuncNames[evnt][0] == 0)) {
         // no response defined for this event
         // If there is a response for "Any Click", then abort now so as to
         // run that instead
         if (chkAny < 0) ;
-        else if ((nint->scriptFuncNames[chkAny] != NULL) && (nint->scriptFuncNames[chkAny][0] != 0))
+        else if ((nint->ScriptFuncNames[chkAny] != NULL) && (nint->ScriptFuncNames[chkAny][0] != 0))
             return 0;
 
         // Otherwise, run unhandled_event
@@ -213,19 +216,11 @@ int run_interaction_script(InteractionScripts *nint, int evnt, int chkAny, int i
     update_mp3();
         if ((strstr(evblockbasename,"character")!=0) || (strstr(evblockbasename,"inventory")!=0)) {
             // Character or Inventory (global script)
-            if (inside_script) 
-                curscript->run_another (nint->scriptFuncNames[evnt], rval_null, rval_null /*0, 0*/);
-            else gameinst->RunTextScript(nint->scriptFuncNames[evnt]);
+            QueueScriptFunction(kScInstGame, nint->ScriptFuncNames[evnt]);
         }
         else {
             // Other (room script)
-            if (inside_script) {
-                char funcName[MAX_FUNCTION_NAME_LEN+1];
-                snprintf(funcName, MAX_FUNCTION_NAME_LEN, "|%s", nint->scriptFuncNames[evnt]);
-                curscript->run_another (funcName, rval_null, rval_null /*0, 0*/);
-            }
-            else
-                roominst->RunTextScript(nint->scriptFuncNames[evnt]);
+            QueueScriptFunction(kScInstRoom, nint->ScriptFuncNames[evnt]);
         }
         update_mp3();
 
@@ -282,6 +277,39 @@ void cancel_all_scripts() {
     num_scripts = 0;
     /*  if (gameinst!=NULL) ->Abort(gameinst);
     if (roominst!=NULL) ->Abort(roominst);*/
+}
+
+ccInstance *GetScriptInstanceByType(ScriptInstType sc_inst)
+{
+    if (sc_inst == kScInstGame)
+        return gameinst;
+    else if (sc_inst == kScInstRoom)
+        return roominst;
+    return NULL;
+}
+
+void QueueScriptFunction(ScriptInstType sc_inst, const char *fn_name, size_t param_count, const RuntimeScriptValue &p1, const RuntimeScriptValue &p2)
+{
+    if (inside_script)
+        // queue the script for the run after current script is finished
+        curscript->run_another (fn_name, sc_inst, param_count, p1, p2);
+    else
+        // if no script is currently running, run the requested script right away
+        RunScriptFunction(sc_inst, fn_name, param_count, p1, p2);
+}
+
+void RunScriptFunction(ScriptInstType sc_inst, const char *fn_name, size_t param_count, const RuntimeScriptValue &p1, const RuntimeScriptValue &p2)
+{
+    ccInstance *inst = GetScriptInstanceByType(sc_inst);
+    if (inst)
+    {
+        if (param_count == 2)
+            inst->RunTextScript2IParam(fn_name, p1, p2);
+        else if (param_count == 1)
+            inst->RunTextScriptIParam(fn_name, p1);
+        else if (param_count == 0)
+            inst->RunTextScript(fn_name);
+    }
 }
 
 //=============================================================================
@@ -369,23 +397,13 @@ void post_script_cleanup() {
     int jj;
     for (jj = 0; jj < copyof.numanother; jj++) {
         old_room_number = displayed_room;
-        char runnext[MAX_FUNCTION_NAME_LEN+1];
-        strncpy(runnext,copyof.script_run_another[jj],MAX_FUNCTION_NAME_LEN);
-        copyof.script_run_another[jj][0]=0;
-        if (runnext[0]=='#')
-            gameinst->RunTextScript2IParam(&runnext[1],copyof.run_another_p1[jj],copyof.run_another_p2[jj]);
-        else if (runnext[0]=='!')
-            gameinst->RunTextScriptIParam(&runnext[1],copyof.run_another_p1[jj]);
-        else if (runnext[0]=='|')
-            roominst->RunTextScript(&runnext[1]);
-        else if (runnext[0]=='%')
-            roominst->RunTextScript2IParam(&runnext[1], copyof.run_another_p1[jj], copyof.run_another_p2[jj]);
-        else if (runnext[0]=='$') {
-            roominst->RunTextScriptIParam(&runnext[1],copyof.run_another_p1[jj]);
+        QueuedScript &script = copyof.ScFnQueue[jj];
+        RunScriptFunction(script.Instance, script.FnName, script.ParamCount, script.Param1, script.Param2);
+        if (script.Instance == kScInstRoom && script.ParamCount == 1)
+        {
+            // some bogus hack for "on_call" event handler
             play.roomscript_finished = 1;
         }
-        else
-            gameinst->RunTextScript(runnext);
 
         // if they've changed rooms, cancel any further pending scripts
         if ((displayed_room != old_room_number) || (load_new_game))
@@ -400,12 +418,36 @@ void quit_with_script_error(const char *functionName)
     quitprintf("%sError running function '%s':\n%s", (ccErrorIsUserError ? "!" : ""), functionName, ccErrorString);
 }
 
-int get_nivalue (NewInteractionCommandList *nic, int idx, int parm) {
-    if (nic->command[idx].data[parm].valType == VALTYPE_VARIABLE) {
+int get_nivalue (InteractionCommandList *nic, int idx, int parm) {
+    if (nic->Cmds[idx].Data[parm].Type == AGS::Common::kInterValVariable) {
         // return the value of the variable
-        return get_interaction_variable(nic->command[idx].data[parm].val)->value;
+        return get_interaction_variable(nic->Cmds[idx].Data[parm].Value)->Value;
     }
-    return nic->command[idx].data[parm].val;
+    return nic->Cmds[idx].Data[parm].Value;
+}
+
+InteractionVariable *get_interaction_variable (int varindx) {
+
+    if ((varindx >= LOCAL_VARIABLE_OFFSET) && (varindx < LOCAL_VARIABLE_OFFSET + thisroom.numLocalVars))
+        return &thisroom.localvars[varindx - LOCAL_VARIABLE_OFFSET];
+
+    if ((varindx < 0) || (varindx >= numGlobalVars))
+        quit("!invalid interaction variable specified");
+
+    return &globalvars[varindx];
+}
+
+InteractionVariable *FindGraphicalVariable(const char *varName) {
+    int ii;
+    for (ii = 0; ii < numGlobalVars; ii++) {
+        if (stricmp (globalvars[ii].Name, varName) == 0)
+            return &globalvars[ii];
+    }
+    for (ii = 0; ii < thisroom.numLocalVars; ii++) {
+        if (stricmp (thisroom.localvars[ii].Name, varName) == 0)
+            return &thisroom.localvars[ii];
+    }
+    return NULL;
 }
 
 #define IPARAM1 get_nivalue(nicl, i, 0)
@@ -426,17 +468,17 @@ struct TempEip {
 // the 'cmdsrun' parameter counts how many commands are run.
 // if a 'Inv Item Was Used' check does not pass, it doesn't count
 // so cmdsrun remains 0 if no inventory items matched
-int run_interaction_commandlist (NewInteractionCommandList *nicl, int *timesrun, int*cmdsrun) {
-    int i;
+int run_interaction_commandlist (InteractionCommandList *nicl, int *timesrun, int*cmdsrun) {
+    size_t i;
 
     if (nicl == NULL)
         return -1;
 
-    for (i = 0; i < nicl->numCommands; i++) {
+    for (i = 0; i < nicl->Cmds.size(); i++) {
         cmdsrun[0] ++;
         int room_was = play.room_changes;
 
-        switch (nicl->command[i].type) {
+        switch (nicl->Cmds[i].Type) {
       case 0:  // Do nothing
           break;
       case 1:  // Run script
@@ -446,22 +488,14 @@ int run_interaction_commandlist (NewInteractionCommandList *nicl, int *timesrun,
               update_mp3();
                   if ((strstr(evblockbasename,"character")!=0) || (strstr(evblockbasename,"inventory")!=0)) {
                       // Character or Inventory (global script)
-                      char *torun = make_ts_func_name(evblockbasename,evblocknum,nicl->command[i].data[0].val);
+                      const char *torun = make_ts_func_name(evblockbasename,evblocknum,nicl->Cmds[i].Data[0].Value);
                       // we are already inside the mouseclick event of the script, can't nest calls
-                      if (inside_script) 
-                          curscript->run_another (torun, rval_null, rval_null /*0, 0*/);
-                      else gameinst->RunTextScript(torun);
+                      QueueScriptFunction(kScInstGame, torun);
                   }
                   else {
                       // Other (room script)
-                      if (inside_script) {
-                          char funcName[MAX_FUNCTION_NAME_LEN+1];
-                          strcpy(funcName,"|");
-                          strncat(funcName,make_ts_func_name(evblockbasename,evblocknum,nicl->command[i].data[0].val),MAX_FUNCTION_NAME_LEN-1);
-                          curscript->run_another (funcName, rval_null, rval_null /*0, 0*/);
-                      }
-                      else
-                          roominst->RunTextScript(make_ts_func_name(evblockbasename,evblocknum,nicl->command[i].data[0].val));
+                      const char *torun = make_ts_func_name(evblockbasename,evblocknum,nicl->Cmds[i].Data[0].Value);
+                      QueueScriptFunction(kScInstRoom, torun);
                   }
                   update_mp3();
                       break;
@@ -515,7 +549,7 @@ int run_interaction_commandlist (NewInteractionCommandList *nicl, int *timesrun,
           MoveObject (IPARAM1, IPARAM2, IPARAM3, IPARAM4);
           // if they want to wait until finished, do so
           if (IPARAM5)
-              do_main_cycle(UNTIL_MOVEEND,(long)&objs[IPARAM1].moving);
+              GameLoopUntilEvent(UNTIL_MOVEEND,(long)&objs[IPARAM1].moving);
           break;
       case 15: // Object Off
           ObjectOff (IPARAM1);
@@ -539,7 +573,7 @@ int run_interaction_commandlist (NewInteractionCommandList *nicl, int *timesrun,
           if (play.usedinv == IPARAM1) {
               if (game.options[OPT_NOLOSEINV] == 0)
                   lose_inventory (play.usedinv);
-              if (run_interaction_commandlist (nicl->command[i].get_child_list(), timesrun, cmdsrun))
+              if (run_interaction_commandlist (nicl->Cmds[i].Children.get(), timesrun, cmdsrun))
                   return -1;
           }
           else
@@ -547,17 +581,17 @@ int run_interaction_commandlist (NewInteractionCommandList *nicl, int *timesrun,
           break;
       case 21: // if player has inventory item
           if (playerchar->inv[IPARAM1] > 0)
-              if (run_interaction_commandlist (nicl->command[i].get_child_list(), timesrun, cmdsrun))
+              if (run_interaction_commandlist (nicl->Cmds[i].Children.get(), timesrun, cmdsrun))
                   return -1;
           break;
       case 22: // if a character is moving
           if (game.chars[IPARAM1].walking)
-              if (run_interaction_commandlist (nicl->command[i].get_child_list(), timesrun, cmdsrun))
+              if (run_interaction_commandlist (nicl->Cmds[i].Children.get(), timesrun, cmdsrun))
                   return -1;
           break;
       case 23: // if two variables are equal
           if (IPARAM1 == IPARAM2)
-              if (run_interaction_commandlist (nicl->command[i].get_child_list(), timesrun, cmdsrun))
+              if (run_interaction_commandlist (nicl->Cmds[i].Children.get(), timesrun, cmdsrun))
                   return -1;
           break;
       case 24: // Stop character walking
@@ -590,16 +624,16 @@ int run_interaction_commandlist (NewInteractionCommandList *nicl, int *timesrun,
           EnableHotspot (IPARAM1);
           break;
       case 33: // Set variable value
-          get_interaction_variable(nicl->command[i].data[0].val)->value = IPARAM2;
+          get_interaction_variable(nicl->Cmds[i].Data[0].Value)->Value = IPARAM2;
           break;
       case 34: // Run animation
           scAnimateCharacter(IPARAM1, IPARAM2, IPARAM3, 0);
-          do_main_cycle(UNTIL_SHORTIS0,(long)&game.chars[IPARAM1].animating);
+          GameLoopUntilEvent(UNTIL_SHORTIS0,(long)&game.chars[IPARAM1].animating);
           break;
       case 35: // Quick animation
           SetCharacterView (IPARAM1, IPARAM2);
           scAnimateCharacter(IPARAM1, IPARAM3, IPARAM4, 0);
-          do_main_cycle(UNTIL_SHORTIS0,(long)&game.chars[IPARAM1].animating);
+          GameLoopUntilEvent(UNTIL_SHORTIS0,(long)&game.chars[IPARAM1].animating);
           ReleaseCharacterView (IPARAM1);
           break;
       case 36: // Set idle animation
@@ -630,17 +664,17 @@ int run_interaction_commandlist (NewInteractionCommandList *nicl, int *timesrun,
           break;
       case 45: // If player character is
           if (GetPlayerCharacter() == IPARAM1)
-              if (run_interaction_commandlist (nicl->command[i].get_child_list(), timesrun, cmdsrun))
+              if (run_interaction_commandlist (nicl->Cmds[i].Children.get(), timesrun, cmdsrun))
                   return -1;
           break;
       case 46: // if cursor mode is
           if (GetCursorMode() == IPARAM1)
-              if (run_interaction_commandlist (nicl->command[i].get_child_list(), timesrun, cmdsrun))
+              if (run_interaction_commandlist (nicl->Cmds[i].Children.get(), timesrun, cmdsrun))
                   return -1;
           break;
       case 47: // if player has been to room
           if (HasBeenToRoom(IPARAM1))
-              if (run_interaction_commandlist (nicl->command[i].get_child_list(), timesrun, cmdsrun))
+              if (run_interaction_commandlist (nicl->Cmds[i].Children.get(), timesrun, cmdsrun))
                   return -1;
           break;
       default:
@@ -686,10 +720,7 @@ void run_unhandled_event (int evnt) {
     else if (evtype > 0) {
         can_run_delayed_command();
 
-        if (inside_script)
-            curscript->run_another ("#unhandled_event", RuntimeScriptValue().SetInt32(evtype), RuntimeScriptValue().SetInt32(evnt));
-        else
-            gameinst->RunTextScript2IParam("unhandled_event",RuntimeScriptValue().SetInt32(evtype),RuntimeScriptValue().SetInt32(evnt));
+        QueueScriptFunction(kScInstGame, "unhandled_event", 2, RuntimeScriptValue().SetInt32(evtype), RuntimeScriptValue().SetInt32(evnt));
     }
 }
 

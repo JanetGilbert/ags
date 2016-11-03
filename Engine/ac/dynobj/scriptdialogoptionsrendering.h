@@ -24,8 +24,10 @@ struct ScriptDialogOptionsRendering : AGSCCDynamicObject {
     int parserTextboxWidth;
     int dialogID;
     int activeOptionID;
+    int chosenOptionID;
     ScriptDrawingSurface *surfaceToRenderTo;
     bool surfaceAccessed;
+    bool needRepaint;
 
     // return the type name of the object
     virtual const char *GetType();

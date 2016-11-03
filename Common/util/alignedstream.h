@@ -84,7 +84,7 @@ public:
     virtual size_t  WriteArrayOfInt32(const int32_t *buffer, size_t count);
     virtual size_t  WriteArrayOfInt64(const int64_t *buffer, size_t count);
 
-    virtual size_t  Seek(StreamSeek seek, int pos);
+    virtual size_t  Seek(int offset, StreamSeek origin);
 
 protected:
     void            ReadPadding(size_t next_type);
@@ -98,7 +98,6 @@ private:
     size_t              _baseAlignment;
     size_t              _maxAlignment;
     int64_t             _block;
-    int8_t              _paddingBuffer[sizeof(int64_t)];
 };
 
 } // namespace Common

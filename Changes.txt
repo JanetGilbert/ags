@@ -1,5 +1,175 @@
 REVISION HISTORY
 ================
+VERSION 3.4.0, September 2016
+
+Common features:
+ - Added support for building game for multiple platforms (Windows and Linux
+   options are maintained now).
+ - Added custom game resolutions.
+ - Added extended WFN font support (up to 256 characters).
+ - Made custom property values modifiable at runtime.
+ - Removed limit on custom properties number (was 30 properties per project),
+   increased maximal property name and value length.
+ - Removed limit on GUI Control number (was 30 per GUI),
+   increased maximal control name length.
+ - Removed limit on script modules number (was 50).
+ - Added Locked property to room Objects.
+ - Added Padding property for TextWindow GUI.
+
+Editor features:
+ - New splash screen.
+ - Exposed Clickable property for room Objects in the Editor.
+ - Exposed TintLuminance property for room Regions in the Editor.
+ - Added "Close all tabs" command for the pane's context menu.
+ - Added Preferences option "Prompt dialog on closing multiple tabs".
+ - The sprite editor now highlights drop targets when you drag sprites around.
+
+Editor Plugin API:
+ - Exposed GUI Panes to plugin API.
+
+Engine features:
+ - Added support for any runtime display resolution (now restricted only
+   by your system specifics).
+ - Added support for vertical sync in Direct3D rendering mode.
+ - Made engine try to use all implemented graphic renderers in the
+   order of priority, if user selection failed to initialize.
+ - Rised default sprite cache limit for desktop platforms to 100 MB (was 20).
+ - Game writes latest translation and mouse speed setting to config file
+   on exit.
+
+Scripting features:
+ - Added managed user structs; although currently limited to containing only
+   non-pointer variables in them.
+ - Added support for dynamic arrays in non-managed structs.
+ - Added support for dynamic array as return value of the struct's
+   member function.
+ - Added support for static extender functions.
+ - Added "do..while" kind of loop, in addition to previously existing "while".
+ - Added "for" operator and related loop construct.
+ - Added "switch" and "case" operators and related branching construct.
+ - Added "break" and "continue" operators working in any loop or switch.
+ - Added missing compound assignment operators (*=, /=, and so on).
+ - Made preprocessor macros usable in definition of another macro.
+ - Added "#region" and "#endregion" preprocessor commands.
+
+Script API:
+ - Added Script API version switch to the project's General Settings. For every
+   supported API version a "SCRIPT_API_vXXX" macro is introduced, where XXX are
+   version numbers.
+ - Added Script Compatibility Level switch to General Settings. For every
+   compatible version a "SCRIPT_COMPAT_vXXX" macro is introduced.
+ - Added AudioChannel.Speed property.
+ - Added CharacterDirection enum and optional "direction" parameter
+   for Character.ChangeRoom().
+ - Added Character.FaceDirection().
+ - Added Character.DestinationX and Character.DestinationY properties.
+ - Added RunActiveOption() and Update() member functions to the
+   DialogOptionsRenderingInfo type.
+ - Extended Dialog Options API: added support for dialog_options_repexec() and
+   dialog_options_key_press() functions to improve handling of the custom
+   dialog options; added related compatibility project option and support for
+   "NEW_DIALOGOPTS_API" macro in scripts.
+ - Added game.dialog_options_highlight_color variable.
+ - Added File.Seek() function and File.Position property.
+ - Added IsInteractionAvailable() method to Hotspot, Object and
+   Character types.
+ - Added Game.AudioClipCount property and Game.AudioClips[n] array.
+ - Added Game.IsPluginLoaded().
+ - Added GUIControl.ZOrder property.
+ - Added GUI.Click() and Button.Click() functions which call
+   OnClick event handler of corresponding GUI or button.
+ - Added GUI.ProcessClick() function that processes click on GUI only,
+   similarily to how old ProcessClick processed click on room objects only.
+ - Added Mouse.Click() function to simulate mouse click on screen.
+ - Added Room.GetProperty() to substitute global GetRoomProperty().
+ - Added Room.ProcessClick() to substitute global ProcessClick().
+ - Added SetProperty() and SetTextProperty() functions to Room, InventoryItem,
+   Hotspot, Object and Character types.
+ - Added optional "luminance" parameter to Region.Tint() and
+   Region.TintLuminance readonly property.
+ - Added SetAmbientLightLevel() to set global light level for
+   anything in the room.
+ - Added Character.SetLightLevel() and Object.SetLightLevel() functions to
+   set individual light levels. Negative light levels can be used
+   in 8-bit games to produce darkening effect.
+ - Added System.RuntimeInfo property which returns a short description of
+   current graphics mode, scaling filter and enabled game resources.
+
+Editor bug fixes:
+ - Fixed Undo history was deleted when an Editor panel changes
+   its docked state.
+ - Fixed crashes under certain circumstances when a script editor is closed.
+ - Fixed crash if selecting a character without a normal view
+   in the room editor.
+ - Fixed Ctrl+Tab did not work for the first time when cycling
+   through opened editor tabs.
+ - Fixed "Go to Line..." command did not always move cursor to correct line.
+   Also, do not select that line.
+ - Made the project completely rebuild itself whenever "Enable Debug Mode"
+   value in the General Settings differs from the setting used for
+   the last build, to prevent inconsistency in compiled scripts.
+ - Fixed a crash when trying to run game setup from the Editor
+   while "Compiled" folder does not exist.
+ - Fixed project items could sometimes get incorrectly arranged
+   inside the folder.
+ - Fixed writing faulty timestamps in project file on some occasions that
+   could spoil usage of file versioning control.
+ - Fixed Help window positioning on multi-monitor desktop.
+ - Fixed error in autocomplete occuring when there is a single-line comment
+   in the end of the script.
+ - Fixed incorrect compiler parsing of a static function call inside
+   array index brackets.
+ - Fixed compilation of struct member functions having name identical
+   to existing global function.
+ - Fixed compilation of structs having members with names identical
+   to non-basic types, global variables and game entities (such as characters,
+   GUI, etc).
+ - Corrected few error messages related to struct's function declaration.
+ - Fixed compiler reporting errors as "runtime errors" under
+   certain circumstances.
+ 
+Engine bug fixes:
+ - Fixed result of using transparency parameter of the
+   DrawingSurface.DrawImage() in 32-bit games when drawing opaque sprites
+   over surfaces with alpha channel.
+ - Fixed DynamicSprite.CopyTransparencyMask() was overwriting magic transparent
+   pixels on destination with alpha values from mask.
+ - Fixed the speech portrait position was not adjusted for character walking
+   between its lines, when BasedOnCharacterPosition portrait placement is used.
+ - Fixed occasional pathfinding failure on straight lines with complex
+   walkable areas.
+ - Fixed using '[' special character in Display-like commands discarded all of
+   the backslashes before it (e.g. "\\[" should now print \[ as expected).
+ - Fixed WAVE audio not looping after restoring a game
+ - Fixed a bug that caused MP3 clip continuously increase its base volume if
+   the directional volume modifier was applied.
+ - Fixed queued audio clips did not update their volume when default
+   audio type volume changes.
+
+WinSetup:
+ - Added support for "default_translation_name" option in the "[language]"
+   section of the config file.
+
+   
+VERSION 3.3.5 - Patch 7, September 2016
+
+Editor:
+- Fixed "Check for updates" feature, which should now be compatible with
+  the new website.
+
+Engine:
+- Allow to run game without mouse installed (game won't abort).
+- Fixed SetSavegameDirectory() to be compliant with the new script path rules.
+  Now if you pass a save directory without specifying $MYDOCS$ tag, the
+  directory will be created as a subdirectory of default saves path. If the
+  player has configured a custom save path, SetSavegameDirectory() will
+  properly keep subdirectories after remapping paths.
+- Fixed missing slash after special directory token in the script file paths
+  could case a creation of directory outside of permitted location.
+- Fixed plugins with dot (".") in their name failed to load (regression).
+- Fixed display gamma forcedly reapplied every time save is restored.
+
+
 VERSION 3.3.5 - Patch 6, August 2016
 
 Editor:
@@ -32,8 +202,8 @@ Engine:
 
 WinSetup:
 - Only let user choose actually existing folders for custom save paths.
-
-
+   
+   
 VERSION 3.3.5 - Patch 3, June 2016
 
 Engine:

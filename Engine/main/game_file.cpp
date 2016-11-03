@@ -23,6 +23,7 @@
 #include "ac/charactercache.h"
 #include "ac/dialogtopic.h"
 #include "ac/draw.h"
+#include "ac/game.h"
 #include "ac/gamesetupstruct.h"
 #include "ac/gamestate.h"
 #include "ac/gamestructdefines.h"
@@ -48,6 +49,7 @@
 #include "ac/gamesetup.h"
 
 using namespace AGS::Common;
+using namespace AGS::Engine;
 
 extern char saveGameSuffix[MAX_SG_EXT_LENGTH + 1];
 
@@ -55,15 +57,11 @@ extern char saveGameSuffix[MAX_SG_EXT_LENGTH + 1];
 extern unsigned char** old_dialog_scripts; // defined in ac_conversation
 extern char** old_speech_lines;
 
-extern DynamicArray<GUILabel> guilabels; // defined in ac_guilabel
-extern int numguilabels;
-
 extern int ifacepopped;
 
 extern GameSetupStruct game;
 extern ViewStruct*views;
 extern DialogTopic *dialog;
-extern GUIMain*guis;
 extern CharacterCache *charcache;
 extern MoveList *mls;
 
@@ -92,10 +90,10 @@ extern int game_paused;
 extern AGSPlatformDriver *platform;
 extern ccScript* gamescript;
 extern ccScript* dialogScriptsScript;
-extern ccScript *scriptModules[MAX_SCRIPT_MODULES];
-extern ccInstance *moduleInst[MAX_SCRIPT_MODULES];
-extern ccInstance *moduleInstFork[MAX_SCRIPT_MODULES];
-extern RuntimeScriptValue moduleRepExecAddr[MAX_SCRIPT_MODULES];
+extern std::vector<ccScript *> scriptModules;
+extern std::vector<ccInstance *> moduleInst;
+extern std::vector<ccInstance *> moduleInstFork;
+extern std::vector<RuntimeScriptValue> moduleRepExecAddr;
 extern int numScriptModules;
 extern GameState play;
 extern char **characterScriptObjNames;
@@ -195,15 +193,22 @@ void game_file_read_script_modules(Stream *in)
 	if (filever >= kGameVersion_270) // 2.7.0+ script modules
     {
         numScriptModules = in->ReadInt32();
-        if (numScriptModules > MAX_SCRIPT_MODULES)
-            quit("too many script modules; need newer version?");
-
+        scriptModules.resize(numScriptModules);
+        moduleInst.resize(numScriptModules, NULL);
+        moduleInstFork.resize(numScriptModules, NULL);
+        moduleRepExecAddr.resize(numScriptModules);
+        repExecAlways.moduleHasFunction.resize(numScriptModules, true);
+        lateRepExecAlways.moduleHasFunction.resize(numScriptModules, true);
+        getDialogOptionsDimensionsFunc.moduleHasFunction.resize(numScriptModules, true);
+        renderDialogOptionsFunc.moduleHasFunction.resize(numScriptModules, true);
+        getDialogOptionUnderCursorFunc.moduleHasFunction.resize(numScriptModules, true);
+        runDialogOptionMouseClickHandlerFunc.moduleHasFunction.resize(numScriptModules, true);
+        runDialogOptionKeyPressHandlerFunc.moduleHasFunction.resize(numScriptModules, true);
+        runDialogOptionRepExecFunc.moduleHasFunction.resize(numScriptModules, true);
         for (int bb = 0; bb < numScriptModules; bb++) {
             scriptModules[bb] = ccScript::CreateFromStream(in);
             if (scriptModules[bb] == NULL)
                 quit("Script module load failure; need newer version?");
-            moduleInst[bb] = NULL;
-            moduleInstFork[bb] = NULL;
             moduleRepExecAddr[bb].Invalidate();
         }
     }
@@ -286,7 +291,7 @@ void game_file_read_dialogs(Stream *in)
 
             // Skip encrypted text script
             unsigned int script_size = in->ReadInt32();
-            in->Seek(Common::kSeekCurrent, script_size);
+            in->Seek(script_size);
         }
 
         // Read the dialog lines
@@ -312,7 +317,7 @@ void game_file_read_dialogs(Stream *in)
                     if ((unsigned char)*nextchar == 0xEF)
                     {
                         end_reached = true;
-                        in->Seek(Common::kSeekCurrent, -1);
+                        in->Seek(-1);
                         break;
                     }
 
@@ -335,7 +340,7 @@ void game_file_read_dialogs(Stream *in)
                 unsigned int newlen = in->ReadInt32();
                 if (newlen == 0xCAFEBEEF)  // GUI magic
                 {
-                    in->Seek(Common::kSeekCurrent, -4);
+                    in->Seek(-4);
                     break;
                 }
 
@@ -353,7 +358,7 @@ void game_file_read_dialogs(Stream *in)
 
 void game_file_read_gui(Stream *in)
 {
-	read_gui(in,guis,&game, &guis);
+	read_gui(in,guis,&game);
 
     for (int bb = 0; bb < numguilabels; bb++) {
         // labels are not clickable by default
@@ -469,19 +474,18 @@ void init_and_register_guis()
     guiScriptObjNames = (char**)malloc(sizeof(char*) * game.numgui);
 
     for (ee=0;ee<game.numgui;ee++) {
-        guis[ee].rebuild_array();
-        if ((guis[ee].popup == POPUP_NONE) || (guis[ee].popup == POPUP_NOAUTOREM))
-            guis[ee].on = 1;
+        guis[ee].RebuildArray();
+        if ((guis[ee].PopupStyle == kGUIPopupNone) || (guis[ee].PopupStyle == kGUIPopupNoAutoRemove))
+            guis[ee].SetVisibility(kGUIVisibility_On);
         else
-            guis[ee].on = 0;
+            guis[ee].SetVisibility(kGUIVisibility_Off);
 
         // export all the GUI's controls
         export_gui_controls(ee);
 
         // copy the script name to its own memory location
         // because ccAddExtSymbol only keeps a reference
-        guiScriptObjNames[ee] = (char*)malloc(21);
-        strcpy(guiScriptObjNames[ee], guis[ee].name);
+        guiScriptObjNames[ee] = strdup(guis[ee].Name);
 
         // 64 bit: Using the id instead
         // scrGui[ee].gui = &guis[ee];
@@ -650,6 +654,9 @@ GameFileError load_game_file()
 
     ReadGameSetupStructBase_Aligned(in);
 
+    if (game.size.IsNull())
+        quit("Unable to define native game resolution, could be unsupported game format.");
+
     // The earlier versions of AGS provided support for "upscaling" low-res
     // games (320x200 and 320x240) to hi-res (640x400 and 640x480
     // respectively). The script API has means for detecting if the game is
@@ -661,10 +668,10 @@ GameFileError load_game_file()
     // resolutions, such as 320x200 and 320x240.
     if (usetup.override_upscale)
     {
-        if (game.default_resolution == kGameResolution_320x200)
-            game.default_resolution = kGameResolution_640x400;
-        else if (game.default_resolution == kGameResolution_320x240)
-            game.default_resolution = kGameResolution_640x480;
+        if (game.GetDefaultResolution() == kGameResolution_320x200)
+            game.SetDefaultResolution(kGameResolution_640x400);
+        else if (game.GetDefaultResolution() == kGameResolution_320x240)
+            game.SetDefaultResolution(kGameResolution_640x480);
     }
 
     if (filever < kGameVersion_312)
@@ -677,6 +684,10 @@ GameFileError load_game_file()
         // Convert game option for 3.1.2 - 3.2 games
         game.options[OPT_GLOBALTALKANIMSPD] = game.options[OPT_GLOBALTALKANIMSPD] != 0 ? 5 : (-5 - 1);
     }
+
+    // Define old dialog options API for pre-3.4.0.2 games
+    if (filever < kGameVersion_340_2)
+        game.options[OPT_DIALOGOPTIONSAPI] = -1;
 
     if (game.numfonts > MAX_FONTS)
         quit("!This game requires a newer version of AGS. Too many fonts for this version to handle.");
@@ -712,7 +723,8 @@ GameFileError load_game_file()
     actspswb = (Bitmap **)calloc(actSpsCount, sizeof(Bitmap *));
     actspswbbmp = (IDriverDependantBitmap**)calloc(actSpsCount, sizeof(IDriverDependantBitmap*));
     actspswbcache = (CachedActSpsData*)calloc(actSpsCount, sizeof(CachedActSpsData));
-    game.charProps = (CustomProperties*)calloc(game.numcharacters, sizeof(CustomProperties));
+    game.charProps.resize(game.numcharacters);
+    play.charProps.resize(game.numcharacters);
 
     allocate_memory_for_views(game.numviews);
     int iteratorCount = 0;
@@ -724,7 +736,7 @@ GameFileError load_game_file()
     if (filever <= kGameVersion_251) // <= 2.1 skip unknown data
     {
         int count = in->ReadInt32();
-        in->Seek(Common::kSeekCurrent, count * 0x204);
+        in->Seek(count * 0x204);
     }
 
     charcache = (CharacterCache*)calloc(1,sizeof(CharacterCache)*game.numcharacters+5);

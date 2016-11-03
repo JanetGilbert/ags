@@ -43,11 +43,11 @@ void Region_SetLightLevel(ScriptRegion *ssr, int brightness) {
 }
 
 int Region_GetLightLevel(ScriptRegion *ssr) {
-    return thisroom.regionLightLevel[ssr->id];
+    return thisroom.get_region_lightlevel(ssr->id);
 }
 
 int Region_GetTintEnabled(ScriptRegion *srr) {
-    if (thisroom.regionTintLevel[srr->id] & TINT_IS_ENABLED)
+    if (thisroom.regionTintLevel[srr->id] & 0xFF000000)
         return 1;
     return 0;
 }
@@ -69,10 +69,21 @@ int Region_GetTintBlue(ScriptRegion *srr) {
 
 int Region_GetTintSaturation(ScriptRegion *srr) {
 
-    return thisroom.regionLightLevel[srr->id];
+    return (thisroom.regionTintLevel[srr->id] >> 24) & 0xFF;
 }
 
-void Region_Tint(ScriptRegion *srr, int red, int green, int blue, int amount) {
+int Region_GetTintLuminance(ScriptRegion *srr)
+{
+    return thisroom.get_region_tintluminance(srr->id);
+}
+
+void Region_Tint(ScriptRegion *srr, int red, int green, int blue, int amount, int luminance)
+{
+    SetRegionTint(srr->id, red, green, blue, amount, luminance);
+}
+
+void Region_TintNoLum(ScriptRegion *srr, int red, int green, int blue, int amount)
+{
     SetRegionTint(srr->id, red, green, blue, amount);
 }
 
@@ -97,17 +108,12 @@ void Region_RunInteraction(ScriptRegion *ssr, int mood) {
 
 //=============================================================================
 
-void generate_light_table() {
-    int cc;
-    if ((game.color_depth == 1) && (color_map == NULL)) {
-        // in 256-col mode, check if we need the light table this room
-        for (cc=0;cc < MAX_REGIONS;cc++) {
-            if (thisroom.regionLightLevel[cc] < 0) {
-                create_light_table(&maincoltable,palette,0,0,0,NULL);
-                color_map=&maincoltable;
-                break;
-            }
-        }
+void generate_light_table()
+{
+    if (game.color_depth == 1 && color_map == NULL)
+    {
+        create_light_table(&maincoltable, palette, 0, 0, 0, NULL);
+        color_map = &maincoltable;
     }
 }
 
@@ -127,10 +133,15 @@ RuntimeScriptValue Sc_GetRegionAtLocation(const RuntimeScriptValue *params, int3
     API_SCALL_OBJ_PINT2(ScriptRegion, ccDynamicRegion, GetRegionAtLocation);
 }
 
-// void (ScriptRegion *srr, int red, int green, int blue, int amount)
 RuntimeScriptValue Sc_Region_Tint(void *self, const RuntimeScriptValue *params, int32_t param_count)
 {
-    API_OBJCALL_VOID_PINT4(ScriptRegion, Region_Tint);
+    API_OBJCALL_VOID_PINT5(ScriptRegion, Region_Tint);
+}
+
+// void (ScriptRegion *srr, int red, int green, int blue, int amount)
+RuntimeScriptValue Sc_Region_TintNoLum(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_VOID_PINT4(ScriptRegion, Region_TintNoLum);
 }
 
 // void (ScriptRegion *ssr, int mood)
@@ -199,12 +210,18 @@ RuntimeScriptValue Sc_Region_GetTintSaturation(void *self, const RuntimeScriptVa
     API_OBJCALL_INT(ScriptRegion, Region_GetTintSaturation);
 }
 
+RuntimeScriptValue Sc_Region_GetTintLuminance(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_INT(ScriptRegion, Region_GetTintLuminance);
+}
+
 
 
 void RegisterRegionAPI()
 {
     ccAddExternalStaticFunction("Region::GetAtRoomXY^2",        Sc_GetRegionAtLocation);
-    ccAddExternalObjectFunction("Region::Tint^4",               Sc_Region_Tint);
+    ccAddExternalObjectFunction("Region::Tint^4",               Sc_Region_TintNoLum);
+    ccAddExternalObjectFunction("Region::Tint^5",               Sc_Region_Tint);
     ccAddExternalObjectFunction("Region::RunInteraction^1",     Sc_Region_RunInteraction);
     ccAddExternalObjectFunction("Region::get_Enabled",          Sc_Region_GetEnabled);
     ccAddExternalObjectFunction("Region::set_Enabled",          Sc_Region_SetEnabled);
@@ -216,11 +233,12 @@ void RegisterRegionAPI()
     ccAddExternalObjectFunction("Region::get_TintGreen",        Sc_Region_GetTintGreen);
     ccAddExternalObjectFunction("Region::get_TintRed",          Sc_Region_GetTintRed);
     ccAddExternalObjectFunction("Region::get_TintSaturation",   Sc_Region_GetTintSaturation);
+    ccAddExternalObjectFunction("Region::get_TintLuminance",    Sc_Region_GetTintLuminance);
 
     /* ----------------------- Registering unsafe exports for plugins -----------------------*/
 
     ccAddExternalFunctionForPlugin("Region::GetAtRoomXY^2",        (void*)GetRegionAtLocation);
-    ccAddExternalFunctionForPlugin("Region::Tint^4",               (void*)Region_Tint);
+    ccAddExternalFunctionForPlugin("Region::Tint^4",               (void*)Region_TintNoLum);
     ccAddExternalFunctionForPlugin("Region::RunInteraction^1",     (void*)Region_RunInteraction);
     ccAddExternalFunctionForPlugin("Region::get_Enabled",          (void*)Region_GetEnabled);
     ccAddExternalFunctionForPlugin("Region::set_Enabled",          (void*)Region_SetEnabled);

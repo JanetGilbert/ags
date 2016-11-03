@@ -25,7 +25,7 @@ using AGS::Common::Stream;
 using AGS::Common::Bitmap;
 
 
-DynamicArray<GUIButton> guibuts;
+std::vector<GUIButton> guibuts;
 //GUIButton guibuts[MAX_OBJ_EACH_TYPE];
 int numguibuts = 0;
 
@@ -239,4 +239,6 @@ void GUIButton::MouseUp()
 
   ispushed = 0;
 }
+
+
 

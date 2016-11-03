@@ -26,7 +26,6 @@
 struct SOUNDCLIP;
 
 void        calculate_reserved_channel_count();
-void        register_audio_script_objects();
 void        update_clip_default_volume(ScriptAudioClip *audioClip);
 void        start_fading_in_new_track_if_applicable(int fadeInChannel, ScriptAudioClip *newSound);
 void        move_track_to_crossfade_channel(int currentChannel, int crossfadeSpeed, int fadeInChannel, ScriptAudioClip *newSound);
@@ -39,10 +38,9 @@ void        audio_update_polled_stuff();
 void        queue_audio_clip_to_play(ScriptAudioClip *clip, int priority, int repeat);
 ScriptAudioChannel* play_audio_clip_on_channel(int channel, ScriptAudioClip *clip, int priority, int repeat, int fromOffset, SOUNDCLIP *cachedClip = NULL);
 void        remove_clips_of_type_from_queue(int audioType);
+void        update_queued_clips_volume(int audioType, int new_vol);
 ScriptAudioChannel* play_audio_clip(ScriptAudioClip *clip, int priority, int repeat, int fromOffset, bool queueIfNoChannel);
 void        play_audio_clip_by_index(int audioClipIndex);
-void        register_audio_script_functions();
-bool        unserialize_audio_script_object(int index, const char *objectType, const char *serializedData, int dataSize);
 ScriptAudioClip* get_audio_clip_for_old_style_number(bool isMusic, int indexNumber);
 void        stop_and_destroy_channel_ex(int chid, bool resetLegacyMusicSettings);
 void        stop_and_destroy_channel (int chid);

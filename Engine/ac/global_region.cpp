@@ -71,12 +71,12 @@ void SetAreaLightLevel(int area, int brightness) {
     if (brightness > 100) brightness = 100;
     thisroom.regionLightLevel[area] = brightness;
     // disable RGB tint for this area
-    thisroom.regionTintLevel[area] &= ~TINT_IS_ENABLED;
-    generate_light_table();
+    thisroom.regionTintLevel[area]  = 0;
     DEBUG_CONSOLE("Region %d light level set to %d", area, brightness);
 }
 
-void SetRegionTint (int area, int red, int green, int blue, int amount) {
+void SetRegionTint (int area, int red, int green, int blue, int amount, int luminance)
+{
     if ((area < 0) || (area > MAX_REGIONS))
         quit("!SetRegionTint: invalid region");
 
@@ -86,11 +86,14 @@ void SetRegionTint (int area, int red, int green, int blue, int amount) {
     }
 
     // originally the value was passed as 0
+    // TODO: find out which versions had this; fixup only for past versions in the future!
     if (amount == 0)
         amount = 100;
 
     if ((amount < 1) || (amount > 100))
         quit("!SetRegionTint: amount must be 1-100");
+    if ((luminance < 0) || (luminance > 100))
+        quit("!SetRegionTint: luminance must be 0-100");
 
     DEBUG_CONSOLE("Region %d tint set to %d,%d,%d", area, red, green, blue);
 
@@ -98,15 +101,11 @@ void SetRegionTint (int area, int red, int green, int blue, int amount) {
     green -= 100;
     blue -= 100;*/
 
-    unsigned char rred = red;
-    unsigned char rgreen = green;
-    unsigned char rblue = blue;
-
-    thisroom.regionTintLevel[area] = TINT_IS_ENABLED;
-    thisroom.regionTintLevel[area] |= rred & 0x000000ff;
-    thisroom.regionTintLevel[area] |= (int(rgreen) << 8) & 0x0000ff00;
-    thisroom.regionTintLevel[area] |= (int(rblue) << 16) & 0x00ff0000;
-    thisroom.regionLightLevel[area] = amount;
+    thisroom.regionTintLevel[area] = red & 0xFF |
+                                   ((green & 0xFF) << 8) |
+                                   ((blue & 0XFF) << 16) |
+                                   ((amount & 0xFF) << 24);
+    thisroom.regionLightLevel[area] = (luminance * 25) / 10;
 }
 
 void DisableRegion(int hsnum) {

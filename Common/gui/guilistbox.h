@@ -15,16 +15,13 @@
 #ifndef __AC_GUILISTBOX_H
 #define __AC_GUILISTBOX_H
 
+#include <vector>
 #include "gui/guiobject.h"
-#include "gui/dynamicarray.h"
-
-#define GLF_NOBORDER     1
-#define GLF_NOARROWS     2
-#define GLF_SGINDEXVALID 4
+#include "util/string.h"
 
 struct GUIListBox:public GUIObject
 {
-  char *items[MAX_LISTBOX_ITEMS];
+  AGS::Common::String items[MAX_LISTBOX_ITEMS];
   short saveGameIndex[MAX_LISTBOX_ITEMS];
   int numItems, selected, topItem, mousexp, mouseyp;
   int rowheight, num_items_fit;
@@ -82,6 +79,9 @@ struct GUIListBox:public GUIObject
     selectedbgcol = 16;
     backcol = 7;
     exflags = 0;
+    rowheight = 0;
+    num_items_fit = 0;
+    alignment = GALIGN_LEFT;
     numSupportedEvents = 1;
     supportedEvents[0] = "SelectionChanged";
     supportedEventArgs[0] = "GUIControl *control";
@@ -94,7 +94,7 @@ struct GUIListBox:public GUIObject
   virtual ~GUIListBox()
   {
     for (int i = 0; i < numItems; i++)
-      free(items[i]);
+      items[i].Free();
   }
 
 private:
@@ -105,7 +105,7 @@ private:
   void Draw_set_oritext(char *oritext, const char *text);
 };
 
-extern DynamicArray<GUIListBox> guilist;
+extern std::vector<GUIListBox> guilist;
 extern int numguilist;
 
 #endif // __AC_GUILISTBOX_H

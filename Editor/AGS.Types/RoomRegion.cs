@@ -7,6 +7,7 @@ using System.Text;
 namespace AGS.Types
 {
     [PropertyTab(typeof(PropertyTabInteractions), PropertyTabScope.Component)]
+    [DefaultProperty("LightLevel")]
     public class RoomRegion : ICustomTypeDescriptor
     {
         private static InteractionSchema _interactionSchema;
@@ -18,6 +19,7 @@ namespace AGS.Types
         private int _greenTint;
         private int _blueTint;
         private int _tintAmount;
+        private int _tintLuminance;
         private Interactions _interactions = new Interactions(_interactionSchema);
 
         static RoomRegion()
@@ -81,12 +83,27 @@ namespace AGS.Types
             set { _blueTint = value; }
         }
 
-        [Description("The saturation of the region tint (0=no tint, 100=fully colourize)")]
+        [Description("The saturation of the region tint (1=minimal tint, 100=fully colourize)")]
         [Category("Lighting")]
+        [DefaultValue(50)]
         public int TintSaturation
         {
             get { return _tintAmount; }
-            set { _tintAmount = value; }
+            set
+            {
+                if (value == 0)
+                    throw new ArgumentOutOfRangeException("Saturation cannot be 0, disable colour tint instead");
+                _tintAmount = value;
+            }
+        }
+
+        [Description("The luminance of the region tint (0=pitch black, 100=original lighting)")]
+        [Category("Lighting")]
+        [DefaultValue(100)]
+        public int TintLuminance
+        {
+            get { return _tintLuminance; }
+            set { _tintLuminance = value; }
         }
 
         [Browsable(false)]
@@ -163,7 +180,8 @@ namespace AGS.Types
                     ((property.Name == "RedTint") || 
                     (property.Name == "GreenTint") ||
                     (property.Name == "BlueTint") ||
-                    (property.Name == "TintSaturation")))
+                    (property.Name == "TintSaturation") ||
+                    (property.Name == "TintLuminance")))
                 {
                     wantThisProperty = false;
                 }

@@ -200,7 +200,7 @@ void Test_IniFile()
         assert(tree.find("section3") != tree.end());
         assert(tree.find("section4") != tree.end());
         assert(tree.find("section5") != tree.end());
-        StringMap &sub_tree = tree[""];
+        StringOrderMap &sub_tree = tree[""];
         assert(sub_tree.size() == 1);
         assert(sub_tree.find("global_item") != sub_tree.end());
         assert(sub_tree["global_item"] == "global_value");
@@ -243,10 +243,10 @@ void Test_IniFile()
 
         // construct the tree
         {
-            StringMap &audio_tree = tree1["audio"];
+            StringOrderMap &audio_tree = tree1["audio"];
             audio_tree["volume"] = "100.0";
             audio_tree["driver"] = "midi";
-            StringMap &video_tree = tree1["video"];
+            StringOrderMap &video_tree = tree1["video"];
             video_tree["gfx_mode"] = "standard mode";
             video_tree["gamma"]    = "1.0";
             video_tree["vsync"] = "false";
@@ -267,18 +267,18 @@ void Test_IniFile()
         // Try merging altered tree into existing file
         tree3 = tree1;
         {
-            StringMap &audio_tree = tree3["audio"];
+            StringOrderMap &audio_tree = tree3["audio"];
             audio_tree["extra_option1"] = "extra value 1";
             audio_tree["extra_option2"] = "extra value 2";
             audio_tree["extra_option3"] = "extra value 3";
-            StringMap &video_tree = tree3["video"];
+            StringOrderMap &video_tree = tree3["video"];
             video_tree["gfx_mode"] = "alternate mode";
             video_tree["gamma"]    = "2.0";
-            StringMap &new_tree = tree3["other1"];
+            StringOrderMap &new_tree = tree3["other1"];
             new_tree["item1_1"] = "value1_1";
             new_tree["item1_2"] = "value1_2";
             new_tree["item1_3"] = "value1_3";
-            StringMap &new_tree2 = tree3["other2"];
+            StringOrderMap &new_tree2 = tree3["other2"];
             new_tree2["item2_1"] = "value2_1";
             new_tree2["item2_2"] = "value2_2";
             new_tree2["item2_3"] = "value2_3";

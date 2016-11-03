@@ -12,13 +12,23 @@
 //
 //=============================================================================
 
+#include "ac/game_version.h"
 #include "ac/gamestate.h"
 #include "ac/gamesetupstruct.h"
+#include "game/customproperties.h"
 #include "util/alignedstream.h"
 #include "util/string_utils.h"
 
-using AGS::Common::AlignedStream;
-using AGS::Common::Stream;
+using namespace AGS::Common;
+
+extern GameSetupStruct game;
+
+void GameState::SetViewport(const Size viewport_size)
+{
+    viewport = RectWH((game.size.Width - viewport_size.Width) / 2,
+                      (game.size.Height - viewport_size.Height) / 2,
+                       viewport_size.Width, viewport_size.Height);
+}
 
 //
 // [IKM] What must be kept in mind: in previous versions of AGS
@@ -29,8 +39,6 @@ using AGS::Common::Stream;
 // On other hand we should read/write even pointers to arrays
 // (or at least emulate that), although that could make no sense.
 //
-
-extern GameSetupStruct game;
 
 void GameState::ReadFromFile_v321(Stream *in)
 {
@@ -113,6 +121,7 @@ void GameState::ReadFromFile_v321(Stream *in)
     speech_portrait_x = in->ReadInt32();
     speech_portrait_y = in->ReadInt32();
     speech_display_post_time_ms = in->ReadInt32();
+    dialog_options_highlight_color = in->ReadInt32();
     in->ReadArrayOfInt32(reserved, GAME_STATE_RESERVED_INTS);
     // ** up to here is referenced in the script "game." object
     recording = in->ReadInt32();   // user is recording their moves
@@ -152,7 +161,7 @@ void GameState::ReadFromFile_v321(Stream *in)
     speech_font = in->ReadInt32();
     key_skip_wait = in->ReadInt8();
     swap_portrait_lastchar = in->ReadInt32();
-    seperate_music_lib = in->ReadInt32();
+    separate_music_lib = in->ReadInt32();
     in_conversation = in->ReadInt32();
     screen_tint = in->ReadInt32();
     num_parsed_words = in->ReadInt32();
@@ -174,6 +183,10 @@ void GameState::ReadFromFile_v321(Stream *in)
     rtint_blue = in->ReadInt32();
     rtint_level = in->ReadInt32();
     rtint_light = in->ReadInt32();
+    if (loaded_game_file_version >= kGameVersion_340_4)
+        play.rtint_enabled = in->ReadBool();
+    else
+        play.rtint_enabled = play.rtint_level > 0;
     end_cutscene_music = in->ReadInt32();
     skip_until_char_stops = in->ReadInt32();
     get_loc_name_last_time = in->ReadInt32();
@@ -293,6 +306,7 @@ void GameState::WriteToFile_v321(Stream *out)
     out->WriteInt32(speech_portrait_x);
     out->WriteInt32(speech_portrait_y);
     out->WriteInt32(speech_display_post_time_ms);
+    out->WriteInt32(dialog_options_highlight_color);
     out->WriteArrayOfInt32(reserved, GAME_STATE_RESERVED_INTS);
     // ** up to here is referenced in the script "game." object
     out->WriteInt32( recording);   // user is recording their moves
@@ -332,7 +346,7 @@ void GameState::WriteToFile_v321(Stream *out)
     out->WriteInt32( speech_font);
     out->WriteInt8( key_skip_wait);
     out->WriteInt32( swap_portrait_lastchar);
-    out->WriteInt32( seperate_music_lib);
+    out->WriteInt32( separate_music_lib);
     out->WriteInt32( in_conversation);
     out->WriteInt32( screen_tint);
     out->WriteInt32( num_parsed_words);
@@ -354,6 +368,8 @@ void GameState::WriteToFile_v321(Stream *out)
     out->WriteInt32( rtint_blue);
     out->WriteInt32( rtint_level);
     out->WriteInt32( rtint_light);
+    if (loaded_game_file_version >= kGameVersion_340_4)
+        out->WriteBool(play.rtint_enabled);
     out->WriteInt32( end_cutscene_music);
     out->WriteInt32( skip_until_char_stops);
     out->WriteInt32( get_loc_name_last_time);
@@ -409,5 +425,44 @@ void GameState::WriteQueuedAudioItems_Aligned(Common::Stream *out)
     {
         new_music_queue[i].WriteToFile(&align_s);
         align_s.Reset();
+    }
+}
+
+void GameState::ReadCustomProperties(Common::Stream *in)
+{
+    if (loaded_game_file_version >= kGameVersion_340_4)
+    {
+        // After runtime property values were read we also copy missing default,
+        // because we do not keep defaults in the saved game, and also in case
+        // this save is made by an older game version which had different
+        // properties.
+        for (int i = 0; i < game.numcharacters; ++i)
+        {
+            charProps[i].clear();
+            Properties::ReadValues(charProps[i], in);
+        }
+        for (int i = 0; i < game.numinvitems; ++i)
+        {
+            invProps[i].clear();
+            Properties::ReadValues(invProps[i], in);
+        }
+    }
+}
+
+void GameState::WriteCustomProperties(Common::Stream *out)
+{
+    if (loaded_game_file_version >= kGameVersion_340_4)
+    {
+        // We temporarily remove properties that kept default values
+        // just for the saving data time to avoid getting lots of 
+        // redundant data into saved games
+        for (int i = 0; i < game.numcharacters; ++i)
+        {
+            Properties::WriteValues(charProps[i], out);
+        }
+        for (int i = 0; i < game.numinvitems; ++i)
+        {
+            Properties::WriteValues(invProps[i], out);
+        }
     }
 }

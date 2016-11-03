@@ -16,7 +16,6 @@
 #include "font/fonts.h"
 #include "gui/guitextbox.h"
 #include "gui/guimain.h"
-#include "font/agsfontrenderer.h"	// fontRenderers;
 #include "util/stream.h"
 #include "gfx/bitmap.h"
 #include "util/wgt2allg.h"
@@ -24,7 +23,7 @@
 using AGS::Common::Stream;
 using AGS::Common::Bitmap;
 
-DynamicArray<GUITextBox> guitext;
+std::vector<GUITextBox> guitext;
 int numguitext = 0;
 
 void GUITextBox::WriteToFile(Stream *out)
@@ -71,7 +70,7 @@ void GUITextBox::KeyPress(int kp)
     return;
 
   // other key, continue
-  if ((kp >= 128) && (!fontRenderers[font]->SupportsExtendedCharacters(font)))
+  if ((kp >= 128) && (!font_supports_extended_characters(font)))
     return;
 
   if (kp == 13) {

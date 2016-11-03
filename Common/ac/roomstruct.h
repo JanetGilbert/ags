@@ -15,18 +15,22 @@
 #ifndef __AC_ROOMSTRUCT_H
 #define __AC_ROOMSTRUCT_H
 
-#include "ac/common_defines.h"      // PCKD
-#include "ac/interaction.h"  // NewInteraction
-#include "ac/customproperties.h"
+#include "ac/common_defines.h"
 #include "ac/messageinfo.h"
 #include "ac/animationstruct.h"
 #include "ac/point.h"
+#include "game/customproperties.h"
+#include "game/interactions.h"
 #include "script/cc_script.h"       // ccScript
 #include "util/wgt2allg.h" // color (allegro RGB)
 
 namespace AGS { namespace Common { class Stream; } }
-namespace AGS { namespace Common { class Bitmap; }}
-using namespace AGS; // FIXME later
+namespace AGS { namespace Common { class Bitmap; } }
+using AGS::Common::Stream;
+using AGS::Common::Bitmap;
+using AGS::Common::Interaction;
+using AGS::Common::InteractionScripts;
+using AGS::Common::InteractionVariable;
 
 /* room file versions history
 8:  final v1.14 release
@@ -51,6 +55,7 @@ using namespace AGS; // FIXME later
 27:  v3.0 - store Y of bottom of object, not top
 28:  v3.0.3 - remove hotspot name length limit
 29:  v3.0.3 - high-res coords for object x/y, edges and hotspot walk-to point
+30:  v3.4.0.4 - tint luminance for regions
 */
 enum RoomFileVersion
 {
@@ -81,7 +86,8 @@ enum RoomFileVersion
     kRoomVersion_300b       = 27,
     kRoomVersion_303a       = 28,
     kRoomVersion_303b       = 29,
-    kRoomVersion_Current    = kRoomVersion_303b
+    kRoomVersion_3404       = 30,
+    kRoomVersion_Current    = kRoomVersion_3404
 };
 
 // thisroom.options[0] = startup music
@@ -111,10 +117,10 @@ enum RoomVolumeAdjustment
 
 #pragma pack(1)
 struct sprstruc {
-    short sprnum  PCKD;   // number from array
-    short x,y     PCKD;   // x,y co-ords
-    short room    PCKD;   // room number
-    short on      PCKD;
+    short sprnum  ;   // number from array
+    short x,y     ;   // x,y co-ords
+    short room    ;   // room number
+    short on      ;
     sprstruc() { on = 0; }
 
     void ReadFromFile(Common::Stream *in);
@@ -122,7 +128,7 @@ struct sprstruc {
 #pragma pack()
 
 #define NOT_VECTOR_SCALED -10000
-#define TINT_IS_ENABLED 0x80000000
+#define LEGACY_TINT_IS_ENABLED 0x80000000
 struct roomstruct {
     Common::Bitmap *        walls, *object, *lookat;          // 'object' is the walk-behind
     Common::Bitmap *        regions;
@@ -139,13 +145,13 @@ struct roomstruct {
     short         left,right,top,bottom;          // to walk off screen
     short         numsprs,nummes;                 // number of initial sprites and messages
     sprstruc      sprs[MAX_INIT_SPR];             // structures for each sprite
-    NewInteraction *intrObject[MAX_INIT_SPR];
+    Interaction  *intrObject[MAX_INIT_SPR];
     InteractionScripts **objectScripts;
     int           objbaseline[MAX_INIT_SPR];                // or -1 (use bottom of object graphic)
     short         objectFlags[MAX_INIT_SPR];
     char          objectnames[MAX_INIT_SPR][MAXOBJNAMELEN];
     char          objectscriptnames[MAX_INIT_SPR][MAX_SCRIPT_NAME_LEN];
-    CustomProperties objProps[MAX_INIT_SPR];
+    AGS::Common::StringIMap objProps[MAX_INIT_SPR];
     char          password[11];
     char          options[10];                    // [0]=startup music
     char          *message[MAXMESS];
@@ -162,9 +168,9 @@ struct roomstruct {
     _Point        hswalkto[MAX_HOTSPOTS];
     char*         hotspotnames[MAX_HOTSPOTS];
     char          hotspotScriptNames[MAX_HOTSPOTS][MAX_SCRIPT_NAME_LEN];
-    NewInteraction *intrHotspot[MAX_HOTSPOTS];
-    NewInteraction *intrRoom;
-    NewInteraction *intrRegion[MAX_REGIONS];
+    Interaction  *intrHotspot[MAX_HOTSPOTS];
+    Interaction  *intrRoom;
+    Interaction  *intrRegion[MAX_REGIONS];
     InteractionScripts **hotspotScripts;
     InteractionScripts **regionScripts;
     InteractionScripts *roomScripts;
@@ -189,13 +195,22 @@ struct roomstruct {
     InteractionVariable *localvars;
     int           numLocalVars;
     char          ebpalShared[MAX_BSCENE];  // used internally by engine atm
-    CustomProperties roomProps;
-    CustomProperties hsProps[MAX_HOTSPOTS];
+    AGS::Common::StringIMap roomProps;
+    AGS::Common::StringIMap hsProps[MAX_HOTSPOTS];
     int           gameId;
 
     roomstruct();
     void freemessage();
     void freescripts();
+
+    // Gets if the given region has light level set
+    bool has_region_lightlevel(int id) const;
+    // Gets if the given region has a tint set
+    bool has_region_tint(int id) const;
+    // Gets region's light level in -100 to 100 range value; returns 0 (default level) if region's tint is set
+    int  get_region_lightlevel(int id) const;
+    // Gets region's tint luminance in 0 to 100 range value; returns 0 if region's light level is set
+    int  get_region_tintluminance(int id) const;
 };
 
 #define BLOCKTYPE_MAIN        1
