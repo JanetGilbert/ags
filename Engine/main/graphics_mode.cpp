@@ -61,8 +61,16 @@ Size get_desktop_size()
 {
     Size sz;
     get_desktop_resolution(&sz.Width, &sz.Height);
+    
+#if defined(IOS_VERSION)
+    //J get_desktop_size() returns 0,0 on iOS, and I will assume the desktop will always be the size of the screen on iOS.
+    sz.Width = game.size.Width;
+    sz.Height = game.size.Height;
+#endif
+    
     return sz;
 }
+
 
 Size get_max_display_size(bool windowed)
 {
