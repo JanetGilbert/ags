@@ -232,7 +232,7 @@ void check_controls() {
             if (play.cant_skip_speech & SKIP_MOUSECLICK)
                 remove_screen_overlay(OVER_TEXTMSG);
         }
-        guis[wasongui].OnMouseButtonUp(); //J used to be mouse_but_up
+        gui_on_mouse_up(wasongui, wasbutdown);
         //int whichbut=wasbutdown;
         wasbutdown=0;
     }
