@@ -101,3 +101,15 @@ xcuserdata/
 *.xcuserstate
 *.xccheckout
 *.xcscmblueprint
+OSX/xcode/agsteam/agsplugin.h
+OSX/xcode/agsteam/AGSteam.cpp
+OSX/xcode/agsteam/AGSteam.h
+OSX/xcode/agsteam/AGSteam.sln
+OSX/xcode/agsteam/AGSteam.vcproj
+OSX/xcode/agsteam/LICENSE
+OSX/xcode/agsteam/SteamAchievements.cpp
+OSX/xcode/agsteam/SteamAchievements.h
+OSX/xcode/agsteam/SteamStats.cpp
+OSX/xcode/agsteam/SteamStats.h
+OSX/xcode/agsteam/win32fillin.cpp
+OSX/xcode/agsteam/win32fillin.hpp
