@@ -400,6 +400,7 @@ void GUIMain::OnControlPositionChanged()
 
 void GUIMain::OnMouseButtonDown()
 {
+    Poll(); //JG
     if (MouseOverCtrl < 0)
         return;
 
