@@ -53,6 +53,7 @@
 #include "ac/spritecache.h"
 #include "ac/string.h"
 #include "ac/system.h"
+#include "ac/keycode.h" //JG
 #include "ac/timer.h"
 #include "ac/translation.h"
 #include "ac/dynobj/all_dynamicclasses.h"
@@ -2608,20 +2609,26 @@ void start_skipping_cutscene () {
 
 }
 
+
 // JG - detect player dragging from left to right at the top of the screen, in order to skip a cutscene.
 void check_skip_cutscene_drag(int startx, int starty, int endx, int endy)
 {
-    if (play.in_cutscene==1  && play.fast_forward==0){
+    //if (play.in_cutscene==1  && play.fast_forward==0){
+    if (play.fast_forward==0){
         int scrw = System_GetScreenWidth();
         int scrh = System_GetScreenHeight();
         int scr_limit_x = scrw/4;
         int scr_limit_y = (scrh/8)*3;
         int distx=abs(startx-endx);
         
+        
         if (distx>scr_limit_x && starty<scr_limit_y && endy<scr_limit_y){
-            prepare_cutscene_skip();
+            call_simulate_keypress(AGS_KEYCODE_ESCAPE);
+            //prepare_cutscene_skip();
         }
     }
+
+    
 }
 
 void check_skip_cutscene_keypress (int kgn) {
