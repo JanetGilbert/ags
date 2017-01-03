@@ -2,6 +2,7 @@
 #import <QuartzCore/QuartzCore.h>
 
 #import "EAGLView.h"
+#import "agsViewController.h"
 
 @interface EAGLView (PrivateMethods)
 - (void)createFramebuffer;
@@ -19,6 +20,57 @@ extern int mouse_position_x;
 extern int mouse_position_y;
 
 
+// Debug
+- (void)elogDebug:(NSString *)toPrint
+{
+    NSLog(@"%@", toPrint);
+}
+
+- (void)elogDebug:(NSString *)toPrint appendInt:(int)num
+{
+    NSString *number = [[NSString alloc] initWithFormat:@"%d", num];
+    
+    toPrint = [toPrint stringByAppendingString:number];
+    
+    NSLog(@"%@", toPrint);
+}
+
+- (void)elogDebug:(NSString *)toPrint appendStr:(NSString *)addStr
+{
+    toPrint = [toPrint stringByAppendingString:addStr];
+    
+    NSLog(@"%@", toPrint);
+}
+
+void elogdebugc(const char *message)
+{
+    
+    NSString *temp = [[NSString alloc] initWithUTF8String:message];
+    
+    NSLog(@"%@", temp);
+}
+
+void elogdebugc_int(const char *message, int num)
+{
+    NSString *temp = [[NSString alloc] initWithUTF8String:message];
+    NSString *number = [[NSString alloc] initWithFormat:@"%d", num];
+    
+    temp = [temp stringByAppendingString:number];
+    
+    NSLog(@"%@", temp);
+}
+
+void elogdebugc_str(const char *message, const char *extra)
+{
+    NSString *temp = [[NSString alloc] initWithUTF8String:message];
+    NSString *temp2 = [[NSString alloc] initWithUTF8String:extra];
+    
+    temp = [temp stringByAppendingString:temp2];
+    
+    NSLog(@"%@", temp);
+}
+
+
 void ios_swap_buffers()
 {
 	if (eaglview)
@@ -27,19 +79,34 @@ void ios_swap_buffers()
 
 void ios_select_buffer()
 {
+    elogdebugc("JGS eaglview ios_select_buffer");
+    
+    
 	if (eaglview)
 		[eaglview setFramebuffer];
 }
 
+
+
 // You must implement this method
 + (Class)layerClass
 {
+    elogdebugc("JGS eaglview layerClass");
+
+
 	return [CAEAGLLayer class];
 }
+
+
+
 
 //The EAGL view is stored in the nib file. When it's unarchived it's sent -initWithCoder:.
 - (id)initWithCoder:(NSCoder*)coder
 {
+    elogdebugc("JGS eaglview initWithCoder");
+    
+    
+    
 	self = [super initWithCoder:coder];
 	if (self)
 	{
@@ -71,6 +138,10 @@ void ios_select_buffer()
 
 - (void)setContext:(EAGLContext *)newContext
 {
+    elogdebugc("JGS eaglview setContext");
+    
+    
+    
 	if (context != newContext)
 	{
 		[self deleteFramebuffer];
@@ -116,6 +187,10 @@ extern void ios_initialize_renderer(int w, int h);
 
 - (void)deleteFramebuffer
 {
+    elogdebugc("JGS eaglview deleteFramebuffer");
+    
+    
+    
 	if (context)
 	{
 		[EAGLContext setCurrentContext:context];
@@ -140,6 +215,10 @@ extern volatile int drawing_in_progress;
 
 - (void)setFramebuffer
 {
+
+        elogdebugc("JGS eaglview setFramebuffer");
+    
+    
 	while (!is_in_foreground)
 	{
 		//printf("looping in background\n");
@@ -181,6 +260,9 @@ extern volatile int drawing_in_progress;
 
 - (void)layoutSubviews
 {
+    elogdebugc("JGS eaglview layoutSubviews");
+    
+    
 	// The framebuffer will be re-created at the beginning of the next setFramebuffer method call.
 	changedOrientation = true;
 }

@@ -13,16 +13,27 @@ volatile int drawing_in_progress = 0;
 extern "C" void ios_resume_sound();
 extern "C" volatile int ios_audio_must_restart;//jg
 
+extern "C" void logdebugc(const char *message);
+extern "C" void logdebugc_int(const char *message, int num);
+extern "C" void logdebugc_str(const char *message, const char *extra);
+
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    logdebugc("JGS didFinishLaunchingWithOptions");
+    
 	[[UIApplication sharedApplication] setIdleTimerDisabled:YES];
-	self.window.rootViewController = self.viewController;
-	return YES;
+	//self.window.rootViewController = self.viewController;
+    //self.window.rootViewController = self.viewController;
+   // [self.window makeKeyAndVisible];
+    
+    return YES;
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
 {
-	is_in_foreground = 0;
+    logdebugc("JGS applicationWillResignActive is_in_foreground = 0");
+	//is_in_foreground = 0;
 	do
 	{
 		//printf("waiting for drawing to finish %d...\n", drawing_in_progress);
@@ -33,6 +44,8 @@ extern "C" volatile int ios_audio_must_restart;//jg
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
+    logdebugc("JGS applicationDidBecomeActive is_in_foreground = 1");
+    
 	is_in_foreground = 1;
     ios_audio_must_restart = 1;//jg
     usleep(1000 * 1000); //jg Crude hack to try and make the audio start up after answering a phone call.
@@ -46,6 +59,7 @@ extern "C" volatile int ios_audio_must_restart;//jg
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
 	// Handle any background procedures not related to animation here.
+    logdebugc("JGS applicationDidEnterBackground is_in_foreground = 0");
 	is_in_foreground = 0;
 	while (drawing_in_progress)
 	{
@@ -58,6 +72,7 @@ extern "C" volatile int ios_audio_must_restart;//jg
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
 	// Handle any foreground procedures not related to animation here.
+    logdebugc("JGS applicationWillEnterForeground is_in_foreground = 1");
 	is_in_foreground = 1;
 }
 

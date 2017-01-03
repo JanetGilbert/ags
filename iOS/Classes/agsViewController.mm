@@ -81,6 +81,53 @@ extern "C"
     }
 }
 
+// Debug
+- (void)logDebug:(NSString *)toPrint
+{
+    NSLog(@"%@", toPrint);
+}
+
+- (void)logDebug:(NSString *)toPrint appendInt:(int)num
+{
+    NSString *number = [[NSString alloc] initWithFormat:@"%d", num];
+    
+    toPrint = [toPrint stringByAppendingString:number];
+    
+    NSLog(@"%@", toPrint);
+}
+
+- (void)logDebug:(NSString *)toPrint appendStr:(NSString *)addStr
+{
+    toPrint = [toPrint stringByAppendingString:addStr];
+    
+    NSLog(@"%@", toPrint);
+}
+
+
+extern "C" void logdebugc(const char *message)
+{
+    
+    NSString *temp = [[NSString alloc] initWithUTF8String:message];
+    
+    [agsviewcontroller logDebug:temp];
+}
+
+extern "C" void logdebugc_int(const char *message, int num)
+{
+    NSString *temp = [[NSString alloc] initWithUTF8String:message];
+    
+    [agsviewcontroller logDebug:temp appendInt:num];
+}
+
+extern "C" void logdebugc_str(const char *message, const char *extra)
+{
+    NSString *temp = [[NSString alloc] initWithUTF8String:message];
+    NSString *temp2 = [[NSString alloc] initWithUTF8String:extra];
+    
+    temp = [temp stringByAppendingString:temp2];
+    
+    [agsviewcontroller logDebug:temp];
+}
 
 
 // Keyboard
@@ -88,7 +135,7 @@ extern "C"
 
 - (BOOL)canBecomeFirstResponder
 {
-	return YES;
+	return NO;
 }
 
 //JG - Allows script to fake a keypress.
@@ -290,23 +337,6 @@ extern "C" int ios_is_keyboard_visible()
 		[self createKeyboardButtonBar:9];
 }
 
-
-
-// Touching
-
-//JG - Drag'n'Drop
-/*
-- (IBAction)handleSingleFingerTap:(UIGestureRecognizer *)sender
-{
-	mouse_button = 1;
-}
-
-- (IBAction)handleTwoFingerTap:(UIGestureRecognizer *)sender
-{
-	mouse_button = 2;
-}*/
-
-
 - (void)moveViewAnimated:(BOOL)upwards duration:(float)duration
 {
 	[UIView beginAnimations:nil context:NULL];
@@ -324,31 +354,6 @@ extern "C" int ios_is_keyboard_visible()
 	self.view.frame = CGRectMake(0, newTop, self.view.frame.size.width, self.view.frame.size.height);
 	[UIView commitAnimations];
 }
-
-//JG - Drag'n'Drop
-/*
-- (IBAction)handleLongPress:(UIGestureRecognizer *)sender
-{
-	if (sender.state != UIGestureRecognizerStateBegan)
-	  return;
-
-	if (self.isKeyboardActive)
-	{
-		[self hideKeyboard];
-	}
-	else
-	{
-		[self showKeyboard];
-	}
-}
-
-- (IBAction)handleShortLongPress:(UIGestureRecognizer *)sender
-{
-	if (sender.state != UIGestureRecognizerStateBegan)
-	  return;
-
-	mouse_button = 10;
-}*/
 
 - (void)touchesMoved:(NSSet*)touches withEvent:(UIEvent*)event
 {
@@ -384,33 +389,7 @@ extern "C" int ios_is_keyboard_visible()
 
 - (void)createGestureRecognizers
 {
-    //JG - Drag'n'Drop
-	/*UITapGestureRecognizer* singleFingerTap = [[UITapGestureRecognizer alloc]
-	initWithTarget:self action:@selector(handleSingleFingerTap:)];
-	singleFingerTap.numberOfTapsRequired = 1;
-	singleFingerTap.numberOfTouchesRequired = 1;
-	[self.view addGestureRecognizer:singleFingerTap];
-	[singleFingerTap release];
-
-	UITapGestureRecognizer* twoFingerTap = [[UITapGestureRecognizer alloc]
-	initWithTarget:self action:@selector(handleTwoFingerTap:)];
-	twoFingerTap.numberOfTapsRequired = 1;
-	twoFingerTap.numberOfTouchesRequired = 2;
-	[self.view addGestureRecognizer:twoFingerTap];
-	[twoFingerTap release];	
-	
-	UILongPressGestureRecognizer* longPressGesture = [[UILongPressGestureRecognizer alloc]
-	initWithTarget:self action:@selector(handleLongPress:)];
-	longPressGesture.minimumPressDuration = 1.5;
-	[self.view addGestureRecognizer:longPressGesture];
-	[longPressGesture release];
-	
-	UILongPressGestureRecognizer* shortLongPressGesture = [[UILongPressGestureRecognizer alloc]
-	initWithTarget:self action:@selector(handleShortLongPress:)];
-	shortLongPressGesture.minimumPressDuration = 0.7;
-	[shortLongPressGesture requireGestureRecognizerToFail:longPressGesture];
-	[self.view addGestureRecognizer:shortLongPressGesture];
-	[shortLongPressGesture release];*/
+    int dummy=0;
 }
 
 
@@ -430,6 +409,8 @@ extern "C" int ios_is_keyboard_visible()
 
 - (void)hideActivityIndicator
 {
+    [self logDebug:@"JGS hideActivityIndicator"];
+    
 	NSArray *subviews = [self.view subviews];
 	for (UIView *view in subviews)
 		[view removeFromSuperview];
@@ -438,6 +419,7 @@ extern "C" int ios_is_keyboard_visible()
 
 extern "C" void ios_create_screen()
 {
+    logdebugc("JGS ios_create_screen");
 	[agsviewcontroller performSelectorOnMainThread:@selector(hideActivityIndicator) withObject:nil waitUntilDone:YES];
 }
 
@@ -446,9 +428,11 @@ extern "C" void ios_create_screen()
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad
 {
+    [self logDebug:@"JGS viewDidLoad"];
+    [super viewDidLoad];
 	[self showActivityIndicator];
 
-	[super viewDidLoad];
+	
 	[self.view setMultipleTouchEnabled:YES];
 	[self createGestureRecognizers];
 	agsviewcontroller = self;
@@ -468,7 +452,7 @@ extern "C" void ios_create_screen()
 }
 
 
-//- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
 	self.isInPortraitOrientation = UIInterfaceOrientationIsLandscape(fromInterfaceOrientation);
@@ -477,14 +461,21 @@ extern "C" void ios_create_screen()
 }
 
 
+
+
+
 - (void)awakeFromNib
 {
-	EAGLContext* aContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
+    [self logDebug:@"JGS awakefromnib"];
+    [super awakeFromNib];
+    
+	EAGLContext* aContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1]; //jg kEAGLRenderingAPIOpenGLES1
 	
 	if (!aContext)
 		NSLog(@"Failed to create ES context");
 	else if (![EAGLContext setCurrentContext:aContext])
 		NSLog(@"Failed to set ES context current");
+    else NSLog(@"Successfully set ES context current");
 	
 	self.context = aContext;
 	[aContext release];
@@ -493,16 +484,18 @@ extern "C" void ios_create_screen()
 	[(EAGLView *)self.view setFramebuffer];
 	
 	self.isKeyboardActive = FALSE;
-	self.isInPortraitOrientation = TRUE;
+	self.isInPortraitOrientation = FALSE;
 	
-	[self createKeyboardButtonBar:1];
+	//[self createKeyboardButtonBar:1];
 	
-	[NSThread detachNewThreadSelector:@selector(startThread) toTarget:self withObject:nil];  
+	[NSThread detachNewThreadSelector:@selector(startThread) toTarget:self withObject:nil];
 }
 
 - (void)startThread
 {
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+    [self logDebug:@"JGS startThread"];
+
+	//NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
 	// Handle any foreground procedures not related to animation here.
 	NSArray *searchPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
@@ -529,10 +522,11 @@ extern "C" void ios_create_screen()
 	strcpy(filename, path);
 	strcat(filename, "ac2game.dat");
 #endif
-	
+	[self logDebug:@"JGS startThread startengine"];
 	startEngine(filename, path, 0);
+    [self logDebug:@"JGS startThread startengine done"];
 
-	[pool release];
+	//[pool release];
 }
 
 
@@ -568,6 +562,8 @@ void ios_show_message_box(char* buffer)
 
 - (void)viewWillAppear:(BOOL)animated
 {
+    [self logDebug:@"JGS viewWillAppear"];
+    
 	[super viewWillAppear:animated];
 }
 
@@ -578,12 +574,14 @@ void ios_show_message_box(char* buffer)
 
 - (void)viewDidUnload
 {
-	[super viewDidUnload];
+	
 
 	// Tear down context.
 	if ([EAGLContext currentContext] == context)
 		[EAGLContext setCurrentContext:nil];
-	self.context = nil;	
+	self.context = nil;
+    
+    [super viewDidUnload];
 }
 
 - (void)didReceiveMemoryWarning
@@ -598,5 +596,13 @@ void ios_show_message_box(char* buffer)
 {
     return YES;
 }
+
+
+
+
+
+ 
+
+
 
 @end

@@ -77,6 +77,8 @@ int convert_16bit_bgr = 0;
 
 int ff; // whatever!
 
+extern "C" void logdebugc(const char *message);
+
 int adjust_pixel_size_for_loaded_data(int size, int filever)
 {
     if (filever < kGameVersion_310)
@@ -322,12 +324,16 @@ bool pre_create_gfx_driver(const String &gfx_driver_id)
     else
 #endif
 #if defined (IOS_VERSION) || defined(ANDROID_VERSION) || defined(WINDOWS_VERSION)
-    if (gfx_driver_id.CompareNoCase("DX5") != 0 && (psp_gfx_renderer > 0) && (game.color_depth != 1))
+    if (gfx_driver_id.CompareNoCase("DX5") == 0 && (psp_gfx_renderer > 0) && (game.color_depth != 1))
     {
         gfxDriver = GetOGLGraphicsDriver(NULL);
         if (!gfxDriver)
         {
             Out::FPrint("Failed to initialize OGL driver: %s", get_allegro_error());
+        }
+        else
+        {
+            Out::FPrint("Initialize OGL driver succeeded");
         }
     }
 #endif
@@ -754,8 +760,12 @@ bool init_gfx_mode(const Size &game_size, const Size &screen_size, int cdep)
     else {
         set_color_depth(cdep);
     }
+    
+    logdebugc("gfxDriver->Init before");
 
     const bool result = gfxDriver->Init(game_size.Width, game_size.Height, screen_size.Width, screen_size.Height, final_col_dep, usetup.windowed, &timerloop);
+    
+    logdebugc("gfxDriver->Init done");
 
     if (result)
     {
@@ -1038,6 +1048,8 @@ int graphics_mode_init()
 {
     // Engine may try to change from windowed to fullscreen if the first failed;
     // here we keep the original windowed flag in case we'll have to restore it
+    
+    logdebugc("graphics_mode_init enter");
     const bool windowed = usetup.windowed;
 
     Size game_size;

@@ -18,6 +18,8 @@
 		119769D01AB3589800048EE1 /* ios_ipad.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 119769CB1AB3589800048EE1 /* ios_ipad.cfg */; };
 		119769D11AB3589800048EE1 /* ios_iphone.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 119769CC1AB3589800048EE1 /* ios_iphone.cfg */; };
 		119769D21AB3589800048EE1 /* speech.vox in Resources */ = {isa = PBXBuildFile; fileRef = 119769CD1AB3589800048EE1 /* speech.vox */; };
+		1405472D1E09E78C0079DFA1 /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1405472C1E09E78C0079DFA1 /* MainStoryboard.storyboard */; };
+		142D78D81E0979F500B6172C /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 142D78D71E0979F500B6172C /* Launch.storyboard */; };
 		146320AD1D78C0DE00854FEA /* mutifilelib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 146320AC1D78C0DE00854FEA /* mutifilelib.cpp */; };
 		146320B11D78C27300854FEA /* asset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 146320B01D78C27300854FEA /* asset.cpp */; };
 		146320B31D78C33600854FEA /* ini_util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 146320B21D78C33600854FEA /* ini_util.cpp */; };
@@ -27,8 +29,6 @@
 		1D60589B0D05DD56006BFB54 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.mm */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
-		28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD733E0D9D9553002E5188 /* MainWindow.xib */; };
-		28EC4C5A11D54ECE0027AA9F /* agsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28EC4C5811D54ECE0027AA9F /* agsViewController.xib */; };
 		28FD15000DC6FC520079059D /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28FD14FF0DC6FC520079059D /* OpenGLES.framework */; };
 		28FD15080DC6FC5B0079059D /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28FD15070DC6FC5B0079059D /* QuartzCore.framework */; };
 		6007696216E9F56E00DCE88E /* test_version.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6007696116E9F56E00DCE88E /* test_version.cpp */; };
@@ -45,7 +45,6 @@
 		60661BB316847C3C0005B5CD /* directory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60661BAF16847C3C0005B5CD /* directory.cpp */; };
 		60661BB416847C3C0005B5CD /* path.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60661BB216847C3C0005B5CD /* path.cpp */; };
 		6080428E1614DE8F00D33732 /* assetmanager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6080428D1614DE8F00D33732 /* assetmanager.cpp */; };
-		60844EAD1573943400003ED0 /* MainWindow-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 60844EAC1573943400003ED0 /* MainWindow-iPad.xib */; };
 		608778491699CE4600015533 /* ags_parallax.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 608778481699CE4600015533 /* ags_parallax.cpp */; };
 		608781951695922900AC84FE /* global_api.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 608781941695922900AC84FE /* global_api.cpp */; };
 		608781A21695925A00AC84FE /* script_api.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 608781A11695925A00AC84FE /* script_api.cpp */; };
@@ -358,6 +357,8 @@
 		119769CB1AB3589800048EE1 /* ios_ipad.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios_ipad.cfg; path = game/ios_ipad.cfg; sourceTree = "<group>"; };
 		119769CC1AB3589800048EE1 /* ios_iphone.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios_iphone.cfg; path = game/ios_iphone.cfg; sourceTree = "<group>"; };
 		119769CD1AB3589800048EE1 /* speech.vox */ = {isa = PBXFileReference; lastKnownFileType = file; name = speech.vox; path = game/speech.vox; sourceTree = "<group>"; };
+		1405472C1E09E78C0079DFA1 /* MainStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard.storyboard; sourceTree = "<group>"; };
+		142D78D71E0979F500B6172C /* Launch.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Launch.storyboard; sourceTree = "<group>"; };
 		146320AC1D78C0DE00854FEA /* mutifilelib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mutifilelib.cpp; sourceTree = "<group>"; };
 		146320AE1D78C0E800854FEA /* multifilelib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multifilelib.h; sourceTree = "<group>"; };
 		146320AF1D78C26A00854FEA /* asset.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = asset.h; sourceTree = "<group>"; };
@@ -372,8 +373,6 @@
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D6058910D05DD3D006BFB54 /* Shardlight.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Shardlight.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		28AD733E0D9D9553002E5188 /* MainWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainWindow.xib; sourceTree = "<group>"; };
-		28EC4C5811D54ECE0027AA9F /* agsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = agsViewController.xib; sourceTree = "<group>"; };
 		28FD14FF0DC6FC520079059D /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		28FD15070DC6FC5B0079059D /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		29B97316FDCFA39411CA2CEA /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
@@ -399,7 +398,6 @@
 		60661BB216847C3C0005B5CD /* path.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = path.cpp; sourceTree = "<group>"; };
 		6080428C1614DE8900D33732 /* assetmanager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = assetmanager.h; sourceTree = "<group>"; };
 		6080428D1614DE8F00D33732 /* assetmanager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = assetmanager.cpp; sourceTree = "<group>"; };
-		60844EAC1573943400003ED0 /* MainWindow-iPad.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "MainWindow-iPad.xib"; path = "Resources-iPad/MainWindow-iPad.xib"; sourceTree = "<group>"; };
 		608778471699CE4600015533 /* ags_parallax.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ags_parallax.h; path = ags_parallax/ags_parallax.h; sourceTree = "<group>"; };
 		608778481699CE4600015533 /* ags_parallax.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ags_parallax.cpp; path = ags_parallax/ags_parallax.cpp; sourceTree = "<group>"; };
 		608781941695922900AC84FE /* global_api.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = global_api.cpp; sourceTree = "<group>"; };
@@ -1120,7 +1118,6 @@
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
-				60844EAB1573942F00003ED0 /* Resources-iPad */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 			);
@@ -1146,9 +1143,9 @@
 				119769CB1AB3589800048EE1 /* ios_ipad.cfg */,
 				119769CC1AB3589800048EE1 /* ios_iphone.cfg */,
 				119769CD1AB3589800048EE1 /* speech.vox */,
-				28EC4C5811D54ECE0027AA9F /* agsViewController.xib */,
-				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
 				8D1107310486CEB800E47090 /* Shardlight-Info.plist */,
+				142D78D71E0979F500B6172C /* Launch.storyboard */,
+				1405472C1E09E78C0079DFA1 /* MainStoryboard.storyboard */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -1172,14 +1169,6 @@
 				6041A8871552E89E00596310 /* libz.dylib */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		60844EAB1573942F00003ED0 /* Resources-iPad */ = {
-			isa = PBXGroup;
-			children = (
-				60844EAC1573943400003ED0 /* MainWindow-iPad.xib */,
-			);
-			name = "Resources-iPad";
 			sourceTree = "<group>";
 		};
 		608778461699CE3000015533 /* ags_parallax */ = {
@@ -2354,15 +2343,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				14B80DA51D78CBF300AFDEBD /* patches.dat in Resources */,
+				1405472D1E09E78C0079DFA1 /* MainStoryboard.storyboard in Resources */,
 				14FFC0531B0E17B000E719A4 /* Images.xcassets in Resources */,
-				28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */,
-				28EC4C5A11D54ECE0027AA9F /* agsViewController.xib in Resources */,
 				119769CE1AB3589800048EE1 /* ac2game.dat in Resources */,
 				119769D01AB3589800048EE1 /* ios_ipad.cfg in Resources */,
 				119769D21AB3589800048EE1 /* speech.vox in Resources */,
 				119769CF1AB3589800048EE1 /* audio.vox in Resources */,
 				119769D11AB3589800048EE1 /* ios_iphone.cfg in Resources */,
-				60844EAD1573943400003ED0 /* MainWindow-iPad.xib in Resources */,
+				142D78D81E0979F500B6172C /* Launch.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2710,7 +2698,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
@@ -2746,7 +2733,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
@@ -2803,7 +2789,7 @@
 					BUILTIN_PLUGINS,
 					DEBUG,
 				);
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -2858,7 +2844,7 @@
 					IOS_VERSION,
 					BUILTIN_PLUGINS,
 				);
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
