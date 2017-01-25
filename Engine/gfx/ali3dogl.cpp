@@ -143,7 +143,6 @@ extern "C"
   void ios_select_buffer();
   void ios_create_screen();
   void ios_mouse_setup(int left, int right, int top, int bottom, float scaling_x, float scaling_y);
-  void logdebugc(const char *message);
 }
 
 #define HDC void*
@@ -679,16 +678,12 @@ void OGLGraphicsDriver::create_backbuffer_arrays()
 
 void OGLGraphicsDriver::InitOpenGl()
 {
-    logdebugc("JGS OGLGraphicsDriver::InitOpenGl enter");
 #if defined(IOS_VERSION)
   ios_select_buffer();
 #endif
-    
-    logdebugc("JGS OGLGraphicsDriver::InitOpenGl buffer selected");
 
   if (_render_to_texture)
   {
-      logdebugc("JGS OGLGraphicsDriver::InitOpenGl _render_to_texture 1");
     char* extensions = (char*)glGetString(GL_EXTENSIONS);
 
     if (strstr(extensions, fbo_extension_string) != NULL)
@@ -719,7 +714,6 @@ void OGLGraphicsDriver::InitOpenGl()
     }
   }
 
-     logdebugc("JGS OGLGraphicsDriver::InitOpenGl _render_to_texture after");
 
   glDisable(GL_CULL_FACE);
   glDisable(GL_DEPTH_TEST);
@@ -746,12 +740,9 @@ void OGLGraphicsDriver::InitOpenGl()
   glDisableClientState(GL_NORMAL_ARRAY);
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-  logdebugc("JGS OGLGraphicsDriver::InitOpenGl after glstuff");
     
   if (psp_gfx_scaling && !_render_to_texture)
   {
-      logdebugc("JGS OGLGraphicsDriver::InitOpenGl (psp_gfx_scaling && !_render_to_texture)");
     if (psp_gfx_scaling == 1)
     {
       float android_screen_ar = (float)_newmode_width / (float)_newmode_height;
@@ -776,15 +767,11 @@ void OGLGraphicsDriver::InitOpenGl()
   }
   else
   {
-      logdebugc("JGS OGLGraphicsDriver::InitOpenGl (psp_gfx_scaling && !_render_to_texture) else");
     _scale_width = _scale_height = 1.0f * _super_sampling;
   }
-    
- logdebugc("JGS OGLGraphicsDriver::InitOpenGl (psp_gfx_scaling && !_render_to_texture)");
 
   if (_render_to_texture)
   {
-      logdebugc("JGS OGLGraphicsDriver::InitOpenGl _render_to_texture 2");
       
     _backbuffer_texture_width = _newmode_width * _super_sampling;
     _backbuffer_texture_height = _newmode_height * _super_sampling;
@@ -817,14 +804,11 @@ void OGLGraphicsDriver::InitOpenGl()
   }
   else
   {
-      logdebugc("JGS OGLGraphicsDriver::InitOpenGl _render_to_texture 2 else");
     glEnable(GL_SCISSOR_TEST);
     glScissor((int)(((float)device_screen_physical_width - _scale_width * (float)_newmode_width) / 2.0f + 1.0f), (int)(((float)device_screen_physical_height - _scale_height * (float)_newmode_height) / 2.0f), (int)(_scale_width * (float)_newmode_width), (int)(_scale_height * (float)_newmode_height));
   }
 
-    logdebugc("JGS OGLGraphicsDriver::InitOpenGl create_backbuffer_arrays start");
   create_backbuffer_arrays();
-    logdebugc("JGS OGLGraphicsDriver::InitOpenGl create_backbuffer_arrays done");
 }
 
 bool OGLGraphicsDriver::Init(int width, int height, int colourDepth, bool windowed, volatile int *loopTimer) 
@@ -834,14 +818,11 @@ bool OGLGraphicsDriver::Init(int width, int height, int colourDepth, bool window
 
 bool OGLGraphicsDriver::Init(int virtualWidth, int virtualHeight, int realWidth, int realHeight, int colourDepth, bool windowed, volatile int *loopTimer)
 {
-    
-    logdebugc("jgs OGLGraphicsDriver::Init(int virtualWidth, int virtualHeight, int realWidth, int realHeight, int colourDepth, bool windowed, volatile int *loopTimer) enter");
 #if defined(ANDROID_VERSION)
   android_create_screen(realWidth, realHeight, colourDepth);
 #elif defined(IOS_VERSION)
   ios_create_screen();
 #endif
-    logdebugc("jgs OGLGraphicsDriver::Init done create screen.");
     
   if (colourDepth < 15)
   {
@@ -937,9 +918,7 @@ bool OGLGraphicsDriver::Init(int virtualWidth, int virtualHeight, int realWidth,
     if(!wglMakeCurrent(_hDC, _hRC))
       return false;
 #endif
-      logdebugc("jgs pre InitOpenGl()");
     InitOpenGl();
-      logdebugc("jgs done InitOpenGl()");
 
     this->create_screen_tint_bitmap();
 
@@ -993,7 +972,6 @@ void OGLGraphicsDriver::ClearRectangle(int x1, int y1, int x2, int y2, RGB *colo
 
 void OGLGraphicsDriver::GetCopyOfScreenIntoBitmap(Bitmap *destination)
 {
-    logdebugc("JGS OGLGraphicsDriver::GetCopyOfScreenIntoBitmap enter");
 #if defined(IOS_VERSION)
   ios_select_buffer();
 #endif
@@ -1053,9 +1031,7 @@ void OGLGraphicsDriver::Render()
 
 void OGLGraphicsDriver::Render(GlobalFlipType flip)
 {
-    logdebugc("jgs OGLGraphicsDriver::Render enter");
   _render(flip, true);
-    logdebugc("jgs OGLGraphicsDriver::Render done");
 }
 
 void OGLGraphicsDriver::_reDrawLastFrame()
@@ -1177,8 +1153,6 @@ void OGLGraphicsDriver::_renderSprite(SpriteDrawListEntry *drawListEntry, bool g
 
 void OGLGraphicsDriver::_render(GlobalFlipType flip, bool clearDrawListAfterwards)
 {
-    logdebugc("JGS OGLGraphicsDriver::_render enter");
-
 #if defined(IOS_VERSION)
   ios_select_buffer();
 #endif
@@ -1247,7 +1221,6 @@ void OGLGraphicsDriver::_render(GlobalFlipType flip, bool clearDrawListAfterward
 
   if (_render_to_texture)
   {
-      logdebugc("JGS OGLGraphicsDriver::_render _render_to_texture");
 #if defined(IOS_VERSION)
     ios_select_buffer();
 #else
@@ -1284,9 +1257,7 @@ void OGLGraphicsDriver::_render(GlobalFlipType flip, bool clearDrawListAfterward
 #if defined(WINDOWS_VERSION)
   SwapBuffers(_hDC);
 #elif defined(ANDROID_VERSION) || defined(IOS_VERSION)
-    logdebugc("JGS swap before");
   device_swap_buffers();
-    logdebugc("JGS swap after");
 #endif
 
   if (clearDrawListAfterwards)
@@ -1761,9 +1732,7 @@ void OGLGraphicsDriver::do_fade(bool fadingOut, int speed, int targetColourRed, 
 
 void OGLGraphicsDriver::FadeOut(int speed, int targetColourRed, int targetColourGreen, int targetColourBlue) 
 {
-    logdebugc("JGS OGLGraphicsDriver::FadeOut enter");
   do_fade(true, speed, targetColourRed, targetColourGreen, targetColourBlue);
-    logdebugc("JGS OGLGraphicsDriver::FadeOut leave");
 }
 
 void OGLGraphicsDriver::FadeIn(int speed, PALLETE p, int targetColourRed, int targetColourGreen, int targetColourBlue) 

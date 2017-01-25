@@ -61,8 +61,6 @@ RGB faded_out_palette[256];
 void tint_image(Bitmap* srcimg, Bitmap* destimg, int red, int grn, int blu, int light_level, int luminance);
 unsigned long _trans_alpha_blender32(unsigned long x, unsigned long y, unsigned long n);
 
-extern "C" void logdebugc(const char *message);
-
 class ALSoftwareBitmap : public IDriverDependantBitmap
 {
 public:
@@ -697,9 +695,7 @@ void ALSoftwareGraphicsDriver::highcolor_fade_out(int speed, int targetColourRed
                 set_trans_blender(0,0,0,a);
                 bmp_buff->TransBlendBlt(bmp_orig, 0, 0);
                 this->Vsync();
-                logdebugc("jgs software highcolor_fade_out");
                 _filter->RenderScreen(bmp_buff, 0, 0);
-                logdebugc("jgs software highcolor_fade_out done");
                 do
                 {
                   if (_callback)
@@ -759,16 +755,12 @@ void ALSoftwareGraphicsDriver::__fade_out_range(int speed, int from, int to, int
 
 void ALSoftwareGraphicsDriver::FadeOut(int speed, int targetColourRed, int targetColourGreen, int targetColourBlue) {
 
-  logdebugc("JGS ALSoftwareGraphicsDriver::FadeOut enter");
   if (_colorDepth > 8) 
   {
-      logdebugc("JGS ALSoftwareGraphicsDriver::FadeOut highcolor_fade_out");
-      
     highcolor_fade_out(speed * 4, targetColourRed, targetColourGreen, targetColourBlue);
   }
   else __fade_out_range(speed, 0, 255, targetColourRed, targetColourGreen, targetColourBlue);
     
-    logdebugc("JGS ALSoftwareGraphicsDriver::FadeOut leave");
 
 }
 

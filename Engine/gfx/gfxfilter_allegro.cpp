@@ -19,8 +19,6 @@
 
 using AGS::Common::Bitmap;
 
-extern "C" void logdebugc(const char *message);
-
 
 // Standard Allegro filter
 
@@ -49,12 +47,8 @@ Bitmap *AllegroGFXFilter::ShutdownAndReturnRealScreen(Bitmap *currentScreen) {
 
 void AllegroGFXFilter::RenderScreen(Bitmap *toRender, int x, int y) {
 
-    logdebugc("jgs RenderScreen enter");
     if (toRender != realScreen) {
-        
-        logdebugc("jgs RenderScreen render");
         realScreen->Blit(toRender, 0, 0, x, y, toRender->GetWidth(), toRender->GetHeight());
-        logdebugc("jgs RenderScreen done");
     }
 
     lastBlitX = x;

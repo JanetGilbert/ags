@@ -409,8 +409,6 @@ extern "C" int ios_is_keyboard_visible()
 
 - (void)hideActivityIndicator
 {
-    [self logDebug:@"JGS hideActivityIndicator"];
-    
 	NSArray *subviews = [self.view subviews];
 	for (UIView *view in subviews)
 		[view removeFromSuperview];
@@ -419,7 +417,6 @@ extern "C" int ios_is_keyboard_visible()
 
 extern "C" void ios_create_screen()
 {
-    logdebugc("JGS ios_create_screen");
 	[agsviewcontroller performSelectorOnMainThread:@selector(hideActivityIndicator) withObject:nil waitUntilDone:YES];
 }
 
@@ -428,7 +425,6 @@ extern "C" void ios_create_screen()
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad
 {
-    [self logDebug:@"JGS viewDidLoad"];
     [super viewDidLoad];
 	[self showActivityIndicator];
 
@@ -466,7 +462,6 @@ extern "C" void ios_create_screen()
 
 - (void)awakeFromNib
 {
-    [self logDebug:@"JGS awakefromnib"];
     [super awakeFromNib];
     
 	EAGLContext* aContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1]; //jg kEAGLRenderingAPIOpenGLES1
@@ -493,8 +488,6 @@ extern "C" void ios_create_screen()
 
 - (void)startThread
 {
-    [self logDebug:@"JGS startThread"];
-
 	//NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
 	// Handle any foreground procedures not related to animation here.
@@ -522,9 +515,7 @@ extern "C" void ios_create_screen()
 	strcpy(filename, path);
 	strcat(filename, "ac2game.dat");
 #endif
-	[self logDebug:@"JGS startThread startengine"];
 	startEngine(filename, path, 0);
-    [self logDebug:@"JGS startThread startengine done"];
 
 	//[pool release];
 }
@@ -562,8 +553,6 @@ void ios_show_message_box(char* buffer)
 
 - (void)viewWillAppear:(BOOL)animated
 {
-    [self logDebug:@"JGS viewWillAppear"];
-    
 	[super viewWillAppear:animated];
 }
 

@@ -77,8 +77,6 @@ int convert_16bit_bgr = 0;
 
 int ff; // whatever!
 
-extern "C" void logdebugc(const char *message);
-
 int adjust_pixel_size_for_loaded_data(int size, int filever)
 {
     if (filever < kGameVersion_310)
@@ -760,12 +758,8 @@ bool init_gfx_mode(const Size &game_size, const Size &screen_size, int cdep)
     else {
         set_color_depth(cdep);
     }
-    
-    logdebugc("gfxDriver->Init before");
 
     const bool result = gfxDriver->Init(game_size.Width, game_size.Height, screen_size.Width, screen_size.Height, final_col_dep, usetup.windowed, &timerloop);
-    
-    logdebugc("gfxDriver->Init done");
 
     if (result)
     {
@@ -1049,7 +1043,6 @@ int graphics_mode_init()
     // Engine may try to change from windowed to fullscreen if the first failed;
     // here we keep the original windowed flag in case we'll have to restore it
     
-    logdebugc("graphics_mode_init enter");
     const bool windowed = usetup.windowed;
 
     Size game_size;

@@ -114,8 +114,6 @@ int errno;
 #define myerrno errno
 #endif
 
-extern "C" void logdebugc(const char *message);
-
 bool engine_init_allegro()
 {
     Out::FPrint("Initializing allegro");
@@ -1540,15 +1538,11 @@ int initialize_engine(int argc,char*argv[])
     our_eip = -179;
 
     engine_init_modxm_player();
-
-    logdebugc("jgs initialize_engine graphics_mode_init");
     
     res = graphics_mode_init();
     if (res != RETURN_CONTINUE) {
         return res;
     }
-
-    logdebugc("jgs initialize_engine SetMultitasking"); //doesn't get here
 
     
     SetMultitasking(0);
@@ -1560,35 +1554,24 @@ int initialize_engine(int argc,char*argv[])
     // If auto lock option is set, lock mouse to the game window
     if (usetup.mouse_auto_lock && usetup.windowed)
         Mouse::TryLockToWindow();
-
-    logdebugc("jgs initialize_engine engine_show_preload");
     
     engine_show_preload();
-
-    logdebugc("jgs initialize_engine engine_init_sprites");
     
     res = engine_init_sprites();
     if (res != RETURN_CONTINUE) {
         return res;
     }
-
-    logdebugc("jgs initialize_engine engine_setup_screen");
     
     engine_setup_screen();
 
-    logdebugc("jgs initialize_engine engine_init_game_settings");
     engine_init_game_settings();
 
-    logdebugc("jgs initialize_engine engine_prepare_to_start_game");
     engine_prepare_to_start_game();
 
-    logdebugc("jgs initialize_engine allegro_bitmap_test_init");
 	allegro_bitmap_test_init();
 
-    logdebugc("jgs initialize_engine initialize_start_and_play_game");
     initialize_start_and_play_game(override_start_room, loadSaveGameOnStartup);
 
-    logdebugc("jgs initialize_engine done");
     quit("|bye!");
     return 0;
 }
