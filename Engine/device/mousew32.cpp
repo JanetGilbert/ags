@@ -48,6 +48,10 @@
 #include "ac/global_game.h" // j for IsKeyPressed
 #endif
 
+extern "C" bool isPhone();
+
+
+
 using namespace AGS::Common;
 
 
@@ -107,9 +111,35 @@ void mgraphconfine(int x1, int y1, int x2, int y2)
       Mouse::ControlRect.GetWidth(), Mouse::ControlRect.GetHeight());
 }
 
+void mouse_kludge()
+{
+    //JG HORRIBLE KLUDGE
+    // For some reason Allegro sometimes gives me a rogue tap on 82, 198
+    // Until I figure out why, ignore taps from this one pixel
+    
+    if (isPhone())
+    {
+        if (mouse_x == 82 && mouse_y == 198)
+        {
+            mouse_x = mousex;
+            mouse_y = mousey;
+        }
+    }
+    else
+    {
+        if (mouse_x == 100 && mouse_y == 178)
+        {
+            mouse_x = mousex;
+            mouse_y = mousey;
+        }
+    }
+}
+
 void mgetgraphpos()
 {
     poll_mouse();
+    mouse_kludge();
+    
     if (disable_mgetgraphpos)
     {
         // The cursor coordinates are provided from alternate source;
@@ -170,8 +200,13 @@ void mgetgraphpos()
     else
     {
         // Save real cursor coordinates provided by system
+        
+
+        
         real_mouse_x = mouse_x;
         real_mouse_y = mouse_y;
+
+        
     }
 
     // Set new in-game cursor position
@@ -309,6 +344,8 @@ int mgetbutton(bool checkrelease=true)
 {
   int toret = NONE;
   poll_mouse();
+  mouse_kludge();
+  
   int butis = mouse_b;
 
   if ((butis > 0) & (butwas > 0))
@@ -341,6 +378,8 @@ const int MB_ARRAY[3] = { 1, 2, 4 };
 int misbuttondown(int buno)
 {
   poll_mouse();
+  mouse_kludge();
+    
   if (mouse_b & MB_ARRAY[buno])
     return TRUE;
   return FALSE;
@@ -352,6 +391,7 @@ int misbuttonreleased(int buno)
     int toret = FALSE;
     
     poll_mouse();
+    mouse_kludge();
     
     if (mouse_b & MB_ARRAY[buno])
         toret = FALSE;
