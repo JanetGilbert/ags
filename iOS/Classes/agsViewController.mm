@@ -88,7 +88,7 @@ extern "C"
 
 - (BOOL)canBecomeFirstResponder
 {
-	return YES;
+	return NO;
 }
 
 //JG - Allows script to fake a keypress.
@@ -446,14 +446,16 @@ extern "C" void ios_create_screen()
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad
 {
-	[self showActivityIndicator];
-
-	[super viewDidLoad];
-	[self.view setMultipleTouchEnabled:YES];
-	[self createGestureRecognizers];
-	agsviewcontroller = self;
-	self.isIPad = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad);
+    [super viewDidLoad];
+    [self showActivityIndicator];
+    
+    
+    [self.view setMultipleTouchEnabled:YES];
+    [self createGestureRecognizers];
+    agsviewcontroller = self;
+    self.isIPad = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad);
 }
+
 
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -479,45 +481,48 @@ extern "C" void ios_create_screen()
 
 - (void)awakeFromNib
 {
-	EAGLContext* aContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
-	
-	if (!aContext)
-		NSLog(@"Failed to create ES context");
-	else if (![EAGLContext setCurrentContext:aContext])
-		NSLog(@"Failed to set ES context current");
-	
-	self.context = aContext;
-	[aContext release];
-	
-	[(EAGLView *)self.view setContext:context];
-	[(EAGLView *)self.view setFramebuffer];
-	
-	self.isKeyboardActive = FALSE;
-	self.isInPortraitOrientation = TRUE;
-	
-	[self createKeyboardButtonBar:1];
-	
-	[NSThread detachNewThreadSelector:@selector(startThread) toTarget:self withObject:nil];  
+    [super awakeFromNib];
+    
+    EAGLContext* aContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1]; //jg kEAGLRenderingAPIOpenGLES1
+    
+    if (!aContext)
+        NSLog(@"Failed to create ES context");
+    else if (![EAGLContext setCurrentContext:aContext])
+        NSLog(@"Failed to set ES context current");
+    else NSLog(@"Successfully set ES context current");
+    
+    self.context = aContext;
+    [aContext release];
+    
+    [(EAGLView *)self.view setContext:context];
+    [(EAGLView *)self.view setFramebuffer];
+    
+    self.isKeyboardActive = FALSE;
+    self.isInPortraitOrientation = FALSE;
+    
+    //[self createKeyboardButtonBar:1];
+    
+    [NSThread detachNewThreadSelector:@selector(startThread) toTarget:self withObject:nil];
 }
 
 - (void)startThread
 {
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-
-	// Handle any foreground procedures not related to animation here.
-	NSArray *searchPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-	NSString *documentPath = [searchPaths objectAtIndex:0];
-	
-	const char* temp_document_dir = [documentPath UTF8String];
-	ios_document_directory = (char*)malloc(strlen(temp_document_dir) + 1);
-	strcpy(ios_document_directory, temp_document_dir);
-	
-	char path[300];
-	strcpy(path, temp_document_dir);
+    //NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+    
+    // Handle any foreground procedures not related to animation here.
+    NSArray *searchPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentPath = [searchPaths objectAtIndex:0];
+    
+    const char* temp_document_dir = [documentPath UTF8String];
+    ios_document_directory = (char*)malloc(strlen(temp_document_dir) + 1);
+    strcpy(ios_document_directory, temp_document_dir);
+    
+    char path[300];
+    strcpy(path, temp_document_dir);
 #if !defined (IOS_VERSION)
-	strcat(path, "/ags/game/"); //JG
+    strcat(path, "/ags/game/"); //JG
 #endif
-	char filename[300];
+    char filename[300];
     
 #if defined (IOS_VERSION)
     //JG
@@ -526,13 +531,12 @@ extern "C" void ios_create_screen()
     const char * resourceChars = [filePath UTF8String];
     strcpy(filename, resourceChars);
 #else
-	strcpy(filename, path);
-	strcat(filename, "ac2game.dat");
+    strcpy(filename, path);
+    strcat(filename, "ac2game.dat");
 #endif
-	
-	startEngine(filename, path, 0);
-
-	[pool release];
+    startEngine(filename, path, 0);
+    
+    //[pool release];
 }
 
 
@@ -578,13 +582,16 @@ void ios_show_message_box(char* buffer)
 
 - (void)viewDidUnload
 {
-	[super viewDidUnload];
-
-	// Tear down context.
-	if ([EAGLContext currentContext] == context)
-		[EAGLContext setCurrentContext:nil];
-	self.context = nil;	
+    
+    
+    // Tear down context.
+    if ([EAGLContext currentContext] == context)
+        [EAGLContext setCurrentContext:nil];
+    self.context = nil;
+    
+    [super viewDidUnload];
 }
+
 
 - (void)didReceiveMemoryWarning
 {

@@ -15,14 +15,18 @@ extern "C" volatile int ios_audio_must_restart;//jg
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-	[[UIApplication sharedApplication] setIdleTimerDisabled:YES];
-	self.window.rootViewController = self.viewController;
-	return YES;
+    [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
+    //self.window.rootViewController = self.viewController;
+    //self.window.rootViewController = self.viewController;
+    // [self.window makeKeyAndVisible];
+    
+    return YES;
 }
+
 
 - (void)applicationWillResignActive:(UIApplication *)application
 {
-	is_in_foreground = 0;
+	///is_in_foreground = 0; // causes game to fail when launching from Testflight
 	do
 	{
 		//printf("waiting for drawing to finish %d...\n", drawing_in_progress);
