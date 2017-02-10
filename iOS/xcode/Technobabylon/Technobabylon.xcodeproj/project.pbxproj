@@ -19,6 +19,7 @@
 		119769D11AB3589800048EE1 /* ios_iphone.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 119769CC1AB3589800048EE1 /* ios_iphone.cfg */; };
 		119769D21AB3589800048EE1 /* speech.vox in Resources */ = {isa = PBXBuildFile; fileRef = 119769CD1AB3589800048EE1 /* speech.vox */; };
 		1405472D1E09E78C0079DFA1 /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1405472C1E09E78C0079DFA1 /* MainStoryboard.storyboard */; };
+		141FD08C1E4BD50F00A2616A /* 2208x1242.png in Resources */ = {isa = PBXBuildFile; fileRef = 141FD08B1E4BD50F00A2616A /* 2208x1242.png */; };
 		142D78D81E0979F500B6172C /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 142D78D71E0979F500B6172C /* Launch.storyboard */; };
 		146320AD1D78C0DE00854FEA /* mutifilelib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 146320AC1D78C0DE00854FEA /* mutifilelib.cpp */; };
 		146320B11D78C27300854FEA /* asset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 146320B01D78C27300854FEA /* asset.cpp */; };
@@ -360,6 +361,7 @@
 		119769CC1AB3589800048EE1 /* ios_iphone.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios_iphone.cfg; path = game/ios_iphone.cfg; sourceTree = "<group>"; };
 		119769CD1AB3589800048EE1 /* speech.vox */ = {isa = PBXFileReference; lastKnownFileType = file; name = speech.vox; path = game/speech.vox; sourceTree = "<group>"; };
 		1405472C1E09E78C0079DFA1 /* MainStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard.storyboard; sourceTree = "<group>"; };
+		141FD08B1E4BD50F00A2616A /* 2208x1242.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = 2208x1242.png; path = icons/2208x1242.png; sourceTree = "<group>"; };
 		142D78D71E0979F500B6172C /* Launch.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Launch.storyboard; sourceTree = "<group>"; };
 		146320AC1D78C0DE00854FEA /* mutifilelib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mutifilelib.cpp; sourceTree = "<group>"; };
 		146320AE1D78C0E800854FEA /* multifilelib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multifilelib.h; sourceTree = "<group>"; };
@@ -1160,6 +1162,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				141FD08B1E4BD50F00A2616A /* 2208x1242.png */,
 				14B80DA41D78CBF300AFDEBD /* patches.dat */,
 				14FFC0521B0E17B000E719A4 /* Images.xcassets */,
 				119769C91AB3589800048EE1 /* ac2game.dat */,
@@ -2379,6 +2382,7 @@
 				14FFC0531B0E17B000E719A4 /* Images.xcassets in Resources */,
 				119769CE1AB3589800048EE1 /* ac2game.dat in Resources */,
 				119769D01AB3589800048EE1 /* ios_ipad.cfg in Resources */,
+				141FD08C1E4BD50F00A2616A /* 2208x1242.png in Resources */,
 				119769D21AB3589800048EE1 /* speech.vox in Resources */,
 				119769CF1AB3589800048EE1 /* audio.vox in Resources */,
 				119769D11AB3589800048EE1 /* ios_iphone.cfg in Resources */,
@@ -2742,7 +2746,7 @@
 				GCC_PREFIX_HEADER = Technobabylon_Prefix.pch;
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				INFOPLIST_FILE = "Technobabylon-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../nativelibs/fat/lib\"",
@@ -2775,7 +2779,7 @@
 				GCC_PREFIX_HEADER = Technobabylon_Prefix.pch;
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				INFOPLIST_FILE = "Technobabylon-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../nativelibs/fat/lib\"",
@@ -2838,7 +2842,7 @@
 					"${SOURCE_ROOT}/../../../iOS/nativelibs/fat/include",
 					"${SOURCE_ROOT}/../../nativelibs/fat/include/freetype2",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
 				LIBRARY_SEARCH_PATHS = "${SOURCE_ROOT}/../../nativelibs/fat/lib";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CODE_SIGN_FLAGS = "";
@@ -2891,7 +2895,7 @@
 					"${SOURCE_ROOT}/../../../iOS/nativelibs/fat/include",
 					"${SOURCE_ROOT}/../../nativelibs/fat/include/freetype2",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
 				LIBRARY_SEARCH_PATHS = "${SOURCE_ROOT}/../../nativelibs/fat/lib";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
