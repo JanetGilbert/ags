@@ -89,6 +89,11 @@ extern void ios_initialize_renderer(int w, int h);
 	if (context && !defaultFramebuffer)
 	{
 		[EAGLContext setCurrentContext:context];
+        
+        //JG Scale for Retina
+        float deviceScale = [[UIScreen mainScreen] scale];
+        self.contentScaleFactor = deviceScale;
+
 		
 		// Create default framebuffer object.
 		glGenFramebuffers(1, &defaultFramebuffer);

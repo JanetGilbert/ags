@@ -2842,7 +2842,7 @@
 					"${SOURCE_ROOT}/../../../iOS/nativelibs/fat/include",
 					"${SOURCE_ROOT}/../../nativelibs/fat/include/freetype2",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LIBRARY_SEARCH_PATHS = "${SOURCE_ROOT}/../../nativelibs/fat/lib";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CODE_SIGN_FLAGS = "";
@@ -2895,7 +2895,7 @@
 					"${SOURCE_ROOT}/../../../iOS/nativelibs/fat/include",
 					"${SOURCE_ROOT}/../../nativelibs/fat/include/freetype2",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LIBRARY_SEARCH_PATHS = "${SOURCE_ROOT}/../../nativelibs/fat/lib";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";

@@ -105,7 +105,8 @@ extern "C"
   void ios_swap_buffers();
   void ios_select_buffer();
   void ios_create_screen();
-  void ios_mouse_setup(int left, int right, int top, int bottom, float scaling_x, float scaling_y);  
+  void ios_mouse_setup(int left, int right, int top, int bottom, float scaling_x, float scaling_y);
+  float get_device_scale();//JG
 }
 
 #define glOrtho glOrthof
@@ -338,13 +339,20 @@ void OGLGraphicsDriver::create_backbuffer_arrays()
       backbuffer_vertices[5] = backbuffer_vertices[7] = device_screen_physical_width * ((float)_srcRect.GetHeight() / (float)_srcRect.GetWidth());
 
 #if defined(ANDROID_VERSION) || defined(IOS_VERSION)
-      device_mouse_setup(
-        0, 
-        device_screen_physical_width - 1, 
-        (device_screen_physical_height - backbuffer_vertices[5]) / 2, 
-        device_screen_physical_height - ((device_screen_physical_height - backbuffer_vertices[5]) / 2), 
-        (float)_srcRect.GetWidth() / (float)device_screen_physical_width, 
-        (float)_srcRect.GetHeight() / backbuffer_vertices[5]);
+        //JG  altered to work with retina displays.
+        float mult = get_device_scale();
+        float scalex = ((float)_srcRect.GetWidth() / (float)device_screen_physical_width) * mult;
+        float scaley = ((float)_srcRect.GetHeight() / backbuffer_vertices[5]) * mult;
+        float top_offset = (device_screen_physical_height - backbuffer_vertices[5]) / 2.0f / mult;
+        
+        device_mouse_setup(
+        0, // left
+        device_screen_physical_width - 1, // right
+        top_offset, // top
+        device_screen_physical_height-1, // bottom
+        scalex,
+        scaley);
+
 #endif
     }
     else
@@ -353,13 +361,20 @@ void OGLGraphicsDriver::create_backbuffer_arrays()
       backbuffer_vertices[5] = backbuffer_vertices[7] = device_screen_physical_height - 1;
 
 #if defined(ANDROID_VERSION) || defined(IOS_VERSION)
-      device_mouse_setup(
-        (device_screen_physical_width - backbuffer_vertices[2]) / 2,
-        device_screen_physical_width - ((device_screen_physical_width - backbuffer_vertices[2]) / 2),
+        //JG  altered to work with retina displays.
+        float mult = get_device_scale();
+        float scalex = ((float)_srcRect.GetWidth() / backbuffer_vertices[2]) * mult;
+        float scaley = ((float)_srcRect.GetHeight() / (float)device_screen_physical_height) * mult;
+        float left_offset = (device_screen_physical_width - backbuffer_vertices[2]) / 2.0f / mult;
+        
+        device_mouse_setup(
+        left_offset,
+        device_screen_physical_width - 1,
         0,
         device_screen_physical_height - 1,
-        (float)_srcRect.GetWidth() / backbuffer_vertices[2], 
-        (float)_srcRect.GetHeight() / (float)device_screen_physical_height);
+        scalex,
+        scaley);
+
 #endif
     }
   }

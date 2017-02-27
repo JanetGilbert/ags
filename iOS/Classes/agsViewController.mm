@@ -48,6 +48,7 @@ int mouse_start_position_y = 0;
 
 extern "C" float ios_mouse_scaling_x; //JG
 extern "C" float ios_mouse_scaling_y;
+extern "C" float ios_mouse_scaling_y;
 
 extern "C"
 {
@@ -78,6 +79,12 @@ extern "C"
         y = (float)y / ios_mouse_scaling_y;
         mouse_position_x=x;
         mouse_position_y=y;
+    }
+    
+    float get_device_scale()
+    {
+        float deviceScale = [[UIScreen mainScreen] scale];
+        return deviceScale;
     }
 }
 
