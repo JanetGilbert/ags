@@ -54,5 +54,6 @@ void start_replay_record ();
 void stop_recording();
 void start_playback();
 int  my_readkey();
+void call_simulate_keypress(int keycode);
 
 #endif // __AGS_EE_AC__RECORD_H
