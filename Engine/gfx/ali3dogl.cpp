@@ -731,8 +731,8 @@ void OGLGraphicsDriver::GetCopyOfScreenIntoBitmap(Bitmap *destination)
         destPtr = &retrieveInto->GetScanLineForWriting(y)[0];
         for (int x = 0; x < retrieveInto->GetWidth() * 4; x += 4)
         {
-          destPtr[x] = sourcePtr[x + 2];
-          destPtr[x + 2] = sourcePtr[x];
+          destPtr[x] = sourcePtr[x]; // JG was + 2
+          destPtr[x + 2] = sourcePtr[x + 2]; // JG was 0
           destPtr[x + 1] = sourcePtr[x + 1];
           destPtr[x + 3] = sourcePtr[x + 3];
         }
