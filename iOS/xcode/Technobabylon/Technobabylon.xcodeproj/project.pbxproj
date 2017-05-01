@@ -2901,8 +2901,8 @@
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PREBINDING = NO;
-				PROVISIONING_PROFILE = "eefb654c-ed18-4d0e-8f8b-19908b13d600";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "eefb654c-ed18-4d0e-8f8b-19908b13d600";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
 				USER_HEADER_SEARCH_PATHS = "${SOURCE_ROOT}/../../../Common ${SOURCE_ROOT}/../../../Common/libinclude ${SOURCE_ROOT}/../../../Engine ${SOURCE_ROOT}/../../../iOS/nativelibs/fat/include ${SOURCE_ROOT}/../../nativelibs/fat/include/freetype2";
 				VALID_ARCHS = "arm64 armv7";
