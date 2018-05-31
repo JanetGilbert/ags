@@ -549,17 +549,17 @@ int my_readkey() {
       }
       //j arrow keys
       if (scancode==KEY_LEFT) {
-        gott = 8; //j backspace on mac
+        gott = 375; //j backspace on mac
       }
-     /* if (scancode==KEY_RIGHT) {
-        gott = 0; //j
+      if (scancode==KEY_RIGHT) {
+        gott = 377; //j
       }
       if (scancode==KEY_UP) {
-        gott = 0; //j
+        gott = 372; //j
       }
       if (scancode==KEY_DOWN) {
-        gott = 0; //j
-      }*/
+        gott = 380; //j
+      }
         
         
 #endif
