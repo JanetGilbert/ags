@@ -11,6 +11,9 @@
       location = "group:golden_wake/GoldenWake.xcodeproj">
    </FileRef>
    <FileRef
+      location = "group:agsteamtest/agsteamtest.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:legacy/Legacy.xcodeproj">
    </FileRef>
    <FileRef

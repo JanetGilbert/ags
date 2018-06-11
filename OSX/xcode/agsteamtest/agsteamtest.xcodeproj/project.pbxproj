@@ -1,0 +1,487 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		149CD98420CE0FC0004E2194 /* libsteam_api.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 149CD98220CE0FC0004E2194 /* libsteam_api.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		149CD98620CE100B004E2194 /* libagsteam.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 149CD98520CE100A004E2194 /* libagsteam.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		A3CA13AD20C94CE500D49491 /* Steamworks.ags in Resources */ = {isa = PBXBuildFile; fileRef = A3CA13AC20C94CE500D49491 /* Steamworks.ags */; };
+		A3F2DD5220C93B50008F9811 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A3F2DD5120C93B50008F9811 /* Assets.xcassets */; };
+		A3F2DD5520C93B50008F9811 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = A3F2DD5320C93B50008F9811 /* MainMenu.xib */; };
+		A3F2DD6420C93C9A008F9811 /* plugin_registration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A3F2DD6220C93C99008F9811 /* plugin_registration.cpp */; };
+		A3F2DD6920C93CEE008F9811 /* agswadjetutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A3F2DD6820C93CEE008F9811 /* agswadjetutil.cpp */; };
+		A3F2DD7020C93E33008F9811 /* steam_appid.txt in Resources */ = {isa = PBXBuildFile; fileRef = A3F2DD6D20C93E33008F9811 /* steam_appid.txt */; };
+		A3F2DD7320C93E42008F9811 /* AGSKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3F2DD7220C93E42008F9811 /* AGSKit.framework */; };
+		A3F2DD7920C93E98008F9811 /* steam_appid.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = A3F2DD6D20C93E33008F9811 /* steam_appid.txt */; };
+		A3F2DD9920C93F2C008F9811 /* libbz2.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A3F2DD9420C93EF1008F9811 /* libbz2.1.0.dylib */; };
+		A3F2DD9A20C93F2C008F9811 /* libz.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A3F2DD8F20C93EF1008F9811 /* libz.1.dylib */; };
+		A3F2DD9B20C93F2C008F9811 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3F2DD9520C93EF1008F9811 /* AudioToolbox.framework */; };
+		A3F2DD9C20C93F2C008F9811 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3F2DD9220C93EF1008F9811 /* AudioUnit.framework */; };
+		A3F2DD9D20C93F2C008F9811 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3F2DD9620C93EF1008F9811 /* CoreAudio.framework */; };
+		A3F2DD9E20C93F2C008F9811 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3F2DD9020C93EF1008F9811 /* IOKit.framework */; };
+		A3F2DD9F20C93F2C008F9811 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3F2DD9720C93EF1008F9811 /* CoreVideo.framework */; };
+		A3F2DDA020C93F2C008F9811 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3F2DD9820C93EF2008F9811 /* OpenGL.framework */; };
+		A3F2DDA120C93F2C008F9811 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3F2DD9320C93EF1008F9811 /* AppKit.framework */; };
+		A3F2DDA220C93F2C008F9811 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3F2DD9120C93EF1008F9811 /* Cocoa.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A3F2DD7420C93E52008F9811 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+				149CD98620CE100B004E2194 /* libagsteam.dylib in CopyFiles */,
+				149CD98420CE0FC0004E2194 /* libsteam_api.dylib in CopyFiles */,
+				A3F2DD7920C93E98008F9811 /* steam_appid.txt in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		149CD98120CE0FC0004E2194 /* libagsteam-unified.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libagsteam-unified.dylib"; path = "../../lib/plugin/libagsteam-unified.dylib"; sourceTree = "<group>"; };
+		149CD98220CE0FC0004E2194 /* libsteam_api.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsteam_api.dylib; path = ../../lib/plugin/libsteam_api.dylib; sourceTree = "<group>"; };
+		149CD98520CE100A004E2194 /* libagsteam.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libagsteam.dylib; path = ../../lib/plugin/libagsteam.dylib; sourceTree = "<group>"; };
+		A3CA13AC20C94CE500D49491 /* Steamworks.ags */ = {isa = PBXFileReference; lastKnownFileType = file; name = Steamworks.ags; path = game/Steamworks.ags; sourceTree = SOURCE_ROOT; };
+		A3F2DD4C20C93B4F008F9811 /* agsteamtest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = agsteamtest.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A3F2DD5120C93B50008F9811 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A3F2DD5420C93B50008F9811 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		A3F2DD5620C93B50008F9811 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A3F2DD6220C93C99008F9811 /* plugin_registration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = plugin_registration.cpp; path = ../../wadjetcommon/plugin_registration.cpp; sourceTree = "<group>"; };
+		A3F2DD6320C93C9A008F9811 /* plugin_registration.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = plugin_registration.hpp; path = ../../wadjetcommon/plugin_registration.hpp; sourceTree = "<group>"; };
+		A3F2DD6520C93CC3008F9811 /* plugin_engine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = plugin_engine.h; path = ../../../../Engine/plugin/plugin_engine.h; sourceTree = "<group>"; };
+		A3F2DD6620C93CC3008F9811 /* agsplugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = agsplugin.h; path = ../../../../Engine/plugin/agsplugin.h; sourceTree = "<group>"; };
+		A3F2DD6720C93CEE008F9811 /* agswadjetutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = agswadjetutil.h; path = ../../../../Plugins/agswadjetutil/agswadjetutil.h; sourceTree = "<group>"; };
+		A3F2DD6820C93CEE008F9811 /* agswadjetutil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = agswadjetutil.cpp; path = ../../../../Plugins/agswadjetutil/agswadjetutil.cpp; sourceTree = "<group>"; };
+		A3F2DD6C20C93E33008F9811 /* libagsteam.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libagsteam.dylib; path = game/libagsteam.dylib; sourceTree = SOURCE_ROOT; };
+		A3F2DD6D20C93E33008F9811 /* steam_appid.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = steam_appid.txt; path = game/steam_appid.txt; sourceTree = SOURCE_ROOT; };
+		A3F2DD7220C93E42008F9811 /* AGSKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AGSKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A3F2DD8F20C93EF1008F9811 /* libz.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.dylib; path = ../../../../../../usr/lib/libz.1.dylib; sourceTree = "<group>"; };
+		A3F2DD9020C93EF1008F9811 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		A3F2DD9120C93EF1008F9811 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		A3F2DD9220C93EF1008F9811 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
+		A3F2DD9320C93EF1008F9811 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		A3F2DD9420C93EF1008F9811 /* libbz2.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbz2.1.0.dylib; path = ../../../../../../usr/lib/libbz2.1.0.dylib; sourceTree = "<group>"; };
+		A3F2DD9520C93EF1008F9811 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		A3F2DD9620C93EF1008F9811 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
+		A3F2DD9720C93EF1008F9811 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		A3F2DD9820C93EF2008F9811 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		A3F2DDA420C93F76008F9811 /* libsteam_api.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsteam_api.dylib; path = ../../../../../steamworks/142/sdk/redistributable_bin/osx32/libsteam_api.dylib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A3F2DD4920C93B4F008F9811 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A3F2DD9920C93F2C008F9811 /* libbz2.1.0.dylib in Frameworks */,
+				A3F2DD9A20C93F2C008F9811 /* libz.1.dylib in Frameworks */,
+				A3F2DD9B20C93F2C008F9811 /* AudioToolbox.framework in Frameworks */,
+				A3F2DD9C20C93F2C008F9811 /* AudioUnit.framework in Frameworks */,
+				A3F2DD9D20C93F2C008F9811 /* CoreAudio.framework in Frameworks */,
+				A3F2DD9E20C93F2C008F9811 /* IOKit.framework in Frameworks */,
+				A3F2DD9F20C93F2C008F9811 /* CoreVideo.framework in Frameworks */,
+				A3F2DDA020C93F2C008F9811 /* OpenGL.framework in Frameworks */,
+				A3F2DDA120C93F2C008F9811 /* AppKit.framework in Frameworks */,
+				A3F2DDA220C93F2C008F9811 /* Cocoa.framework in Frameworks */,
+				A3F2DD7320C93E42008F9811 /* AGSKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A3F2DD4320C93B4F008F9811 = {
+			isa = PBXGroup;
+			children = (
+				149CD98520CE100A004E2194 /* libagsteam.dylib */,
+				149CD98120CE0FC0004E2194 /* libagsteam-unified.dylib */,
+				149CD98220CE0FC0004E2194 /* libsteam_api.dylib */,
+				A3F2DD4E20C93B4F008F9811 /* agsteamtest */,
+				A3F2DD4D20C93B4F008F9811 /* Products */,
+				A3F2DD7120C93E42008F9811 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		A3F2DD4D20C93B4F008F9811 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A3F2DD4C20C93B4F008F9811 /* agsteamtest.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A3F2DD4E20C93B4F008F9811 /* agsteamtest */ = {
+			isa = PBXGroup;
+			children = (
+				A3F2DD6A20C93DF2008F9811 /* Resources */,
+				A3F2DD5D20C93BFA008F9811 /* Plugins */,
+				A3F2DD5120C93B50008F9811 /* Assets.xcassets */,
+				A3F2DD5320C93B50008F9811 /* MainMenu.xib */,
+				A3F2DD5620C93B50008F9811 /* Info.plist */,
+			);
+			path = agsteamtest;
+			sourceTree = "<group>";
+		};
+		A3F2DD5D20C93BFA008F9811 /* Plugins */ = {
+			isa = PBXGroup;
+			children = (
+				A3F2DD6120C93C58008F9811 /* engine */,
+				A3F2DD6020C93C42008F9811 /* wadjetcommon */,
+				A3F2DD5F20C93C3A008F9811 /* agswadjetutil */,
+			);
+			name = Plugins;
+			sourceTree = "<group>";
+		};
+		A3F2DD5F20C93C3A008F9811 /* agswadjetutil */ = {
+			isa = PBXGroup;
+			children = (
+				A3F2DD6820C93CEE008F9811 /* agswadjetutil.cpp */,
+				A3F2DD6720C93CEE008F9811 /* agswadjetutil.h */,
+			);
+			name = agswadjetutil;
+			sourceTree = "<group>";
+		};
+		A3F2DD6020C93C42008F9811 /* wadjetcommon */ = {
+			isa = PBXGroup;
+			children = (
+				A3F2DD6220C93C99008F9811 /* plugin_registration.cpp */,
+				A3F2DD6320C93C9A008F9811 /* plugin_registration.hpp */,
+			);
+			name = wadjetcommon;
+			sourceTree = "<group>";
+		};
+		A3F2DD6120C93C58008F9811 /* engine */ = {
+			isa = PBXGroup;
+			children = (
+				A3F2DD6620C93CC3008F9811 /* agsplugin.h */,
+				A3F2DD6520C93CC3008F9811 /* plugin_engine.h */,
+			);
+			name = engine;
+			sourceTree = "<group>";
+		};
+		A3F2DD6A20C93DF2008F9811 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A3CA13AC20C94CE500D49491 /* Steamworks.ags */,
+				A3F2DDA420C93F76008F9811 /* libsteam_api.dylib */,
+				A3F2DD6C20C93E33008F9811 /* libagsteam.dylib */,
+				A3F2DD6D20C93E33008F9811 /* steam_appid.txt */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		A3F2DD7120C93E42008F9811 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A3F2DD8E20C93EDF008F9811 /* System Frameworks */,
+				A3F2DD7220C93E42008F9811 /* AGSKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A3F2DD8E20C93EDF008F9811 /* System Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A3F2DD9420C93EF1008F9811 /* libbz2.1.0.dylib */,
+				A3F2DD8F20C93EF1008F9811 /* libz.1.dylib */,
+				A3F2DD9520C93EF1008F9811 /* AudioToolbox.framework */,
+				A3F2DD9220C93EF1008F9811 /* AudioUnit.framework */,
+				A3F2DD9620C93EF1008F9811 /* CoreAudio.framework */,
+				A3F2DD9020C93EF1008F9811 /* IOKit.framework */,
+				A3F2DD9720C93EF1008F9811 /* CoreVideo.framework */,
+				A3F2DD9820C93EF2008F9811 /* OpenGL.framework */,
+				A3F2DD9320C93EF1008F9811 /* AppKit.framework */,
+				A3F2DD9120C93EF1008F9811 /* Cocoa.framework */,
+			);
+			name = "System Frameworks";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A3F2DD4B20C93B4F008F9811 /* agsteamtest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A3F2DD5A20C93B50008F9811 /* Build configuration list for PBXNativeTarget "agsteamtest" */;
+			buildPhases = (
+				A3F2DD4820C93B4F008F9811 /* Sources */,
+				A3F2DD4920C93B4F008F9811 /* Frameworks */,
+				A3F2DD4A20C93B4F008F9811 /* Resources */,
+				A3F2DD7420C93E52008F9811 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = agsteamtest;
+			productName = agsteamtest;
+			productReference = A3F2DD4C20C93B4F008F9811 /* agsteamtest.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A3F2DD4420C93B4F008F9811 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0940;
+				LastUpgradeCheck = 0940;
+				ORGANIZATIONNAME = "MonkeyMoto Productions";
+				TargetAttributes = {
+					A3F2DD4B20C93B4F008F9811 = {
+						CreatedOnToolsVersion = 9.4;
+					};
+				};
+			};
+			buildConfigurationList = A3F2DD4720C93B4F008F9811 /* Build configuration list for PBXProject "agsteamtest" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A3F2DD4320C93B4F008F9811;
+			productRefGroup = A3F2DD4D20C93B4F008F9811 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A3F2DD4B20C93B4F008F9811 /* agsteamtest */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A3F2DD4A20C93B4F008F9811 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A3F2DD7020C93E33008F9811 /* steam_appid.txt in Resources */,
+				A3F2DD5220C93B50008F9811 /* Assets.xcassets in Resources */,
+				A3F2DD5520C93B50008F9811 /* MainMenu.xib in Resources */,
+				A3CA13AD20C94CE500D49491 /* Steamworks.ags in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A3F2DD4820C93B4F008F9811 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A3F2DD6920C93CEE008F9811 /* agswadjetutil.cpp in Sources */,
+				A3F2DD6420C93C9A008F9811 /* plugin_registration.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		A3F2DD5320C93B50008F9811 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A3F2DD5420C93B50008F9811 /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		A3F2DD5820C93B50008F9811 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A3F2DD5920C93B50008F9811 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		A3F2DD5B20C93B50008F9811 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					BUILTIN_PLUGINS,
+				);
+				INFOPLIST_FILE = agsteamtest/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/game",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.monkeymoto.agsteamtest;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Debug;
+		};
+		A3F2DD5C20C93B50008F9811 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = BUILTIN_PLUGINS;
+				INFOPLIST_FILE = agsteamtest/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/game",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.monkeymoto.agsteamtest;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A3F2DD4720C93B4F008F9811 /* Build configuration list for PBXProject "agsteamtest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A3F2DD5820C93B50008F9811 /* Debug */,
+				A3F2DD5920C93B50008F9811 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A3F2DD5A20C93B50008F9811 /* Build configuration list for PBXNativeTarget "agsteamtest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A3F2DD5B20C93B50008F9811 /* Debug */,
+				A3F2DD5C20C93B50008F9811 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A3F2DD4420C93B4F008F9811 /* Project object */;
+}

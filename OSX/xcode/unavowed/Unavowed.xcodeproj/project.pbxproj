@@ -13,6 +13,7 @@
 		119529A318B3EDD300923A50 /* agswadjetutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1195299A18B3EDD300923A50 /* agswadjetutil.cpp */; };
 		146963C820A92468008AB1E1 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 146963C720A92467008AB1E1 /* Images.xcassets */; };
 		146963C920A92468008AB1E1 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 146963C720A92467008AB1E1 /* Images.xcassets */; };
+		149CD97320CE06C6004E2194 /* steam_appid.txt in Resources */ = {isa = PBXBuildFile; fileRef = 14A3A88920CDF40B00B7714A /* steam_appid.txt */; };
 		14A3A88720CDF1EE00B7714A /* libagsteam-unified.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 14A3A85820CD73BC00B7714A /* libagsteam-unified.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		14A3A88820CDF1EE00B7714A /* libsteam_api.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 14A3A85E20CD741B00B7714A /* libsteam_api.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		14CD770B20CDFC6500E99A57 /* steam_appid.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 14A3A88920CDF40B00B7714A /* steam_appid.txt */; };
@@ -402,6 +403,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				149CD97320CE06C6004E2194 /* steam_appid.txt in Resources */,
 				525611881D718C50001C9D62 /* acsetup.cfg in Resources */,
 				146963C920A92468008AB1E1 /* Images.xcassets in Resources */,
 				525611AE1D718DC1001C9D62 /* ac2game.dat in Resources */,
@@ -487,6 +489,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = NO;
+				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = 69P49K3LPW;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -511,6 +514,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = NO;
+				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = 69P49K3LPW;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Unavowed_Prefix.pch;
