@@ -9,6 +9,28 @@
 /* Begin PBXBuildFile section */
 		1444B1A920D744AF00A31ACB /* agswadjetutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1444B1A820D744AF00A31ACB /* agswadjetutil.cpp */; };
 		1444B1AC20D7463100A31ACB /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1444B1AB20D7463100A31ACB /* MainMenu.xib */; };
+		14E15B8E20DF1993004BA193 /* agswadjetutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1444B1A820D744AF00A31ACB /* agswadjetutil.cpp */; };
+		14E15B8F20DF1993004BA193 /* plugin_registration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A30F906020D6B0120085FC40 /* plugin_registration.cpp */; };
+		14E15B9120DF1993004BA193 /* libbz2.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A30F907120D6B1040085FC40 /* libbz2.1.0.dylib */; };
+		14E15B9220DF1993004BA193 /* libz.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A30F907320D6B1070085FC40 /* libz.1.dylib */; };
+		14E15B9320DF1993004BA193 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A30F904320D6AE630085FC40 /* AudioToolbox.framework */; };
+		14E15B9420DF1993004BA193 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A30F904520D6AE630085FC40 /* AudioUnit.framework */; };
+		14E15B9520DF1993004BA193 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A30F904720D6AE630085FC40 /* CoreAudio.framework */; };
+		14E15B9620DF1993004BA193 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A30F904920D6AE630085FC40 /* IOKit.framework */; };
+		14E15B9720DF1993004BA193 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A30F904B20D6AE630085FC40 /* CoreVideo.framework */; };
+		14E15B9820DF1993004BA193 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A30F904D20D6AE630085FC40 /* OpenGL.framework */; };
+		14E15B9920DF1993004BA193 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A30F904F20D6AE630085FC40 /* AppKit.framework */; };
+		14E15B9A20DF1993004BA193 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A30F905120D6AE630085FC40 /* Cocoa.framework */; };
+		14E15B9B20DF1993004BA193 /* AGSKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A30F905320D6AE6C0085FC40 /* AGSKit.framework */; };
+		14E15B9F20DF1993004BA193 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A30F903620D6AC8F0085FC40 /* Images.xcassets */; };
+		14E15BA020DF1993004BA193 /* acsetup.cfg in Resources */ = {isa = PBXBuildFile; fileRef = A30F906720D6B07D0085FC40 /* acsetup.cfg */; };
+		14E15BA220DF1993004BA193 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1444B1AB20D7463100A31ACB /* MainMenu.xib */; };
+		14E15BB120DF1A2B004BA193 /* audio.vox in Resources */ = {isa = PBXBuildFile; fileRef = 14E15BAE20DF1A2B004BA193 /* audio.vox */; };
+		14E15BB220DF1A2B004BA193 /* ac2game.dat in Resources */ = {isa = PBXBuildFile; fileRef = 14E15BAF20DF1A2B004BA193 /* ac2game.dat */; };
+		14E15BB320DF1A2B004BA193 /* speech.vox in Resources */ = {isa = PBXBuildFile; fileRef = 14E15BB020DF1A2B004BA193 /* speech.vox */; };
+		14E15BB520DF1A9F004BA193 /* ac2game.dat in Resources */ = {isa = PBXBuildFile; fileRef = A30F90AB20D6C72A0085FC40 /* ac2game.dat */; };
+		14E15BB920DF1CB0004BA193 /* speech.vox in Resources */ = {isa = PBXBuildFile; fileRef = 14E15BB820DF1CB0004BA193 /* speech.vox */; };
+		14E15BBA20DF1CB8004BA193 /* speech.vox in Resources */ = {isa = PBXBuildFile; fileRef = 14E15BB820DF1CB0004BA193 /* speech.vox */; };
 		A30F903720D6AC8F0085FC40 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A30F903620D6AC8F0085FC40 /* Images.xcassets */; };
 		A30F904420D6AE630085FC40 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A30F904320D6AE630085FC40 /* AudioToolbox.framework */; };
 		A30F904620D6AE630085FC40 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A30F904520D6AE630085FC40 /* AudioUnit.framework */; };
@@ -22,11 +44,8 @@
 		A30F905820D6AF2F0085FC40 /* libsteam_api.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = A30F905620D6AF2F0085FC40 /* libsteam_api.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A30F905920D6AF2F0085FC40 /* libagsteam-unified.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = A30F905720D6AF2F0085FC40 /* libagsteam-unified.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A30F906220D6B0120085FC40 /* plugin_registration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A30F906020D6B0120085FC40 /* plugin_registration.cpp */; };
-		A30F906B20D6B07D0085FC40 /* speech.vox in Resources */ = {isa = PBXBuildFile; fileRef = A30F906620D6B07D0085FC40 /* speech.vox */; };
 		A30F906C20D6B07D0085FC40 /* acsetup.cfg in Resources */ = {isa = PBXBuildFile; fileRef = A30F906720D6B07D0085FC40 /* acsetup.cfg */; };
-		A30F906E20D6B07D0085FC40 /* steam_appid.txt in Resources */ = {isa = PBXBuildFile; fileRef = A30F906920D6B07D0085FC40 /* steam_appid.txt */; };
 		A30F906F20D6B07D0085FC40 /* audio.vox in Resources */ = {isa = PBXBuildFile; fileRef = A30F906A20D6B07D0085FC40 /* audio.vox */; };
-		A30F907020D6B08D0085FC40 /* steam_appid.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = A30F906920D6B07D0085FC40 /* steam_appid.txt */; };
 		A30F907220D6B1040085FC40 /* libbz2.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A30F907120D6B1040085FC40 /* libbz2.1.0.dylib */; };
 		A30F907420D6B1070085FC40 /* libz.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A30F907320D6B1070085FC40 /* libz.1.dylib */; };
 		A30F908E20D6C4260085FC40 /* libbz2.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A30F907120D6B1040085FC40 /* libbz2.1.0.dylib */; };
@@ -42,12 +61,8 @@
 		A30F909920D6C4260085FC40 /* AGSKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A30F905320D6AE6C0085FC40 /* AGSKit.framework */; };
 		A30F909A20D6C4560085FC40 /* acsetup.cfg in Resources */ = {isa = PBXBuildFile; fileRef = A30F906720D6B07D0085FC40 /* acsetup.cfg */; };
 		A30F909B20D6C4590085FC40 /* audio.vox in Resources */ = {isa = PBXBuildFile; fileRef = A30F906A20D6B07D0085FC40 /* audio.vox */; };
-		A30F909C20D6C45D0085FC40 /* speech.vox in Resources */ = {isa = PBXBuildFile; fileRef = A30F906620D6B07D0085FC40 /* speech.vox */; };
-		A30F909D20D6C4600085FC40 /* steam_appid.txt in Resources */ = {isa = PBXBuildFile; fileRef = A30F906920D6B07D0085FC40 /* steam_appid.txt */; };
 		A30F909F20D6C46F0085FC40 /* plugin_registration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A30F906020D6B0120085FC40 /* plugin_registration.cpp */; };
 		A30F90A120D6C4780085FC40 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A30F903B20D6AC8F0085FC40 /* Info.plist */; };
-		A30F90A220D6C4780085FC40 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A30F903B20D6AC8F0085FC40 /* Info.plist */; };
-		A30F90A620D6C4A80085FC40 /* steam_appid.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = A30F906920D6B07D0085FC40 /* steam_appid.txt */; };
 		A30F90A720D6C4B70085FC40 /* libagsteam.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = A30F907920D6C2EF0085FC40 /* libagsteam.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A30F90A820D6C4BA0085FC40 /* libsteam_api.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = A30F905620D6AF2F0085FC40 /* libsteam_api.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A30F90AC20D6C72A0085FC40 /* ac2game.dat in Resources */ = {isa = PBXBuildFile; fileRef = A30F90AB20D6C72A0085FC40 /* ac2game.dat */; };
@@ -55,6 +70,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		14E15BA320DF1993004BA193 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A30F905520D6AF190085FC40 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -64,7 +88,6 @@
 				A30F90AD20D6C7D80085FC40 /* libagsteam.dylib in CopyFiles */,
 				A30F905820D6AF2F0085FC40 /* libsteam_api.dylib in CopyFiles */,
 				A30F905920D6AF2F0085FC40 /* libagsteam-unified.dylib in CopyFiles */,
-				A30F907020D6B08D0085FC40 /* steam_appid.txt in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -74,7 +97,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
-				A30F90A620D6C4A80085FC40 /* steam_appid.txt in CopyFiles */,
 				A30F90A720D6C4B70085FC40 /* libagsteam.dylib in CopyFiles */,
 				A30F90A820D6C4BA0085FC40 /* libsteam_api.dylib in CopyFiles */,
 			);
@@ -86,7 +108,13 @@
 		1444B1A820D744AF00A31ACB /* agswadjetutil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = agswadjetutil.cpp; path = ../../../Plugins/agswadjetutil/agswadjetutil.cpp; sourceTree = "<group>"; };
 		1444B1AA20D744BD00A31ACB /* agswadjetutil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = agswadjetutil.h; path = ../../../Plugins/agswadjetutil/agswadjetutil.h; sourceTree = "<group>"; };
 		1444B1AB20D7463100A31ACB /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
-		A30F903120D6AC740085FC40 /* Unavowed.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Unavowed.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		14E15BAA20DF1993004BA193 /* Unavowed.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Unavowed.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		14E15BAB20DF1994004BA193 /* Unavowed copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Unavowed copy-Info.plist"; path = "/Users/janetgilbert/Documents/ags/OSX/xcode/unavowed/Unavowed copy-Info.plist"; sourceTree = "<absolute>"; };
+		14E15BAE20DF1A2B004BA193 /* audio.vox */ = {isa = PBXFileReference; lastKnownFileType = file; name = audio.vox; path = game_files/audio.vox; sourceTree = "<group>"; };
+		14E15BAF20DF1A2B004BA193 /* ac2game.dat */ = {isa = PBXFileReference; lastKnownFileType = file; name = ac2game.dat; path = game_files/ac2game.dat; sourceTree = "<group>"; };
+		14E15BB020DF1A2B004BA193 /* speech.vox */ = {isa = PBXFileReference; lastKnownFileType = file; name = speech.vox; path = game_files/speech.vox; sourceTree = "<group>"; };
+		14E15BB820DF1CB0004BA193 /* speech.vox */ = {isa = PBXFileReference; lastKnownFileType = file; name = speech.vox; path = game_files/steam/speech.vox; sourceTree = "<group>"; };
+		A30F903120D6AC740085FC40 /* Unavowed_Steam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Unavowed_Steam.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A30F903620D6AC8F0085FC40 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Unavowed/Images.xcassets; sourceTree = "<group>"; };
 		A30F903B20D6AC8F0085FC40 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A30F904320D6AE630085FC40 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
@@ -104,7 +132,6 @@
 		A30F905F20D6AF9F0085FC40 /* agsplugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = agsplugin.h; path = ../../../Engine/plugin/agsplugin.h; sourceTree = "<group>"; };
 		A30F906020D6B0120085FC40 /* plugin_registration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = plugin_registration.cpp; path = ../wadjetcommon/plugin_registration.cpp; sourceTree = "<group>"; };
 		A30F906120D6B0120085FC40 /* plugin_registration.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = plugin_registration.hpp; path = ../wadjetcommon/plugin_registration.hpp; sourceTree = "<group>"; };
-		A30F906620D6B07D0085FC40 /* speech.vox */ = {isa = PBXFileReference; lastKnownFileType = file; name = speech.vox; path = game_files/speech.vox; sourceTree = "<group>"; };
 		A30F906720D6B07D0085FC40 /* acsetup.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = acsetup.cfg; path = game_files/acsetup.cfg; sourceTree = "<group>"; };
 		A30F906920D6B07D0085FC40 /* steam_appid.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = steam_appid.txt; path = game_files/steam/steam_appid.txt; sourceTree = "<group>"; };
 		A30F906A20D6B07D0085FC40 /* audio.vox */ = {isa = PBXFileReference; lastKnownFileType = file; name = audio.vox; path = game_files/steam/audio.vox; sourceTree = "<group>"; };
@@ -116,6 +143,24 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		14E15B9020DF1993004BA193 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				14E15B9120DF1993004BA193 /* libbz2.1.0.dylib in Frameworks */,
+				14E15B9220DF1993004BA193 /* libz.1.dylib in Frameworks */,
+				14E15B9320DF1993004BA193 /* AudioToolbox.framework in Frameworks */,
+				14E15B9420DF1993004BA193 /* AudioUnit.framework in Frameworks */,
+				14E15B9520DF1993004BA193 /* CoreAudio.framework in Frameworks */,
+				14E15B9620DF1993004BA193 /* IOKit.framework in Frameworks */,
+				14E15B9720DF1993004BA193 /* CoreVideo.framework in Frameworks */,
+				14E15B9820DF1993004BA193 /* OpenGL.framework in Frameworks */,
+				14E15B9920DF1993004BA193 /* AppKit.framework in Frameworks */,
+				14E15B9A20DF1993004BA193 /* Cocoa.framework in Frameworks */,
+				14E15B9B20DF1993004BA193 /* AGSKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A30F902E20D6AC740085FC40 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -155,6 +200,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		14E15BB420DF1A4F004BA193 /* game_files_steam */ = {
+			isa = PBXGroup;
+			children = (
+				14E15BB820DF1CB0004BA193 /* speech.vox */,
+				A30F906A20D6B07D0085FC40 /* audio.vox */,
+				A30F90AB20D6C72A0085FC40 /* ac2game.dat */,
+			);
+			name = game_files_steam;
+			sourceTree = "<group>";
+		};
 		A30F902820D6AC740085FC40 = {
 			isa = PBXGroup;
 			children = (
@@ -162,14 +217,16 @@
 				A30F903320D6AC740085FC40 /* Unavowed */,
 				A30F903220D6AC740085FC40 /* Products */,
 				A30F904220D6AE630085FC40 /* Frameworks */,
+				14E15BAB20DF1994004BA193 /* Unavowed copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
 		A30F903220D6AC740085FC40 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A30F903120D6AC740085FC40 /* Unavowed.app */,
+				A30F903120D6AC740085FC40 /* Unavowed_Steam.app */,
 				A30F907F20D6C3FA0085FC40 /* Unavowed-cheat.app */,
+				14E15BAA20DF1993004BA193 /* Unavowed.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -229,10 +286,11 @@
 		A30F906520D6B06E0085FC40 /* game_files */ = {
 			isa = PBXGroup;
 			children = (
-				A30F90AB20D6C72A0085FC40 /* ac2game.dat */,
+				14E15BAF20DF1A2B004BA193 /* ac2game.dat */,
+				14E15BAE20DF1A2B004BA193 /* audio.vox */,
+				14E15BB020DF1A2B004BA193 /* speech.vox */,
+				14E15BB420DF1A4F004BA193 /* game_files_steam */,
 				A30F906720D6B07D0085FC40 /* acsetup.cfg */,
-				A30F906A20D6B07D0085FC40 /* audio.vox */,
-				A30F906620D6B07D0085FC40 /* speech.vox */,
 				A30F906920D6B07D0085FC40 /* steam_appid.txt */,
 			);
 			name = game_files;
@@ -250,9 +308,27 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A30F903020D6AC740085FC40 /* Unavowed */ = {
+		14E15B8C20DF1993004BA193 /* Unavowed */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A30F903F20D6AC8F0085FC40 /* Build configuration list for PBXNativeTarget "Unavowed" */;
+			buildConfigurationList = 14E15BA720DF1993004BA193 /* Build configuration list for PBXNativeTarget "Unavowed" */;
+			buildPhases = (
+				14E15B8D20DF1993004BA193 /* Sources */,
+				14E15B9020DF1993004BA193 /* Frameworks */,
+				14E15B9C20DF1993004BA193 /* Resources */,
+				14E15BA320DF1993004BA193 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Unavowed;
+			productName = Unsteamvowed;
+			productReference = 14E15BAA20DF1993004BA193 /* Unavowed.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A30F903020D6AC740085FC40 /* Unavowed_Steam */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A30F903F20D6AC8F0085FC40 /* Build configuration list for PBXNativeTarget "Unavowed_Steam" */;
 			buildPhases = (
 				A30F902D20D6AC740085FC40 /* Sources */,
 				A30F902E20D6AC740085FC40 /* Frameworks */,
@@ -263,9 +339,9 @@
 			);
 			dependencies = (
 			);
-			name = Unavowed;
+			name = Unavowed_Steam;
 			productName = Unsteamvowed;
-			productReference = A30F903120D6AC740085FC40 /* Unavowed.app */;
+			productReference = A30F903120D6AC740085FC40 /* Unavowed_Steam.app */;
 			productType = "com.apple.product-type.application";
 		};
 		A30F907E20D6C3FA0085FC40 /* Unavowed-cheat */ = {
@@ -316,25 +392,37 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A30F903020D6AC740085FC40 /* Unavowed */,
+				A30F903020D6AC740085FC40 /* Unavowed_Steam */,
 				A30F907E20D6C3FA0085FC40 /* Unavowed-cheat */,
+				14E15B8C20DF1993004BA193 /* Unavowed */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		14E15B9C20DF1993004BA193 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				14E15BB120DF1A2B004BA193 /* audio.vox in Resources */,
+				14E15BB220DF1A2B004BA193 /* ac2game.dat in Resources */,
+				14E15BB320DF1A2B004BA193 /* speech.vox in Resources */,
+				14E15B9F20DF1993004BA193 /* Images.xcassets in Resources */,
+				14E15BA020DF1993004BA193 /* acsetup.cfg in Resources */,
+				14E15BA220DF1993004BA193 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A30F902F20D6AC740085FC40 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A30F90A220D6C4780085FC40 /* Info.plist in Resources */,
-				A30F906E20D6B07D0085FC40 /* steam_appid.txt in Resources */,
 				A30F90AC20D6C72A0085FC40 /* ac2game.dat in Resources */,
 				A30F906F20D6B07D0085FC40 /* audio.vox in Resources */,
 				A30F903720D6AC8F0085FC40 /* Images.xcassets in Resources */,
 				A30F906C20D6B07D0085FC40 /* acsetup.cfg in Resources */,
-				A30F906B20D6B07D0085FC40 /* speech.vox in Resources */,
 				1444B1AC20D7463100A31ACB /* MainMenu.xib in Resources */,
+				14E15BB920DF1CB0004BA193 /* speech.vox in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -343,16 +431,25 @@
 			buildActionMask = 2147483647;
 			files = (
 				A30F90A120D6C4780085FC40 /* Info.plist in Resources */,
-				A30F909D20D6C4600085FC40 /* steam_appid.txt in Resources */,
 				A30F909A20D6C4560085FC40 /* acsetup.cfg in Resources */,
 				A30F909B20D6C4590085FC40 /* audio.vox in Resources */,
-				A30F909C20D6C45D0085FC40 /* speech.vox in Resources */,
+				14E15BB520DF1A9F004BA193 /* ac2game.dat in Resources */,
+				14E15BBA20DF1CB8004BA193 /* speech.vox in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		14E15B8D20DF1993004BA193 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				14E15B8E20DF1993004BA193 /* agswadjetutil.cpp in Sources */,
+				14E15B8F20DF1993004BA193 /* plugin_registration.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A30F902D20D6AC740085FC40 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -373,6 +470,55 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		14E15BA820DF1993004BA193 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 69P49K3LPW;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					BUILTIN_PLUGINS,
+					MAC_VERSION,
+					"DEBUG=1",
+				);
+				INFOPLIST_FILE = "Unavowed copy-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.wadjeteyegames.mac.Unavowed;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Debug;
+		};
+		14E15BA920DF1993004BA193 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 69P49K3LPW;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					BUILTIN_PLUGINS,
+					MAC_VERSION,
+				);
+				INFOPLIST_FILE = "Unavowed copy-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.wadjeteyegames.mac.Unavowed;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Release;
+		};
 		A30F903D20D6AC8F0085FC40 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -424,7 +570,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -478,7 +624,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -504,7 +650,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.monkeymoto.Unsteamvowed;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wadjeteyegames.mac.Unavowed;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.0;
@@ -528,7 +674,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.monkeymoto.Unsteamvowed;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wadjeteyegames.mac.Unavowed;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.0;
@@ -583,6 +729,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		14E15BA720DF1993004BA193 /* Build configuration list for PBXNativeTarget "Unavowed" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				14E15BA820DF1993004BA193 /* Debug */,
+				14E15BA920DF1993004BA193 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		A30F902C20D6AC740085FC40 /* Build configuration list for PBXProject "Unavowed" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -592,7 +747,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A30F903F20D6AC8F0085FC40 /* Build configuration list for PBXNativeTarget "Unavowed" */ = {
+		A30F903F20D6AC8F0085FC40 /* Build configuration list for PBXNativeTarget "Unavowed_Steam" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A30F904020D6AC8F0085FC40 /* Debug */,
