@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14113" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12118" systemVersion="16C67" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14113"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12118"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication"/>
@@ -10,11 +11,11 @@
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
         <menu title="Main Menu" systemMenu="main" id="AYu-sK-qS6">
             <items>
-                <menuItem title="GeminiRue" id="1Xt-HY-uBw">
+                <menuItem title="Gemini Rue" id="1Xt-HY-uBw" userLabel="Gemini Rue">
                     <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="GeminiRue" systemMenu="apple" id="uQy-DD-JDr">
+                    <menu key="submenu" title="Gemini Rue" systemMenu="apple" id="uQy-DD-JDr">
                         <items>
-                            <menuItem title="About GeminiRue" id="5kV-Vb-QxS">
+                            <menuItem title="About Gemini Rue" id="5kV-Vb-QxS" userLabel="About Gemini Rue">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="orderFrontStandardAboutPanel:" target="-1" id="Exp-CZ-Vem"/>
@@ -28,7 +29,7 @@
                                 <menu key="submenu" title="Services" systemMenu="services" id="hz9-B4-Xy5"/>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="4je-JR-u6R"/>
-                            <menuItem title="Hide GeminiRue" keyEquivalent="h" id="Olw-nP-bQN">
+                            <menuItem title="Hide Gemini Rue" keyEquivalent="h" id="Olw-nP-bQN" userLabel="Hide Gemini Rue">
                                 <connections>
                                     <action selector="hide:" target="-1" id="PnN-Uc-m68"/>
                                 </connections>
@@ -46,7 +47,7 @@
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="kCx-OE-vgT"/>
-                            <menuItem title="Quit GeminiRue" keyEquivalent="q" id="4sb-4s-VLi">
+                            <menuItem title="Quit Gemini Rue" keyEquivalent="q" id="4sb-4s-VLi" userLabel="Quit Gemini Rue">
                                 <connections>
                                     <action selector="terminate:" target="-1" id="Te7-pn-YzF"/>
                                 </connections>

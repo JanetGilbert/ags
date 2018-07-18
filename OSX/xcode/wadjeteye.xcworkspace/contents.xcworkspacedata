@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:geminirue/GeminiRue.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:AGSKit/AGSKit.xcodeproj">
    </FileRef>
    <FileRef
@@ -21,9 +24,6 @@
    </FileRef>
    <FileRef
       location = "group:shivah/Shivah.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:geminirue/GeminiRue.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:unbound/Unbound.xcodeproj">
