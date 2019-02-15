@@ -148,19 +148,13 @@
 		526F23031D3B5C4900EF4E1F /* mpglib.h in Headers */ = {isa = PBXBuildFile; fileRef = 526F21891D3B5C4900EF4E1F /* mpglib.h */; };
 		526F23041D3B5C4900EF4E1F /* config_types.h in Headers */ = {isa = PBXBuildFile; fileRef = 526F218B1D3B5C4900EF4E1F /* config_types.h */; };
 		526F23051D3B5C4900EF4E1F /* config_types.h.in in Resources */ = {isa = PBXBuildFile; fileRef = 526F218C1D3B5C4900EF4E1F /* config_types.h.in */; };
-		526F23061D3B5C4900EF4E1F /* MAKEFILE.AM in Resources */ = {isa = PBXBuildFile; fileRef = 526F218D1D3B5C4900EF4E1F /* MAKEFILE.AM */; };
-		526F23071D3B5C4900EF4E1F /* MAKEFILE.IN in Resources */ = {isa = PBXBuildFile; fileRef = 526F218E1D3B5C4900EF4E1F /* MAKEFILE.IN */; };
 		526F23081D3B5C4900EF4E1F /* OGG.H in Headers */ = {isa = PBXBuildFile; fileRef = 526F218F1D3B5C4900EF4E1F /* OGG.H */; };
 		526F23091D3B5C4900EF4E1F /* OS_TYPES.H in Headers */ = {isa = PBXBuildFile; fileRef = 526F21901D3B5C4900EF4E1F /* OS_TYPES.H */; };
 		526F230A1D3B5C4900EF4E1F /* codec.h in Headers */ = {isa = PBXBuildFile; fileRef = 526F21921D3B5C4900EF4E1F /* codec.h */; };
-		526F230B1D3B5C4900EF4E1F /* Makefile.am in Resources */ = {isa = PBXBuildFile; fileRef = 526F21931D3B5C4900EF4E1F /* Makefile.am */; };
-		526F230C1D3B5C4900EF4E1F /* Makefile.in in Resources */ = {isa = PBXBuildFile; fileRef = 526F21941D3B5C4900EF4E1F /* Makefile.in */; };
 		526F230D1D3B5C4900EF4E1F /* theora.h in Headers */ = {isa = PBXBuildFile; fileRef = 526F21951D3B5C4900EF4E1F /* theora.h */; };
 		526F230E1D3B5C4900EF4E1F /* theoradec.h in Headers */ = {isa = PBXBuildFile; fileRef = 526F21961D3B5C4900EF4E1F /* theoradec.h */; };
 		526F230F1D3B5C4900EF4E1F /* theoraenc.h in Headers */ = {isa = PBXBuildFile; fileRef = 526F21971D3B5C4900EF4E1F /* theoraenc.h */; };
 		526F23101D3B5C4900EF4E1F /* codec.h in Headers */ = {isa = PBXBuildFile; fileRef = 526F21991D3B5C4900EF4E1F /* codec.h */; };
-		526F23111D3B5C4900EF4E1F /* Makefile.am in Resources */ = {isa = PBXBuildFile; fileRef = 526F219A1D3B5C4900EF4E1F /* Makefile.am */; };
-		526F23121D3B5C4900EF4E1F /* Makefile.in in Resources */ = {isa = PBXBuildFile; fileRef = 526F219B1D3B5C4900EF4E1F /* Makefile.in */; };
 		526F23131D3B5C4900EF4E1F /* vorbisenc.h in Headers */ = {isa = PBXBuildFile; fileRef = 526F219C1D3B5C4900EF4E1F /* vorbisenc.h */; };
 		526F23141D3B5C4900EF4E1F /* vorbisfile.h in Headers */ = {isa = PBXBuildFile; fileRef = 526F219D1D3B5C4900EF4E1F /* vorbisfile.h */; };
 		526F23151D3B5C4900EF4E1F /* AAROT.c in Sources */ = {isa = PBXBuildFile; fileRef = 526F21A01D3B5C4900EF4E1F /* AAROT.c */; };
@@ -552,10 +546,6 @@
 		526F27E21D3B5CC300EF4E1F /* newcontrol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 526F25651D3B5CC300EF4E1F /* newcontrol.cpp */; };
 		526F27E31D3B5CC300EF4E1F /* newcontrol.h in Headers */ = {isa = PBXBuildFile; fileRef = 526F25661D3B5CC300EF4E1F /* newcontrol.h */; };
 		526F27E41D3B5CC300EF4E1F /* alfont.c in Sources */ = {isa = PBXBuildFile; fileRef = 526F25691D3B5CC300EF4E1F /* alfont.c */; };
-		526F27E51D3B5CC300EF4E1F /* ALFONT.txt in Resources */ = {isa = PBXBuildFile; fileRef = 526F256A1D3B5CC300EF4E1F /* ALFONT.txt */; };
-		526F27E61D3B5CC300EF4E1F /* AUTHORS.txt in Resources */ = {isa = PBXBuildFile; fileRef = 526F256B1D3B5CC300EF4E1F /* AUTHORS.txt */; };
-		526F27E71D3B5CC300EF4E1F /* FTL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 526F256C1D3B5CC300EF4E1F /* FTL.txt */; };
-		526F27E81D3B5CC300EF4E1F /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = 526F256D1D3B5CC300EF4E1F /* README.txt */; };
 		526F27F11D3B5CC300EF4E1F /* almp3.c in Sources */ = {isa = PBXBuildFile; fileRef = 526F257A1D3B5CC300EF4E1F /* almp3.c */; };
 		526F27F21D3B5CC300EF4E1F /* common.c in Sources */ = {isa = PBXBuildFile; fileRef = 526F257D1D3B5CC300EF4E1F /* common.c */; };
 		526F27F31D3B5CC300EF4E1F /* dct64_i386.c in Sources */ = {isa = PBXBuildFile; fileRef = 526F257E1D3B5CC300EF4E1F /* dct64_i386.c */; };
@@ -567,14 +557,8 @@
 		526F27F91D3B5CC300EF4E1F /* layer3.c in Sources */ = {isa = PBXBuildFile; fileRef = 526F25841D3B5CC300EF4E1F /* layer3.c */; };
 		526F27FA1D3B5CC300EF4E1F /* mpg123.h in Headers */ = {isa = PBXBuildFile; fileRef = 526F25851D3B5CC300EF4E1F /* mpg123.h */; };
 		526F27FB1D3B5CC300EF4E1F /* mpglib.h in Headers */ = {isa = PBXBuildFile; fileRef = 526F25861D3B5CC300EF4E1F /* mpglib.h */; };
-		526F27FC1D3B5CC300EF4E1F /* README in Resources */ = {isa = PBXBuildFile; fileRef = 526F25871D3B5CC300EF4E1F /* README */; };
 		526F27FD1D3B5CC300EF4E1F /* tabinit.c in Sources */ = {isa = PBXBuildFile; fileRef = 526F25881D3B5CC300EF4E1F /* tabinit.c */; };
 		526F27FF1D3B5CC300EF4E1F /* alogg.c in Sources */ = {isa = PBXBuildFile; fileRef = 526F258B1D3B5CC300EF4E1F /* alogg.c */; };
-		526F28001D3B5CC300EF4E1F /* ALOGG.txt in Resources */ = {isa = PBXBuildFile; fileRef = 526F258C1D3B5CC300EF4E1F /* ALOGG.txt */; };
-		526F28011D3B5CC300EF4E1F /* AUTHORS.txt in Resources */ = {isa = PBXBuildFile; fileRef = 526F258D1D3B5CC300EF4E1F /* AUTHORS.txt */; };
-		526F28021D3B5CC300EF4E1F /* CHANGES.txt in Resources */ = {isa = PBXBuildFile; fileRef = 526F258E1D3B5CC300EF4E1F /* CHANGES.txt */; };
-		526F28031D3B5CC300EF4E1F /* COPYING.txt in Resources */ = {isa = PBXBuildFile; fileRef = 526F258F1D3B5CC300EF4E1F /* COPYING.txt */; };
-		526F28041D3B5CC300EF4E1F /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = 526F25901D3B5CC300EF4E1F /* README.txt */; };
 		526F28051D3B5CC300EF4E1F /* adisplay.c in Sources */ = {isa = PBXBuildFile; fileRef = 526F25921D3B5CC300EF4E1F /* adisplay.c */; };
 		526F28061D3B5CC300EF4E1F /* apeg.txt in Resources */ = {isa = PBXBuildFile; fileRef = 526F25931D3B5CC300EF4E1F /* apeg.txt */; };
 		526F28071D3B5CC300EF4E1F /* aaudio.c in Sources */ = {isa = PBXBuildFile; fileRef = 526F25951D3B5CC300EF4E1F /* aaudio.c */; };
@@ -670,7 +654,6 @@
 		526F28B11D3B5CC300EF4E1F /* global_plugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 526F265B1D3B5CC300EF4E1F /* global_plugin.cpp */; };
 		526F28B21D3B5CC300EF4E1F /* pluginobjectreader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 526F265C1D3B5CC300EF4E1F /* pluginobjectreader.cpp */; };
 		526F28B31D3B5CC300EF4E1F /* pluginobjectreader.h in Headers */ = {isa = PBXBuildFile; fileRef = 526F265D1D3B5CC300EF4E1F /* pluginobjectreader.h */; };
-		526F28B41D3B5CC300EF4E1F /* CompileShader.bat in Resources */ = {isa = PBXBuildFile; fileRef = 526F265F1D3B5CC300EF4E1F /* CompileShader.bat */; };
 		526F28B51D3B5CC300EF4E1F /* DefaultGDF.gdf.xml in Resources */ = {isa = PBXBuildFile; fileRef = 526F26601D3B5CC300EF4E1F /* DefaultGDF.gdf.xml */; };
 		526F28B61D3B5CC300EF4E1F /* game-1.ICO in Resources */ = {isa = PBXBuildFile; fileRef = 526F26611D3B5CC300EF4E1F /* game-1.ICO */; };
 		526F28B71D3B5CC300EF4E1F /* resource.h in Headers */ = {isa = PBXBuildFile; fileRef = 526F26621D3B5CC300EF4E1F /* resource.h */; };
@@ -3211,32 +3194,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				526F28031D3B5CC300EF4E1F /* COPYING.txt in Resources */,
-				526F230C1D3B5C4900EF4E1F /* Makefile.in in Resources */,
-				526F28041D3B5CC300EF4E1F /* README.txt in Resources */,
 				526F28BA1D3B5CC300EF4E1F /* tintshaderLegacy.fx in Resources */,
-				526F27E71D3B5CC300EF4E1F /* FTL.txt in Resources */,
 				526F28BB1D3B5CC300EF4E1F /* tintshaderLegacy.fxo in Resources */,
-				526F27FC1D3B5CC300EF4E1F /* README in Resources */,
 				526F28061D3B5CC300EF4E1F /* apeg.txt in Resources */,
-				526F28011D3B5CC300EF4E1F /* AUTHORS.txt in Resources */,
-				526F28B41D3B5CC300EF4E1F /* CompileShader.bat in Resources */,
 				526F28B61D3B5CC300EF4E1F /* game-1.ICO in Resources */,
-				526F27E61D3B5CC300EF4E1F /* AUTHORS.txt in Resources */,
-				526F28001D3B5CC300EF4E1F /* ALOGG.txt in Resources */,
-				526F27E51D3B5CC300EF4E1F /* ALFONT.txt in Resources */,
 				526F28B91D3B5CC300EF4E1F /* tintshader.fxo in Resources */,
 				526F28B81D3B5CC300EF4E1F /* tintshader.fx in Resources */,
-				526F23071D3B5C4900EF4E1F /* MAKEFILE.IN in Resources */,
 				526F28BC1D3B5CC300EF4E1F /* version.rc in Resources */,
-				526F230B1D3B5C4900EF4E1F /* Makefile.am in Resources */,
-				526F23121D3B5C4900EF4E1F /* Makefile.in in Resources */,
-				526F23111D3B5C4900EF4E1F /* Makefile.am in Resources */,
 				526F23051D3B5C4900EF4E1F /* config_types.h.in in Resources */,
 				526F28B51D3B5CC300EF4E1F /* DefaultGDF.gdf.xml in Resources */,
-				526F27E81D3B5CC300EF4E1F /* README.txt in Resources */,
-				526F28021D3B5CC300EF4E1F /* CHANGES.txt in Resources */,
-				526F23061D3B5C4900EF4E1F /* MAKEFILE.AM in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

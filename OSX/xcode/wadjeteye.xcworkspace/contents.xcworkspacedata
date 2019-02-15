@@ -31,4 +31,7 @@
    <FileRef
       location = "group:/Users/janetgilbert/Documents/ags/OSX/xcode/unavowed/Unavowed.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:legacy/Legacy.xcodeproj">
+   </FileRef>
 </Workspace>
