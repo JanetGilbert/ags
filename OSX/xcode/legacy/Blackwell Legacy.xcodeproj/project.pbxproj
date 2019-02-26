@@ -11,7 +11,6 @@
 		1444B1AC20D7463100A31ACB /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1444B1AB20D7463100A31ACB /* MainMenu.xib */; };
 		14747F5B2217494700771D4E /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14747F592217494700771D4E /* Images.xcassets */; };
 		14747F5E2217495400771D4E /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14747F5C2217495400771D4E /* Images.xcassets */; };
-		14747F5F221750ED00771D4E /* steam_appid.txt in Resources */ = {isa = PBXBuildFile; fileRef = A30F906920D6B07D0085FC40 /* steam_appid.txt */; };
 		14E15B8E20DF1993004BA193 /* agswadjetutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1444B1A820D744AF00A31ACB /* agswadjetutil.cpp */; };
 		14E15B8F20DF1993004BA193 /* plugin_registration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A30F906020D6B0120085FC40 /* plugin_registration.cpp */; };
 		14E15B9120DF1993004BA193 /* libbz2.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A30F907120D6B1040085FC40 /* libbz2.1.0.dylib */; };
@@ -83,7 +82,7 @@
 		14747F5A2217494700771D4E /* Legacy_Steam.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; name = Legacy_Steam.entitlements; path = Legacy_Steam/Legacy_Steam.entitlements; sourceTree = "<group>"; };
 		14747F5C2217495400771D4E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Legacy/Images.xcassets; sourceTree = "<group>"; };
 		14747F5D2217495400771D4E /* Legacy.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; name = Legacy.entitlements; path = Legacy/Legacy.entitlements; sourceTree = "<group>"; };
-		14E15BAA20DF1993004BA193 /* Legacy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Legacy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		14E15BAA20DF1993004BA193 /* Blackwell Legacy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Blackwell Legacy.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		14E15BAE20DF1A2B004BA193 /* audio.vox */ = {isa = PBXFileReference; lastKnownFileType = file; name = audio.vox; path = game_files/audio.vox; sourceTree = "<group>"; };
 		14E15BAF20DF1A2B004BA193 /* ac2game.dat */ = {isa = PBXFileReference; lastKnownFileType = file; name = ac2game.dat; path = game_files/ac2game.dat; sourceTree = "<group>"; };
 		14E15BB020DF1A2B004BA193 /* speech.vox */ = {isa = PBXFileReference; lastKnownFileType = file; name = speech.vox; path = game_files/speech.vox; sourceTree = "<group>"; };
@@ -187,7 +186,7 @@
 			isa = PBXGroup;
 			children = (
 				A30F903120D6AC740085FC40 /* Legacy_Steam.app */,
-				14E15BAA20DF1993004BA193 /* Legacy.app */,
+				14E15BAA20DF1993004BA193 /* Blackwell Legacy.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -271,9 +270,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		14E15B8C20DF1993004BA193 /* Legacy */ = {
+		14E15B8C20DF1993004BA193 /* Blackwell Legacy */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 14E15BA720DF1993004BA193 /* Build configuration list for PBXNativeTarget "Legacy" */;
+			buildConfigurationList = 14E15BA720DF1993004BA193 /* Build configuration list for PBXNativeTarget "Blackwell Legacy" */;
 			buildPhases = (
 				14E15B8D20DF1993004BA193 /* Sources */,
 				14E15B9020DF1993004BA193 /* Frameworks */,
@@ -284,9 +283,9 @@
 			);
 			dependencies = (
 			);
-			name = Legacy;
+			name = "Blackwell Legacy";
 			productName = Unsteamvowed;
-			productReference = 14E15BAA20DF1993004BA193 /* Legacy.app */;
+			productReference = 14E15BAA20DF1993004BA193 /* Blackwell Legacy.app */;
 			productType = "com.apple.product-type.application";
 		};
 		A30F903020D6AC740085FC40 /* Legacy_Steam */ = {
@@ -318,6 +317,9 @@
 				TargetAttributes = {
 					14E15B8C20DF1993004BA193 = {
 						SystemCapabilities = {
+							com.apple.HardenedRuntime = {
+								enabled = 1;
+							};
 							com.apple.Sandbox = {
 								enabled = 1;
 							};
@@ -326,6 +328,9 @@
 					A30F903020D6AC740085FC40 = {
 						CreatedOnToolsVersion = 9.4;
 						SystemCapabilities = {
+							com.apple.HardenedRuntime = {
+								enabled = 1;
+							};
 							com.apple.Sandbox = {
 								enabled = 0;
 							};
@@ -333,7 +338,7 @@
 					};
 				};
 			};
-			buildConfigurationList = A30F902C20D6AC740085FC40 /* Build configuration list for PBXProject "Legacy" */;
+			buildConfigurationList = A30F902C20D6AC740085FC40 /* Build configuration list for PBXProject "Blackwell Legacy" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -347,7 +352,7 @@
 			projectRoot = "";
 			targets = (
 				A30F903020D6AC740085FC40 /* Legacy_Steam */,
-				14E15B8C20DF1993004BA193 /* Legacy */,
+				14E15B8C20DF1993004BA193 /* Blackwell Legacy */,
 			);
 		};
 /* End PBXProject section */
@@ -375,7 +380,6 @@
 				A30F906C20D6B07D0085FC40 /* acsetup.cfg in Resources */,
 				14747F5B2217494700771D4E /* Images.xcassets in Resources */,
 				1444B1AC20D7463100A31ACB /* MainMenu.xib in Resources */,
-				14747F5F221750ED00771D4E /* steam_appid.txt in Resources */,
 				14E15BB920DF1CB0004BA193 /* speech.vox in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -413,6 +417,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 69P49K3LPW;
+				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					BUILTIN_PLUGINS,
 					MAC_VERSION,
@@ -423,7 +428,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.wadjeteyegames.mac.Blackwell-Legacy";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -440,6 +445,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 69P49K3LPW;
+				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					BUILTIN_PLUGINS,
 					MAC_VERSION,
@@ -449,7 +455,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.wadjeteyegames.mac.Blackwell-Legacy";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -508,7 +514,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -562,7 +568,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -574,10 +580,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconSteam;
+				CODE_SIGN_ENTITLEMENTS = Legacy_Steam/Legacy_Steam.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 69P49K3LPW;
+				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					BUILTIN_PLUGINS,
 					MAC_VERSION,
@@ -588,7 +596,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.wadjeteyegames.mac.Blackwell-Legacy";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -600,10 +608,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconSteam;
+				CODE_SIGN_ENTITLEMENTS = Legacy_Steam/Legacy_Steam.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 69P49K3LPW;
+				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					BUILTIN_PLUGINS,
 					MAC_VERSION,
@@ -613,7 +623,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.wadjeteyegames.mac.Blackwell-Legacy";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -624,7 +634,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		14E15BA720DF1993004BA193 /* Build configuration list for PBXNativeTarget "Legacy" */ = {
+		14E15BA720DF1993004BA193 /* Build configuration list for PBXNativeTarget "Blackwell Legacy" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				14E15BA820DF1993004BA193 /* Debug */,
@@ -633,7 +643,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A30F902C20D6AC740085FC40 /* Build configuration list for PBXProject "Legacy" */ = {
+		A30F902C20D6AC740085FC40 /* Build configuration list for PBXProject "Blackwell Legacy" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A30F903D20D6AC8F0085FC40 /* Debug */,

@@ -108,6 +108,7 @@
 		1444B1A820D744AF00A31ACB /* agswadjetutil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = agswadjetutil.cpp; path = ../../../Plugins/agswadjetutil/agswadjetutil.cpp; sourceTree = "<group>"; };
 		1444B1AA20D744BD00A31ACB /* agswadjetutil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = agswadjetutil.h; path = ../../../Plugins/agswadjetutil/agswadjetutil.h; sourceTree = "<group>"; };
 		1444B1AB20D7463100A31ACB /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
+		14AFDE932219DCCD001E4359 /* steam_appid.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = steam_appid.txt; path = game_files/steam/steam_appid.txt; sourceTree = "<group>"; };
 		14CB299320FCAFD30020633F /* Unavowed.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Unavowed.entitlements; path = Unavowed/Unavowed.entitlements; sourceTree = "<group>"; };
 		14CB299420FD76130020633F /* Unavowed_Steam.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Unavowed_Steam.entitlements; sourceTree = "<group>"; };
 		14E15BAA20DF1993004BA193 /* Unavowed.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Unavowed.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -205,6 +206,7 @@
 		14E15BB420DF1A4F004BA193 /* game_files_steam */ = {
 			isa = PBXGroup;
 			children = (
+				14AFDE932219DCCD001E4359 /* steam_appid.txt */,
 				14E15BB820DF1CB0004BA193 /* speech.vox */,
 				A30F906A20D6B07D0085FC40 /* audio.vox */,
 				A30F90AB20D6C72A0085FC40 /* ac2game.dat */,

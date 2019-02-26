@@ -17,7 +17,7 @@
       location = "group:agsteamtest/agsteamtest.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:legacy/Legacy.xcodeproj">
+      location = "group:/Users/janetgilbert/Documents/ags/OSX/xcode/legacy/Blackwell Legacy.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:primordia/Primordia.xcodeproj">
@@ -30,8 +30,5 @@
    </FileRef>
    <FileRef
       location = "group:/Users/janetgilbert/Documents/ags/OSX/xcode/unavowed/Unavowed.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:legacy/Legacy.xcodeproj">
    </FileRef>
 </Workspace>
