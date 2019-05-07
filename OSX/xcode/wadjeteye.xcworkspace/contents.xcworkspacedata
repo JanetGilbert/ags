@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:primordia/Primordia.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:geminirue/GeminiRue.xcodeproj">
    </FileRef>
    <FileRef
@@ -18,9 +21,6 @@
    </FileRef>
    <FileRef
       location = "group:/Users/janetgilbert/Documents/ags/OSX/xcode/legacy/Blackwell Legacy.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:primordia/Primordia.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:shivah/Shivah.xcodeproj">
