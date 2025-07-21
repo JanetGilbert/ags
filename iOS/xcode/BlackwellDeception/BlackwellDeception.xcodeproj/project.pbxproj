@@ -18,6 +18,7 @@
 		119769D01AB3589800048EE1 /* ios_ipad.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 119769CB1AB3589800048EE1 /* ios_ipad.cfg */; };
 		119769D11AB3589800048EE1 /* ios_iphone.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 119769CC1AB3589800048EE1 /* ios_iphone.cfg */; };
 		119769D21AB3589800048EE1 /* speech.vox in Resources */ = {isa = PBXBuildFile; fileRef = 119769CD1AB3589800048EE1 /* speech.vox */; };
+		143222332E0AF914008A1711 /* update.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 143222322E0AF914008A1711 /* update.cpp */; };
 		14FFC0531B0E17B000E719A4 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14FFC0521B0E17B000E719A4 /* Images.xcassets */; };
 		1D60589B0D05DD56006BFB54 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.mm */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
@@ -57,8 +58,6 @@
 		60898D94160779DB009E152F /* ags_snowrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60898CF2160779DB009E152F /* ags_snowrain.cpp */; };
 		60898DA91607816F009E152F /* mpg123.c in Sources */ = {isa = PBXBuildFile; fileRef = 60898DA81607816F009E152F /* mpg123.c */; };
 		60898DC416078501009E152F /* aaudio.c in Sources */ = {isa = PBXBuildFile; fileRef = 60898DC316078501009E152F /* aaudio.c */; };
-		60898DCA160785CB009E152F /* gfxfilter_hq2x.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60898DC9160785CB009E152F /* gfxfilter_hq2x.cpp */; };
-		60898DCC160785DD009E152F /* gfxfilter_hq3x.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60898DCB160785DD009E152F /* gfxfilter_hq3x.cpp */; };
 		60898DD6160787FF009E152F /* hq2x3x.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60898DD4160787FF009E152F /* hq2x3x.cpp */; };
 		608B20641866295B005B3BCD /* logfile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 608B20631866295B005B3BCD /* logfile.cpp */; };
 		608B4E57163BF27B00547FAA /* libc.c in Sources */ = {isa = PBXBuildFile; fileRef = 608B4E56163BF27B00547FAA /* libc.c */; };
@@ -66,11 +65,9 @@
 		608D788B176B832C00E48976 /* gfx_util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 608D7889176B832C00E48976 /* gfx_util.cpp */; };
 		60CA3A66160713D300CFB3BD /* audiocliptype.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA39AB160713D200CFB3BD /* audiocliptype.cpp */; };
 		60CA3A67160713D300CFB3BD /* common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA39AE160713D200CFB3BD /* common.cpp */; };
-		60CA3A68160713D300CFB3BD /* customproperties.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA39B1160713D200CFB3BD /* customproperties.cpp */; };
 		60CA3A69160713D300CFB3BD /* scriptaudioclip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA39B5160713D200CFB3BD /* scriptaudioclip.cpp */; };
 		60CA3A6A160713D300CFB3BD /* gamesetupstruct.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA39B7160713D200CFB3BD /* gamesetupstruct.cpp */; };
 		60CA3A6B160713D300CFB3BD /* gamesetupstructbase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA39B9160713D200CFB3BD /* gamesetupstructbase.cpp */; };
-		60CA3A6C160713D300CFB3BD /* interaction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA39BC160713D200CFB3BD /* interaction.cpp */; };
 		60CA3A6D160713D300CFB3BD /* messageinfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA39C1160713D200CFB3BD /* messageinfo.cpp */; };
 		60CA3A6E160713D300CFB3BD /* mousecursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA39C3160713D200CFB3BD /* mousecursor.cpp */; };
 		60CA3A6F160713D300CFB3BD /* point.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA39C6160713D200CFB3BD /* point.cpp */; };
@@ -79,7 +76,6 @@
 		60CA3A72160713D300CFB3BD /* view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA39CC160713D200CFB3BD /* view.cpp */; };
 		60CA3A73160713D300CFB3BD /* wordsdictionary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA39CE160713D200CFB3BD /* wordsdictionary.cpp */; };
 		60CA3A74160713D300CFB3BD /* out.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA39D4160713D200CFB3BD /* out.cpp */; };
-		60CA3A75160713D300CFB3BD /* agsfontrenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA39D8160713D200CFB3BD /* agsfontrenderer.cpp */; };
 		60CA3A76160713D300CFB3BD /* fonts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA39DA160713D200CFB3BD /* fonts.cpp */; };
 		60CA3A77160713D300CFB3BD /* ttffontrenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA39DC160713D200CFB3BD /* ttffontrenderer.cpp */; };
 		60CA3A78160713D300CFB3BD /* wfnfontrenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA39DE160713D200CFB3BD /* wfnfontrenderer.cpp */; };
@@ -242,12 +238,10 @@
 		60CA3DB3160713FF00CFB3BD /* ali3dsw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3BC0160713FE00CFB3BD /* ali3dsw.cpp */; };
 		60CA3DB4160713FF00CFB3BD /* blender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3BC1160713FE00CFB3BD /* blender.cpp */; };
 		60CA3DB5160713FF00CFB3BD /* color_engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3BC3160713FE00CFB3BD /* color_engine.cpp */; };
-		60CA3DB6160713FF00CFB3BD /* gfxfilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3BC5160713FE00CFB3BD /* gfxfilter.cpp */; };
 		60CA3DB7160713FF00CFB3BD /* gfxfilter_aad3d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3BC9160713FE00CFB3BD /* gfxfilter_aad3d.cpp */; };
 		60CA3DB8160713FF00CFB3BD /* gfxfilter_allegro.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3BCB160713FE00CFB3BD /* gfxfilter_allegro.cpp */; };
 		60CA3DB9160713FF00CFB3BD /* gfxfilter_d3d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3BCD160713FE00CFB3BD /* gfxfilter_d3d.cpp */; };
 		60CA3DBC160713FF00CFB3BD /* gfxfilter_scaling.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3BD3160713FE00CFB3BD /* gfxfilter_scaling.cpp */; };
-		60CA3DBD160713FF00CFB3BD /* gfxfilter_scalingallegro.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3BD5160713FE00CFB3BD /* gfxfilter_scalingallegro.cpp */; };
 		60CA3DCE160713FF00CFB3BD /* animatingguibutton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3BEB160713FE00CFB3BD /* animatingguibutton.cpp */; };
 		60CA3DCF160713FF00CFB3BD /* cscidialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3BED160713FE00CFB3BD /* cscidialog.cpp */; };
 		60CA3DD0160713FF00CFB3BD /* guidialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3BEF160713FE00CFB3BD /* guidialog.cpp */; };
@@ -297,7 +291,6 @@
 		60CA3E4C160713FF00CFB3BD /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3C92160713FF00CFB3BD /* main.cpp */; };
 		60CA3E4D160713FF00CFB3BD /* minidump.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3C96160713FF00CFB3BD /* minidump.cpp */; };
 		60CA3E4E160713FF00CFB3BD /* quit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3C97160713FF00CFB3BD /* quit.cpp */; };
-		60CA3E4F160713FF00CFB3BD /* udpate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3C99160713FF00CFB3BD /* udpate.cpp */; };
 		60CA3E55160713FF00CFB3BD /* ambientsound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3CA2160713FF00CFB3BD /* ambientsound.cpp */; };
 		60CA3E56160713FF00CFB3BD /* audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3CA4160713FF00CFB3BD /* audio.cpp */; };
 		60CA3E57160713FF00CFB3BD /* clip_mydumbmod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3CA8160713FF00CFB3BD /* clip_mydumbmod.cpp */; };
@@ -313,7 +306,6 @@
 		60CA3E61160713FF00CFB3BD /* soundcache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3CBC160713FF00CFB3BD /* soundcache.cpp */; };
 		60CA3E62160713FF00CFB3BD /* soundclip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3CBE160713FF00CFB3BD /* soundclip.cpp */; };
 		60CA3E63160713FF00CFB3BD /* video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3CC1160713FF00CFB3BD /* video.cpp */; };
-		60CA3E64160713FF00CFB3BD /* acgfx_unused.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3CC5160713FF00CFB3BD /* acgfx_unused.cpp */; };
 		60CA3E67160713FF00CFB3BD /* agsplatformdriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3CCB160713FF00CFB3BD /* agsplatformdriver.cpp */; };
 		60CA3E6B160713FF00CFB3BD /* acplios.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3CD4160713FF00CFB3BD /* acplios.cpp */; };
 		60CA3E74160713FF00CFB3BD /* agsplugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3CE7160713FF00CFB3BD /* agsplugin.cpp */; };
@@ -353,6 +345,7 @@
 		119769CB1AB3589800048EE1 /* ios_ipad.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios_ipad.cfg; path = game/ios_ipad.cfg; sourceTree = "<group>"; };
 		119769CC1AB3589800048EE1 /* ios_iphone.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios_iphone.cfg; path = game/ios_iphone.cfg; sourceTree = "<group>"; };
 		119769CD1AB3589800048EE1 /* speech.vox */ = {isa = PBXFileReference; lastKnownFileType = file; name = speech.vox; path = game/speech.vox; sourceTree = "<group>"; };
+		143222322E0AF914008A1711 /* update.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = update.cpp; sourceTree = "<group>"; };
 		14FFC0521B0E17B000E719A4 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = IconResources/Images.xcassets; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D6058910D05DD3D006BFB54 /* BlackwellDeception.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BlackwellDeception.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -951,7 +944,6 @@
 		60CA3C96160713FF00CFB3BD /* minidump.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = minidump.cpp; sourceTree = "<group>"; };
 		60CA3C97160713FF00CFB3BD /* quit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = quit.cpp; sourceTree = "<group>"; };
 		60CA3C98160713FF00CFB3BD /* quit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = quit.h; sourceTree = "<group>"; };
-		60CA3C99160713FF00CFB3BD /* udpate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = udpate.cpp; sourceTree = "<group>"; };
 		60CA3C9A160713FF00CFB3BD /* update.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = update.h; sourceTree = "<group>"; };
 		60CA3CA2160713FF00CFB3BD /* ambientsound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ambientsound.cpp; sourceTree = "<group>"; };
 		60CA3CA3160713FF00CFB3BD /* ambientsound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ambientsound.h; sourceTree = "<group>"; };
@@ -2069,6 +2061,7 @@
 		60CA3C85160713FF00CFB3BD /* main */ = {
 			isa = PBXGroup;
 			children = (
+				143222322E0AF914008A1711 /* update.cpp */,
 				6007696A16E9F61600DCE88E /* version.h */,
 				6007696B16E9F61600DCE88E /* version.cpp */,
 				60CA3C86160713FF00CFB3BD /* config.cpp */,
@@ -2090,7 +2083,6 @@
 				60CA3C96160713FF00CFB3BD /* minidump.cpp */,
 				60CA3C97160713FF00CFB3BD /* quit.cpp */,
 				60CA3C98160713FF00CFB3BD /* quit.h */,
-				60CA3C99160713FF00CFB3BD /* udpate.cpp */,
 				60CA3C9A160713FF00CFB3BD /* update.h */,
 			);
 			path = main;
@@ -2365,11 +2357,9 @@
 				1D60589B0D05DD56006BFB54 /* main.mm in Sources */,
 				60CA3A66160713D300CFB3BD /* audiocliptype.cpp in Sources */,
 				60CA3A67160713D300CFB3BD /* common.cpp in Sources */,
-				60CA3A68160713D300CFB3BD /* customproperties.cpp in Sources */,
 				60CA3A69160713D300CFB3BD /* scriptaudioclip.cpp in Sources */,
 				60CA3A6A160713D300CFB3BD /* gamesetupstruct.cpp in Sources */,
 				60CA3A6B160713D300CFB3BD /* gamesetupstructbase.cpp in Sources */,
-				60CA3A6C160713D300CFB3BD /* interaction.cpp in Sources */,
 				60CA3A6D160713D300CFB3BD /* messageinfo.cpp in Sources */,
 				60CA3A6E160713D300CFB3BD /* mousecursor.cpp in Sources */,
 				60CA3A6F160713D300CFB3BD /* point.cpp in Sources */,
@@ -2378,7 +2368,6 @@
 				60CA3A72160713D300CFB3BD /* view.cpp in Sources */,
 				60CA3A73160713D300CFB3BD /* wordsdictionary.cpp in Sources */,
 				60CA3A74160713D300CFB3BD /* out.cpp in Sources */,
-				60CA3A75160713D300CFB3BD /* agsfontrenderer.cpp in Sources */,
 				60CA3A76160713D300CFB3BD /* fonts.cpp in Sources */,
 				60CA3A77160713D300CFB3BD /* ttffontrenderer.cpp in Sources */,
 				60CA3A78160713D300CFB3BD /* wfnfontrenderer.cpp in Sources */,
@@ -2544,12 +2533,10 @@
 				60CA3DB3160713FF00CFB3BD /* ali3dsw.cpp in Sources */,
 				60CA3DB4160713FF00CFB3BD /* blender.cpp in Sources */,
 				60CA3DB5160713FF00CFB3BD /* color_engine.cpp in Sources */,
-				60CA3DB6160713FF00CFB3BD /* gfxfilter.cpp in Sources */,
 				60CA3DB7160713FF00CFB3BD /* gfxfilter_aad3d.cpp in Sources */,
 				60CA3DB8160713FF00CFB3BD /* gfxfilter_allegro.cpp in Sources */,
 				60CA3DB9160713FF00CFB3BD /* gfxfilter_d3d.cpp in Sources */,
 				60CA3DBC160713FF00CFB3BD /* gfxfilter_scaling.cpp in Sources */,
-				60CA3DBD160713FF00CFB3BD /* gfxfilter_scalingallegro.cpp in Sources */,
 				60CA3DCE160713FF00CFB3BD /* animatingguibutton.cpp in Sources */,
 				60CA3DCF160713FF00CFB3BD /* cscidialog.cpp in Sources */,
 				60CA3DD0160713FF00CFB3BD /* guidialog.cpp in Sources */,
@@ -2578,6 +2565,7 @@
 				60CA3DF7160713FF00CFB3BD /* decode_4to1.c in Sources */,
 				60CA3DF8160713FF00CFB3BD /* layer1.c in Sources */,
 				60CA3DF9160713FF00CFB3BD /* layer2.c in Sources */,
+				143222332E0AF914008A1711 /* update.cpp in Sources */,
 				60CA3DFA160713FF00CFB3BD /* layer3.c in Sources */,
 				60CA3DFC160713FF00CFB3BD /* readers.c in Sources */,
 				60CA3DFD160713FF00CFB3BD /* tabinit.c in Sources */,
@@ -2600,7 +2588,6 @@
 				60CA3E4C160713FF00CFB3BD /* main.cpp in Sources */,
 				60CA3E4D160713FF00CFB3BD /* minidump.cpp in Sources */,
 				60CA3E4E160713FF00CFB3BD /* quit.cpp in Sources */,
-				60CA3E4F160713FF00CFB3BD /* udpate.cpp in Sources */,
 				60CA3E55160713FF00CFB3BD /* ambientsound.cpp in Sources */,
 				60CA3E56160713FF00CFB3BD /* audio.cpp in Sources */,
 				60CA3E57160713FF00CFB3BD /* clip_mydumbmod.cpp in Sources */,
@@ -2616,7 +2603,6 @@
 				60CA3E61160713FF00CFB3BD /* soundcache.cpp in Sources */,
 				60CA3E62160713FF00CFB3BD /* soundclip.cpp in Sources */,
 				60CA3E63160713FF00CFB3BD /* video.cpp in Sources */,
-				60CA3E64160713FF00CFB3BD /* acgfx_unused.cpp in Sources */,
 				60CA3E67160713FF00CFB3BD /* agsplatformdriver.cpp in Sources */,
 				60CA3E6B160713FF00CFB3BD /* acplios.cpp in Sources */,
 				60CA3E74160713FF00CFB3BD /* agsplugin.cpp in Sources */,
@@ -2644,8 +2630,6 @@
 				60898D94160779DB009E152F /* ags_snowrain.cpp in Sources */,
 				60898DA91607816F009E152F /* mpg123.c in Sources */,
 				60898DC416078501009E152F /* aaudio.c in Sources */,
-				60898DCA160785CB009E152F /* gfxfilter_hq2x.cpp in Sources */,
-				60898DCC160785DD009E152F /* gfxfilter_hq3x.cpp in Sources */,
 				60898DD6160787FF009E152F /* hq2x3x.cpp in Sources */,
 				6080428E1614DE8F00D33732 /* assetmanager.cpp in Sources */,
 				608B4E57163BF27B00547FAA /* libc.c in Sources */,
@@ -2684,13 +2668,14 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = 69P49K3LPW;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = BlackwellDeception_Prefix.pch;
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				INFOPLIST_FILE = "BlackwellDeception-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../nativelibs/fat/lib\"",
@@ -2719,11 +2704,12 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
+				DEVELOPMENT_TEAM = 69P49K3LPW;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = BlackwellDeception_Prefix.pch;
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				INFOPLIST_FILE = "BlackwellDeception-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../nativelibs/fat/lib\"",
