@@ -18,6 +18,9 @@
 		119769D01AB3589800048EE1 /* ios_ipad.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 119769CB1AB3589800048EE1 /* ios_ipad.cfg */; };
 		119769D11AB3589800048EE1 /* ios_iphone.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 119769CC1AB3589800048EE1 /* ios_iphone.cfg */; };
 		119769D21AB3589800048EE1 /* speech.vox in Resources */ = {isa = PBXBuildFile; fileRef = 119769CD1AB3589800048EE1 /* speech.vox */; };
+		1420CC1A2E2F091400C22679 /* geometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1420CC192E2F091400C22679 /* geometry.cpp */; };
+		1420CC1D2E2F097200C22679 /* engine_setup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1420CC1C2E2F097200C22679 /* engine_setup.cpp */; };
+		1420CC202E2F099F00C22679 /* scriptuserobject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1420CC1F2E2F099F00C22679 /* scriptuserobject.cpp */; };
 		143222332E0AF914008A1711 /* update.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 143222322E0AF914008A1711 /* update.cpp */; };
 		14FFC0531B0E17B000E719A4 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14FFC0521B0E17B000E719A4 /* Images.xcassets */; };
 		1D60589B0D05DD56006BFB54 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.mm */; };
@@ -345,6 +348,12 @@
 		119769CB1AB3589800048EE1 /* ios_ipad.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios_ipad.cfg; path = game/ios_ipad.cfg; sourceTree = "<group>"; };
 		119769CC1AB3589800048EE1 /* ios_iphone.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios_iphone.cfg; path = game/ios_iphone.cfg; sourceTree = "<group>"; };
 		119769CD1AB3589800048EE1 /* speech.vox */ = {isa = PBXFileReference; lastKnownFileType = file; name = speech.vox; path = game/speech.vox; sourceTree = "<group>"; };
+		1420CC182E2F091400C22679 /* geometry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = geometry.h; sourceTree = "<group>"; };
+		1420CC192E2F091400C22679 /* geometry.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = geometry.cpp; sourceTree = "<group>"; };
+		1420CC1B2E2F097200C22679 /* engine_setup.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = engine_setup.h; sourceTree = "<group>"; };
+		1420CC1C2E2F097200C22679 /* engine_setup.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = engine_setup.cpp; sourceTree = "<group>"; };
+		1420CC1E2E2F099F00C22679 /* scriptuserobject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = scriptuserobject.h; sourceTree = "<group>"; };
+		1420CC1F2E2F099F00C22679 /* scriptuserobject.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = scriptuserobject.cpp; sourceTree = "<group>"; };
 		143222322E0AF914008A1711 /* update.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = update.cpp; sourceTree = "<group>"; };
 		14FFC0521B0E17B000E719A4 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = IconResources/Images.xcassets; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -1515,6 +1524,8 @@
 		60CA3A46160713D300CFB3BD /* util */ = {
 			isa = PBXGroup;
 			children = (
+				1420CC182E2F091400C22679 /* geometry.h */,
+				1420CC192E2F091400C22679 /* geometry.cpp */,
 				600C369016C454C400D0CC4F /* stream.cpp */,
 				600C369116C454C400D0CC4F /* proxystream.h */,
 				600C369216C454C400D0CC4F /* proxystream.cpp */,
@@ -1789,6 +1800,8 @@
 		60CA3AC6160713FD00CFB3BD /* dynobj */ = {
 			isa = PBXGroup;
 			children = (
+				1420CC1E2E2F099F00C22679 /* scriptuserobject.h */,
+				1420CC1F2E2F099F00C22679 /* scriptuserobject.cpp */,
 				60CA3AC7160713FD00CFB3BD /* all_dynamicclasses.h */,
 				60CA3AC8160713FD00CFB3BD /* all_scriptclasses.h */,
 				60CA3AC9160713FD00CFB3BD /* cc_agsdynamicobject.cpp */,
@@ -2061,6 +2074,8 @@
 		60CA3C85160713FF00CFB3BD /* main */ = {
 			isa = PBXGroup;
 			children = (
+				1420CC1B2E2F097200C22679 /* engine_setup.h */,
+				1420CC1C2E2F097200C22679 /* engine_setup.cpp */,
 				143222322E0AF914008A1711 /* update.cpp */,
 				6007696A16E9F61600DCE88E /* version.h */,
 				6007696B16E9F61600DCE88E /* version.cpp */,
@@ -2463,6 +2478,7 @@
 				60CA3D67160713FF00CFB3BD /* global_invwindow.cpp in Sources */,
 				60CA3D68160713FF00CFB3BD /* global_label.cpp in Sources */,
 				60CA3D69160713FF00CFB3BD /* global_listbox.cpp in Sources */,
+				1420CC1A2E2F091400C22679 /* geometry.cpp in Sources */,
 				60CA3D6A160713FF00CFB3BD /* global_mouse.cpp in Sources */,
 				60CA3D6B160713FF00CFB3BD /* global_object.cpp in Sources */,
 				60CA3D6C160713FF00CFB3BD /* global_overlay.cpp in Sources */,
@@ -2564,10 +2580,12 @@
 				60CA3DF6160713FF00CFB3BD /* decode_2to1.c in Sources */,
 				60CA3DF7160713FF00CFB3BD /* decode_4to1.c in Sources */,
 				60CA3DF8160713FF00CFB3BD /* layer1.c in Sources */,
+				1420CC202E2F099F00C22679 /* scriptuserobject.cpp in Sources */,
 				60CA3DF9160713FF00CFB3BD /* layer2.c in Sources */,
 				143222332E0AF914008A1711 /* update.cpp in Sources */,
 				60CA3DFA160713FF00CFB3BD /* layer3.c in Sources */,
 				60CA3DFC160713FF00CFB3BD /* readers.c in Sources */,
+				1420CC1D2E2F097200C22679 /* engine_setup.cpp in Sources */,
 				60CA3DFD160713FF00CFB3BD /* tabinit.c in Sources */,
 				60CA3DFE160713FF00CFB3BD /* vbrhead.c in Sources */,
 				60CA3E00160713FF00CFB3BD /* getbits.c in Sources */,
