@@ -16,9 +16,9 @@ extern "C" volatile int ios_audio_must_restart;//jg
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
-    //self.window.rootViewController = self.viewController;
-    //self.window.rootViewController = self.viewController;
-    // [self.window makeKeyAndVisible];
+    self.window.rootViewController = self.viewController;
+    self.window.rootViewController = self.viewController;
+    [self.window makeKeyAndVisible];
     
     return YES;
 }
