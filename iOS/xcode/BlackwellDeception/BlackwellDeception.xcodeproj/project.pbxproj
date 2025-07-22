@@ -28,6 +28,10 @@
 		1420CC302E2F138000C22679 /* inifile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1420CC2F2E2F138000C22679 /* inifile.cpp */; };
 		1420CC332E2F14DB00C22679 /* mutifilelib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1420CC322E2F14DB00C22679 /* mutifilelib.cpp */; };
 		1420CC372E2F152C00C22679 /* gfxdriverfactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1420CC352E2F152C00C22679 /* gfxdriverfactory.cpp */; };
+		1420CC3B2E2F178C00C22679 /* gfxdriverbase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1420CC3A2E2F178C00C22679 /* gfxdriverbase.cpp */; };
+		1420CC442E2F180800C22679 /* gfxfilter_hqx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1420CC402E2F180800C22679 /* gfxfilter_hqx.cpp */; };
+		1420CC452E2F180800C22679 /* gfxfilter_ogl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1420CC422E2F180800C22679 /* gfxfilter_ogl.cpp */; };
+		1420CC482E2F183800C22679 /* wfnfont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1420CC472E2F183800C22679 /* wfnfont.cpp */; };
 		143222332E0AF914008A1711 /* update.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 143222322E0AF914008A1711 /* update.cpp */; };
 		14FFC0531B0E17B000E719A4 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14FFC0521B0E17B000E719A4 /* Images.xcassets */; };
 		1D60589B0D05DD56006BFB54 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.mm */; };
@@ -376,6 +380,19 @@
 		1420CC342E2F152C00C22679 /* gfxdriverfactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gfxdriverfactory.h; sourceTree = "<group>"; };
 		1420CC352E2F152C00C22679 /* gfxdriverfactory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = gfxdriverfactory.cpp; sourceTree = "<group>"; };
 		1420CC362E2F152C00C22679 /* gfxdriverfactorybase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gfxdriverfactorybase.h; sourceTree = "<group>"; };
+		1420CC382E2F178C00C22679 /* gfxdefines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gfxdefines.h; sourceTree = "<group>"; };
+		1420CC392E2F178C00C22679 /* gfxdriverbase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gfxdriverbase.h; sourceTree = "<group>"; };
+		1420CC3A2E2F178C00C22679 /* gfxdriverbase.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = gfxdriverbase.cpp; sourceTree = "<group>"; };
+		1420CC3C2E2F17C100C22679 /* ali3dexception.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ali3dexception.h; sourceTree = "<group>"; };
+		1420CC3D2E2F17C100C22679 /* ali3dogl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ali3dogl.h; sourceTree = "<group>"; };
+		1420CC3E2E2F17C100C22679 /* ali3dsw.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ali3dsw.h; sourceTree = "<group>"; };
+		1420CC3F2E2F180800C22679 /* gfxfilter_hqx.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gfxfilter_hqx.h; sourceTree = "<group>"; };
+		1420CC402E2F180800C22679 /* gfxfilter_hqx.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = gfxfilter_hqx.cpp; sourceTree = "<group>"; };
+		1420CC412E2F180800C22679 /* gfxfilter_ogl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gfxfilter_ogl.h; sourceTree = "<group>"; };
+		1420CC422E2F180800C22679 /* gfxfilter_ogl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = gfxfilter_ogl.cpp; sourceTree = "<group>"; };
+		1420CC432E2F180800C22679 /* gfxmodelist.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gfxmodelist.h; sourceTree = "<group>"; };
+		1420CC462E2F183800C22679 /* wfnfont.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = wfnfont.h; sourceTree = "<group>"; };
+		1420CC472E2F183800C22679 /* wfnfont.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = wfnfont.cpp; sourceTree = "<group>"; };
 		143222322E0AF914008A1711 /* update.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = update.cpp; sourceTree = "<group>"; };
 		14FFC0521B0E17B000E719A4 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = IconResources/Images.xcassets; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -487,7 +504,6 @@
 		60CA39D4160713D200CFB3BD /* out.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = out.cpp; sourceTree = "<group>"; };
 		60CA39D5160713D200CFB3BD /* out.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = out.h; sourceTree = "<group>"; };
 		60CA39D6160713D200CFB3BD /* outputtarget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = outputtarget.h; sourceTree = "<group>"; };
-		60CA39D8160713D200CFB3BD /* agsfontrenderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = agsfontrenderer.cpp; sourceTree = "<group>"; };
 		60CA39D9160713D200CFB3BD /* agsfontrenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = agsfontrenderer.h; sourceTree = "<group>"; };
 		60CA39DA160713D200CFB3BD /* fonts.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fonts.cpp; sourceTree = "<group>"; };
 		60CA39DB160713D200CFB3BD /* fonts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fonts.h; sourceTree = "<group>"; };
@@ -1390,7 +1406,8 @@
 		60CA39D7160713D200CFB3BD /* font */ = {
 			isa = PBXGroup;
 			children = (
-				60CA39D8160713D200CFB3BD /* agsfontrenderer.cpp */,
+				1420CC462E2F183800C22679 /* wfnfont.h */,
+				1420CC472E2F183800C22679 /* wfnfont.cpp */,
 				60CA39D9160713D200CFB3BD /* agsfontrenderer.h */,
 				60CA39DA160713D200CFB3BD /* fonts.cpp */,
 				60CA39DB160713D200CFB3BD /* fonts.h */,
@@ -1931,6 +1948,17 @@
 		60CA3BBD160713FE00CFB3BD /* gfx */ = {
 			isa = PBXGroup;
 			children = (
+				1420CC3F2E2F180800C22679 /* gfxfilter_hqx.h */,
+				1420CC402E2F180800C22679 /* gfxfilter_hqx.cpp */,
+				1420CC412E2F180800C22679 /* gfxfilter_ogl.h */,
+				1420CC422E2F180800C22679 /* gfxfilter_ogl.cpp */,
+				1420CC432E2F180800C22679 /* gfxmodelist.h */,
+				1420CC3C2E2F17C100C22679 /* ali3dexception.h */,
+				1420CC3D2E2F17C100C22679 /* ali3dogl.h */,
+				1420CC3E2E2F17C100C22679 /* ali3dsw.h */,
+				1420CC382E2F178C00C22679 /* gfxdefines.h */,
+				1420CC392E2F178C00C22679 /* gfxdriverbase.h */,
+				1420CC3A2E2F178C00C22679 /* gfxdriverbase.cpp */,
 				1420CC342E2F152C00C22679 /* gfxdriverfactory.h */,
 				1420CC352E2F152C00C22679 /* gfxdriverfactory.cpp */,
 				1420CC362E2F152C00C22679 /* gfxdriverfactorybase.h */,
@@ -2510,6 +2538,7 @@
 				60CA3D74160713FF00CFB3BD /* global_string.cpp in Sources */,
 				60CA3D75160713FF00CFB3BD /* global_textbox.cpp in Sources */,
 				60CA3D76160713FF00CFB3BD /* global_timer.cpp in Sources */,
+				1420CC482E2F183800C22679 /* wfnfont.cpp in Sources */,
 				60CA3D77160713FF00CFB3BD /* global_translation.cpp in Sources */,
 				60CA3D78160713FF00CFB3BD /* global_video.cpp in Sources */,
 				60CA3D79160713FF00CFB3BD /* global_viewframe.cpp in Sources */,
@@ -2602,6 +2631,7 @@
 				60CA3DF8160713FF00CFB3BD /* layer1.c in Sources */,
 				1420CC202E2F099F00C22679 /* scriptuserobject.cpp in Sources */,
 				60CA3DF9160713FF00CFB3BD /* layer2.c in Sources */,
+				1420CC3B2E2F178C00C22679 /* gfxdriverbase.cpp in Sources */,
 				143222332E0AF914008A1711 /* update.cpp in Sources */,
 				60CA3DFA160713FF00CFB3BD /* layer3.c in Sources */,
 				60CA3DFC160713FF00CFB3BD /* readers.c in Sources */,
@@ -2688,6 +2718,8 @@
 				600C369416C454C400D0CC4F /* proxystream.cpp in Sources */,
 				6007696216E9F56E00DCE88E /* test_version.cpp in Sources */,
 				6007696416E9F57A00DCE88E /* test_sprintf.cpp in Sources */,
+				1420CC442E2F180800C22679 /* gfxfilter_hqx.cpp in Sources */,
+				1420CC452E2F180800C22679 /* gfxfilter_ogl.cpp in Sources */,
 				6007696C16E9F61600DCE88E /* version.cpp in Sources */,
 				608D787C176B82D300E48976 /* speech.cpp in Sources */,
 				608D788B176B832C00E48976 /* gfx_util.cpp in Sources */,
