@@ -2740,6 +2740,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 100;
 				DEVELOPMENT_TEAM = 69P49K3LPW;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -2747,6 +2748,8 @@
 				GCC_PREFIX_HEADER = BlackwellDeception_Prefix.pch;
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				INFOPLIST_FILE = "BlackwellDeception-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Blackwell 4: Deception";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.adventure-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2755,6 +2758,7 @@
 					"\"$(SRCROOT)/../../../Plugins/agslua/agslua/zlib\"",
 					"\"$(SRCROOT)/../../../iOS/nativelibs/fat/lib\"",
 				);
+				MARKETING_VERSION = 1.1;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_NAME = BlackwellDeception;
@@ -2776,11 +2780,14 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
+				CURRENT_PROJECT_VERSION = 100;
 				DEVELOPMENT_TEAM = 69P49K3LPW;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = BlackwellDeception_Prefix.pch;
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				INFOPLIST_FILE = "BlackwellDeception-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Blackwell 4: Deception";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.adventure-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2789,6 +2796,7 @@
 					"\"$(SRCROOT)/../../../Plugins/agslua/agslua/zlib\"",
 					"\"$(SRCROOT)/../../../iOS/nativelibs/fat/lib\"",
 				);
+				MARKETING_VERSION = 1.1;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = BlackwellDeception;
 				PROVISIONING_PROFILE = "";
