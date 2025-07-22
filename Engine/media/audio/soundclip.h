@@ -126,7 +126,7 @@ struct SOUNDCLIP
     virtual void adjust_volume() = 0;
 
     SOUNDCLIP();
-    ~SOUNDCLIP();
+    virtual ~SOUNDCLIP();
 
 protected:
     inline int get_final_volume() const
