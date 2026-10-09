@@ -313,7 +313,6 @@
 		60CA3E61160713FF00CFB3BD /* soundcache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3CBC160713FF00CFB3BD /* soundcache.cpp */; };
 		60CA3E62160713FF00CFB3BD /* soundclip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3CBE160713FF00CFB3BD /* soundclip.cpp */; };
 		60CA3E63160713FF00CFB3BD /* video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3CC1160713FF00CFB3BD /* video.cpp */; };
-		60CA3E64160713FF00CFB3BD /* acgfx_unused.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3CC5160713FF00CFB3BD /* acgfx_unused.cpp */; };
 		60CA3E67160713FF00CFB3BD /* agsplatformdriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3CCB160713FF00CFB3BD /* agsplatformdriver.cpp */; };
 		60CA3E6B160713FF00CFB3BD /* acplios.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3CD4160713FF00CFB3BD /* acplios.cpp */; };
 		60CA3E74160713FF00CFB3BD /* agsplugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CA3CE7160713FF00CFB3BD /* agsplugin.cpp */; };
@@ -986,7 +985,6 @@
 		60CA3CC1160713FF00CFB3BD /* video.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = video.cpp; sourceTree = "<group>"; };
 		60CA3CC2160713FF00CFB3BD /* video.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = video.h; sourceTree = "<group>"; };
 		60CA3CC3160713FF00CFB3BD /* VMR9Graph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VMR9Graph.h; sourceTree = "<group>"; };
-		60CA3CC5160713FF00CFB3BD /* acgfx_unused.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = acgfx_unused.cpp; sourceTree = "<group>"; };
 		60CA3CCB160713FF00CFB3BD /* agsplatformdriver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = agsplatformdriver.cpp; sourceTree = "<group>"; };
 		60CA3CCC160713FF00CFB3BD /* agsplatformdriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = agsplatformdriver.h; sourceTree = "<group>"; };
 		60CA3CCD160713FF00CFB3BD /* override_defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = override_defines.h; sourceTree = "<group>"; };
@@ -2155,7 +2153,6 @@
 		60CA3CC4160713FF00CFB3BD /* obsolete */ = {
 			isa = PBXGroup;
 			children = (
-				60CA3CC5160713FF00CFB3BD /* acgfx_unused.cpp */,
 			);
 			path = obsolete;
 			sourceTree = "<group>";
@@ -2617,7 +2614,6 @@
 				60CA3E61160713FF00CFB3BD /* soundcache.cpp in Sources */,
 				60CA3E62160713FF00CFB3BD /* soundclip.cpp in Sources */,
 				60CA3E63160713FF00CFB3BD /* video.cpp in Sources */,
-				60CA3E64160713FF00CFB3BD /* acgfx_unused.cpp in Sources */,
 				60CA3E67160713FF00CFB3BD /* agsplatformdriver.cpp in Sources */,
 				60CA3E6B160713FF00CFB3BD /* acplios.cpp in Sources */,
 				60CA3E74160713FF00CFB3BD /* agsplugin.cpp in Sources */,
@@ -2685,12 +2681,14 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer: David Gilbert (V72VMZY53F)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: David Gilbert (V72VMZY53F)";
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 2.1.0;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = BlackwellConvergence_Prefix.pch;
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				INFOPLIST_FILE = "BlackwellConvergence-Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
 				IPHONEOS_DEPLOYMENT_TARGET = "$(RECOMMENDED_IPHONEOS_DEPLOYMENT_TARGET)";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2699,6 +2697,7 @@
 					"\"$(SRCROOT)/../../../Plugins/agslua/agslua/zlib\"",
 					"\"$(SRCROOT)/../../../iOS/nativelibs/fat/lib\"",
 				);
+				MARKETING_VERSION = 2.1.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.wadjeteyegames.Blackwell-Convergence";
@@ -2720,10 +2719,12 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution: WADJET EYE GAMES, LLC";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: WADJET EYE GAMES, LLC";
 				COPY_PHASE_STRIP = YES;
+				CURRENT_PROJECT_VERSION = 2.1.0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = BlackwellConvergence_Prefix.pch;
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				INFOPLIST_FILE = "BlackwellConvergence-Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
 				IPHONEOS_DEPLOYMENT_TARGET = "$(RECOMMENDED_IPHONEOS_DEPLOYMENT_TARGET)";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2732,6 +2733,7 @@
 					"\"$(SRCROOT)/../../../Plugins/agslua/agslua/zlib\"",
 					"\"$(SRCROOT)/../../../iOS/nativelibs/fat/lib\"",
 				);
+				MARKETING_VERSION = 2.1.0;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.wadjeteyegames.Blackwell-Convergence";
 				PRODUCT_NAME = BlackwellConvergence;
