@@ -2380,7 +2380,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 2660;
+				LastUpgradeCheck = 2700;
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "BlackwellUnbound" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -2774,14 +2774,16 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1.8.0;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = BlackwellUnbound_Prefix.pch;
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				INFOPLIST_FILE = "BlackwellUnbound-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Blackwell 2: Unbound";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = "$(RECOMMENDED_IPHONEOS_DEPLOYMENT_TARGET)";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../nativelibs/fat/lib\"",
@@ -2789,6 +2791,7 @@
 					"\"$(SRCROOT)/../../../Plugins/agslua/agslua/zlib\"",
 					"\"$(SRCROOT)/../../../iOS/nativelibs/fat/lib\"",
 				);
+				MARKETING_VERSION = 1.2.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.wadjeteyegames.Blackwell-Unbound";
@@ -2811,12 +2814,14 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = YES;
+				CURRENT_PROJECT_VERSION = 1.8.0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = BlackwellUnbound_Prefix.pch;
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				INFOPLIST_FILE = "BlackwellUnbound-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Blackwell 2: Unbound";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = "$(RECOMMENDED_IPHONEOS_DEPLOYMENT_TARGET)";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../nativelibs/fat/lib\"",
@@ -2824,6 +2829,7 @@
 					"\"$(SRCROOT)/../../../Plugins/agslua/agslua/zlib\"",
 					"\"$(SRCROOT)/../../../iOS/nativelibs/fat/lib\"",
 				);
+				MARKETING_VERSION = 1.2.0;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.wadjeteyegames.Blackwell-Unbound";
 				PRODUCT_NAME = BlackwellUnbound;
