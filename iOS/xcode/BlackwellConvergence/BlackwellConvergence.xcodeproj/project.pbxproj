@@ -36,6 +36,8 @@
 		14DEB16230797F4B00C2DAC2 /* ini_util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 14DEB15A30797F4B00C2DAC2 /* ini_util.cpp */; };
 		14DEB16330797F4B00C2DAC2 /* geometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 14DEB15830797F4B00C2DAC2 /* geometry.cpp */; };
 		14DEB16430797F4B00C2DAC2 /* inifile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 14DEB15C30797F4B00C2DAC2 /* inifile.cpp */; };
+		14DEB16A3079828F00C2DAC2 /* interactions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 14DEB1683079828F00C2DAC2 /* interactions.cpp */; };
+		14DEB16B3079828F00C2DAC2 /* customproperties.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 14DEB1663079828F00C2DAC2 /* customproperties.cpp */; };
 		14FFC0531B0E17B000E719A4 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14FFC0521B0E17B000E719A4 /* Images.xcassets */; };
 		1D60589B0D05DD56006BFB54 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.mm */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
@@ -405,6 +407,10 @@
 		14DEB15E30797F4B00C2DAC2 /* multifilelib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = multifilelib.h; sourceTree = "<group>"; };
 		14DEB15F30797F4B00C2DAC2 /* mutifilelib.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = mutifilelib.cpp; sourceTree = "<group>"; };
 		14DEB16030797F4B00C2DAC2 /* string_types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = string_types.h; sourceTree = "<group>"; };
+		14DEB1653079828F00C2DAC2 /* customproperties.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = customproperties.h; sourceTree = "<group>"; };
+		14DEB1663079828F00C2DAC2 /* customproperties.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = customproperties.cpp; sourceTree = "<group>"; };
+		14DEB1673079828F00C2DAC2 /* interactions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = interactions.h; sourceTree = "<group>"; };
+		14DEB1683079828F00C2DAC2 /* interactions.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = interactions.cpp; sourceTree = "<group>"; };
 		14FFC0521B0E17B000E719A4 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = IconResources/Images.xcassets; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D6058910D05DD3D006BFB54 /* BlackwellConvergence.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BlackwellConvergence.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1117,6 +1123,17 @@
 			name = AGSWadjetUtil;
 			sourceTree = "<group>";
 		};
+		14DEB1693079828F00C2DAC2 /* game */ = {
+			isa = PBXGroup;
+			children = (
+				14DEB1653079828F00C2DAC2 /* customproperties.h */,
+				14DEB1663079828F00C2DAC2 /* customproperties.cpp */,
+				14DEB1673079828F00C2DAC2 /* interactions.h */,
+				14DEB1683079828F00C2DAC2 /* interactions.cpp */,
+			);
+			path = game;
+			sourceTree = "<group>";
+		};
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -1304,6 +1321,7 @@
 		60CA39A8160713D200CFB3BD /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				14DEB1693079828F00C2DAC2 /* game */,
 				60CA39A9160713D200CFB3BD /* ac */,
 				60CA39D0160713D200CFB3BD /* core */,
 				60CA39D2160713D200CFB3BD /* debug */,
@@ -2618,6 +2636,8 @@
 				60CA3DD8160713FF00CFB3BD /* alfont.c in Sources */,
 				60CA3DE5160713FF00CFB3BD /* almp3.c in Sources */,
 				60CA3DE6160713FF00CFB3BD /* common.c in Sources */,
+				14DEB16A3079828F00C2DAC2 /* interactions.cpp in Sources */,
+				14DEB16B3079828F00C2DAC2 /* customproperties.cpp in Sources */,
 				60CA3DE7160713FF00CFB3BD /* dct64_i386.c in Sources */,
 				60CA3DE8160713FF00CFB3BD /* decode_i386.c in Sources */,
 				60CA3DE9160713FF00CFB3BD /* interface.c in Sources */,
