@@ -38,6 +38,7 @@
 		14DEB16430797F4B00C2DAC2 /* inifile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 14DEB15C30797F4B00C2DAC2 /* inifile.cpp */; };
 		14DEB16A3079828F00C2DAC2 /* interactions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 14DEB1683079828F00C2DAC2 /* interactions.cpp */; };
 		14DEB16B3079828F00C2DAC2 /* customproperties.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 14DEB1663079828F00C2DAC2 /* customproperties.cpp */; };
+		14FBB2E8307D7511003F0F49 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 14FBB2E7307D7511003F0F49 /* Launch Screen.storyboard */; };
 		14FFC0531B0E17B000E719A4 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14FFC0521B0E17B000E719A4 /* Images.xcassets */; };
 		1D60589B0D05DD56006BFB54 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.mm */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
@@ -411,6 +412,7 @@
 		14DEB1663079828F00C2DAC2 /* customproperties.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = customproperties.cpp; sourceTree = "<group>"; };
 		14DEB1673079828F00C2DAC2 /* interactions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = interactions.h; sourceTree = "<group>"; };
 		14DEB1683079828F00C2DAC2 /* interactions.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = interactions.cpp; sourceTree = "<group>"; };
+		14FBB2E7307D7511003F0F49 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		14FFC0521B0E17B000E719A4 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = IconResources/Images.xcassets; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D6058910D05DD3D006BFB54 /* BlackwellConvergence.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BlackwellConvergence.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1145,6 +1147,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				14FBB2E7307D7511003F0F49 /* Launch Screen.storyboard */,
 				60898C2B160779D9009E152F /* Plugins */,
 				60CA3AA7160713FD00CFB3BD /* Engine */,
 				60CA39A8160713D200CFB3BD /* Common */,
@@ -2400,6 +2403,7 @@
 				119769D21AB3589800048EE1 /* speech.vox in Resources */,
 				119769CF1AB3589800048EE1 /* audio.vox in Resources */,
 				119769D11AB3589800048EE1 /* ios_iphone.cfg in Resources */,
+				14FBB2E8307D7511003F0F49 /* Launch Screen.storyboard in Resources */,
 				60844EAD1573943400003ED0 /* MainWindow-iPad.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2755,7 +2759,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -2796,12 +2799,12 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: WADJET EYE GAMES, LLC";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: WADJET EYE GAMES, LLC";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = YES;
 				CURRENT_PROJECT_VERSION = 2.1.0;
+				DEVELOPMENT_TEAM = 69P49K3LPW;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = BlackwellConvergence_Prefix.pch;
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
@@ -2821,6 +2824,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.wadjeteyegames.Blackwell-Convergence";
 				PRODUCT_NAME = BlackwellConvergence;
 				PROVISIONING_PROFILE = "8c088ef4-aead-47cb-9367-5615369abde7";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -2850,8 +2854,8 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: David Gilbert (V72VMZY53F)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: David Gilbert (V72VMZY53F)";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -2884,6 +2888,7 @@
 				LIBRARY_SEARCH_PATHS = "${SOURCE_ROOT}/../../nativelibs/fat/lib";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CODE_SIGN_FLAGS = "";
+				"OTHER_CODE_SIGN_FLAGS[sdk=*]" = "";
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PROVISIONING_PROFILE = None;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = None;
@@ -2923,8 +2928,8 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: WADJET EYE GAMES, LLC";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: WADJET EYE GAMES, LLC";
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
@@ -2953,6 +2958,7 @@
 				LIBRARY_SEARCH_PATHS = "${SOURCE_ROOT}/../../nativelibs/fat/lib";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				"OTHER_CODE_SIGN_FLAGS[sdk=*]" = "";
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PROVISIONING_PROFILE = "8c088ef4-aead-47cb-9367-5615369abde7";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "8c088ef4-aead-47cb-9367-5615369abde7";
