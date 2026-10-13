@@ -11,11 +11,11 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
+    /*[[UIApplication sharedApplication] setIdleTimerDisabled:YES];
     self.window.rootViewController = self.viewController;
     self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
-    
+    */
     return YES;
 }
 

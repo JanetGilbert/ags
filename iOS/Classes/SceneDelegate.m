@@ -9,6 +9,13 @@ extern volatile int ios_audio_must_restart;
 
 #import "SceneDelegate.h"
 #import "agsViewController.h"
+#import "agsAppDelegate.h"
+
+@interface NibOwner : NSObject
+@property (strong) id delegate;
+@end
+@implementation NibOwner
+@end
 
 @implementation SceneDelegate
 
@@ -16,17 +23,17 @@ volatile int is_in_foreground = 1;
 volatile int drawing_in_progress = 0;
 
 
-- (void)scene:(UIScene *)scene willConnectToSession:(UISceneSession *)session
-    options:(UISceneConnectionOptions *) connectionOptions {
-    if ([scene isKindOfClass:[UIWindowScene class]]) {
-            UIWindowScene *windowScene = (UIWindowScene *)scene;
-            self.window = [[UIWindow alloc] initWithWindowScene:windowScene];
-            
-            agsViewController *rootVC = [[agsViewController alloc] init];
-            self.window.rootViewController = rootVC;
-            [self.window makeKeyAndVisible];
-        }
-    }
+- (void)scene:(UIScene *)scene willConnectToSession:(UISceneSession *)session options:(UISceneConnectionOptions *)opts {
+    NibOwner *o = [NibOwner new];
+    NSString *nib = (UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad) ? @"MainWindow-iPad" : @"MainWindow";
+    [[NSBundle mainBundle] loadNibNamed:nib owner:o options:nil];
+
+    agsAppDelegate *ad = (agsAppDelegate *)UIApplication.sharedApplication.delegate;
+    ad.window = [o.delegate window];
+    self.window = ad.window;
+    self.window.windowScene = (UIWindowScene *)scene;
+    [self.window makeKeyAndVisible];
+}
 
 
 - (void)sceneDidBecomeActive:(UIScene *)scene {
