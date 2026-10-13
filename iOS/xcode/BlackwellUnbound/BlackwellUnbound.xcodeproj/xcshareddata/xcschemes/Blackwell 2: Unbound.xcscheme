@@ -16,8 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
-               BuildableName = "BlackwellUnbound.app"
-               BlueprintName = "BlackwellUnbound"
+               BuildableName = "Blackwell 2: Unbound.app"
                ReferencedContainer = "container:BlackwellUnbound.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -46,8 +45,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
-            BuildableName = "BlackwellUnbound.app"
-            BlueprintName = "BlackwellUnbound"
+            BuildableName = "Blackwell 2: Unbound.app"
             ReferencedContainer = "container:BlackwellUnbound.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -63,8 +61,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
-            BuildableName = "BlackwellUnbound.app"
-            BlueprintName = "BlackwellUnbound"
+            BuildableName = "Blackwell 2: Unbound.app"
             ReferencedContainer = "container:BlackwellUnbound.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

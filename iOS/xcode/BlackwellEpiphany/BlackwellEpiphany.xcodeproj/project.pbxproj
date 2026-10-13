@@ -38,6 +38,7 @@
 		14DEB1AE307989B100C2DAC2 /* inifile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 14DEB1A8307989B100C2DAC2 /* inifile.cpp */; };
 		14DEB1AF307989B100C2DAC2 /* mutifilelib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 14DEB1AB307989B100C2DAC2 /* mutifilelib.cpp */; };
 		14DEB1B0307989B100C2DAC2 /* geometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 14DEB1A4307989B100C2DAC2 /* geometry.cpp */; };
+		14FBB2EA307D8F62003F0F49 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 14FBB2E9307D8F62003F0F49 /* Launch Screen.storyboard */; };
 		14FFC0531B0E17B000E719A4 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14FFC0521B0E17B000E719A4 /* Images.xcassets */; };
 		1D60589B0D05DD56006BFB54 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.mm */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
@@ -412,6 +413,7 @@
 		14DEB1AA307989B100C2DAC2 /* multifilelib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = multifilelib.h; sourceTree = "<group>"; };
 		14DEB1AB307989B100C2DAC2 /* mutifilelib.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = mutifilelib.cpp; sourceTree = "<group>"; };
 		14DEB1AC307989B100C2DAC2 /* string_types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = string_types.h; sourceTree = "<group>"; };
+		14FBB2E9307D8F62003F0F49 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		14FFC0521B0E17B000E719A4 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = IconResources/Images.xcassets; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D6058910D05DD3D006BFB54 /* BlackwellEpiphany.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BlackwellEpiphany.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1147,6 +1149,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				14FBB2E9307D8F62003F0F49 /* Launch Screen.storyboard */,
 				60898C2B160779D9009E152F /* Plugins */,
 				60CA3AA7160713FD00CFB3BD /* Engine */,
 				60CA39A8160713D200CFB3BD /* Common */,
@@ -2396,6 +2399,7 @@
 				119769D21AB3589800048EE1 /* speech.vox in Resources */,
 				119769CF1AB3589800048EE1 /* audio.vox in Resources */,
 				119769D11AB3589800048EE1 /* ios_iphone.cfg in Resources */,
+				14FBB2EA307D8F62003F0F49 /* Launch Screen.storyboard in Resources */,
 				60844EAD1573943400003ED0 /* MainWindow-iPad.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2751,10 +2755,9 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1.1.0;
 				DEVELOPMENT_TEAM = 69P49K3LPW;
@@ -2780,6 +2783,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.wadjeteyegames.Blackwell-Epiphany";
 				PRODUCT_NAME = BlackwellEpiphany;
 				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 armv7";
@@ -2791,10 +2795,9 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_IDENTITY = "Apple Development: David Gilbert (U86AFQ35Q6)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: David Gilbert (U86AFQ35Q6)";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = YES;
 				CURRENT_PROJECT_VERSION = 1.1.0;
 				DEVELOPMENT_TEAM = 69P49K3LPW;
@@ -2817,6 +2820,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.wadjeteyegames.Blackwell-Epiphany";
 				PRODUCT_NAME = BlackwellEpiphany;
 				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
