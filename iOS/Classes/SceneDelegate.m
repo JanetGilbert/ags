@@ -26,15 +26,28 @@ volatile int drawing_in_progress = 0;
 - (void)scene:(UIScene *)scene willConnectToSession:(UISceneSession *)session options:(UISceneConnectionOptions *)opts {
     NibOwner *o = [NibOwner new];
     NSString *nib = (UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad) ? @"MainWindow-iPad" : @"MainWindow";
-    [[NSBundle mainBundle] loadNibNamed:nib owner:o options:nil];
+    NSArray *objects = [[NSBundle mainBundle] loadNibNamed:nib owner:o options:nil];
+
+    agsViewController *vc = nil;
+    UIWindow *win = nil;
+    for (id obj in objects) {
+        if ([obj isKindOfClass:[agsViewController class]]) vc = obj;
+        if ([obj isKindOfClass:[UIWindow class]]) win = obj;
+    }
+
+    win.windowScene = (UIWindowScene *)scene;
+    win.frame = ((UIWindowScene *)scene).coordinateSpace.bounds;
+    win.rootViewController = vc;
 
     agsAppDelegate *ad = (agsAppDelegate *)UIApplication.sharedApplication.delegate;
-    ad.window = [o.delegate window];
-    self.window = ad.window;
-    self.window.windowScene = (UIWindowScene *)scene;
+    ad.viewController = vc;
+    ad.window = win;
+
+    [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
+
+    self.window = win;
     [self.window makeKeyAndVisible];
 }
-
 
 - (void)sceneDidBecomeActive:(UIScene *)scene {
     // Migrated from applicationDidBecomeActive:
