@@ -1,0 +1,116 @@
+Remove all red files from tree
+Remove udpate.cpp from Build Phases/Compile Sources and add update.cpp there and to engine/main in the tree
+Then go into the tree and right click on all folders and add all un-added files (except googletest).
+Don't forget common/game which is entirely missing
+Disable midi in cfg files
+Set the build numbers in the general tab: Version is the marketing version, and Build is the project version
+In Info.plist, replace Bundle version string with $(MARKETING_VERSION) [Version] and Bundle version with $(CURRENT_PROJECT_VERSION).[Build] (build can be increased with new builds if old ones are rejected without the player's version changing)
+Set the icons in Images.xcassets to single size and add one 1024x1024 icon to the bar at the right (opened with the Attributes inspector, command-option-4)
+Add Display name in general page
+Place audio.vox, speeech.vox and exe (renamed ac2game.dat) into game folder
+Create a new Scheme and run
+Update Provisioning profiles
+In Signing and Capabilities select to automatically manage signing and select Wadjet eye games
+Then In Build settings set Debug to Apple Development and Release to Wadjet Eye Games
+
+
+Convergence and unbound are 320x240 and epiphany is 640x400
+
+iphone screenshot size
+1206 × 2622 (1179 × 2556 also accepted)
+iPhone 17 or 17 Pro
+
+ipad screenshot size
+2064 × 2752 (2048 × 2732 also accepted)
+iPad Pro 13" (M4/M5)
+
+
+AI generated complete checklist
+--------------------------------
+
+Checklist for updating each game:
+
+1. Version numbers
+
+Info tab: set Bundle version string (short) to $(MARKETING_VERSION)
+Info tab: set Bundle version to $(CURRENT_PROJECT_VERSION)
+General tab: enter Version and Build.
+
+2. App icon
+
+In Images.xcassets, select AppIcon. In the Attributes inspector, set iOS to Single Size.
+Drag in a 1024×1024 PNG: no transparency, square corners.
+Delete the unassigned old icon images.
+Info tab: delete Icon files (iOS 5) and CFBundleIcons~ipad.
+
+3. Launch image into a regular image set
+
+In Images.xcassets, add a new Image Set named Launch.
+Drag the largest landscape image from the old LaunchImage set into its 2x slot.
+Delete the LaunchImage set.
+Build Settings: search launch image and clear Asset Catalog Launch Image Set Name.
+
+4. Launch screen storyboard
+
+File → New → File from Template → Launch Screen, saved as Launch Screen.storyboard.
+In the storyboard, delete the two labels.
+View → Show Library, then drag an Image View in.
+Select the slider image in the bar to the right then under the Image dropdown select the Launch image
+
+5. Info.plist keys (Info tab → right-click → Add Row, add  "Requires full screen", yes
+and "Launch screen interface base file name" "Launch Screen"
+
+IOS 27 compatibility
+---------------------
+
+From Info plist
+delete Icon files (iOS 5) and CFBundleIcons~ipad
+
+Launch screen interface file base name = Launch Screen
+Requires full screen = YES
+
+
+Add Application Scene manifest:
+	Enable Multiple scenes NO
+	Scene Configuration
+		Windows application session role
+			Item 0:
+				Delegate Class Name: SceneDelegate
+				Configuration Name: Default configuration
+				(delete others)
+				
+XIB files:
+	MainWindow.xib
+	MainWindow-iPad.xib
+	- remove doubled agsAppDelegate
+	
+Copy over main.mm
+
+Add SceneDelegate.h/m to Classes
+	
+Prompt to remove app delegate duplicate from xib files
+-----------------------------------------------------------------------
+	
+Attached are old Interface Builder 3 .xib files (pre-2011 XML archive format, which
+current Xcode can't open). Remove the app delegate object from each one by editing
+the XML directly, and send the edited files back.
+
+In each file:
+1. Find the delegate's object number: in flattenedProperties, the "N.CustomClassName"
+   key whose value is the delegate class (e.g. agsAppDelegate). N is the object number.
+2. Find its internal id: the IBObjectRecord with objectID N gives it in
+   <reference key="object" ref="ID"/>.
+3. Delete:
+   - the <object class="IBUICustomObject" id="ID"> block in IBDocument.RootObjects
+   - every IBConnectionRecord whose source or destination ref is ID
+   - the IBObjectRecord with objectID N
+   - every "N.*" key in flattenedProperties' dict.sortedKeys AND its matching entry
+     at the same position in dict.values (the lists must stay the same length)
+4. Leave the IBDocument.Classes class descriptions alone.
+5. Verify: the file parses as XML, ID no longer appears anywhere, and sortedKeys and
+   values have equal counts. Show me the diff.
+
+Afterwards, main.m must pass NSStringFromClass([MyAppDelegate class]) as the last
+argument of UIApplicationMain, since the xib no longer creates the delegate.
+	
+
