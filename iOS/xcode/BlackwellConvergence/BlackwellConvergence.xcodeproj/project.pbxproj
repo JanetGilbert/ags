@@ -18,6 +18,7 @@
 		119769D01AB3589800048EE1 /* ios_ipad.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 119769CB1AB3589800048EE1 /* ios_ipad.cfg */; };
 		119769D11AB3589800048EE1 /* ios_iphone.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 119769CC1AB3589800048EE1 /* ios_iphone.cfg */; };
 		119769D21AB3589800048EE1 /* speech.vox in Resources */ = {isa = PBXBuildFile; fileRef = 119769CD1AB3589800048EE1 /* speech.vox */; };
+		14C1722E307FC679001B1A15 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 14C1722D307FC679001B1A15 /* SceneDelegate.m */; };
 		14DEB12A30797D9D00C2DAC2 /* scriptuserobject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 14DEB12930797D9D00C2DAC2 /* scriptuserobject.cpp */; };
 		14DEB13930797DF000C2DAC2 /* gfxfilter_ogl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 14DEB13730797DF000C2DAC2 /* gfxfilter_ogl.cpp */; };
 		14DEB13A30797DF000C2DAC2 /* gfxdriverfactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 14DEB13230797DF000C2DAC2 /* gfxdriverfactory.cpp */; };
@@ -365,6 +366,8 @@
 		119769CB1AB3589800048EE1 /* ios_ipad.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios_ipad.cfg; path = game/ios_ipad.cfg; sourceTree = "<group>"; };
 		119769CC1AB3589800048EE1 /* ios_iphone.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios_iphone.cfg; path = game/ios_iphone.cfg; sourceTree = "<group>"; };
 		119769CD1AB3589800048EE1 /* speech.vox */ = {isa = PBXFileReference; lastKnownFileType = file; name = speech.vox; path = game/speech.vox; sourceTree = "<group>"; };
+		14C1722C307FC679001B1A15 /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
+		14C1722D307FC679001B1A15 /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
 		14DEB12830797D9D00C2DAC2 /* scriptuserobject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = scriptuserobject.h; sourceTree = "<group>"; };
 		14DEB12930797D9D00C2DAC2 /* scriptuserobject.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = scriptuserobject.cpp; sourceTree = "<group>"; };
 		14DEB12B30797DF000C2DAC2 /* ali3dexception.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ali3dexception.h; sourceTree = "<group>"; };
@@ -1105,6 +1108,8 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				14C1722C307FC679001B1A15 /* SceneDelegate.h */,
+				14C1722D307FC679001B1A15 /* SceneDelegate.m */,
 				119398591AD6D0AE00F4E6E9 /* agsAppDelegate.h */,
 				1193985A1AD6D0AE00F4E6E9 /* agsAppDelegate.mm */,
 				1193985B1AD6D0AE00F4E6E9 /* agsViewController.h */,
@@ -2474,6 +2479,7 @@
 				60CA3A9A160713D300CFB3BD /* alignedstream.cpp in Sources */,
 				60CA3A9C160713D300CFB3BD /* compress.cpp in Sources */,
 				60CA3A9D160713D300CFB3BD /* datastream.cpp in Sources */,
+				14C1722E307FC679001B1A15 /* SceneDelegate.m in Sources */,
 				60CA3A9E160713D300CFB3BD /* file.cpp in Sources */,
 				60CA3A9F160713D300CFB3BD /* filestream.cpp in Sources */,
 				60CA3AA0160713D300CFB3BD /* lzw.cpp in Sources */,
@@ -2763,7 +2769,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2.1.1;
+				CURRENT_PROJECT_VERSION = 2.1.2;
 				DEVELOPMENT_TEAM = 69P49K3LPW;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -2803,7 +2809,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = YES;
-				CURRENT_PROJECT_VERSION = 2.1.1;
+				CURRENT_PROJECT_VERSION = 2.1.2;
 				DEVELOPMENT_TEAM = 69P49K3LPW;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = BlackwellConvergence_Prefix.pch;
